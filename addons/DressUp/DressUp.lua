@@ -1,4 +1,4 @@
--- Copyright (c) 2013, Cairthenn
+-- Copyright © 2013-2015, Cairthenn
 -- All rights reserved.
 
 -- Redistribution and use in source and binary forms, with or without
@@ -72,118 +72,106 @@ end)
 model_names = S{"Face","Race","Head","Body","Hands","Legs","Feet","Main","Sub","Ranged"}
 
 windower.register_event('incoming chunk',function (id, data)
-    if id == 0x0a then
-        if not _char then return end
-        local _ignore = data:sub(1,68)
-        local self = packets.parse('incoming', data)
-        local _end = data:sub(87)
-        
-        for k,v in pairs(self) do
-            if model_names:contains(k) and v ~= 0 then
-                if settings[_char][k:lower()] then
-                    self[k] = Int2LE(settings[_char][k:lower()],k)
-                elseif table.containskey(settings.replacements[k:lower()],tostring(v)) then
-                    self[k] = Int2LE(settings.replacements[k:lower()][tostring(v)],k)
-                else
-                    self[k] = Int2LE(v,k)
-                end
-            end
-        end  
-            
-        return  _ignore..self["Face"]..self["Race"]..self["Head"]..self["Body"]..self["Hands"]..
-                      self["Legs"]..self["Feet"]..self["Main"]..self["Sub"]..self["Ranged"].._end
-    
-    elseif id == 0x51 then
-        if not _char then return end
-        
-        local _ignore = data:sub(1,4)
-        local self = packets.parse('incoming', data)
-        local _end = data:sub(23)
-        
-        for k,v in pairs(self) do
-            if model_names:contains(k) and v ~= 0 then
-                if settings[_char][k:lower()] then
-                    self[k] = Int2LE(settings[_char][k:lower()],k)
-                elseif table.containskey(settings.replacements[k:lower()],tostring(v)) then
-                    self[k] = Int2LE(settings.replacements[k:lower()][tostring(v)],k)
-                else
-                    self[k] = Int2LE(v,k)
-                end
-            end
+    if id ~= 0x00A and id ~= 0x00D and id ~= 0x051 then
+        return
+    end
+
+    local packet = packets.parse('incoming', data)
+
+    local name
+    local blink_type = "others"
+    local character
+
+    -- Preprocessing based on packet
+    if id == 0x00A or id == 0x00D then
+        if not _char then
+            return
         end
-            
-        local blink_type = windower.ffxi.get_player().autorun and "follow" or "self"
-        block = blink_logic(blink_type,windower.ffxi.get_player().index)
-        
-        -- Model ID 0xFFFF in ranged slot signifies a monster. This prevents undesired results.
-        if self["Ranged"] ~= string.char(0xFF,0xFF) then
-            return block or _ignore..self["Face"]..self["Race"]..self["Head"]..self["Body"]..self["Hands"]..
-                      self["Legs"]..self["Feet"]..self["Main"]..self["Sub"]..self["Ranged"].._end
-        end
-    elseif id == 0x00d then
-                       
-            local _ignore = data:sub(1,68)
-            local pc = packets.parse('incoming', data)
-            local _end = data:sub(87)
-            
-            local _Index = data:byte(9) + 256*data:byte(10)
-            local character = windower.ffxi.get_mob_by_index(_Index)
-            local blink_type = "others"
-            local block = false
-            local return_packet = false
-            -- Name is used to check for custom model settings, blink_type is similar but passes arguments to blink logic.
-            
-            if character then
-                if windower.ffxi.get_player().follow_index == character.index then
-                    blink_type = "follow"
-                elseif character.in_alliance then
-                    blink_type = "party"
-                else
-                    blink_type = "others"
-                end
-                
-                if character.name == windower.ffxi.get_player().name then
-                    name = _char
-                    blink_type = "self"
-                elseif settings[character.name:lower()] then
-                    name = character.name:lower()
-                else
-                    name = "others"
-                end
+
+        name = _char
+
+    elseif id == 0x00D then
+        character = windower.ffxi.get_mob_by_index(packet['Index'])
+
+        if character then
+            if windower.ffxi.get_player().follow_index == character.index then
+                blink_type = "follow"
+            elseif character.in_alliance then
+                blink_type = "party"
+            else
+                blink_type = "others"
+            end
+
+            if character.name == windower.ffxi.get_player().name then
+                name = _char
+                blink_type = "self"
+            elseif settings[character.name:lower()] then
+                name = character.name:lower()
             else
                 name = "others"
             end
-            
-            for k,v in pairs(pc) do
-                if S{"Face","Race","Head","Body","Hands","Legs","Feet","Main","Sub","Ranged"}:contains(k) and v ~= 0 then
-                    if settings[name][k:lower()] then
-                        pc[k] = Int2LE(settings[name][k:lower()],k)
-                        return_packet = true
-                    elseif table.containskey(settings.replacements[k:lower()],tostring(v)) then
-                        pc[k] = Int2LE(settings.replacements[k:lower()][tostring(v)],k)
-                        return_packet = true
-                    else
-                        pc[k] = Int2LE(v,k)
-                    end
-                end
-            end    
-            
-            --Begin blinking region
-            
-            if character then
-                if model_mask:contains(data:byte(11)) then
-                    block = blink_logic(blink_type,character.index)
-                    if block == true then return_packet = true end
+        else
+            name = "others"
+        end
+    end
+
+    for k, v in pairs(packet) do
+        if model_names:contains(k) and v ~= 0 then
+            if settings[name][k:lower()] then
+                packet[k] = settings[name][k:lower()]
+            elseif table.containskey(settings.replacements[k:lower()], tostring(v)) then
+                packet[k] = settings.replacements[k:lower()][tostring(v)]
+            else
+                packet[k] = v
+            end
+        end
+    end  
+
+    -- Postprocessing based on packet
+    if id == 0x00A then
+        return packets.build(packet)
+
+    elseif id == 0x51 then
+        blink_type = windower.ffxi.get_player().autorun and "follow" or "packet"
+        local block = blink_logic(blink_type, windower.ffxi.get_player().index)
+
+        -- Model ID 0xFFFF in ranged slot signifies a monster. This prevents undesired results.
+        if packet["Ranged"] ~= string.char(0xFF,0xFF) then
+            return block or packets.build(packet)
+        end
+
+    elseif id == 0x00d then
+        local block = false
+        local return_packet = false
+        -- Name is used to check for custom model settings, blink_type is similar but passes arguments to blink logic.
+
+        for k, v in pairs(packet) do
+            if model_names:contains(k) and v ~= 0 then
+                if settings[name][k:lower()] then
+                    return_packet = true
+                elseif table.containskey(settings.replacements[k:lower()], tostring(v)) then
+                    return_packet = true
                 end
             end
-            
-            --End blinking region
-            
-            -- Prevents superfluous returning of the PC Update packet by only doing so if the requirements are flagged
-            if return_packet and pc["Ranged"] ~= string.char(0xFF,0xFF) then
-                return block or _ignore..pc["Face"]..pc["Race"]..pc["Head"]..pc["Body"]..pc["Hands"]..
-                       pc["Legs"]..pc["Feet"]..pc["Main"]..pc["Sub"]..pc["Ranged"].._end
+        end
+
+        --Begin blinking region
+
+        if character then
+            if model_mask:contains(data:byte(11)) then
+                block = blink_logic(blink_type,character.index)
+                if block then
+                    return_packet = true
+                end
             end
+        end
+
+        --End blinking region
+
+        -- Prevents superfluous returning of the PC Update packet by only doing so if the requirements are flagged
+        if return_packet and packet["Ranged"] ~= string.char(0xFF,0xFF) then
+            return block or packets.build(packet)
+        end
     end
 end)
 

@@ -1,4 +1,4 @@
--- Copyright (c) 2013, Cairthenn
+-- Copyright © 2013-2014, Cairthenn
 -- All rights reserved.
 
 -- Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
 function get_item_id(str,slot)
     local item_result = false
     
-    if T{"none"}:contains(str) then
+    if str == "none" then
         return "None"
     else
     
@@ -45,7 +45,7 @@ function get_item_id(str,slot)
 end
 
 function update_model(index)
-    windower.packets.inject_outgoing(0x16,string.char(0,0,0,0)..Int2LE(index,2)..string.char(0,0))
+    packets.inject(packets.new('outgoing', 0x016, { ['Target Index'] = index }))
 end
 
 function load_profile(name)
@@ -91,28 +91,6 @@ function blink_logic(blink_type,index)
     end
     
     return false
-end
-
-function Int2LE(num,number_of_bytes)
-    local these_bytes = ''
-
-    num = num or 0
-
-    if S{"Race","Face"}:contains(number_of_bytes) then
-        number_of_bytes = 1
-    elseif S{"Head","Body","Hands","Legs","Feet","Sub","Main","Ranged"}:contains(number_of_bytes) then
-        number_of_bytes = 2
-    else
-        number_of_bytes = number_of_bytes or 4
-    end
-
-
-    for i=1,number_of_bytes do
-        these_bytes = these_bytes..string.char(num%256)
-        num = math.floor(num/256)
-    end
-
-    return these_bytes
 end
 
 function print_blink_settings(option)
