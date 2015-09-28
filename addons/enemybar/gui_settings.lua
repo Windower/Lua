@@ -265,6 +265,8 @@ config.register(settings, function(settings_table)
     
     stbg_cap_l:pos(stbg_cap_l:pos_x() + 399, 65)
     stbg_cap_r:pos(stbg_cap_r:pos_x() + subtargetBarWidth + 1, 65)
+    stfg_body:pos(stfg_body:pos_x() + 400, 65)
+    stbg_body:pos(stbg_body:pos_x() + 400, 65)
     st_text:pos(st_text:pos_x() + 400, 65)
 end)
 

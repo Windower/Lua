@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'enemybar'
 _addon.author = 'mmckee'
-_addon.version = '1.0.1'
+_addon.version = '1.0.2'
 _addon.language = 'English'
 
 config = require('config')
@@ -47,3 +47,8 @@ end)
 windower.register_event('prerender', render_target_bar)
 windower.register_event('prerender', render_subtarget_bar)
 windower.register_event('target change', target_change)
+
+windower.register_event('logout', function(...)
+    -- This is a super cheap fix, but it works. 
+    windower.send_command("input //lua r enemybar");        
+end)
