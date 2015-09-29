@@ -169,7 +169,7 @@ next_sequence_offset   = 0
 item_names             = T{}
 global_storages        = T{}
 storages_path          = 'data/storages.json'
-storages_order_tokens  = L{'temporary', 'inventory', 'wardrobe', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case'}
+storages_order_tokens  = L{'temporary', 'inventory', 'wardrobe', 'safe', 'safe 2', 'storage', 'locker', 'satchel', 'sack', 'case'}
 -- This is to maintain sorting order. I don't know why this was done, but omitting this will sort the bags arbitrarily, which (I guess) was not intended
 storages_order         = S(res.bags:map(string.gsub-{' ', ''} .. string.lower .. table.get-{'english'})):sort(function(name1, name2)
     local index1 = storages_order_tokens:find(name1)
