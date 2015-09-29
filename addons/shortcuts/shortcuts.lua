@@ -244,7 +244,7 @@ function command_logic(original,modified)
         -- If the command is legitimate and requires target completion but not ability interpretation
         
         if command2_list[command]==true then -- If there are not any excluded secondary commands
-            local temptarg = valid_target(potential_targ) or target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true}) -- Complete the target or make one.
+            local temptarg = valid_target(potential_targ) or target_make(command2_targets[command] or {['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true}) -- Complete the target or make one.
             if temptarg ~= '<me>' then -- These commands, like emotes, check, etc., don't need to default to <me>
                 lastsent = '/'..command..' '..temptarg -- Push the command and target together and send it out.
             else

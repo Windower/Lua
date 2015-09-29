@@ -53,12 +53,13 @@ command2_list = {['kick']=true,['assist']=true,['alliancecmd']=T{'kick','add','l
 	['joy']=T{'motion'},['kneel']=T{'motion'},['laugh']=T{'motion'},['muted']=T{'motion'},['kneel']=T{'motion'},['laugh']=T{'motion'},['no']=T{'motion'},['nod']=T{'motion'},['yes']=T{'motion'},
 	['panic']=T{'motion'},['point']=T{'motion'},['praise']=T{'motion'},['psych']=T{'motion'},['salute']=T{'motion'},['shocked']=T{'motion'},['sigh']=T{'motion'},['sit']=T{'motion'},['slap']=T{'motion'},
 	['smile']=T{'motion'},['stagger']=T{'motion'},['stare']=T{'motion'},['sulk']=T{'motion'},['surprised']=T{'motion'},['think']=T{'motion'},['toss']=T{'motion'},['upset']=T{'motion'},['welcome']=T{'motion'},
-	['check']=true,['c']=true,['checkparam']=true,['breaklinkshell']=true,['target']=true,['ta']=true,['ra']=true,['targetnpc']=true,['follow']=true}
+	['check']=true,['c']=true,['checkparam']=true,['breaklinkshell']=true,['target']=true,['ta']=true,['ra']=true,['targetnpc']=true,['targetbnpc']=true,['follow']=true,['recruit']=true,['rec']=true}
 	
+command2_targets = {['checkparam']={['Player']=false,['Enemy']=false,['Party']=false,['Ally']=false,['NPC']=false,['Self']=true,['Corpse']=false}}
 unhandled_list = {['p']=true,['s']=true,['sh']=true,['yell']=true,['echo']=true,['t']=true,['l']=true}
 
 -- List of commands to be ignored
-ignore_list = {['equip']=true,['raw']=true,['fish']=true,['dig']=true,['range']=true,['map']=true,['hide']=true,['attackoff']=true,['quest']=true}
+ignore_list = {['equip']=true,['raw']=true,['fish']=true,['dig']=true,['range']=true,['map']=true,['hide']=true,['attackoff']=true,['quest']=true,['recruitlist']=true,['rlist']=true,['statustimer']=true}
 
 -- Targets to ignore and just pass through
 pass_through_targs = T{'<t>','<me>','<ft>','<scan>','<bt>','<lastst>','<r>','<pet>','<p0>','<p1>','<p2>','<p3>','<p4>',
