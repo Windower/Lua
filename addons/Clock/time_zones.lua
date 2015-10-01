@@ -15,8 +15,8 @@ return {
     AMT     = -04.00, -- Amazon Time (Brazil)[2]
     AMT2    = +04.00, -- Armenia Time
     ART     = -03.00, -- Argentina Time
-    AST     = +03.00, -- Arabia Standard Time
-    AST2    = -04.00, -- Atlantic Standard Time
+    AST     = -04.00, -- Atlantic Standard Time
+    AST2    = +03.00, -- Arabia Standard Time
     AWDT    = +09.00, -- Australian Western Daylight Time
     AWST    = +08.00, -- Australian Western Standard Time
     AZOST   = -01.00, -- Azores Standard Time
@@ -26,8 +26,8 @@ return {
     BIT     = -12.00, -- Baker Island Time
     BOT     = -04.00, -- Bolivia Time
     BRT     = -03.00, -- Brasilia Time
-    BST     = +06.00, -- Bangladesh Standard Time
-    BST2    = +01.00, -- British Summer Time (British Standard Time from Feb 1968 to Oct 1971)
+    BST     = +01.00, -- British Summer Time (British Standard Time from Feb 1968 to Oct 1971)
+    BST2    = +06.00, -- Bangladesh Standard Time
     BTT     = +06.00, -- Bhutan Time
     CAT     = +02.00, -- Central Africa Time
     CCT     = +06.50, -- Cocos Islands Time
@@ -49,10 +49,10 @@ return {
     COST    = -04.00, -- Colombia Summer Time
     COT     = -05.00, -- Colombia Time
     CST     = -06.00, -- Central Standard Time (North America)
-    CST2    = +08.00, -- China Standard Time
-    CST3    = +09.50, -- Central Standard Time (Australia)
-    CST3    = +10.50, -- Central Summer Time (Australia)
-    CST4    = -05.00, -- Cuba Standard Time
+    CST2    = -05.00, -- Cuba Standard Time
+    CST3    = +08.00, -- China Standard Time
+    CST4    = +09.50, -- Central Standard Time (Australia)
+    CST5    = +10.50, -- Central Summer Time (Australia)
     CT      = +08.00, -- China time
     CVT     = -01.00, -- Cape Verde Time
     CWST    = +08.75, -- Central Western Standard Time (Australia) unofficial
@@ -91,7 +91,7 @@ return {
     GST2    = +04.00, -- Gulf Standard Time
     GYT     = -04.00, -- Guyana Time
     HADT    = -09.00, -- Hawaii-Aleutian Daylight Time
-    HAEC    = +02.00, -- Heure Avancée d'Europe Centrale francised name for CEST
+    HAEC    = +02.00, -- Heure Avancï¿½e d'Europe Centrale francised name for CEST
     HAST    = -10.00, -- Hawaii-Aleutian Standard Time
     HKT     = +08.00, -- Hong Kong Time
     HMT     = +05.00, -- Heard and McDonald Islands Time
@@ -103,9 +103,9 @@ return {
     IRDT    = +04.50, -- Iran Daylight Time
     IRKT    = +08.00, -- Irkutsk Time
     IRST    = +03.50, -- Iran Standard Time
-    IST     = +05.50, -- Indian Standard Time
-    IST2    = +01.00, -- Irish Standard Time[5]
-    IST3    = +02.00, -- Israel Standard Time
+    IST     = +01.00, -- Irish Standard Time[5]
+    IST2    = +02.00, -- Israel Standard Time
+    IST3    = +05.50, -- Indian Standard Time
     JST     = +09.00, -- Japan Standard Time
     KGT     = +06.00, -- Kyrgyzstan time
     KOST    = +11.00, -- Kosrae Time
@@ -125,9 +125,9 @@ return {
     MIT     = -09.50, -- Marquesas Islands Time
     MMT     = +06.50, -- Myanmar Time
     MSK     = +03.00, -- Moscow Time
-    MST2    = +08.00, -- Malaysia Standard Time
-    MST2    = -07.00, -- Mountain Standard Time (North America)
+    MST     = -07.00, -- Mountain Standard Time (North America)
     MST2    = +06.50, -- Myanmar Standard Time
+    MST3    = +08.00, -- Malaysia Standard Time
     MUT     = +04.00, -- Mauritius Time
     MVT     = +05.00, -- Maldives Time
     MYT     = +08.00, -- Malaysia Time
@@ -155,7 +155,7 @@ return {
     PST2    = +08.00, -- Philippine Standard Time
     PYST    = -03.00, -- Paraguay Summer Time (South America)[6]
     PYT     = -04.00, -- Paraguay Time (South America)[7]
-    RET     = +04.00, -- Réunion Time
+    RET     = +04.00, -- Rï¿½union Time
     ROTT    = -03.00, -- Rothera Research Station Time
     SAKT    = +11.00, -- Sakhalin Island time
     SAMT    = +04.00, -- Samara Time
@@ -202,7 +202,7 @@ return {
 }
 
 --[[
-Copyright © 2015, Windower
+Copyright ï¿½ 2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

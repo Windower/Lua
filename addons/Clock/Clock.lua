@@ -18,12 +18,13 @@ end
 
 local tz_format = {}
 for tz in time_zones:keyset():it() do
-    tz_format[tz:lower()] = tz:gsub('%d', '')
+    tz_format[tz:upper()] = tz:gsub('%d', '')
 end
 
 defaults = {}
 defaults.Format = '%H:%M:%S'
 defaults.TimeZones = L{'UTC', 'JST'}
+defaults.Display = T{}
 defaults.ShowTimeZones = true
 defaults.Separator = '\\n'
 defaults.Sort = 'None'
@@ -45,11 +46,12 @@ sort = T{
 redraw = function()
     local sorted = settings.Sort ~= 'None' and settings.TimeZones:sort(sort[settings.Sort:lower()]) or settings.TimeZones
     local width = settings.TimeZones:reduce(function(acc, tz)
-        return math.max(acc, #tz)
+        return math.max(acc, #(settings.Display[tz] or tz_format[tz]))
     end, 0)
     local format_string = settings.ShowTimeZones and '%s%s: ${%s}' or '${%s}'
     local strings = sorted:map(function(tz)
-        return format_string:format(' ':rep(width - #tz), tz_format[tz:lower()], tz:lower())
+        local display = settings.Display[tz] or tz_format[tz]
+        return format_string:format(display, ' ':rep(width - #display), tz)
     end)
 
     -- Use loadstring to let Lua interpret things like \n for us
@@ -66,7 +68,7 @@ windower.register_event('prerender', function()
     local utc_now = os.time() - utc_diff
     for var in clock:it() do
         if tz_format[var] then
-            clock[var] = os.date(settings.Format, utc_now + time_zones[tz_format[var]])
+            clock[var] = os.date(settings.Format, utc_now + time_zones[var])
         end
     end
 end)
@@ -96,19 +98,19 @@ windower.register_event('addon command', function(command, ...)
         end
 
         while args[1] do
-            local tz = tz_format[args[1]]
+            local arg = args:remove(1):upper()
+            local tz = tz_format[arg]
             if not tz then
                 error('Unknown time zone identifier: %s':format(args[1]))
                 return
             end
 
-            if settings.TimeZones:contains(tz) then
+            if settings.TimeZones:contains(arg) then
                 notice('Time zone "%s" is already being displayed.':format(tz))
                 return
             end
 
-            settings.TimeZones:append(tz)
-            args:remove(1)
+            settings.TimeZones:append(arg)
         end
 
         config.save(settings)
@@ -121,19 +123,19 @@ windower.register_event('addon command', function(command, ...)
         end
 
         while args[1] do
-            local tz = tz_format[args[1]]
+            local arg = args:remove(1):upper()
+            local tz = tz_format[arg]
             if not tz then
                 error('Unknown time zone identifier: %s':format(args[1]))
                 return
             end
 
-            if not settings.TimeZones:contains(tz) then
+            if not settings.TimeZones:contains(arg) then
                 notice('Time zone "%s" is not being displayed.':format(tz))
                 return
             end
 
-            settings.TimeZones:remove(settings.TimeZones:find(tz))
-            args:remove(1)
+            settings.TimeZones:remove(settings.TimeZones:find(arg))
         end
 
         config.save(settings)
@@ -153,11 +155,28 @@ windower.register_event('addon command', function(command, ...)
         log('Sorting set to: %s':format(settings.Sort:capitalize()))
         redraw()
 
+    elseif command == 'display' or command == 'd' then
+        if not args[1] or not args[2] then
+            error('Invalid syntax: //clock display <timezone> <name>')
+            return
+        end
+
+        local arg = args:remove(1):upper()
+        local tz = tz_format[arg]
+        if not tz then
+            error('Unknown time zone identifier: %s':format(args[1]))
+            return
+        end
+
+        settings.Display[arg] = args:concat(' ')
+        config.save(settings)
+        redraw()
+
     end
 end)
 
 --[[
-Copyright © 2015, Windower
+Copyright ï¿½ 2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
