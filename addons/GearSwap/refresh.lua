@@ -213,7 +213,11 @@ function refresh_player(dt,user_event_flag)
         end
         update_job_names()
         player.status_id = player.status
-        player.status = res.statuses[player.status].english
+        if res.statuses[player.status] then
+            player.status = res.statuses[player.status].english
+        else
+            print(player.status_id)
+        end
         player.nation_id = player.nation
         player.nation = res.regions[player.nation_id][language] or 'None'
     

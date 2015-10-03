@@ -109,7 +109,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
             end
             
             r_line.name = r_line[language]
-            spell = spell_complete(r_line)
+            local spell = spell_complete(r_line)
             spell.target = temp_mob_arr
             spell.action_type = action_type_map[command]
             
@@ -127,7 +127,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
                             command_registry[ts].proposed_packet = assemble_menu_item_packet(spell.target.id,spell.target.index,spell.id)
                         end
                     else
-                        command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id)
+                        command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id,windower.ffxi.get_info().target_arrow)
                     end
                     if command_registry[ts].proposed_packet then
                         equip_sets('precast',ts,spell)
@@ -180,7 +180,7 @@ function inc_action(act)
         prefix = 'pet_'
     end
     
-    spell = get_spell(act)
+    local spell = get_spell(act)
 --    if not spell_res or (spell.english ~= spell_res.english) then print('Did not match.',spell.english,spell_res) end
     
     if spell then logit('\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell[language])..' '..tostring(act.category))
@@ -217,7 +217,6 @@ function inc_action(act)
     -- For some reason avatar Out of Range messages send two packets (Category 4 and Category 7)
     -- Category 4 contains real information, while Category 7 does not.
     -- I do not know if this will affect automatons being interrupted.
-    
     local ts = command_registry:find_by_spell(spell)
     if (jas[act.category] or uses[act.category]) then
         if uses[act.category] and act.param == 28787 then

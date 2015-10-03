@@ -415,7 +415,7 @@ end
 --Returns:
 ---- string - An action packet. First four bytes are dummy bytes.
 -----------------------------------------------------------------------------------
-function assemble_action_packet(target_id,target_index,category,spell_id)
+function assemble_action_packet(target_id,target_index,category,spell_id,arrow_offset)
     local outstr = string.char(0x1A,0x08,0,0)
     outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
     outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
@@ -425,8 +425,9 @@ function assemble_action_packet(target_id,target_index,category,spell_id)
         spell_id = 0
     end
     
-    outstr = outstr..string.char( (spell_id%256), math.floor(spell_id/256)%256)
-    return outstr..(string.char(0):rep(14))
+   
+    outstr = outstr..string.char( (spell_id%256), math.floor(spell_id/256)%256)..string.char(0):rep(14)
+    return outstr
 end
 
 
@@ -747,7 +748,7 @@ function cmd_reg:new_entry(sp)
     while rawget(self,ts) do
         ts = ts+0.001
     end
-    rawset(self,ts,{pretarget_cast_delay=0, precast_cast_delay=0, spell=sp, timestamp=ts})
+    rawset(self,ts,{pretarget_cast_delay=0, precast_cast_delay=0, cancel_spell=false, new_target=false, current_event='nascent', spell=sp, timestamp=ts})
     if debugging.command_registry then
         msg.addon_msg('Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(self[ts])))
     end
@@ -905,17 +906,18 @@ function get_spell(act)
     else
         if not res.action_messages[msg_ID] or msg_ID == 31 then
             if act.category == 4 or act.category == 8 then
-                spell = copy_entry(res.spells[abil_ID])
+                spell = spell_complete(copy_entry(res.spells[abil_ID]))
                 if act.category == 4 and spell then spell.recast = act.recast end
             elseif T{6,13,14,15}:contains(act.category) then
-                spell = copy_entry(res.job_abilities[abil_ID]) -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
+                spell = spell_complete(copy_entry(res.job_abilities[abil_ID])) -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
             elseif T{3,7}:contains(act.category) then
-                spell = copy_entry(res.weapon_skills[abil_ID])
+                spell = spell_complete(copy_entry(res.weapon_skills[abil_ID]))
             elseif T{5,9}:contains(act.category) then
                 spell = copy_entry(res.items[abil_ID])
             else
                 spell = {name=tostring(msg_ID)}
             end
+            
             return spell
         end
         

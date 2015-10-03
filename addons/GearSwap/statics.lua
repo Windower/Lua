@@ -204,10 +204,6 @@ _settings = {debug_mode = false, demo_mode = false, show_swaps = false}
 
 _ExtraData = {
         player = {},
-        spell = {},
-        alliance = {},
-        pet = {},
-        fellow = {},
         world = {in_mog_house = false,conquest=false},
     }
 

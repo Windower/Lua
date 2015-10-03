@@ -45,7 +45,7 @@ function equip_sets(swap_type,ts,...)
     local var_inps = {...}
     local val1 = var_inps[1]
     local val2 = var_inps[2]
-    table.reassign(_global,command_registry[ts] or {pretarget_cast_delay = 0,precast_cast_delay=0,cancel_spell = false})
+    table.reassign(_global,command_registry[ts] or {pretarget_cast_delay = 0,precast_cast_delay=0,cancel_spell = false, new_target=false})
     _global.current_event = tostring(swap_type)
     
     windower.debug(tostring(swap_type)..' enter')
@@ -105,8 +105,8 @@ function equip_sets(swap_type,ts,...)
     
     if type(swap_type) == 'string' and (swap_type == 'pretarget' or swap_type == 'filtered_action') then -- Target may just have been changed, so make the ind now.
         ts = command_registry:new_entry(val1)
-    elseif type(swap_type) == 'string' and swap_type == 'precast' and not command_registry[ts] and debugging.command_registry then
-        print_set(spell,'precast nil error')
+--    elseif type(swap_type) == 'string' and swap_type == 'precast' and not command_registry[ts] and debugging.command_registry then
+--        print_set(spell,'precast nil error') -- spell's scope changed to local
     end
     
     if player.race ~= 'Precomposed NPC' then
@@ -191,7 +191,7 @@ function equip_sets_exit(swap_type,ts,val1)
         if swap_type == 'pretarget' then
             
             if command_registry[ts].cancel_spell then
-                msg.debugging("Action canceled ("..storedcommand..' '..spell.target.raw..")")
+                msg.debugging("Action canceled ("..storedcommand..' '..val1.target.raw..")")
                 storedcommand = nil
                 command_registry:delete_entry(ts)
                 return true
@@ -200,7 +200,11 @@ function equip_sets_exit(swap_type,ts,val1)
                 return true
             end
             
-            -- Compose a proposed packet for the given action (this should be possible after precast)
+            if command_registry[ts].new_target then
+                val1.target = command_registry[ts].new_target -- Switch target, if it is requested.
+            end
+            
+            -- Compose a proposed packet for the given action (this should be possible after pretarget)
             command_registry[ts].spell = val1
             if val1.target and val1.target.id and val1.target.index and val1.prefix and unify_prefix[val1.prefix] then
                 if val1.prefix == '/item' then
@@ -217,7 +221,7 @@ function equip_sets_exit(swap_type,ts,val1)
                     end
                 elseif outgoing_action_category_table[unify_prefix[val1.prefix]] then
                     if filter_precast(val1) then
-                        command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id,val1.target.index,outgoing_action_category_table[unify_prefix[val1.prefix]],val1.id)
+                        command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id,val1.target.index,outgoing_action_category_table[unify_prefix[val1.prefix]],val1.id,windower.ffxi.get_info().target_arrow)
                         if not command_registry[ts].proposed_packet then
                             command_registry:delete_entry(ts)
                             
@@ -227,7 +231,7 @@ function equip_sets_exit(swap_type,ts,val1)
                         end
                     end
                 else
-                    msg.debugging(8,"Hark, what weird prefix through yonder window breaks? "..tostring(spell.prefix))
+                    msg.debugging(8,"Hark, what weird prefix through yonder window breaks? "..tostring(val1.prefix))
                 end
             end
             
@@ -238,8 +242,8 @@ function equip_sets_exit(swap_type,ts,val1)
                 elseif not val1.target.name then
                 -- Spells with invalid pass_through_targs, like using <t> without a target
                     command_registry:delete_entry(ts)
-                    msg.debugging("Change target was used to pick an invalid target ("..storedcommand..' '..spell.target.raw..")")
-                    local ret = storedcommand..' '..spell.target.raw
+                    msg.debugging("Change target was used to pick an invalid target ("..storedcommand..' '..val1.target.raw..")")
+                    local ret = storedcommand..' '..val1.target.raw
                     storedcommand = nil
                     return ret
                 else
