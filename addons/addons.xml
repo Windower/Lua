@@ -99,7 +99,7 @@
     <author>Anissa</author>
     <description>Change your blue magic on the fly with this clickable menu.  Sort your spells by traits, buffs, procs, and more.</description>
     <bugtracker>https://github.com/AniAniBobbani/Lua/issues</bugtracker>
-	<support>http://www.ffxiah.com/player/Cerberus/Anissa</support>
+    <support>http://www.ffxiah.com/player/Cerberus/Anissa</support>
   </addon>
   <addon>
     <name>boxdestroyer</name>
