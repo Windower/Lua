@@ -1,0 +1,12 @@
+Release Date: 11:50 PM, 4-06-13.
+Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file.
+Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant.
+Author Comment: If you ever mess it up so that it does not work, you can just delete it and AutoRA will regenerate it upon reload.
+Author Comment: Simply add your ranged weapon delay in the "RA Delay:" line and your ammo delay in the "Ammo Delay:" line in place of the existing numbers.
+Author Comment: The design of the settings file is credited to Byrthnoth as well as the creation of the settings file.
+
+
+
+Fill In Settings Below:
+RA Delay: 288 
+Ammo Delay: 288
