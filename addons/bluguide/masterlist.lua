@@ -55,10 +55,6 @@ local function get_limits()
         points = (math.floor((player.sub_job_level + 9) / 10) * 5) + 5
         slots = (math.floor((player.sub_job_level + 9) / 10) * 2) + 4
         level = player.sub_job_level
-    else
-        magicpoints = 0
-        spelllevel = 0
-        spellslots = 0
     end
         
     local jobpointsspent = 0
