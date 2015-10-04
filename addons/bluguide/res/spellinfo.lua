@@ -1,29 +1,3 @@
---Copyright © 2015, Anissa
---All rights reserved.
-
---Redistribution and use in source and binary forms, with or without
---modification, are permitted provided that the following conditions are met:
-
---    * Redistributions of source code must retain the above copyright
---      notice, this list of conditions and the following disclaimer.
---    * Redistributions in binary form must reproduce the above copyright
---      notice, this list of conditions and the following disclaimer in the
---      documentation and/or other materials provided with the distribution.
---    * Neither the name of bluGuide nor the
---      names of its contributors may be used to endorse or promote products
---      derived from this software without specific prior written permission.
-
---THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
---ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
---WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
---DISCLAIMED. IN NO EVENT SHALL ANISSA BE LIABLE FOR ANY
---DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
---(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
---LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
---ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
---(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
---SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
 return {
 [584] = { name = "Sheep Song", id = 584, level = 16, cost = 2, element = 6, effect = { ["Sleep"] = true, }, },
 [616] = { name = "Temporal Shift", id = 616, level = 73, cost = 5, element = 4, effect = { ["Stun"] = true, }, Voidwatch = true, },
@@ -38,7 +12,7 @@ return {
 [522] = { name = "Death Ray", id = 522, level = 34, cost = 2, element = 7, effect = {}, Voidwatch = true, Nuke = true },
 [554] = { name = "Death Scissors", id = 554, level = 60, cost = 5, element = 15, effect = {}, SCA = "Compression", SCB = "Reverberation"},
 [618] = { name = "Blastbomb", id = 618, level = 18, cost = 2, element = 0, effect = { ["Bind"] = true, }, Voidwatch = true, Nuke = true },
-[650] = { name = "Seedspray", id = 650, level = 61, cost = 4, element = 15, effect = { ["Defense Down"] = true, }, SCA = "Induration", SCB = "Detonation", error = true},
+[650] = { name = "Seedspray", id = 650, level = 61, cost = 4, element = 15, effect = { ["Defense Down"] = true, }, SCA = "Induration", SCB = "Detonation", },
 [682] = { name = "Delta Thrust", id = 682, level = 89, cost = 2, element = 15, effect = { ["Plague"] = true, }, SCA = "Liquifaction", SCB = "Detonation"},
 [714] = { name = "Sinker Drill", id = 714, level = 99, cost = 6, element = 15, effect = {}, SCA = "Gravitation", SCB = "Reverberation"},
 [555] = { name = "Magnetite Cloud", id = 555, level = 46, cost = 3, element = 3, effect = { ["Gravity"] = true, }, Voidwatch = true, Abyssea = true, Nuke = true },
@@ -75,11 +49,11 @@ return {
 [720] = { name = "Spectral Floe", id = 720, level = 99, cost = 8, element = 1, effect = { ["Terror"] = true, }, Nuke = true },
 [529] = { name = "Bludgeon", id = 529, level = 18, cost = 2, element = 15, effect = {}, SCA = "Liquifaction"},
 [561] = { name = "Frightful Roar", id = 561, level = 50, cost = 3, element = 2, effect = { ["Defense Down"] = true, }, },
-[593] = { name = "Magic Fruit", id = 593, level = 58, cost = 3, element = 6, effect = { ["Cure"] = true, }, error = true},
+[593] = { name = "Magic Fruit", id = 593, level = 58, cost = 3, element = 6, effect = { ["Cure"] = true, }, },
 [657] = { name = "Blazing Bound", id = 657, level = 80, cost = 3, element = 0, effect = {}, Nuke = true },
 [689] = { name = "Dark Orb", id = 689, level = 93, cost = 3, element = 7, effect = {}, Nuke = true },
 [721] = { name = "Anvil Lightning", id = 721, level = 99, cost = 8, element = 4, effect = { ["Stun"] = true, }, Nuke = true },
-[530] = { name = "Refueling", id = 530, level = 48, cost = 4, element = 2, effect = { ["Haste"] = true, }, error = true},
+[530] = { name = "Refueling", id = 530, level = 48, cost = 4, element = 2, effect = { ["Haste"] = true, }, },
 [594] = { name = "Uppercut", id = 594, level = 38, cost = 3, element = 15, effect = {}, SCA = "Liquifaction"},
 [626] = { name = "Bomb Toss", id = 626, level = 28, cost = 3, element = 0, effect = {}, Nuke = true },
 [658] = { name = "Plenilune Embrace", id = 658, level = 76, cost = 4, element = 6, effect = { ["Cure"] = true, }, },
@@ -117,7 +91,7 @@ return {
 [695] = { name = "Thunder Breath", id = 695, level = 97, cost = 4, element = 4, effect = {}, Nuke = true },
 [727] = { name = "Silent Storm", id = 727, level = 99, cost = 8, element = 2, effect = { ["Silence"] = true, }, Nuke = true },
 [536] = { name = "Poison Breath", id = 536, level = 22, cost = 1, element = 5, effect = { ["Poison"] = true, }, Nuke = true },
-[632] = { name = "Diamondhide", id = 632, level = 67, cost = 3, element = 3, effect = { ["Stoneskin"] = true, }, error = true},
+[632] = { name = "Diamondhide", id = 632, level = 67, cost = 3, element = 3, effect = { ["Stoneskin"] = true, }, },
 [664] = { name = "Regeneration", id = 664, level = 78, cost = 2, element = 6, effect = { ["Regen"] = true, }, },
 [696] = { name = "O. Counterstance", id = 696, level = 98, cost = 5, element = 0, effect = { ["Counter"] = true, }, },
 [728] = { name = "Tenebral Crush", id = 728, level = 99, cost = 8, element = 7, effect = { ["Defense Down"] = true, }, Nuke = true },
@@ -126,7 +100,7 @@ return {
 [633] = { name = "Enervation", id = 633, level = 67, cost = 5, element = 7, effect = { ["Defense Down"] = true, ["Magic Defense Down"] = true, }, },
 [665] = { name = "Final Sting", id = 665, level = 81, cost = 1, element = 15, effect = {}, SCA = "Fusion"},
 [697] = { name = "Amorphic Spikes", id = 697, level = 98, cost = 4, element = 15, effect = {}, SCA = "Gravitation", SCB = "Transfixion"},
-[538] = { name = "Memento Mori", id = 538, level = 62, cost = 4, element = 1, effect = { ["Magic Attack Boost"] = true, }, error = true},
+[538] = { name = "Memento Mori", id = 538, level = 62, cost = 4, element = 1, effect = { ["Magic Attack Boost"] = true, }, },
 [570] = { name = "Blood Drain", id = 570, level = 20, cost = 2, element = 7, effect = { ["Drain"] = true, }, Nuke = true },
 [634] = { name = "Light of Penance", id = 634, level = 58, cost = 5, element = 6, effect = { ["Blind"] = true, ["Bind"] = true, ["Reduce TP"] = true, }, Voidwatch = true, },
 [666] = { name = "Goblin Rush", id = 666, level = 81, cost = 3, element = 15, effect = {}, SCA = "Fusion"},
@@ -138,7 +112,7 @@ return {
 [540] = { name = "Spinal Cleave", id = 540, level = 63, cost = 4, element = 15, effect = {}, SCA = "Scission", SCB = "Detonation"},
 [572] = { name = "Sound Blast", id = 572, level = 32, cost = 1, element = 0, effect = { ["Int Down"] = true, }, },
 [604] = { name = "Bad Breath", id = 604, level = 61, cost = 5, element = 3, effect = { ["Poison"] = true, ["Blind"] = true, ["Silence"] = true, ["Slow"] = true, ["Paralyze"] = true, ["Bind"] = true, ["Gravity"] = true, }, Voidwatch = true, },
-[636] = { name = "Warm-Up", id = 636, level = 68, cost = 4, element = 3, effect = { ["Accuracy Boost"] = true, ["Evasion Boost"] = true, }, error = true},
+[636] = { name = "Warm-Up", id = 636, level = 68, cost = 4, element = 3, effect = { ["Accuracy Boost"] = true, ["Evasion Boost"] = true, }, },
 [668] = { name = "Magic Barrier", id = 668, level = 82, cost = 3, element = 7, effect = { ["Stoneskin"] = true, }, },
 [700] = { name = "Nat. Meditation", id = 700, level = 99, cost = 6, element = 0, effect = { ["Attack Boost"] = true, }, },
 [541] = { name = "Blood Saber", id = 541, level = 48, cost = 2, element = 7, effect = { ["Drain"] = true, }, Nuke = true },
@@ -148,7 +122,7 @@ return {
 [669] = { name = "Whirl of Rage", id = 669, level = 83, cost = 2, element = 15, effect = { ["Stun"] = true, }, SCA = "Scission", SCB = "Detonation"},
 [701] = { name = "Tem. Upheaval", id = 701, level = 99, cost = 6, element = 2, effect = {}, Nuke = true },
 [542] = { name = "Digest", id = 542, level = 36, cost = 2, element = 7, effect = { ["Drain"] = true, }, Nuke = true },
-[574] = { name = "Feather Barrier", id = 574, level = 56, cost = 2, element = 2, effect = { ["Evasion Boost"] = true, }, error = true},
+[574] = { name = "Feather Barrier", id = 574, level = 56, cost = 2, element = 2, effect = { ["Evasion Boost"] = true, }, },
 [606] = { name = "Awful Eye", id = 606, level = 46, cost = 2, element = 5, effect = { ["Str Down"] = true, }, },
 [638] = { name = "Feather Storm", id = 638, level = 12, cost = 3, element = 15, effect = { ["Poison"] = true, }, SCA = "Transfixion"},
 [670] = { name = "Benthic Typhoon", id = 670, level = 83, cost = 4, element = 15, effect = { ["Defense Down"] = true, }, SCA = "Gravitation", SCB = "Transfixion"},
@@ -169,13 +143,13 @@ return {
 [641] = { name = "Hysteric Barrage", id = 641, level = 69, cost = 5, element = 15, effect = {}, SCA = "Detonation"},
 [673] = { name = "Quad. Continuum", id = 673, level = 85, cost = 4, element = 15, effect = {}, SCA = "Gravitation"},
 [705] = { name = "Foul Waters", id = 705, level = 99, cost = 3, element = 5, effect = { ["Drown"] = true, }, Nuke = true },
-[578] = { name = "Wild Carrot", id = 578, level = 30, cost = 3, element = 6, effect = { ["Cure"] = true, }, error = true},
+[578] = { name = "Wild Carrot", id = 578, level = 30, cost = 3, element = 6, effect = { ["Cure"] = true, }, },
 [610] = { name = "Infrasonics", id = 610, level = 65, cost = 4, element = 1, effect = { ["Evasion Down"] = true, }, Voidwatch = true, },
-[642] = { name = "Amplification", id = 642, level = 70, cost = 3, element = 5, effect = { ["Magic Attack Boost"] = true, }, error = true},
+[642] = { name = "Amplification", id = 642, level = 70, cost = 3, element = 5, effect = { ["Magic Attack Boost"] = true, }, },
 [674] = { name = "Fantod", id = 674, level = 85, cost = 1, element = 0, effect = { ["Attack Boost"] = true, }, },
 [706] = { name = "Glutinous Dart", id = 706, level = 99, cost = 2, element = 15, effect = {}, SCA = "Fragmentation"},
 [515] = { name = "Maelstrom", id = 515, level = 61, cost = 5, element = 5, effect = { ["Str Down"] = true, }, Voidwatch = true, Abyssea = true, Nuke = true },
-[547] = { name = "Cocoon", id = 547, level = 8, cost = 1, element = 3, effect = { ["Defense Boost"] = true, }, error = true},
+[547] = { name = "Cocoon", id = 547, level = 8, cost = 1, element = 3, effect = { ["Defense Boost"] = true, }, },
 [579] = { name = "Voracious Trunk", id = 579, level = 64, cost = 4, element = 2, effect = { ["Dispel"] = true, }, },
 [611] = { name = "Disseverment", id = 611, level = 72, cost = 5, element = 15, effect = { ["Poison"] = true, }, SCA = "Distortion"},
 [643] = { name = "Cannonball", id = 643, level = 70, cost = 3, element = 15, effect = {}, SCA = "Fusion"},
@@ -185,22 +159,48 @@ return {
 [612] = { name = "Actinic Burst", id = 612, level = 74, cost = 4, element = 6, effect = { ["Flash"] = true, }, Voidwatch = true, },
 [644] = { name = "Mind Blast", id = 644, level = 73, cost = 4, element = 4, effect = { ["Paralyze"] = true, }, Voidwatch = true, Abyssea = true, Nuke = true },
 [708] = { name = "Subduction", id = 708, level = 99, cost = 6, element = 2, effect = { ["Gravity"] = true, }, Nuke = true },
-[517] = { name = "Metallic Body", id = 517, level = 8, cost = 1, element = 3, effect = { ["Stoneskin"] = true, }, error = true},
-[549] = { name = "Pollen", id = 549, level = 1, cost = 1, element = 6, effect = { ["Cure"] = true, }, error = true},
-[581] = { name = "Healing Breeze", id = 581, level = 16, cost = 4, element = 2, effect = { ["Cure"] = true, }, error = true},
-[613] = { name = "Reactor Cool", id = 613, level = 74, cost = 5, element = 1, effect = { ["Defense Boost"] = true, ["Spikes"] = true, }, error = true},
+[517] = { name = "Metallic Body", id = 517, level = 8, cost = 1, element = 3, effect = { ["Stoneskin"] = true, }, },
+[549] = { name = "Pollen", id = 549, level = 1, cost = 1, element = 6, effect = { ["Cure"] = true, }, },
+[581] = { name = "Healing Breeze", id = 581, level = 16, cost = 4, element = 2, effect = { ["Cure"] = true, }, },
+[613] = { name = "Reactor Cool", id = 613, level = 74, cost = 5, element = 1, effect = { ["Defense Boost"] = true, ["Spikes"] = true, }, },
 [645] = { name = "Exuviation", id = 645, level = 75, cost = 4, element = 0, effect = { ["Erase"] = true, }, },
 [677] = { name = "Empty Thrash", id = 677, level = 87, cost = 3, element = 15, effect = {}, SCA = "Compression", SCB = "Scission"},
 [709] = { name = "Thrashing Assault", id = 709, level = 99, cost = 7, element = 15, effect = {}, SCA = "Fusion"},
 [582] = { name = "Chaotic Eye", id = 582, level = 32, cost = 2, element = 2, effect = { ["Silence"] = true, }, },
-[614] = { name = "Saline Coat", id = 614, level = 72, cost = 3, element = 6, effect = { ["Magic Defense Boost"] = true, }, error = true},
+[614] = { name = "Saline Coat", id = 614, level = 72, cost = 3, element = 6, effect = { ["Magic Defense Boost"] = true, }, },
 [646] = { name = "Magic Hammer", id = 646, level = 74, cost = 4, element = 6, effect = { ["Aspir"] = true, }, Nuke = true },
 [678] = { name = "Dream Flower", id = 678, level = 87, cost = 3, element = 7, effect = { ["Sleep"] = true, }, },
 [710] = { name = "Erratic Flutter", id = 710, level = 99, cost = 6, element = 2, effect = { ["Haste"] = true, }, },
 [519] = { name = "Screwdriver", id = 519, level = 26, cost = 3, element = 15, effect = {}, SCA = "Transfixion", SCB = "Scission"},
 [551] = { name = "Power Attack", id = 551, level = 4, cost = 1, element = 15, effect = {}, SCA = "Reverberation"},
-[615] = { name = "Plasma Charge", id = 615, level = 75, cost = 5, element = 4, effect = { ["Spikes"] = true, }, error = true},
+[615] = { name = "Plasma Charge", id = 615, level = 75, cost = 5, element = 4, effect = { ["Spikes"] = true, }, },
 [647] = { name = "Zephyr Mantle", id = 647, level = 65, cost = 2, element = 2, effect = { ["Blink"] = true, }, },
 [679] = { name = "Occultation", id = 679, level = 88, cost = 3, element = 2, effect = { ["Blink"] = true, }, },
 [711] = { name = "Restoral", id = 711, level = 99, cost = 7, element = 6, effect = { ["Cure"] = true, }, },
 }
+
+--Copyright © 2015, Anissa
+--All rights reserved.
+
+--Redistribution and use in source and binary forms, with or without
+--modification, are permitted provided that the following conditions are met:
+
+--    * Redistributions of source code must retain the above copyright
+--      notice, this list of conditions and the following disclaimer.
+--    * Redistributions in binary form must reproduce the above copyright
+--      notice, this list of conditions and the following disclaimer in the
+--      documentation and/or other materials provided with the distribution.
+--    * Neither the name of bluGuide nor the
+--      names of its contributors may be used to endorse or promote products
+--      derived from this software without specific prior written permission.
+
+--THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+--ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+--WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+--DISCLAIMED. IN NO EVENT SHALL ANISSA BE LIABLE FOR ANY
+--DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+--(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+--LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+--ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+--(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+--SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
