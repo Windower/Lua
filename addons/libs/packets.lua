@@ -228,6 +228,8 @@ end
 local dummy = {name='Unknown', description='No data available.'}
 
 -- Type identifiers as declared in lpack.c
+-- Windower uses an adjusted set of identifiers
+-- This is marked where applicable
 local pack_ids = {}
 pack_ids['bit']             = 'b'   -- Windower exclusive
 pack_ids['boolbit']         = 'q'   -- Windower exclusive
@@ -257,7 +259,7 @@ local make_pack_string = function(field)
 
     local type_name, number = ctype:match(array_pattern)
     if type_name then
-        number = number
+        number = tonumber(number)
         local pack_id = pack_ids[type_name]
         if pack_id then
             if type_name == 'char' then
