@@ -38,6 +38,7 @@ packets = require('packets')
 
 require('helper_functions')
 require('static_variables')
+
 models = {}
 require('head')
 require('body')
@@ -45,19 +46,17 @@ require('hands')
 require('legs')
 require('feet')
 
+settings = config.load(defaults)
+
 windower.register_event('load','login',function ()
-    settings = config.load(defaults)
-    _char = nil
-    if windower.ffxi.get_player() then
-        _char = windower.ffxi.get_player().name:lower()
-        if not settings[_char] then settings[_char] = {} end
-        print_blink_settings("global")
-        if load_profile(windower.ffxi.get_player().main_job) then
-            notice('Loaded profile: ' .. windower.ffxi.get_player().main_job)
-        end
-        update_model(windower.ffxi.get_player().index)
+    local player = windower.ffxi.get_player()
+    _char = player.name:lower()
+    if not settings[_char] then settings[_char] = {} end
+    print_blink_settings("global")
+    if load_profile(player.main_job) then
+        notice('Loaded profile: ' .. player.main_job)
     end
-    
+    update_model(player.index)
 end)
 
 windower.register_event('logout',function() _char = nil end)
@@ -77,6 +76,7 @@ windower.register_event('incoming chunk',function (id, data)
     end
 
     local packet = packets.parse('incoming', data)
+    local player = windower.ffxi.get_player()
 
     local name
     local blink_type = "others"
@@ -94,7 +94,7 @@ windower.register_event('incoming chunk',function (id, data)
         character = windower.ffxi.get_mob_by_index(packet['Index'])
 
         if character then
-            if windower.ffxi.get_player().follow_index == character.index then
+            if player.follow_index == character.index then
                 blink_type = "follow"
             elseif character.in_alliance then
                 blink_type = "party"
@@ -102,7 +102,7 @@ windower.register_event('incoming chunk',function (id, data)
                 blink_type = "others"
             end
 
-            if character.name == windower.ffxi.get_player().name then
+            if character.name == player.name then
                 name = _char
                 blink_type = "self"
             elseif settings[character.name:lower()] then
@@ -117,7 +117,7 @@ windower.register_event('incoming chunk',function (id, data)
 
     for k, v in pairs(packet) do
         if model_names:contains(k) and v ~= 0 then
-            if settings[name][k:lower()] then
+            if rawget(settings, name) and settings[name][k:lower()] then
                 packet[k] = settings[name][k:lower()]
             elseif table.containskey(settings.replacements[k:lower()], tostring(v)) then
                 packet[k] = settings.replacements[k:lower()][tostring(v)]
@@ -132,8 +132,8 @@ windower.register_event('incoming chunk',function (id, data)
         return packets.build(packet)
 
     elseif id == 0x51 then
-        blink_type = windower.ffxi.get_player().autorun and "follow" or "self"
-        local block = blink_logic(blink_type, windower.ffxi.get_player().index)
+        blink_type = player.autorun and "follow" or "self"
+        local block = blink_logic(blink_type, player.index)
 
         -- Model ID 0xFFFF in ranged slot signifies a monster. This prevents undesired results.
         if packet["Ranged"] ~= string.char(0xFF,0xFF) then
@@ -157,8 +157,8 @@ windower.register_event('incoming chunk',function (id, data)
 
         --Begin blinking region
 
-        if character then
-            if model_mask:contains(data:byte(11)) then
+        if id == 0x00D and character then
+            if packet['Update Model'] then
                 block = blink_logic(blink_type,character.index)
                 if block then
                     return_packet = true
