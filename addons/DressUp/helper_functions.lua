@@ -78,15 +78,16 @@ function blink_logic(blink_type,index)
         return true
     end
     
-    if settings.blinking["all"]["combat"] and windower.ffxi.get_player().in_combat then
+    local player = windower.ffxi.get_player()
+    if settings.blinking["all"]["combat"] and player.in_combat then
         return true
-    elseif settings.blinking[blink_type]["combat"] and windower.ffxi.get_player().in_combat then
+    elseif settings.blinking[blink_type]["combat"] and player.in_combat then
         return true
     end
     
-    if settings.blinking["all"]["target"] and windower.ffxi.get_player().target_index == index then
+    if settings.blinking["all"]["target"] and player.target_index == index then
         return true
-    elseif settings.blinking[blink_type]["target"] and windower.ffxi.get_player().target_index == index then
+    elseif settings.blinking[blink_type]["target"] and player.target_index == index then
         return true
     end
     

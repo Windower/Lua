@@ -121,8 +121,6 @@ windower.register_event('incoming chunk',function (id, data)
                 packet[k] = settings[name][k:lower()]
             elseif table.containskey(settings.replacements[k:lower()], tostring(v)) then
                 packet[k] = settings.replacements[k:lower()][tostring(v)]
-            else
-                packet[k] = v
             end
         end
     end  
@@ -136,12 +134,11 @@ windower.register_event('incoming chunk',function (id, data)
         local block = blink_logic(blink_type, player.index)
 
         -- Model ID 0xFFFF in ranged slot signifies a monster. This prevents undesired results.
-        if packet["Ranged"] ~= string.char(0xFF,0xFF) then
+        if packet['Ranged'] ~= 0xFFFF then
             return block or packets.build(packet)
         end
 
-    elseif id == 0x00d then
-        local block = false
+    elseif id == 0x00D then
         local return_packet = false
         -- Name is used to check for custom model settings, blink_type is similar but passes arguments to blink logic.
 
@@ -155,22 +152,14 @@ windower.register_event('incoming chunk',function (id, data)
             end
         end
 
-        --Begin blinking region
-
-        if id == 0x00D and character then
-            if packet['Update Model'] then
-                block = blink_logic(blink_type,character.index)
-                if block then
-                    return_packet = true
-                end
-            end
+        if character and packet['Update Model'] and not packet['Update Name'] and blink_logic(blink_type, character.index) then
+            packet['Update Model'] = false
+            return_packet = true
         end
 
-        --End blinking region
-
         -- Prevents superfluous returning of the PC Update packet by only doing so if the requirements are flagged
-        if return_packet and packet["Ranged"] ~= string.char(0xFF,0xFF) then
-            return block or packets.build(packet)
+        if return_packet and packet['Ranged'] ~= 0xFFFF then
+            return packets.build(packet)
         end
     end
 end)
