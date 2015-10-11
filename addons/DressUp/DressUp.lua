@@ -70,6 +70,24 @@ end)
 
 model_names = S{"Face","Race","Head","Body","Hands","Legs","Feet","Main","Sub","Ranged"}
 
+local modify_gear = function(packet, name)
+    local modified = false
+
+    for k, v in pairs(packet) do
+        if model_names:contains(k) and v ~= 0 then
+            if rawget(settings, name) and settings[name][k:lower()] then
+                packet[k] = settings[name][k:lower()]
+                modified = true
+            elseif table.containskey(settings.replacements[k:lower()], tostring(v)) then
+                packet[k] = settings.replacements[k:lower()][tostring(v)]
+                modified = true
+            end
+        end
+    end  
+
+    return modified
+end
+
 windower.register_event('incoming chunk',function (id, data)
     if id ~= 0x00A and id ~= 0x00D and id ~= 0x051 then
         return
@@ -78,20 +96,26 @@ windower.register_event('incoming chunk',function (id, data)
     local packet = packets.parse('incoming', data)
     local player = windower.ffxi.get_player()
 
-    local name
-    local blink_type = "others"
-    local character
-
     -- Preprocessing based on packet
-    if id == 0x00A or id == 0x051 then
+    if id == 0x00A then
         if not _char then
             return
         end
 
-        name = _char
+        return modify_gear(packet, _char) and packets.build(packet)
+
+    elseif id == 0x51 then
+        if not _char then
+            return
+        end
+
+        -- Model ID 0xFFFF in ranged slot signifies a monster. This prevents undesired results.
+        local block = blink_logic(player.autorun and "follow" or "self", player.index) 
+        return packet['Ranged'] ~= 0xFFFF and (block or modify_gear(packet, _char) and packets.build(packet))
 
     elseif id == 0x00D then
-        character = windower.ffxi.get_mob_by_index(packet['Index'])
+        local character = windower.ffxi.get_mob_by_index(packet['Index'])
+        local blink_type = "others"
 
         if character then
             if player.follow_index == character.index then
@@ -113,54 +137,15 @@ windower.register_event('incoming chunk',function (id, data)
         else
             name = "others"
         end
-    end
 
-    for k, v in pairs(packet) do
-        if model_names:contains(k) and v ~= 0 then
-            if rawget(settings, name) and settings[name][k:lower()] then
-                packet[k] = settings[name][k:lower()]
-            elseif table.containskey(settings.replacements[k:lower()], tostring(v)) then
-                packet[k] = settings.replacements[k:lower()][tostring(v)]
-            end
-        end
-    end  
-
-    -- Postprocessing based on packet
-    if id == 0x00A then
-        return packets.build(packet)
-
-    elseif id == 0x51 then
-        blink_type = player.autorun and "follow" or "self"
-        local block = blink_logic(blink_type, player.index)
-
-        -- Model ID 0xFFFF in ranged slot signifies a monster. This prevents undesired results.
-        if packet['Ranged'] ~= 0xFFFF then
-            return block or packets.build(packet)
-        end
-
-    elseif id == 0x00D then
-        local return_packet = false
-        -- Name is used to check for custom model settings, blink_type is similar but passes arguments to blink logic.
-
-        for k, v in pairs(packet) do
-            if model_names:contains(k) and v ~= 0 then
-                if settings[name][k:lower()] then
-                    return_packet = true
-                elseif table.containskey(settings.replacements[k:lower()], tostring(v)) then
-                    return_packet = true
-                end
-            end
-        end
-
+        local modified = modify_gear(packet, name)
         if character and packet['Update Model'] and not packet['Update Name'] and blink_logic(blink_type, character.index) then
             packet['Update Model'] = false
-            return_packet = true
+            modified = true
         end
 
         -- Prevents superfluous returning of the PC Update packet by only doing so if the requirements are flagged
-        if return_packet and packet['Ranged'] ~= 0xFFFF then
-            return packets.build(packet)
-        end
+        return packet['Ranged'] ~= 0xFFFF and modified and packets.build(packet)
     end
 end)
 
