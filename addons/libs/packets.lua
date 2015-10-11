@@ -157,7 +157,11 @@ parse = function(fields, data, index, max, lookup, depth)
 
                     if not bits then
                         -- Determine length for pointer types (*)
-                        bits = sizes[type] * ((length - parsed_index) / sizes[type]):floor()
+                        type_count = ((length - parsed_index) / sizes[type]):floor()
+                        bits = sizes[type] * type_count
+
+                        field.ctype = '%s[%u]':format(type, type_count)
+
                         count = max
                     end
 
