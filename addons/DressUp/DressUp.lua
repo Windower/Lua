@@ -48,18 +48,32 @@ require('feet')
 
 settings = config.load(defaults)
 
-windower.register_event('load','login',function ()
+local initialize = function()
     local player = windower.ffxi.get_player()
     _char = player.name:lower()
-    if not settings[_char] then settings[_char] = {} end
+    if not settings[_char] then
+        settings[_char] = {}
+    end
+
     print_blink_settings("global")
     if load_profile(player.main_job) then
         notice('Loaded profile: ' .. player.main_job)
     end
+
     update_model(player.index)
+end
+
+windower.register_event('load', function()
+    if windower.ffxi.get_info().logged_in then
+        initialize()
+    end
 end)
 
-windower.register_event('logout',function() _char = nil end)
+windower.register_event('login', initialize)
+
+windower.register_event('logout', function()
+    _char = nil
+end)
 
 windower.register_event('job change',function(job)
     if load_profile(res.jobs[job].name) then
