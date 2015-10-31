@@ -296,7 +296,12 @@ augment_values = {
         [0x15F] = {{stat="Occ. quickens spellcasting ", offset=1,percent=true}},
         [0x160] = {{stat="Occ. grants dmg. bonus based on TP ", offset=1,percent=true}},
         [0x161] = {{stat="TP Bonus ", offset=1, multiplier=5}},
-        [0x163] = {{stat='Potency of "Cure" effect received', offset=1, percent=true}},
+        [0x162] = {{stat="Quadruple Attack ", offset=1}},
+
+        [0x164] = {{stat='Potency of "Cure" effect received', offset=1, percent=true}},
+        
+        [0x168] = {{stat="Save TP ", offset=1, multiplier=10}},
+        
         [0x16A] = {{stat="Magic Damage ", offset=1}},
         [0x16B] = {{stat="Chance of successful block ", offset=1}},
         [0x16E] = {{stat="Blood Pact ab. del. II ", offset=1, multiplier=-1}},
