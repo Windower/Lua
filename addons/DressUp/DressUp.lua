@@ -134,14 +134,13 @@ windower.register_event('incoming chunk',function (id, data)
             Face = character.models[1],
             Head=character.models[2]+0x1000,
             Body=character.models[3]+0x2000,
-            Hands=character.models[8]+0x3000,
-            Legs=character.models[8]+0x4000,
-            Feet=character.models[8]+0x5000,
-            Main=character.models[8]+0x6000,
+            Hands=character.models[4]+0x3000,
+            Legs=character.models[5]+0x4000,
+            Feet=character.models[6]+0x5000,
+            Main=character.models[7]+0x6000,
             Sub=character.models[8]+0x7000,
             Ranged=character.models[9]+0x8000}
     else
-        print('New Player?',packet['Character Name'] or '0x51')
         return
     end
     
