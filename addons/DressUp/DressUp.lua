@@ -26,7 +26,7 @@
 
 _addon.name = 'DressUp'
 _addon.author = 'Cairthenn'
-_addon.version = '1.0'
+_addon.version = '1.1'
 _addon.commands = {'DressUp','du'}
 
 --Libs
@@ -84,22 +84,28 @@ end)
 
 model_names = S{"Face","Race","Head","Body","Hands","Legs","Feet","Main","Sub","Ranged"}
 
-local modify_gear = function(packet, name)
+local modify_gear = function(packet, name, freeze, models)
     local modified = false
 
     for k, v in pairs(packet) do
         if model_names:contains(k) and v ~= 0 then
             if rawget(settings, name) and settings[name][k:lower()] then
+                -- Settings for individuals
                 packet[k] = settings[name][k:lower()]
                 modified = true
             elseif table.containskey(settings.replacements[k:lower()], tostring(v)) then
+                -- Replace specific gear
                 packet[k] = settings.replacements[k:lower()][tostring(v)]
+                modified = true
+            elseif freeze and models and models[k] then
+                -- Swap the model values from memory to the packet to prevent blinking
+                packet[k] = models[k]
                 modified = true
             end
         end
     end  
 
-    return modified
+    return modified, packet
 end
 
 windower.register_event('incoming chunk',function (id, data)
@@ -109,58 +115,60 @@ windower.register_event('incoming chunk',function (id, data)
 
     local packet = packets.parse('incoming', data)
     local player = windower.ffxi.get_player()
+    local modified
 
-    -- Preprocessing based on packet
+    -- Processing based on packet type
     if id == 0x00A then
         if not _char then
             return
         end
-
-        return modify_gear(packet, _char) and packets.build(packet)
-
-    elseif id == 0x51 then
-        if not _char then
-            return
+        modified,packet = modify_gear(packet, _char)
+        return modified and packets.build(packet)
+    end
+    
+    -- Check whether the character is loaded into memory yet.
+    local character = windower.ffxi.get_mob_by_index(packet.Index or player.index) -- Target of 0x00D or yourself for 0x051
+    local blink_type, models, name = 'others'
+    if character and character.models and table.length(character.models) == 9 then
+        models = {Race=character.race,
+            Face = character.models[1],
+            Head=character.models[2]+0x1000,
+            Body=character.models[3]+0x2000,
+            Hands=character.models[8]+0x3000,
+            Legs=character.models[8]+0x4000,
+            Feet=character.models[8]+0x5000,
+            Main=character.models[8]+0x6000,
+            Sub=character.models[8]+0x7000,
+            Ranged=character.models[9]+0x8000}
+    else
+        print('New Player?',packet['Character Name'] or '0x51')
+        return
+    end
+    
+    if character then
+        if player.follow_index == character.index then
+            blink_type = "follow"
+        elseif character.in_alliance then
+            blink_type = "party"
+        else
+            blink_type = "others"
         end
 
-        -- Model ID 0xFFFF in ranged slot signifies a monster. This prevents undesired results.
-        local block = blink_logic(player.autorun and "follow" or "self", player.index) 
-        return packet['Ranged'] ~= 0xFFFF and (block or modify_gear(packet, _char) and packets.build(packet))
-
-    elseif id == 0x00D then
-        local character = windower.ffxi.get_mob_by_index(packet['Index'])
-        local blink_type = "others"
-
-        if character then
-            if player.follow_index == character.index then
-                blink_type = "follow"
-            elseif character.in_alliance then
-                blink_type = "party"
-            else
-                blink_type = "others"
-            end
-
-            if character.name == player.name then
-                name = _char
-                blink_type = "self"
-            elseif settings[character.name:lower()] then
-                name = character.name:lower()
-            else
-                name = "others"
-            end
+        if character.name == player.name then
+            name = _char
+            blink_type = "self"
+        elseif settings[character.name:lower()] then
+            name = character.name:lower()
         else
             name = "others"
         end
-
-        local modified = modify_gear(packet, name)
-        if character and packet['Update Model'] and not packet['Update Name'] and blink_logic(blink_type, character.index) then
-            packet['Update Model'] = false
-            modified = true
-        end
-
-        -- Prevents superfluous returning of the PC Update packet by only doing so if the requirements are flagged
-        return packet['Ranged'] ~= 0xFFFF and modified and packets.build(packet)
+    else
+        name = "others"
     end
+    
+    -- Model ID 0xFFFF in ranged slot signifies a monster. This prevents undesired results.
+    modified,packet = modify_gear(packet, name or _char, blink_logic(player.autorun and "follow" or "self", character, player), models)
+    return packet['Ranged'] ~= 0xFFFF and modified and packets.build(packet)
 end)
 
 --[[windower.register_event('outgoing chunk',function (id, data)
