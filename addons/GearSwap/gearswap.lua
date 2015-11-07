@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.908'
+_addon.version = '0.909'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -207,6 +207,18 @@ windower.register_event('addon command',function (...)
     elseif strip(cmd) == 'showswaps' then
         _settings.show_swaps = not _settings.show_swaps
         print('GearSwap: Show Swaps set to '..tostring(_settings.show_swaps)..'.')
+    elseif strip(cmd) == 'help' then
+        print('GearSwap: Valid commands are:')
+        print(' c <string>      : passes the string to the user\'s self_command function.')
+        print(' equip <string>  : attempts to equip the set indicated by the string.')
+        print(' debugmode       : toggles debugmode on or off.')
+        print(' showswaps       : toggles whether gearswap displays equipment changes in the chat log.')
+        print(' load <string>   : attempts to load the user file indicated by the string.')
+        print(' reload          : reloads the current user file.')
+        print(' export <opts>   : Exports your item collections based on the passed options.')
+        print(' disable <slot>  : Disables equip commands targeting a specified slot.')
+        print(' validate <opts> : Checks your current inventory against your item collections (or vice versa).')
+        print('  Please see the gearswap/README.md file for more details.')
     elseif _settings.debug_mode and strip(cmd) == 'eval' then
         assert(loadstring(table.concat(splitup,' ')))()
     else
