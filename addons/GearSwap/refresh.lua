@@ -531,9 +531,9 @@ function refresh_group_info(dt,user_event_flag)
     alliance.count = 0
     
     -- Reassign to the new structure
-    alliance[1] = c_alliance[1]
-    alliance[2] = c_alliance[2]
-    alliance[3] = c_alliance[3]
+    table.reassign(alliance[1],c_alliance[1])
+    table.reassign(alliance[2],c_alliance[2])
+    table.reassign(alliance[3],c_alliance[3])
     alliance.count = c_alliance.count
 end
 

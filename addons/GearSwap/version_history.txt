@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.908 - Fixed party.count failing to update in user_env. Added README.md file.
+-------------------------------------------------
 GearSwap 0.907 - Fixed a spell completion issue in aftercast caused by action packets that had no message.
 -------------------------------------------------
 GearSwap 0.906 - Added BLU magic spells and handled one aftercast that uses the 0x053 incoming packet.
