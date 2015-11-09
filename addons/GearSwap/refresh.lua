@@ -672,7 +672,7 @@ function pathsearch(files_list)
     -- data
     
     local gearswap_data = windower.addon_path .. 'data/'
-    local gearswap_appdata = os.getenv('APPDATA') .. '/Windower/GearSwap/'
+    local gearswap_appdata = (os.getenv('APPDATA') or '') .. '/Windower/GearSwap/'
     
     local search_path = {
         [1] = windower.addon_path .. 'libs-dev/',
