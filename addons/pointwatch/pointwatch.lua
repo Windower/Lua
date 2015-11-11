@@ -103,8 +103,8 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
         accolades.current = math.floor(org:byte(0x5A)/4) + org:byte(0x5B)*2^6 + (org:byte(0x5C)%4)*2^14
     elseif id == 0x63 and org:byte(5) == 2 then
         lp.current = org:unpack('H',9)
-        lp.number_of_merits = org:byte(11)%64
-        lp.maximum_merits = org:byte(0x0D)%64
+        lp.number_of_merits = org:byte(11)%128
+        lp.maximum_merits = org:byte(0x0D)%128
     elseif id == 0x63 and org:byte(5) == 5 then
         local offset = windower.ffxi.get_player().main_job_id*6+13 -- So WAR (ID==1) starts at byte 19
         cp.current = org:unpack('H',offset)
