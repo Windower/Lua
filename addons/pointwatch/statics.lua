@@ -90,6 +90,7 @@ function initialize()
         total = 0,
         tnjp = 30000,
         number_of_job_points = 0,
+        maximum_job_points = 500,
     }
 
     
