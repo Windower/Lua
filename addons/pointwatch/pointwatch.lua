@@ -103,8 +103,8 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
         accolades.current = math.floor(org:byte(0x5A)/4) + org:byte(0x5B)*2^6 + (org:byte(0x5C)%4)*2^14
     elseif id == 0x63 and org:byte(5) == 2 then
         lp.current = org:unpack('H',9)
-        lp.number_of_merits = org:byte(11)%64
-        lp.maximum_merits = org:byte(0x0D)%64
+        lp.number_of_merits = org:byte(11)%128
+        lp.maximum_merits = org:byte(0x0D)%128
     elseif id == 0x63 and org:byte(5) == 5 then
         local offset = windower.ffxi.get_player().main_job_id*6+13 -- So WAR (ID==1) starts at byte 19
         cp.current = org:unpack('H',offset)
@@ -274,6 +274,11 @@ function exp_msg(val,msg)
     if msg == 718 or msg == 735 then
         cp.registry[t] = (cp.registry[t] or 0) + val
         cp.total = cp.total + val
+        cp.current = cp.current + val
+        if cp.current > cp.tnjp and cp.number_of_job_points ~= cp.maximum_job_points then
+            cp.number_of_job_points = math.min(cp.number_of_job_points + math.floor(cp.current/cp.tnjp),cp.maximum_job_points)
+            cp.current = cp.current%cp.tnjp
+        end
     elseif msg == 8 or msg == 105 then
         xp.registry[t] = (xp.registry[t] or 0) + val
         xp.total = xp.total + val
@@ -286,10 +291,11 @@ function exp_msg(val,msg)
         end
     elseif msg == 371 or msg == 372 then
         lp.registry[t] = (lp.registry[t] or 0) + val
+        lp.current = lp.current + val
         if lp.current + val >= lp.tnm and lp.number_of_merits ~= lp.maximum_merits then
             -- Merit Point gained!
-            lp.current = lp.current + val - lp.tnm
-            lp.number_of_merits = lp.number_of_merits + 1
+            lp.number_of_merits = lp.number_of_merits + math.min(math.floor(lp.current/lp.tnm),lp.maximum_merits)
+            lp.current = lp.current%lp.tnm
         else
             -- If a merit point was not gained, 
             lp.current = math.min(lp.current+val,lp.tnm-1)
