@@ -79,6 +79,7 @@ function display_spell_count(command)
 	all_spells_len = all_spells:length()
 	current_spells_len = current_spells:length()
 	missing_spells_len = 0
+	uc_trust_spells_len = 0
 	
 	--Add missing spells to table for sorting
 	for spell in missing_spells:it() do
@@ -87,6 +88,8 @@ function display_spell_count(command)
 			if not string.match(res.spells[spell].name, "(UC)") then
 				missing_spells_len = missing_spells_len + 1
 				table.insert(missing_spell_names, res.spells[spell].name)
+			else
+				uc_trust_spells_len = uc_trust_spells_len + 1
 			end
 		else
 			missing_spells_len = missing_spells_len + 1
@@ -107,6 +110,11 @@ function display_spell_count(command)
 	  windower.add_to_chat(7, ' - Missing \'' .. spell .. '\'')
 	end
 	
+	--If searching for Trust Magic, subtract the Unity Trusts from the missing_spell list
+	if (command == "tru") then
+		all_spells_len = all_spells_len - uc_trust_spells_len
+	end
+		
 	--Display summary
 	windower.add_to_chat(7, 'SpellCheck: You have ' .. current_spells_len .. ' out of ' .. all_spells_len .. ' ' .. display_spell_type[command] .. ' spells. Missing: ' .. missing_spells_len)
 end
