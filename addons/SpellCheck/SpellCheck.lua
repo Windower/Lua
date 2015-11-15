@@ -38,83 +38,83 @@ spell_type = {whm='WhiteMagic',blm='BlackMagic',smn='SummonerPact',nin='Ninjutsu
 
 --Declare friendly name of spell types for chat output
 display_spell_type = {whm='White Magic',blm='Black Magic',smn='Summoner',nin='Ninjutsu',brd='Bard',blu='Blue Magic',geo='Geomancy',tru='Trust'}
-	
+    
 --Register the base //SpellCheck command
 windower.register_event('addon command',function (command, ...)
-	command = command and command:lower() or 'help'
-	if command == 'help' or command == 'h' or command == '?' then
-		display_help()
-	elseif spell_type[command] == nil then
-		display_error(command)
-	else
-		display_spell_count(command)
-	end
+    command = command and command:lower() or 'help'
+    if command == 'help' or command == 'h' or command == '?' then
+        display_help()
+    elseif spell_type[command] == nil then
+        display_error(command)
+    else
+        display_spell_count(command)
+    end
 end)
 
 --Display a basic help section
 function display_help()
-	windower.add_to_chat(7, _addon.name .. ' v.' .. _addon.version)
-	windower.add_to_chat(7, 'Usage: //spellcheck whm | blm | smn | nin | brd | blu | geo | tru')
+    windower.add_to_chat(7, _addon.name .. ' v.' .. _addon.version)
+    windower.add_to_chat(7, 'Usage: //spellcheck whm | blm | smn | nin | brd | blu | geo | tru')
     windower.add_to_chat(7, 'Sample: //spellcheck whm')
 end
 
 --Display error based on invalid selection
 function display_error(command)
-	windower.add_to_chat(7, _addon.name .. ' v.' .. _addon.version)
-	windower.add_to_chat(7, 'Error: ' .. command .. ' is not a valid option.')
-	windower.add_to_chat(7, 'Usage: //spellcheck whm | blm | smn | nin | brd | blu | geo | tru')
+    windower.add_to_chat(7, _addon.name .. ' v.' .. _addon.version)
+    windower.add_to_chat(7, 'Error: ' .. command .. ' is not a valid option.')
+    windower.add_to_chat(7, 'Usage: //spellcheck whm | blm | smn | nin | brd | blu | geo | tru')
 end
 
 --Get spells
 function display_spell_count(command)
-	missing_spell_names = {}
-	
-	--Get all, current and missing spells 
-	all_spells = res.spells:type(spell_type[command]):keyset()
-	current_spells = T(windower.ffxi.get_spells()):filter(boolean._true):keyset()
-	missing_spells = all_spells - current_spells
-	current_spells = all_spells * current_spells
-	
-	--Get count of all, current and missing spells 
-	all_spells_len = all_spells:length()
-	current_spells_len = current_spells:length()
-	missing_spells_len = 0
-	uc_trust_spells_len = 0
-	
-	--Add missing spells to table for sorting
-	for spell in missing_spells:it() do
-		--if trusts are being searched, exclude Unity trusts
-		if (command == "tru") then
-			if not string.match(res.spells[spell].name, "(UC)") then
-				missing_spells_len = missing_spells_len + 1
-				table.insert(missing_spell_names, res.spells[spell].name)
-			else
-				uc_trust_spells_len = uc_trust_spells_len + 1
-			end
-		else
-			missing_spells_len = missing_spells_len + 1
-			table.insert(missing_spell_names, res.spells[spell].name)
-		end
-	end
-	
-	--Sort missing spells by name
-	table.sort(missing_spell_names)
-	
-	--If there are missing spells, display that they are about to be listed
-	if missing_spells_len > 0 then
-		windower.add_to_chat(7, 'SpellCheck: Showing missing ' .. display_spell_type[command] .. ' spells...')
-	end
-	
-	--List all missing spell names
-	for i, spell in ipairs(missing_spell_names) do
-	  windower.add_to_chat(7, ' - Missing \'' .. spell .. '\'')
-	end
-	
-	--If searching for Trust Magic, subtract the Unity Trusts from the missing_spell list
-	if (command == "tru") then
-		all_spells_len = all_spells_len - uc_trust_spells_len
-	end
-		
-	--Display summary
-	windower.add_to_chat(7, 'SpellCheck: You have ' .. current_spells_len .. ' out of ' .. all_spells_len .. ' ' .. display_spell_type[command] .. ' spells. Missing: ' .. missing_spells_len)
+    missing_spell_names = {}
+    
+    --Get all, current and missing spells 
+    all_spells = res.spells:type(spell_type[command]):keyset()
+    current_spells = T(windower.ffxi.get_spells()):filter(boolean._true):keyset()
+    missing_spells = all_spells - current_spells
+    current_spells = all_spells * current_spells
+    
+    --Get count of all, current and missing spells 
+    all_spells_len = all_spells:length()
+    current_spells_len = current_spells:length()
+    missing_spells_len = 0
+    uc_trust_spells_len = 0
+    
+    --Add missing spells to table for sorting
+    for spell in missing_spells:it() do
+        --if trusts are being searched, exclude Unity trusts
+        if command == "tru" then
+            if not string.match(res.spells[spell].name, "(UC)") then
+                missing_spells_len = missing_spells_len + 1
+                table.insert(missing_spell_names, res.spells[spell].name)
+            else
+                uc_trust_spells_len = uc_trust_spells_len + 1
+            end
+        else
+            missing_spells_len = missing_spells_len + 1
+            table.insert(missing_spell_names, res.spells[spell].name)
+        end
+    end
+    
+    --Sort missing spells by name
+    table.sort(missing_spell_names)
+    
+    --If there are missing spells, display that they are about to be listed
+    if missing_spells_len > 0 then
+        windower.add_to_chat(7, 'SpellCheck: Showing missing ' .. display_spell_type[command] .. ' spells...')
+    end
+    
+    --List all missing spell names
+    for i, spell in ipairs(missing_spell_names) do
+      windower.add_to_chat(7, ' - Missing \'' .. spell .. '\'')
+    end
+    
+    --If searching for Trust Magic, subtract the Unity Trusts from the missing_spell list
+    if command == "tru" then
+        all_spells_len = all_spells_len - uc_trust_spells_len
+    end
+        
+    --Display summary
+    windower.add_to_chat(7, 'SpellCheck: You have ' .. current_spells_len .. ' out of ' .. all_spells_len .. ' ' .. display_spell_type[command] .. ' spells. Missing: ' .. missing_spells_len)
 end
