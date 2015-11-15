@@ -227,6 +227,13 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
+    <name>findTrust</name>
+    <author>Damien Dennehy (Zubis@Asura)</author>
+    <description>This addon lists trusts you haven't unlocked yet by using the //findTrust command.</description>
+    <bugtracker>https://github.com/DamienDennehy/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Asura/Zubis</support>
+  </addon>
+  <addon>
     <author>Omnys@Valefor</author>
     <name>Gametime</name>
     <description>Displays game time, game-week, moon information, and travel times.</description>
