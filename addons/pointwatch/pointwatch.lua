@@ -100,7 +100,7 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
     elseif id == 0x61 then
         xp.current = org:unpack('H',0x11)
         xp.tnl = org:unpack('H',0x13)
-        accolades.current = math.floor(org:byte(0x5A)/4) + org:byte(0x5B)*2^6 + (org:byte(0x5C)%4)*2^14
+        accolades.current = math.floor(org:byte(0x5A)/4) + org:byte(0x5B)*2^6 + org:byte(0x5C)*2^14
     elseif id == 0x63 and org:byte(5) == 2 then
         lp.current = org:unpack('H',9)
         lp.number_of_merits = org:byte(11)%128
@@ -110,7 +110,7 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
         cp.current = org:unpack('H',offset)
         cp.number_of_job_points = org:unpack('H',offset+2)
     elseif id == 0x110 then
-        sparks.current = org:unpack('H',5)
+        sparks.current = org:unpack('I',5)
     elseif id == 0xB and box:visible() then
         zoning_bool = true
         box:hide()
