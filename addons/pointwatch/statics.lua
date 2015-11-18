@@ -112,12 +112,12 @@ function initialize()
     
     sparks = {
         current = 0,
-        maximum = 50000,
+        maximum = 99999,
     }
     
     accolades = {
         current = 0,
-        maximum = 50000,
+        maximum = 99999,
     }
     
     abyssea = {
