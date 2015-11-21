@@ -26,12 +26,14 @@
 
 _addon.name    = 'SpellCheck'
 _addon.author  = 'Zubis'
-_addon.version = '1.0.0'
+_addon.version = '1.0.1'
 _addon.command = 'SpellCheck'
 
 require('sets')
 require('tables')
 res = require('resources')
+
+require('SpellExceptions')
 
 --Declare valid spell types
 spell_type = {whm='WhiteMagic',blm='BlackMagic',smn='SummonerPact',nin='Ninjutsu',brd='BardSong',blu='BlueMagic',geo='Geomancy',tru='Trust'}
@@ -50,7 +52,7 @@ windower.register_event('addon command',function (command, ...)
         display_spell_count(command)
     end
 end)
-
+    
 --Display a basic help section
 function display_help()
     windower.add_to_chat(7, _addon.name .. ' v.' .. _addon.version)
@@ -67,33 +69,33 @@ end
 
 --Get spells
 function display_spell_count(command)
+
+    missing_spells_len = 0
     missing_spell_names = {}
     
     --Get all, current and missing spells 
     all_spells = res.spells:type(spell_type[command]):keyset()
-    current_spells = T(windower.ffxi.get_spells()):filter(boolean._true):keyset()
+    current_spells = T(windower.ffxi.get_spells()):filter(boolean._true):keyset()   
+    
     missing_spells = all_spells - current_spells
     current_spells = all_spells * current_spells
-    
-    --Get count of all, current and missing spells 
-    all_spells_len = all_spells:length()
-    current_spells_len = current_spells:length()
-    missing_spells_len = 0
-    uc_trust_spells_len = 0
-    
+        
     --Add missing spells to table for sorting
     for spell in missing_spells:it() do
-        --if trusts are being searched, exclude Unity trusts
-        if command == "tru" then
-            if not string.match(res.spells[spell].name, "(UC)") then
+        --Trust and spells must be processed separately
+        if command == 'tru' then
+            --Only include non Unity trusts
+            if not res.spells[spell].name:endswith('(UC)') then
                 missing_spells_len = missing_spells_len + 1
                 table.insert(missing_spell_names, res.spells[spell].name)
-            else
-                uc_trust_spells_len = uc_trust_spells_len + 1
             end
         else
-            missing_spells_len = missing_spells_len + 1
-            table.insert(missing_spell_names, res.spells[spell].name)
+            --Add to missing spell list only if it's a valid spell
+            --And it's not in the spell exception list
+            if not table.empty(res.spells[spell].levels) and spell_exceptions[res.spells[spell].id] == nil then
+                missing_spells_len = missing_spells_len + 1
+                table.insert(missing_spell_names, res.spells[spell].name)
+            end
         end
     end
     
@@ -102,7 +104,7 @@ function display_spell_count(command)
     
     --If there are missing spells, display that they are about to be listed
     if missing_spells_len > 0 then
-        windower.add_to_chat(7, 'SpellCheck: Showing missing ' .. display_spell_type[command] .. ' spells...')
+        windower.add_to_chat(7, 'SpellCheck: Listing missing ' .. display_spell_type[command] .. ' spells...')
     end
     
     --List all missing spell names
@@ -110,11 +112,6 @@ function display_spell_count(command)
       windower.add_to_chat(7, ' - Missing \'' .. spell .. '\'')
     end
     
-    --If searching for Trust Magic, subtract the Unity Trusts from the missing_spell list
-    if command == "tru" then
-        all_spells_len = all_spells_len - uc_trust_spells_len
-    end
-        
     --Display summary
-    windower.add_to_chat(7, 'SpellCheck: You have ' .. current_spells_len .. ' out of ' .. all_spells_len .. ' ' .. display_spell_type[command] .. ' spells. Missing: ' .. missing_spells_len)
+    windower.add_to_chat(7, 'SpellCheck: You are missing ' .. missing_spells_len .. ' ' .. display_spell_type[command] .. ' spells.')
 end
