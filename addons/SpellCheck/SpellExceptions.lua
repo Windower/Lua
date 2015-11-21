@@ -6,5 +6,18 @@ spell_exceptions = {
     [358] = {id=358,en="Hastega",ja="ヘイスガ"},
     [356] = {id=356,en="Paralyga",ja="パライガ"},
     [359] = {id=359,en="Silencega",ja="サイレガ"},
-	[357] = {id=357,en="Slowga",ja="スロウガ"}
+    [357] = {id=357,en="Slowga",ja="スロウガ"},
+    [361] = {id=361,en="Blindga",ja="ブライガ"},
+    [362] = {id=362,en="Bindga",ja="バインガ"},
+    [257] = {id=257,en="Curse",ja="カーズ"},
+    [360] = {id=360,en="Dispelga",ja="ディスペガ"},
+    [226] = {id=226,en="Poisonga II",ja="ポイゾガII"},
+    [256] = {id=256,en="Virus",ja="ウィルス"},
+    [244] = {id=244,en="Meteor II",ja="メテオII"},
+    [351] = {id=351,en="Dokumori: Ni",ja="毒盛の術:弐"},
+    [342] = {id=342,en="Jubaku: Ni",ja="呪縛の術:弐"},
+    [349] = {id=349,en="Kurayami: San",ja="暗闇の術:参"},
+    [355] = {id=355,en="Tonko: San",ja="遁甲の術:参"},
+    [416] = {id=416,en="Cactuar Fugue",ja="サボテンダーフーガ"},
+    [407] = {id=407,en="Chocobo Hum",ja="チョコボのハミング"}
 }
