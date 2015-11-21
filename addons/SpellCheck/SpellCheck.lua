@@ -85,7 +85,7 @@ function display_spell_count(command)
         --Trust and spells must be processed separately
         if command == 'tru' then
             --Only include non Unity trusts
-            if not string.match(res.spells[spell].name, '(UC)') then
+            if not res.spells[spell].name:endswith('(UC)') then
                 missing_spells_len = missing_spells_len + 1
                 table.insert(missing_spell_names, res.spells[spell].name)
             end
