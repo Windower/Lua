@@ -25,10 +25,13 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'instaLS'
-_addon.version = 0.150322
+_addon.version = 0.151123
 _addon.author = 'Byrth'
 
 flag=false
+chatmode = false
+chatcolor = false
+message = false
 
 windower.register_event('zone change',function()
     flag=false
@@ -40,30 +43,46 @@ windower.register_event('incoming chunk',function(id)
     end
 end)
 
+windower.register_event('outgoing chunk',function(id,org,mod,inj)
+    if id == 0xB5 and not inj and chatmode and mod:byte(5) == 0 then -- and org:unpack('z',7) == message
+        -- Not injected, message currently queued
+        local outpack = mod:sub(1,4)..string.char(chatmode)..mod:sub(6)
+        chatmode = false
+        return outpack
+    end
+end)
+
+windower.register_event('incoming text',function(org, mod, col)
+    if message and chatcolor and string.find(org,message) then
+        local a,b = string.find(mod,windower.ffxi.get_player().name)
+        mod = mod:sub(1,a-1)..'['..(chatcolor==6 and '1' or '2')..']<'..mod:sub(a,b)..'>'..mod:sub(b+3)
+        local retarr = {mod, chatcolor}
+        chatcolor = false
+        return unpack(retarr)
+    end
+end)
+
 windower.register_event('outgoing text',function(org,mod,bool)
     if bool or flag then return end
-    local chatmode,message
     if mod:sub(1,3) == '/l ' then
         chatmode = 0x05
+        chatcolor = 6
         message = mod:sub(4)
     elseif mod:sub(1,11) == '/linkshell ' then
         chatmode = 0x05
+        chatcolor = 6
         message = mod:sub(12)
     elseif mod:sub(1,4) == '/l2 ' then
         chatmode = 0x1B
+        chatcolor = 213
         message = mod:sub(5)
     elseif mod:sub(1,12) == '/linkshell2 ' then
         chatmode = 0x1B
+        chatcolor = 213
         message = mod:sub(13)
     end
     
-    if chatmode and message ~= '' then
-        local length = math.floor((string.len(message)+6)/4)+1
-        local padrep = 4-(string.len(message)+6)%4
-        local packet = string.char(0xB5,length*2,0,0,chatmode,0)..message..string.rep(string.char(0),padrep)
-        -- Packet requires the string to be null terminated (or the last byte will be dropped).
-        windower.packets.inject_outgoing(0xB5,packet)
-        windower.add_to_chat(chatmode == 0x05 and 6 or chatmode == 0x1B and 213,'['..(chatmode == 0x05 and '1' or chatmode == 0x1B and '2')..']<'..windower.ffxi.get_player().name..'> '..message)
-        return true
+    if chatmode and message then
+        return '/s '..message
     end
 end)
