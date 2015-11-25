@@ -1,4 +1,4 @@
---[[Copyright © 2014, Byrth,smd111
+--[[Copyright © 2014-2015, Byrth,smd111
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -67,7 +67,8 @@ windower.register_event('addon command', function(command, ...)
         "bow of trials","club of trials","pole of trials","pick of trials","dagger of trials","tachi of trials","kodachi of trials","sturdy axe","burning fists",
         "werebuster","mage's staff","vorpal sword","swordbreaker","brave blade","death sickle","double axe","dancing dagger","killer bow","windslicer",
         "sasuke katana","radiant lance","scepter staff","wightslayer","quicksilver","inferno claws","main gauche","elder staff","destroyers","senjuinrikio",
-        "heart snatcher","subduer","dissector","expunger","morgenstern","gravedigger","rampager","coffinmaker","gonzo-shizunori","retributor","michishiba","thyrsusstab"}
+        "heart snatcher","subduer","dissector","expunger","morgenstern","gravedigger","rampager","coffinmaker","gonzo-shizunori","retributor","michishiba",
+        "thyrsusstab","trial wand","trial blade""}
     if command == 'run' then
         windower.add_to_chat(121,'latentchecker: Starting...')
         windower.ffxi.set_equip(0, 0, 0) -- Remove main/sub weapons
