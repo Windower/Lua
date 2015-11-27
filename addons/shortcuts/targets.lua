@@ -54,7 +54,7 @@ function valid_target(targ,flag)
                     if v.id == current_target.id then
                         targar['<t>'] = math.sqrt(v.distance)
                     end
-                elseif not v.is_npc or v.spawn_type == 14 then
+                elseif not v.is_npc or (v.spawn_type == 14 and v.in_party) then
                     targar[v.name] = math.sqrt(v.distance)
                 end
             end
@@ -126,7 +126,10 @@ function target_make(targets)
     
     if targets[target_type] and target_type ~= 'Self' then
         return '<t>'
-    end
+    elseif targets.Self then
 --    windower.add_to_chat(8,"got to the end "..tostring(target_type))
-    return '<me>'
+        return '<me>'
+    else
+        return ''
+    end
 end

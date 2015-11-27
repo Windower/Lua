@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.711'
+_addon.version = '2.800'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -243,8 +243,8 @@ function command_logic(original,modified)
     elseif command2_list[command] and not valid_target(potential_targ,true) then
         -- If the command is legitimate and requires target completion but not ability interpretation
         
-        if command2_list[command]==true then -- If there are not any excluded secondary commands
-            local temptarg = valid_target(potential_targ) or target_make(command2_targets[command] or {['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true}) -- Complete the target or make one.
+        if not command2_list[command].args then -- If there are not any excluded secondary commands
+            local temptarg = valid_target(potential_targ) or target_make(command2_list[command]) -- Complete the target or make one.
             if temptarg ~= '<me>' then -- These commands, like emotes, check, etc., don't need to default to <me>
                 lastsent = '/'..command..' '..temptarg -- Push the command and target together and send it out.
             else
@@ -261,28 +261,25 @@ function command_logic(original,modified)
         else -- If there are excluded secondary commands (like /pcmd add <name>)
             local tempcmd = command
             local passback
+            local targs = command2_list[command]
             for _,v in ipairs(splitline) do -- Iterate over the potential secondary arguments.
-            -- I'm not sure when there could be more than one secondary argument, but it's ready if it happens.
-                if command2_list[command]:contains(v) then
+                if command2_list[command]['args'] and command2_list[command]['args'][v] then
                     tempcmd = tempcmd..' '..v
                     passback = v
+                    targs = command2_list[command]['args'][v]
+                    break
                 end
             end
-            
-            local temptarg = valid_target(potential_targ)
-            if passback then
-                if temptarg == potential_targ or pass_through_targs:contains(temptarg) then
-                    -- If the final entry is a valid target, pass it through.
-                    temptarg = potential_targ
-                elseif passback == potential_targ then
-                    -- If the final entry is the passed through secondary command, just send it out without a target
-                    temptarg = ''
-                elseif not temptarg then
-                    -- Default to using the raw entry
-                    temptarg = potential_targ
+            local temptarg = ''
+            if targs ~= true then
+                -- Target is required
+                if command == potential_targ or passback and passback == potential_targ then
+                    -- No target is provided
+                    temptarg = target_make(targs)
+                else
+                    -- A target is provided, which is either corrected or (if not possible) used raw
+                    temptarg = valid_target(potential_targ) or potential_targ
                 end
-            elseif not temptarg then -- Make a target if the temptarget isn't valid
-                temptarg = target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true})
             end
             lastsent = '/'..tempcmd..' '..temptarg
             debug_chat('292: input '..lastsent)
@@ -293,7 +290,7 @@ function command_logic(original,modified)
             windower.send_command('@input '..lastsent)
             return '',false
         end
-    elseif command2_list[command] and valid_target(potential_targ,true) then
+    elseif command2_list[command] then
         -- If the submitted command does not require ability interpretation and is fine already, send it out.
         lastsent = ''
         if logging then
