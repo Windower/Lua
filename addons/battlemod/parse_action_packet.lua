@@ -42,7 +42,7 @@ function parse_action_packet(act)
                     m.message = 0
                     m.add_effect_message = 0
                 end
-                if not check_filter(v.target[1],act.actor,act.category,m.message) then
+                if m.spike_effect_message ~= 0 and not check_filter(v.target[1],act.actor,act.category,m.message) then
                     m.spike_effect_message = 0
                 end
                 if condensedamage and n > 1 then -- Damage/Action condensation within one target
@@ -119,7 +119,7 @@ function parse_action_packet(act)
                 tempact.message = 0
                 tempact.add_effect_message = 0
             end
-            if not check_filter(v.target[1],act.actor,act.category,tempact.message) then
+            if tempact.spike_effect_message ~= 0 and not check_filter(v.target[1],act.actor,act.category,tempact.message) then
                 tempact.spike_effect_message = 0
             end
             tempact.number = 1
@@ -487,10 +487,14 @@ function get_spell(act)
     elseif act.category == 2 and act.category == 12 then
         if msg_ID == 77 then
             spell = res.job_abilities[171] -- Sange
-            spell.name = color_it(spell[language],color_arr.abilcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.abilcol)
+            end
         elseif msg_ID == 157 then
             spell = res.job_abilities[60] -- Barrage
-            spell.name = color_it(spell[language],color_arr.abilcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.abilcol)
+            end
         else
             spell.english = 'Ranged Attack'
             spell.german = spell.english
@@ -521,12 +525,16 @@ function get_spell(act)
         
         if fields.spell then
             spell = res.spells[abil_ID]
-            spell.name = color_it(spell[language],color_arr.spellcol)
-            spell.spell = color_it(spell[language],color_arr.spellcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.spellcol)
+                spell.spell = color_it(spell[language],color_arr.spellcol)
+            end
         elseif fields.ability then
             spell = res.job_abilities[abil_ID]
-            spell.name = color_it(spell[language],color_arr.abilcol)
-            spell.ability = color_it(spell[language],color_arr.abilcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.abilcol)
+                spell.ability = color_it(spell[language],color_arr.abilcol)
+            end
         elseif fields.weapon_skill then
             if abil_ID > 256 then -- WZ_RECOVER_ALL is used by chests in Limbus
                 spell = res.monster_abilities[abil_ID]
@@ -536,28 +544,40 @@ function get_spell(act)
             elseif abil_ID <= 256 then
                 spell = res.weapon_skills[abil_ID]
             end
-            spell.name = color_it(spell[language],color_arr.wscol)
-            spell.weapon_skill = color_it(spell[language],color_arr.wscol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.wscol)
+                spell.weapon_skill = color_it(spell[language],color_arr.wscol)
+            end
         elseif msg_ID == 303 then
             spell = res.job_abilities[74] -- Divine Seal
-            spell.name = color_it(spell[language],color_arr.abilcol)
-            spell.ability = color_it(spell[language],color_arr.abilcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.abilcol)
+                spell.ability = color_it(spell[language],color_arr.abilcol)
+            end
         elseif msg_ID == 304 then
             spell = res.job_abilities[75] -- 'Elemental Seal'
-            spell.name = color_it(spell[language],color_arr.abilcol)
-            spell.ability = color_it(spell[language],color_arr.abilcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.abilcol)
+                spell.ability = color_it(spell[language],color_arr.abilcol)
+            end
         elseif msg_ID == 305 then
             spell = res.job_abilities[76] -- 'Trick Attack'
-            spell.name = color_it(spell[language],color_arr.abilcol)
-            spell.ability = color_it(spell[language],color_arr.abilcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.abilcol)
+                spell.ability = color_it(spell[language],color_arr.abilcol)
+            end
         elseif msg_ID == 311 or msg_ID == 312 then
             spell = res.job_abilities[79] -- 'Cover'
-            spell.name = color_it(spell[language],color_arr.abilcol)
-            spell.ability = color_it(spell[language],color_arr.abilcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.abilcol)
+                spell.ability = color_it(spell[language],color_arr.abilcol)
+            end
         elseif msg_ID == 240 or msg_ID == 241 then
             spell = res.job_abilities[43] -- 'Hide'
-            spell.name = color_it(spell[language],color_arr.abilcol)
-            spell.ability = color_it(spell[language],color_arr.abilcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.abilcol)
+                spell.ability = color_it(spell[language],color_arr.abilcol)
+            end
         end
 
         if fields.item then
