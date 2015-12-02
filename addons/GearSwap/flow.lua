@@ -102,6 +102,36 @@ function equip_sets(swap_type,ts,...)
         user_pcall(swap_type,...)
     end
     
+--[[    local c
+    if type(swap_type) == 'function' then
+        c = coroutine.create(swap_type)
+    elseif swap_type == 'equip_command' then
+        equip(val1)
+    elseif type(swap_type) == 'string' and user_env[swap_type] and type(user_env[swap_type]) == 'function' then
+        c = coroutine.create(user_env[swap_type])
+    elseif type(swap_type) == 'string' and user_env[swap_type] then
+        msg.addon_msg(123,windower.to_shift_jis(tostring(str))..'() exists but is not a function')
+    end
+    
+    if c then
+        while coroutine.status(c) == 'suspended' do
+            local err, typ, val = coroutine.resume(c,unpack(var_inputs))
+            if not err then
+                error('\nGearSwap has detected an error in the user function '..tostring(swap_type)..':\n'..typ)
+            elseif typ then
+                if typ == 'sleep' and type(val) == 'number' and val >= 0 then
+                    -- coroutine slept
+                    err, typ, val = coroutine.schedule(c,val)
+                else
+                    -- Someone yielded or slept with a nonsensical argument.
+                    err, typ, val = coroutine.resume(c)
+                end
+            else
+                -- coroutine finished
+            end
+        end 
+    end]]
+    
     
     if type(swap_type) == 'string' and (swap_type == 'pretarget' or swap_type == 'filtered_action') then -- Target may just have been changed, so make the ind now.
         ts = command_registry:new_entry(val1)
@@ -131,11 +161,11 @@ function equip_sets(swap_type,ts,...)
         end
         
         
-        if buffactive.charm or buffactive.KO then
+        if (buffactive.charm or player.charmed) or (player.status == 2 or player.status == 3) then -- dead or engaged dead statuses
             local failure_reason
-            if buffactive.charm then
+            if (buffactive.charm or player.charmed) then
                 failure_reason = 'Charmed'
-            elseif buffactive.KO then
+            elseif player.status == 2 or player.status == 3 then
                 failure_reason = 'KOed'
             end
             msg.debugging("Cannot change gear right now: "..tostring(failure_reason))
