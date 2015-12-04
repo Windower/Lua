@@ -156,8 +156,8 @@ command2_list = {
     ['rec']=new_cmd_entry(PC_targets),
     ['retr']=new_cmd_entry(Party_targets,{all=No_targets}),
     ['returntrust']=new_cmd_entry(Party_targets,{all=No_targets}),
-    ['refa']=new_cmd_entry(Party_targets),
-    ['returnfaith']=new_cmd_entry(Party_targets),
+    ['refa']=new_cmd_entry(Party_targets,{all=No_targets}),
+    ['returnfaith']=new_cmd_entry(Party_targets,{all=No_targets}),
     }
 	
 unhandled_list = {['p']=true,['s']=true,['sh']=true,['yell']=true,['echo']=true,['t']=true,['l']=true,['breaklinkshell']=true}
