@@ -1,4 +1,4 @@
---Copyright (c) 2013-2014, Byrthnoth
+--Copyright (c) 2013~2016, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -270,12 +270,13 @@ end
 -- Merges any additional gear sets (...) into the provided base set.
 -- Ensures that only valid slot keys/elements are used in the combined set.
 ----Args:
+-- respect_disable - boolean indicating whether the disable_table should be respected.
 -- baseSet - The set that all the other sets are combined into.  May be an empty set.
 -----------------------------------------------------------------------------------
 ----Returns:
 -- Returns the modified base set, after all other sets have been merged into it.
 -----------------------------------------------------------------------------------
-function set_merge(baseSet, ...)
+function set_merge(respect_disable, baseSet, ...)
     local combineSets = {...}
 
     local canCombine = table.all(combineSets, function(t) return type(t) == 'table' end)
@@ -292,7 +293,7 @@ function set_merge(baseSet, ...)
     -- the slot disabled, assign the item to the not_sent_out_equip table.
     for _,set in pairs(cleanSetsList) do
         for slot,item in pairs(set) do
-            if disable_table[slot_map[slot]] then
+            if respect_disable and disable_table[slot_map[slot]] then
                 not_sent_out_equip[slot] = item
             else
                 baseSet[slot] = item
@@ -646,9 +647,9 @@ function filter_pretarget(spell)
                 msg.debugging("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             end
             return false
-        elseif spell.type == 'BlueMagic' and not ((player.main_job_id == 16 and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) or
-            ((buffactive[485] or buffactive[505]) and unbridled_learning_set[spell.english])) and not
-            (player.sub_job_id == 16 and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
+        elseif spell.type == 'BlueMagic' and not ((player.main_job_id == 16 and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) 
+            or unbridled_learning_set[spell.english]) and
+            not (player.sub_job_id == 16 and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
             -- This code isn't hurting anything, but it doesn't need to be here either.
             msg.debugging("Unable to execute command. Blue magic must be set to cast that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
