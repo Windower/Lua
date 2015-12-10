@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.910'
+_addon.version = '0.911'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -212,6 +212,7 @@ windower.register_event('addon command',function (...)
         print(' c <string>      : passes the string to the user\'s self_command function.')
         print(' equip <string>  : attempts to equip the set indicated by the string.')
         print(' debugmode       : toggles debugmode on or off.')
+        print(' demomode        : toggles demomode on or off.')
         print(' showswaps       : toggles whether gearswap displays equipment changes in the chat log.')
         print(' load <string>   : attempts to load the user file indicated by the string.')
         print(' reload          : reloads the current user file.')
