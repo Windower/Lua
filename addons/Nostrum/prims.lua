@@ -390,7 +390,6 @@ end
 function prims.destroy(t)
     windower.prim.delete(meta[t].name)
     meta[t] = nil
-    t = nil
 end
 
 function prims.get_events(t)

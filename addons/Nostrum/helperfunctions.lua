@@ -573,6 +573,7 @@ function trim_macro()
             for k=1,prim.n do
                 if class(prim[k]) == 'Prim' then
                     prim[k]:destroy()
+                    prim[k] = nil
                 else
                     windower.prim.delete(prim[k])
                     saved_prims:remove(prim[k])
@@ -688,7 +689,15 @@ function draw_buff_display(t, id, type)
         if t[i] ~= buffs[i] then
             local prim = buff_map[p_id][type]
             
-            if not prim[i] then
+            if prim[i] then
+                prim[i]:texture(tracked_buffs[type][t[i]]) -- causing an error on prims/369...
+                if color_over_texture[t[i]] then
+                    prim[i]:argb(unpack(color_over_texture[t[i]]))
+                else
+                    prim[i]:argb(255, 255, 255, 255)
+                end
+                prim[i]:visible(not macro_visibility[1])
+            else
                 local hpp_string = 'phpp'..tostring(p_id)
                 prim[i] = prims.new({
                     pos = {prim_coordinates.x[hpp_string] - 1 - 12 * i, prim_coordinates.y[hpp_string] + (type == 2 and 12 or 0)},
@@ -701,14 +710,6 @@ function draw_buff_display(t, id, type)
                     fit_texture = false,
                 })
                 prims_by_layer[p_id]:append(prim[i])
-            else
-                prim[i]:texture(tracked_buffs[type][t[i]])
-                if color_over_texture[t[i]] then
-                    prim[i]:argb(unpack(color_over_texture[t[i]]))
-                else
-                    prim[i]:argb(255, 255, 255, 255)
-                end
-                prim[i]:visible(not macro_visibility[1])
             end
         end
     end
