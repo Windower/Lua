@@ -1,5 +1,6 @@
 config = require ('config')
 texts  = require('texts')
+packets = require('packets')
 require('pack')
 
 _addon.name     = 'PetTP'
@@ -144,10 +145,6 @@ function update_pet(source,pet_idx_in,own_idx_in)
     petname = pet_table['name']
     if superverbose == true then windower.add_to_chat(8, 'update_pet() : Updating PetName: '..petname) end
     current_hp_percent = pet_table['hpp']
-    if not pet_table['mpp'] == nil then
-        current_mp_percent = pet_table['mpp']
-    end
-    current_tp_percent = pet_table['tp']
     if not petactive and current_hp_percent == 0 then  -- we're likely picking up a dead or despawning pet
         if superverbose == true then windower.add_to_chat(8, 'update_pet() : Picked up a likely dead pet') end
         make_invisible()
@@ -276,16 +273,18 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                     end
                 end
             end
-        elseif id == 0x67 then    -- general hp/tp/mp update
-            local msg_type,msg_len = original:unpack('b6b10',0x05);
-            pet_idx = original:unpack('H', 0x07)
-            own_idx = original:unpack('H', 0x0D)
+        elseif id == 0x67 or id == 0x068 then    -- general hp/tp/mp update
+            local packet = packets.parse('incoming', original)
+            local msg_type = packet['Message Type']
+            local msg_len = packet['Message Length']
+            pet_idx = packet['Pet Index']
+            own_idx = packet['Owner Index']
 
-            if (msg_type == 0x04) then
+            if (msg_type == 0x04) and id == 0x067 then
                 pet_idx, own_idx = own_idx, pet_idx
             end
 
-            if superverbose == true and not ( 
+            if superverbose == true and id == 0x067 and not ( 
                    (msg_type == 0x02) -- not pet related
                 or (msg_type == 0x03 and (own_idx == 0)) -- NPC pops
                 or (msg_type == 0x03 and (own_idx ~= windower.ffxi.get_player().index)) -- other people summoning
@@ -318,8 +317,9 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                             make_invisible()
                         end
                     end
-                    local new_hp_percent, new_mp_percent, new_tp_percent = original:unpack('CCH', 0x0F)
-                    new_tp_percent = new_tp_percent
+                    local new_hp_percent = packet['Current HP%']
+                    local new_mp_percent = packet['Current MP%']
+                    local new_tp_percent = packet['Pet TP']
                     if newpet or (new_hp_percent ~= current_hp_percent) or (new_mp_percent ~= current_mp_percent) or (new_tp_percent ~= current_tp_percent) or (petname == nil) or (petname == "") then
                         if (max_hp ~= 0) and (new_hp_percent ~= current_hp_percent) then
                             current_hp = math.floor(new_hp_percent * max_hp / 100)
@@ -327,8 +327,8 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                         if (max_mp ~= 0) and (new_mp_percent ~= current_mp_percent) then
                             current_mp = math.floor(new_mp_percent * max_mp / 100)
                         end
-                        if ((petname == nil) or (petname == "")) and (msg_len > 24) then
-                            petname = original:unpack('S16', 0x19)
+                        if ((petname == nil) or (petname == "")) then
+                            petname = packet['Pet Name']
                             if superverbose == true then windower.add_to_chat(8, 'Updated PetName: '..petname) end
                         end
                         current_hp_percent = new_hp_percent
@@ -357,7 +357,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
                     printpettp(mypet_idx)
                 end
             end
-        elseif id==0x0E and not S{0x00,0X01,0x08,0x09,0x20}:contains(original:byte(0x0B)) and mypet_idx == (original:byte(0x09)+original:byte(0x0A)*256) then
+        elseif id==0x0E and not S{0x00,0x01,0x08,0x09,0x20}:contains(original:byte(0x0B)) and mypet_idx == (original:byte(0x09)+original:byte(0x0A)*256) then
             if superverbose == true then windower.add_to_chat(8, '0x0E ~ '..original:byte(0x0B)..': '..original:byte(0x1F)) end
         end
     end

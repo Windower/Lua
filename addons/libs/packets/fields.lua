@@ -2142,7 +2142,7 @@ end
 
 -- Base, shared by all jobs
 func.incoming[0x044].base = L{
-    {ctype='unsigned char',     label='Job'},                                   -- 04
+    {ctype='unsigned char',     label='Job',                fn=job},            -- 04
     {ctype='bool',              label='Subjob'},                                -- 05
     {ctype='unsigned short',    label='_unknown1'},                             -- 06
 }
@@ -2831,11 +2831,24 @@ fields.incoming[0x067] = L{
     {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 0C
     {ctype='unsigned char',     label='Current HP%',        fn=percent},        -- 0E
     {ctype='unsigned char',     label='Current MP%',        fn=percent},        -- 0F
-    {ctype='unsigned short',    label='Pet TP%',            fn=percent},        -- 10   Multiplied by 10
-    {ctype='unsigned short',    label='_unknown1'},                             -- 12
-    {ctype='unsigned short',    label='_unknown2'},                             -- 14
-    {ctype='unsigned short',    label='_unknown3'},                             -- 16
-    {ctype='char*',             label='Pet Name'},                              -- 18   Packet expands to accommodate pet name length.
+    {ctype='unsigned int',      label='Pet TP'},                                -- 10
+    {ctype='unsigned int',      label='_unknown1'},                             -- 14
+    {ctype='char*',             label='Pet Name'},                              -- 18
+}
+
+-- Pet Status
+-- It is sent every time a pet performs an action, every time anything about its vitals changes (HP, MP, TP) and every time its target changes
+fields.incoming[0x068] = L{
+    {ctype='bit[6]',            label='Message Type',       const=0x04},        -- 04   Seems to always be 4
+    {ctype='bit[10]',           label='Message Length'},                        -- 05   Number of bytes from the start of the packet (including header) until the last non-null character in the name
+    {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 0C
+    {ctype='unsigned int',      label='Owner ID',           fn=id},             -- 08
+    {ctype='unsigned short',    label='Pet Index',          fn=index},          -- 0C
+    {ctype='unsigned char',     label='Current MP%',        fn=percent},        -- 0E
+    {ctype='unsigned char',     label='Current HP%',        fn=percent},        -- 0F
+    {ctype='unsigned int',      label='Pet TP'},                                -- 10
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 14
+    {ctype='char*',             label='Pet Name'},                              -- 18
 }
 
 -- Self Synth Result
