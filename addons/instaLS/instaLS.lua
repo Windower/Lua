@@ -32,6 +32,7 @@ flag=false
 chatmode = false
 chatcolor = false
 message = false
+require 'strings'
 
 
 function translate_escape(str)
