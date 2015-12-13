@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'instaLS'
-_addon.version = 0.151202
+_addon.version = 0.151212
 _addon.author = 'Byrth'
 
 flag=false
@@ -34,61 +34,9 @@ chatcolor = false
 message = false
 
 
------------------------------------------------------------------------------------
---Name: find_san()
---Args:
----- str (string) - string to be sanitized
------------------------------------------------------------------------------------
---Returns:
----- sanitized string
------------------------------------------------------------------------------------
-function find_san(str)
-	if #str == 0 then return str end
-	
-	str = bracket_closer(str,0x28,0x29)
-	str = bracket_closer(str,0x5B,0x5D)
-	
-	-- strip precentages
-	local hanging_percent,num = 0,num
-	while str:byte(#str-hanging_percent) == 37 do
-		hanging_percent = hanging_percent + 1
-	end
-	str = str:sub(1,#str-hanging_percent%2)
-	return str
+function translate_escape(str)
+    return str:escape():gsub(string.char(0xFD)..".-"..string.char(0xFD),string.char(0xEF,0x27).."(.-)"..string.char(0xEF,0x25,0x25,0x28))
 end
-
------------------------------------------------------------------------------------
---Name: bracket_closer()
---Args:
----- str (string) - string to have its brackets closed
----- opener (number) - opening character's ASCII code
----- closer (number) - closing character's ASCII code
------------------------------------------------------------------------------------
---Returns:
----- string with its opened brackets closed
------------------------------------------------------------------------------------
-function bracket_closer(str,opener,closer)
-	op,cl,opadd = 0,0,1
-	for i=1,#str do
-		local ch = str:byte(i)
-		if ch == opener then
-			op = op +1
-			opadd = i
-		elseif ch == closer then
-			cl = cl + 1
-		end
-	end
-	if op > cl then
-		if opadd ~= #str then
-			str = str..string.char(closer)
-		else
-			str = str..str.char(0x7,closer)
-		end		-- Close captures
-	end
-	return str
-end
-
-
 
 windower.register_event('zone change',function()
     flag=false
@@ -110,11 +58,12 @@ windower.register_event('outgoing chunk',function(id,org,mod,inj)
 end)
 
 windower.register_event('incoming text',function(org, mod, col)
-    if message and chatcolor and string.find(org,find_san(message)) then
+    if message and chatcolor and string.find(org,translate_escape(message)) then
         local a,b = string.find(mod,windower.ffxi.get_player().name)
         mod = mod:sub(1,a-1)..'['..(chatcolor==6 and '1' or '2')..']<'..mod:sub(a,b)..'>'..mod:sub(b+3)
         local retarr = {mod, chatcolor}
         chatcolor = false
+        message = nil
         return unpack(retarr)
     end
 end)
