@@ -30,7 +30,7 @@
 _addon.name = 'Remember'
 _addon.author = 'Byrth'
 _addon.command = 'remember'
-_addon.version = '1.0.1.0'
+_addon.version = '1.0.2.0'
 
 packets = require('packets')
 
@@ -63,6 +63,9 @@ windower.register_event('incoming chunk',function(id,org,mod,inj,blk)
             elseif v~=nil and os.clock()-v > 5 then
                 -- If you asked for an update more than 5 seconds ago and haven't gotten one yet, try again
                 indices_under_investigation[i] = nil
+            elseif v~= nil then
+                -- Asked for an update 5 or fewer seconds ago, so don't ask again.
+                novel_indices[i] = nil
             end
         end
         
