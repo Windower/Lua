@@ -30,7 +30,7 @@
 _addon.name = 'Remember'
 _addon.author = 'Byrth'
 _addon.command = 'remember'
-_addon.version = '1.0.3.0'
+_addon.version = '1.0.4.0'
 
 packets = require('packets')
 
@@ -75,7 +75,7 @@ windower.register_event('incoming chunk',function(id,org,mod,inj,blk)
             local character = windower.ffxi.get_mob_by_index(i)
             if v~= nil and (not character or character.id == 0) and ((seq_id<2 and (seq_id + 256*256)) or seq_id) >= v+2 then
                 -- We've waited a packet cycle since the first occurance of the index and real information hasn't shown up yet, so request another packet
-                print('Sent out an information request for index',i)
+                --print('Sent out an information request for index',i)
                 windower.packets.inject_outgoing(0x016,string.char(0x016,4,0,0,i%256,math.floor(i/256),0,0))
                 indices_under_investigation[i] = os.clock()
             elseif v~=nil and character and character.id ~= 0 then
