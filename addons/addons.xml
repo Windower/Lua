@@ -390,6 +390,13 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
+    <name>Remember</name>
+    <author>Byrth</author>
+    <description>Should request spawn packets for players / mobile NPCs that failed to spawn.</description>
+    <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
     <name>Respond</name>
     <author>Byrth</author>
     <description>Respond to tells and FFOchat PMs using //r.</description>
