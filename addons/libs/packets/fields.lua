@@ -2844,8 +2844,8 @@ fields.incoming[0x068] = L{
     {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 0C
     {ctype='unsigned int',      label='Owner ID',           fn=id},             -- 08
     {ctype='unsigned short',    label='Pet Index',          fn=index},          -- 0C
-    {ctype='unsigned char',     label='Current MP%',        fn=percent},        -- 0E
-    {ctype='unsigned char',     label='Current HP%',        fn=percent},        -- 0F
+    {ctype='unsigned char',     label='Current HP%',        fn=percent},        -- 0E
+    {ctype='unsigned char',     label='Current MP%',        fn=percent},        -- 0F
     {ctype='unsigned int',      label='Pet TP'},                                -- 10
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 14
     {ctype='char*',             label='Pet Name'},                              -- 18
