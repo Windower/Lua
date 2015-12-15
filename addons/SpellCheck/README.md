@@ -14,5 +14,11 @@ http://forums.windower.net/index.php?/topic/973-trust-checklist-script/
 
 ##Release Notes
 
+###1.0.2
+* Added Sleepga I/II spell exception as the spells were listed in spells.lua twice.
+
+###1.0.1
+* Added spell exceptions.
+
 ###1.0.0
 * Initial release.
