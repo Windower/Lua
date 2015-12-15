@@ -1,4 +1,4 @@
---Copyright (c) 2013, Byrthnoth
+--Copyright (c) 2013~2016, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -102,12 +102,12 @@ end
 
 -- Combines the provided gear sets into a new set.  Returns the result.
 function set_combine(...)
-    return set_merge({}, ...)
+    return set_merge(false,{}, ...)
 end
 
 -- Combines the provided gear sets into the equip_list set.
 function equip(...)
-    set_merge(equip_list, ...)
+    set_merge(true,equip_list, ...)
 end
 
 function disable(...)
@@ -366,7 +366,25 @@ function add_to_chat_user(num,str)
 end
 
 
+function user_sleep(delay)
+    if not delay then
+        error('\nGearSwap: coroutine.sleep() not passed a delay value', 2)
+    elseif type(delay) ~= 'number' or delay < 0 then
+        error('\nGearSwap: coroutine.sleep() was passed an invalid value ('..tostring(delay)..'). (must be a number >= 0)', 2)
+    else
+        coroutine.yield('sleep',delay)
+    end
+end
+
+function user_yield()
+    coroutine.yield('yield')
+end
+
+
 -- Define the user windower functions.
 user_windower = {register_event = register_event_user, raw_register_event = raw_register_event_user,
     unregister_event = unregister_event_user, send_command = send_cmd_user,add_to_chat=add_to_chat_user}
+user_coroutine = coroutine
+user_coroutine.sleep = user_sleep
+user_coroutine.yield = user_yield
 setmetatable(user_windower,{__index=windower})

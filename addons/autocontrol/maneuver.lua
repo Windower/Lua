@@ -94,7 +94,7 @@ windower.register_event("action", function(act)
         local pet_index = windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index']
         
         if act['category'] == 6 and actor_id == player.id and S{136,139,141,142,143,144,145,146,147,148,309,310}:contains(abil_ID) then
-            if S{141, 142, 143, 144, 145, 146, 147, 148}:contains(abil_ID) then
+            if S{141, 142, 143, 144, 145, 146, 147, 148}:contains(abil_ID) and maneuvertimers then
                 windower.send_command('timers c "Maneuver: '..maneuver..'" 60 down')
                 if maneuver > 2 then
                     maneuver = 1

@@ -1,4 +1,8 @@
 -------------------------------------------------
+GearSwap 0.911 - Removed dependence of Unbridled Wisdom spells on the respective buff.
+-------------------------------------------------
+GearSwap 0.910 - Fixed set_combine so it does not respect the disable_table and updated copyright statements.
+-------------------------------------------------
 GearSwap 0.908 - Fixed party.count failing to update in user_env. Added README.md file.
 -------------------------------------------------
 GearSwap 0.907 - Fixed a spell completion issue in aftercast caused by action packets that had no message.

@@ -182,6 +182,7 @@ data.incoming[0x062] = {name='Skills Update',       description='Packet that sho
 data.incoming[0x063] = {name='Set Update',          description='Frequently sent packet during battle that updates specific types of job information, like currently available/set automaton equipment and currently set BLU spells.'}
 data.incoming[0x065] = {name='Repositioning',       description='Moves your character. Seems to be functionally idential to the Spawn packet'}
 data.incoming[0x067] = {name='Pet Info',            description='Updates information about whether or not you have a pet and the TP, HP, etc. of the pet if appropriate.'}
+data.incoming[0x068] = {name='Pet Status',          description='Updates information about whether or not you have a pet and the TP, HP, etc. of the pet if appropriate.'}
 data.incoming[0x06F] = {name='Self Synth Result',   description='Results of an attempted synthesis process by yourself.'}
 data.incoming[0x070] = {name='Others Synth Result', description='Results of an attempted synthesis process by others.'}
 data.incoming[0x071] = {name='Campaign Map Info',   description='Populates the Campaign map.'}

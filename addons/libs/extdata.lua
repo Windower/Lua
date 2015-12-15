@@ -1567,8 +1567,11 @@ function decode.Linkshell(str)
         g  = 17*math.floor(str:byte(7)/16),
         b  = 17*str:byte(8)%16,
         status_id = str:byte(9),
-        status = status_map[str:byte(9)],
-        name = tools.bit.bit_string(6,str:sub(10,name_end),name_map)}
+        status = status_map[str:byte(9)]}
+    
+    if rettab.status_id ~= 0 then
+        rettab.name = tools.bit.bit_string(6,str:sub(10,name_end),name_map)
+    end
     
     return rettab
 end

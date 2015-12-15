@@ -25,13 +25,19 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'instaLS'
-_addon.version = 0.151123
+_addon.version = 0.151212
 _addon.author = 'Byrth'
 
 flag=false
 chatmode = false
 chatcolor = false
 message = false
+require 'strings'
+
+
+function translate_escape(str)
+    return str:escape():gsub(string.char(0xFD)..".-"..string.char(0xFD),string.char(0xEF,0x27).."(.-)"..string.char(0xEF,0x25,0x25,0x28))
+end
 
 windower.register_event('zone change',function()
     flag=false
@@ -53,11 +59,12 @@ windower.register_event('outgoing chunk',function(id,org,mod,inj)
 end)
 
 windower.register_event('incoming text',function(org, mod, col)
-    if message and chatcolor and string.find(org,message) then
+    if message and chatcolor and string.find(org,translate_escape(message)) then
         local a,b = string.find(mod,windower.ffxi.get_player().name)
         mod = mod:sub(1,a-1)..'['..(chatcolor==6 and '1' or '2')..']<'..mod:sub(a,b)..'>'..mod:sub(b+3)
         local retarr = {mod, chatcolor}
         chatcolor = false
+        message = nil
         return unpack(retarr)
     end
 end)
