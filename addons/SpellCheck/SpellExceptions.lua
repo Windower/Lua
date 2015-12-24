@@ -19,5 +19,7 @@ spell_exceptions = {
     [349] = {id=349,en="Kurayami: San",ja="暗闇の術:参"},
     [355] = {id=355,en="Tonko: San",ja="遁甲の術:参"},
     [416] = {id=416,en="Cactuar Fugue",ja="サボテンダーフーガ"},
-    [407] = {id=407,en="Chocobo Hum",ja="チョコボのハミング"}
+    [407] = {id=407,en="Chocobo Hum",ja="チョコボのハミング"},
+    [363] = {id=363,en="Sleepga",ja="スリプガ"},
+    [364] = {id=364,en="Sleepga II",ja="スリプガII"}
 }

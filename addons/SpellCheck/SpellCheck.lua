@@ -26,7 +26,7 @@
 
 _addon.name    = 'SpellCheck'
 _addon.author  = 'Zubis'
-_addon.version = '1.0.1'
+_addon.version = '1.0.2'
 _addon.command = 'SpellCheck'
 
 require('sets')
