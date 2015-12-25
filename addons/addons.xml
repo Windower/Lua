@@ -279,6 +279,13 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
+    <name>RAWR</name>
+    <author>Genoxd</author>
+    <description>Plays a sound effect when your unity leader says something about dragons spawning.</description>
+    <bugtracker>https://github.com/geno3302/Lua</bugtracker>
+    <support>http://www.ffxiah.com/player/Lakshmi/Genoxd</support>
+  </addon>
+  <addon>
     <name>reive</name>
     <author>Giuliano Riccio (Zohno@Phoenix)</author>
     <description>Tracks exp, bayld, momentum scores and bonuses during a reive.</description>
