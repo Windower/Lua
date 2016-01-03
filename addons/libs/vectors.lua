@@ -14,11 +14,18 @@ _meta.V = {}
 _meta.V.__index = vector
 _meta.V.__class = 'Vector'
 
--- Constructor for vectors. Optionally provide length n, to avoid computing the length.
+-- Constructor for vectors. Optionally provide dimension n, to avoid computing the dimension from the table.
 function V(t, n)
-    t.n = n or #t
-    return setmetatable(t, _meta.V)
+    local res = {}
+    res.n = n or t.n or #t
+    for i = 1, res.n do
+        res[i] = t[i]
+    end
+
+    return setmetatable(res, _meta.V)
 end
+
+_meta.V.__unp = V:args(1)
 
 -- Creates a zero-vector of dimension n.
 function vector.zero(n)
@@ -62,7 +69,7 @@ function vector.normalize(v)
     return v:scale(1/v:length())
 end
 
--- Returns the dimension of a vector. Constant.
+-- Returns the dimension of v. Constant.
 function vector.dimension(v)
     return v.n
 end
@@ -90,7 +97,7 @@ function vector.cross(v1, v2)
     return setmetatable(res, _meta.V)
 end
 
--- Returns v multiplied by k.
+-- Returns v multiplied by k, i.e. all elements multiplied by the same factor.
 function vector.scale(v, k)
     local res = {}
     for i, val in ipairs(v) do
@@ -101,7 +108,7 @@ function vector.scale(v, k)
     return setmetatable(res, _meta.V)
 end
 
--- Returns the opposite vector of v.
+-- Returns the vector pointing in the opposite direction of v with the same length.
 function vector.negate(v)
     return vector.scale(v, -1)
 end
@@ -134,14 +141,22 @@ end
 
 _meta.V.__sub = vector.subtract
 
--- Returns the angle described by two vectors (in radians)
+-- Returns the angle described by two vectors (in radians).
 function vector.angle(v1, v2)
     return ((v1 * v2) / (v1:length() * v2:length())):acos()
 end
 
--- Returns a 2D vector from a radian value
+-- Returns a normalized 2D vector from a radian value.
+-- Note that this goes against mathematical convention, which commonly makes the radian go counter-clockwise.
+-- This function, instead, goes clockwise, i.e. it will return *(0, -1)* for ''π/2''.
+-- This is done to match the game's internal representation, which has the X axis pointing east and the Y axis pointing south.
 function vector.from_radian(r)
     return V{r:cos(), -r:sin()}
+end
+
+-- Returns the radian that describes the direction of the vector.
+function vector.to_radian(v)
+    return (v[2] < 0 and 1 or -1) * v:normalize()[1]:acos()
 end
 
 -- Returns the vector in string format: (...)
@@ -160,7 +175,7 @@ end
 _meta.V.__tostring = vector.tostring
 
 --[[
-Copyright � 2013-2014, Windower
+Copyright © 2013-2014, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
