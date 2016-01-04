@@ -198,7 +198,7 @@ function options_load( )
         if(settings.retain.items == true) then
             org_verbose("Non-equipment items set to retain")
         end
-		
+
         if(settings.retain.slips == true) then
             org_verbose("Slips set to retain")
             slips = {29312,29313,29314,29315,29316,29317,29318,29319,29320,29321,29322,29323,29324,29325,29326,29327,29328,29329,29330,29331,29332}
@@ -254,7 +254,7 @@ windower.register_event('addon command',function(...)
         get(thaw(file_name, bag))
     elseif (command == 't' or command == 'tidy') then
         org_debug("command", "Calling tidy with file_name '"..file_name.."' and bag '"..bag.."'")
-        tidy(thaw(file_name, bag))
+        tidy_inventory(thaw(file_name, bag))
     elseif (command == 'f' or command == 'freeze') then
 
         org_debug("command", "Calling freeze command")
@@ -353,22 +353,57 @@ function freeze(file_name,bag,items)
     end
 end
 
-function tidy(goal_items,current_items,usable_bags)
+function tidy_inventory(goal_items,current_items,usable_bags)
+    org_verbose('Tidying inventory!')
     org_debug("command", "Entering tidy()")
     usable_bags = usable_bags or get_dump_bags()
-    -- Move everything out of items[0] and into other inventories (defined by the passed table)
-    if goal_items and goal_items[0] and goal_items[0]._info.n > 0 then
-        current_items = current_items or Items.new()
-        goal_items, current_items = clean_goal(goal_items,current_items)
-        for index,item in current_items[0]:it() do
-            if not goal_items[0]:contains(item,true) then
+    -- Move everything out of items[_static.bag_ids.inventory] and into other inventories (defined by the passed table)
+    current_items = current_items or Items.new()
+    goal_items, current_items = clean_goal(goal_items,current_items)
+    if goal_items and goal_items[_static.bag_ids.inventory] then
+        for index,item in current_items[_static.bag_ids.inventory]:it() do
+            if not goal_items[_static.bag_ids.inventory]:contains(item,true) and not current_items[_static.bag_ids.inventory][index]:annihilated()then
                 org_debug("command", "Putting away "..item.log_name)
-                current_items[0][index]:put_away(usable_bags)
+                current_items[_static.bag_ids.inventory][index]:put_away(usable_bags)
                 simulate_item_delay()
             end
         end
     end
+    
     return goal_items, current_items
+end
+
+function tidy_wardrobe(goal_items,current_items)
+    org_verbose('Tidying wardrobe!')
+    current_items = current_items or Items.new()
+    goal_items, current_items = clean_goal(goal_items,current_items)
+    if goal_items and goal_items[_static.bag_ids.wardrobe] then
+        for index,item in current_items[_static.bag_ids.wardrobe]:it() do
+            if not goal_items[_static.bag_ids.wardrobe]:contains(item,true) and not current_items[_static.bag_ids.wardrobe][index]:annihilated() then
+                current_items[_static.bag_ids.wardrobe][index]:put_away({_static.bag_ids.inventory})
+                simulate_item_delay()
+            end
+        end
+    end
+    
+    return goal_items, current_items
+end
+
+function inventory_and_wardrobe_is_tidy(goal_items, current_items)
+    current_items = current_items or Items.new()
+    goal_items, current_items = clean_goal(goal_items,current_items)
+    
+    local bags_that_need_to_be_tidy = {_static.bag_ids.wardrobe, _static.bag_ids.inventory}
+    
+    for _,bag_index in ipairs(bags_that_need_to_be_tidy) do
+        for _,item in current_items[bag_index]:it() do
+            if not item:annihilated() and not goal_items[bag_index]:contains(item,true) then
+                return false
+            end
+        end
+    end
+    
+    return true
 end
 
 function organize(goal_items)
@@ -378,7 +413,7 @@ function organize(goal_items)
 
     local inventory_max = windower.ffxi.get_bag_info(0).max
     if current_items[0].n == inventory_max then
-        tidy(goal_items,current_items,dump_bags)
+        tidy_inventory(goal_items,current_items,dump_bags)
     end
     if current_items[0].n == inventory_max then
         org_error('Unable to make space, aborting!')
@@ -387,10 +422,10 @@ function organize(goal_items)
     
     local remainder = math.huge
     while remainder do
+        goal_items, current_items = tidy_wardrobe(goal_items,current_items)
+        goal_items, current_items = tidy_inventory(goal_items,current_items,dump_bags)
         goal_items, current_items = get(goal_items,current_items)
         
-        goal_items, current_items = clean_goal(goal_items,current_items)
-        goal_items, current_items = tidy(goal_items,current_items,dump_bags)
         remainder = incompletion_check(goal_items,remainder)
         if(remainder) then
             org_verbose("Remainder: "..tostring(remainder)..' Current: '..current_items[0]._info.n,1)
@@ -398,7 +433,18 @@ function organize(goal_items)
             org_verbose("No remainder, so we found everything we were looking for!")
         end
     end
-    goal_items, current_items = tidy(goal_items,current_items,dump_bags)
+    
+    repeat
+        local previous_items = current_items
+    
+        goal_items, current_items = tidy_wardrobe(goal_items,current_items)
+        goal_items, current_items = tidy_inventory(goal_items,current_items,dump_bags)
+        
+        if previous_items == current_items then
+            org_verbose("Unable to tidy any more.")
+            break -- no more tidying can be done
+        end
+    until inventory_and_wardrobe_is_tidy(goal_items, current_items)
     
     local count,failures = 0,T{}
     for bag_id,bag in goal_items:it() do
