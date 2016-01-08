@@ -1,7 +1,21 @@
 _addon.name = "FastCS"
 _addon.author = "Cairthenn"
-_addon.version = "1.0"
+_addon.version = "1.1"
 _addon.commands = {"FastCS","FCS"}
+
+--Requires:
+
+require("luau")
+
+-- Settings:
+
+defaults = {}
+defaults.frame_rate_divisor = 2
+defaults.exclusions = S{"home point #1", "home point #2", "home point #3", "home point #4", "home point #5", "survival guide", "waypoint"}
+settings = config.load(defaults)
+
+
+-- Help text definition:
 
 helptext = [[FastCS - Command List:
 1. help - Displays this help menu.
@@ -9,25 +23,25 @@ helptext = [[FastCS - Command List:
 2b. frameratedivisor [2|1|0]
 	- Changes the default FPS after exiting a cutscene.
 	- The prefix can be used interchangeably. For example, "fastcs fps 2" will set the default to 30 FPS.
-
+3. exclusion [add|remove] <name>
+    - Adds or removes a target from the exclusions list. Case insensitive.
  ]]
-
-require("luau")
-
-defaults = {}
-defaults.frame_rate_divisor = 2
-
-settings = config.load(defaults)
+ 
 
 windower.register_event("status change", function(new,old)
     local fps_divisor = settings.frame_rate_divisor or 2
+    local target = windower.ffxi.get_mob_by_target('t')
     
-    if new == 4 then
-        windower.send_command("config FrameRateDivisor 0")
-    elseif old == 4 and new ~= 4 then
-        windower.send_command("config FrameRateDivisor ".. fps_divisor)
-    end
+    if not target or target and not settings.exclusions:contains(target.name:lower()) then
+    
+        if new == 4 then
+            windower.send_command("config FrameRateDivisor 0")
+        elseif old == 4 then
+            windower.send_command("config FrameRateDivisor ".. fps_divisor)
+        end
 
+    end
+    
 end)
 
 windower.register_event("addon command", function (command,...)
@@ -55,6 +69,20 @@ windower.register_event("addon command", function (command,...)
             error("The command syntax was invalid.")
         end
         settings:save()
+    elseif command == "exclusion" then
+        if #args == 2 then
+            if args[1] == "add" then
+                settings.exclusions:add(args[2]:lower())
+                notice(args[2] .. " added to the exclusions list.")
+            elseif args[1] == "remove" then
+                settings.exclusions:remove(args[2]:lower())
+                notice(args[2] .. " removed from the exclusions list.")
+            else
+                error("The command syntax was invalid.")
+            end
+        else
+            error("The command syntax was invalid.")
+        end
     else
         error("The command syntax was invalid.")
     end
