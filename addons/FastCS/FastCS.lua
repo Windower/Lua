@@ -33,7 +33,6 @@ end)
 windower.register_event("addon command", function (command,...)
     command = command and command:lower() or "help"
     local args = T{...}:map(string.lower)
-    local _clear = nil
     
     if command == "help" then
         print(helptext)
