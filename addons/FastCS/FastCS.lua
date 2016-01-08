@@ -3,6 +3,18 @@ _addon.author = "Cairthenn"
 _addon.version = "1.0"
 _addon.commands = {"FastCS","FCS"}
 
+--Requires:
+
+require("luau")
+
+-- Settings:
+
+defaults = {}
+defaults.frame_rate_divisor = 2
+settings = config.load(defaults)
+
+-- Help text definition:
+
 helptext = [[FastCS - Command List:
 1. help - Displays this help menu.
 2a. fps [30|60|uncapped]
@@ -12,19 +24,12 @@ helptext = [[FastCS - Command List:
 
  ]]
 
-require("luau")
-
-defaults = {}
-defaults.frame_rate_divisor = 2
-
-settings = config.load(defaults)
-
 windower.register_event("status change", function(new,old)
     local fps_divisor = settings.frame_rate_divisor or 2
     
     if new == 4 then
         windower.send_command("config FrameRateDivisor 0")
-    else
+    elseif old == 4 then
         windower.send_command("config FrameRateDivisor ".. fps_divisor)
     end
 
