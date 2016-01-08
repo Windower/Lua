@@ -24,7 +24,7 @@ windower.register_event("status change", function(new,old)
     
     if new == 4 then
         windower.send_command("config FrameRateDivisor 0")
-    elseif old == 4 and new ~= 4 then
+    else
         windower.send_command("config FrameRateDivisor ".. fps_divisor)
     end
 
