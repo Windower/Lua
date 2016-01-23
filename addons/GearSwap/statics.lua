@@ -202,8 +202,12 @@ _global.current_event = 'None'
 
 _settings = {debug_mode = false, demo_mode = false, show_swaps = false}
 
+-- _ExtraData is persistent information that isn't included in the windower API.
+-- Because player, pet, and so forth are regularly regenerated from the windower API,
+-- this table is necessary to maintain information that goes beyond the windower API.
 _ExtraData = {
         player = {},
+        pet = {},
         world = {in_mog_house = false,conquest=false},
     }
 

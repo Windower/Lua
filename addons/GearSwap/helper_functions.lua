@@ -405,6 +405,31 @@ end
 
 
 -----------------------------------------------------------------------------------
+--Name: initialize_arrow_offset(mob_table)
+--Desc: Returns the current target arrow offset.
+--Args:
+---- mob_table - Monster table of the target monster
+-----------------------------------------------------------------------------------
+--Returns:
+---- table - Keys x, y, and z with the respective current offsets from the target.
+-----------------------------------------------------------------------------------
+function initialize_arrow_offset(mob_table)
+    local backtab = {}
+    local arrow = windower.ffxi.get_info().target_arrow
+    
+    if arrow.x == 0 and arrow.y == 0 and arrow.z == 0 then
+        return arrow
+    end
+    
+    backtab.x = arrow.x-mob_table.x
+    backtab.y = arrow.y-mob_table.y
+    backtab.z = arrow.z-mob_table.z
+    return backtab
+end
+
+
+
+-----------------------------------------------------------------------------------
 --Name: assemble_action_packet(target_id,target_index,category,spell_id)
 --Desc: Puts together an "action" packet (0x1A)
 --Args:
@@ -425,9 +450,8 @@ function assemble_action_packet(target_id,target_index,category,spell_id,arrow_o
     if category == 16 then
         spell_id = 0
     end
-    
-   
-    outstr = outstr..string.char( (spell_id%256), math.floor(spell_id/256)%256)..string.char(0):rep(14)
+        
+    outstr = outstr..string.char( (spell_id%256), math.floor(spell_id/256)%256)..string.char(0,0) .. 'fff':pack(arrow_offset.x,arrow_offset.z,arrow_offset.y)
     return outstr
 end
 
@@ -617,9 +641,10 @@ function filter_pretarget(spell)
         -- Filter for spells that you do not know. Exclude Impact.
         if not available_spells[spell.id] and not (spell.id == 503) then
             msg.debugging("Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+            return false
         -- Filter for spells that you know, but do not currently have access to
         elseif (not spell_jobs[player.main_job_id] or not (spell_jobs[player.main_job_id] <= player.main_job_level or
-            (spell_jobs[player.main_job_id] >= 100 and number_of_jps(player.job_points[__raw.lower(player.main_job)]) >= spell_jobs[player.main_job_id]) ) ) and
+            (spell_jobs[player.main_job_id] >= 100 and number_of_jps(player.job_points[__raw.lower(res.jobs[player.main_job_id].ens)]) >= spell_jobs[player.main_job_id]) ) ) and
             (not spell_jobs[player.sub_job_id] or not (spell_jobs[player.sub_job_id] <= player.sub_job_level)) then
             msg.debugging("Unable to execute command. You do not have access to that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
@@ -638,7 +663,7 @@ function filter_pretarget(spell)
         elseif player.sub_job_id == 20 and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
             (addendum_black[spell.id] and not buffactive[402] and not buffactive[416])) and
             not (spell_jobs[player.main_job_id] and (spell_jobs[player.main_job_id] <= player.main_job_level or
-            (spell_jobs[player.main_job_id] >= 100 and number_of_jps(player.job_points[__raw.lower(player.main_job)]) >= spell_jobs[player.main_job_id]) ) ) then
+            (spell_jobs[player.main_job_id] >= 100 and number_of_jps(player.job_points[__raw.lower(res.jobs[player.main_job_id].ens)]) >= spell_jobs[player.main_job_id]) ) ) then
                         
             if addendum_white[spell.id] then
                 msg.debugging("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
@@ -749,7 +774,7 @@ function cmd_reg:new_entry(sp)
     while rawget(self,ts) do
         ts = ts+0.001
     end
-    rawset(self,ts,{pretarget_cast_delay=0, precast_cast_delay=0, cancel_spell=false, new_target=false, current_event='nascent', spell=sp, timestamp=ts})
+    rawset(self,ts,{pretarget_cast_delay=0, precast_cast_delay=0, cancel_spell=false, new_target=false, current_event='nascent', spell=sp, timestamp=ts,target_arrow={x=0,y=0,z=0}})
     if debugging.command_registry then
         msg.addon_msg('Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(self[ts])))
     end

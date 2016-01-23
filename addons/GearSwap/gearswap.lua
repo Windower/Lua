@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.911'
+_addon.version = '0.913'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -109,6 +109,7 @@ res = require 'resources'
 extdata = require 'extdata'
 require 'helper_functions'
 require 'actions'
+packets = require 'packets'
 
 -- Resources Checks
 if res.items and res.bags and res.slots and res.statuses and res.jobs and res.elements and res.skills and res.buffs and res.spells and res.job_abilities and res.weapon_skills and res.monster_abilities and res.action_messages and res.skills and res.monstrosity and res.weather and res.moon_phases and res.races then
@@ -277,9 +278,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             next_packet_events.globals_update = data:unpack('H',3)
         end
         if next_packet_events.pet_status_change then
-            if pet.isvalid then
-                equip_sets('pet_status_change',nil,next_packet_events.pet_status_change.newstatus,next_packet_events.pet_status_change.oldstatus)
-            end
+            equip_sets('pet_status_change',nil,next_packet_events.pet_status_change.newstatus,next_packet_events.pet_status_change.oldstatus)
             next_packet_events.pet_status_change = nil
         end
         if next_packet_events.pet_change then
@@ -333,23 +332,42 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         world.logged_in = true
         
         _ExtraData.world.in_mog_house = data:byte(0x81) == 1
+        
+        _ExtraData.player.base_str = data:unpack('H',0xCD)
+        _ExtraData.player.base_dex = data:unpack('H',0xCF)
+        _ExtraData.player.base_vit = data:unpack('H',0xD1)
+        _ExtraData.player.base_agi = data:unpack('H',0xD3)
+        _ExtraData.player.base_int = data:unpack('H',0xD5)
+        _ExtraData.player.base_mnd = data:unpack('H',0xD7)
+        _ExtraData.player.base_chr = data:unpack('H',0xD9)
+        _ExtraData.player.add_str = data:unpack('h',0xDB)
+        _ExtraData.player.add_dex = data:unpack('h',0xDD)
+        _ExtraData.player.add_vit = data:unpack('h',0xDF)
+        _ExtraData.player.add_agi = data:unpack('h',0xE1)
+        _ExtraData.player.add_int = data:unpack('h',0xE3)
+        _ExtraData.player.add_mnd = data:unpack('h',0xE5)
+        _ExtraData.player.add_chr = data:unpack('h',0xE7)
+        
+        _ExtraData.player.str = _ExtraData.player.base_str + _ExtraData.player.add_str
+        _ExtraData.player.dex = _ExtraData.player.base_dex + _ExtraData.player.add_dex
+        _ExtraData.player.vit = _ExtraData.player.base_vit + _ExtraData.player.add_vit
+        _ExtraData.player.agi = _ExtraData.player.base_agi + _ExtraData.player.add_agi
+        _ExtraData.player.int = _ExtraData.player.base_int + _ExtraData.player.add_int
+        _ExtraData.player.mnd = _ExtraData.player.base_mnd + _ExtraData.player.add_mnd
+        _ExtraData.player.chr = _ExtraData.player.base_chr + _ExtraData.player.add_chr
         refresh_ffxi_info()
     elseif id == 0x00B then
         -- Blank temporary items when zoning.
         items.temporary = make_inventory_table()
     elseif id == 0x0E and pet.index and pet.index == data:unpack('H',9) and math.floor((data:byte(11)%8)/4)== 1 then
-        local oldstatus = pet.status
         local status_id = data:byte(32)
         -- Filter all statuses aside from Idle/Engaged/Dead/Engaged dead.
-        if status_id < 4 or status_id == 33 or status_id == 47 then
-            local newstatus = copy_entry(res.statuses[status_id])
-            if newstatus and newstatus[language] then
-                newstatus = newstatus[language]
-                if oldstatus ~= newstatus then
-                    if not next_packet_events then next_packet_events = {sequence_id = data:byte(4)*256+data:byte(3)} end
-                    next_packet_events.pet_status_change = {newstatus=newstatus,oldstatus=oldstatus}
-                end
-            end
+        print(status_id,pet.status_id)
+        if pet.status_id ~= status_id and (status_id < 4 or status_id == 33 or status_id == 47) then
+            if not next_packet_events then next_packet_events = {sequence_id = data:unpack('H',3)} end
+            next_packet_events.pet_status_change = {newstatus=res.statuses[status_id][language],oldstatus=pet.status}
+            pet.status = res.statuses[status_id][language]
+            pet.status_id = status_id
         end
     elseif id == 0x01B then
         for job_id = 1,23 do
@@ -460,9 +478,11 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             if not next_packet_events then next_packet_events = {sequence_id = data:unpack('H',3)} end
             refresh_globals()
             pet.isvalid = false
+            _ExtraData.pet = {}
             next_packet_events.pet_change = {pet = table.reassign({},pet)}
         elseif subj_ind ~= 0 and not pet.isvalid then
             if not next_packet_events then next_packet_events = {sequence_id = data:unpack('H',3)} end
+            _ExtraData.pet.tp = 0
             next_packet_events.pet_change = {subj_ind = subj_ind}
         end
     elseif id == 0x044 then
@@ -520,6 +540,38 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         
         _ExtraData.player.nation_id = data:byte(0x51)
         _ExtraData.player.nation = res.regions[_ExtraData.player.nation_id][language] or 'None'
+        _ExtraData.player.base_str = data:unpack('H',0x15)
+        _ExtraData.player.base_dex = data:unpack('H',0x17)
+        _ExtraData.player.base_vit = data:unpack('H',0x19)
+        _ExtraData.player.base_agi = data:unpack('H',0x1B)
+        _ExtraData.player.base_int = data:unpack('H',0x1D)
+        _ExtraData.player.base_mnd = data:unpack('H',0x1F)
+        _ExtraData.player.base_chr = data:unpack('H',0x21)
+        _ExtraData.player.add_str = data:unpack('h',0x23)
+        _ExtraData.player.add_dex = data:unpack('h',0x25)
+        _ExtraData.player.add_vit = data:unpack('h',0x27)
+        _ExtraData.player.add_agi = data:unpack('h',0x29)
+        _ExtraData.player.add_int = data:unpack('h',0x2B)
+        _ExtraData.player.add_mnd = data:unpack('h',0x2D)
+        _ExtraData.player.add_chr = data:unpack('h',0x2F)
+        _ExtraData.player.attack = data:unpack('H',0x31)
+        _ExtraData.player.defense = data:unpack('H',0x33)
+        _ExtraData.player.fire_resistance = data:unpack('h',0x35)
+        _ExtraData.player.wind_resistance = data:unpack('h',0x37)
+        _ExtraData.player.lightning_resistance = data:unpack('h',0x39)
+        _ExtraData.player.light_resistance = data:unpack('h',0x3B)
+        _ExtraData.player.ice_resistance = data:unpack('h',0x3D)
+        _ExtraData.player.earth_resistance = data:unpack('h',0x3F)
+        _ExtraData.player.water_resistance = data:unpack('h',0x41)
+        _ExtraData.player.dark_resistance = data:unpack('h',0x43)
+        
+        _ExtraData.player.str = _ExtraData.player.base_str + _ExtraData.player.add_str
+        _ExtraData.player.dex = _ExtraData.player.base_dex + _ExtraData.player.add_dex
+        _ExtraData.player.vit = _ExtraData.player.base_vit + _ExtraData.player.add_vit
+        _ExtraData.player.agi = _ExtraData.player.base_agi + _ExtraData.player.add_agi
+        _ExtraData.player.int = _ExtraData.player.base_int + _ExtraData.player.add_int
+        _ExtraData.player.mnd = _ExtraData.player.base_mnd + _ExtraData.player.add_mnd
+        _ExtraData.player.chr = _ExtraData.player.base_chr + _ExtraData.player.add_chr
                 
         if player.sub_job_id ~= data:byte(15) then
             -- Subjob change event
@@ -538,6 +590,14 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             if current_skill then
                 player.skills[to_windower_api(current_skill.english)] = skill
             end
+        end
+    elseif id == 0x067 then
+        if data:byte(7)%128 == 4 and player.index == data:unpack('H',0x0D) then -- You are the owner
+            _ExtraData.pet.tp = data:unpack('H',0x11)
+        end
+    elseif id == 0x068 then
+        if data:byte(7)%128 == 4 and player.id == data:unpack('I',0x09) then -- You are the owner
+            _ExtraData.pet.tp = data:unpack('H',0x11)
         end
     elseif id == 0x076 then
         partybuffs = {}
