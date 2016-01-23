@@ -72,6 +72,24 @@ function cancel_spell(boolean)
     end
 end
 
+function move_spell_target(position_table)
+    if _global.current_event ~= 'precast' then
+        error('\nGearSwap: move_spell_target() is only valid in the precast function', 2)
+        return
+    end
+    
+    if type(position_table) == 'table' and type(position_table.x or position_table.X) == 'number' and
+        type(position_table.y or position_table.Y) == 'number' and
+        type(position_table.z or positino_table.Z) == 'number' then
+        _global.target_arrow.x = position_table.x or position_table.X
+        _global.target_arrow.y = position_table.y or position_table.Y
+        _global.target_arrow.z = position_table.z or position_table.Z
+        print_set(_global.target_arrow)
+    else
+        error('\nGearSwap: move_spell_target() was passed an invalid value ('..tostring(position_table)..'). Should be a table with x, y, and z keys (offset from target)', 2)
+    end
+end
+
 function change_target(name)
     if _global.current_event ~= 'pretarget' then
         error('\nGearSwap: change_target() is only valid in the pretarget function', 2)

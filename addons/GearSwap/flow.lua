@@ -45,8 +45,12 @@ function equip_sets(swap_type,ts,...)
     local var_inps = {...}
     local val1 = var_inps[1]
     local val2 = var_inps[2]
-    table.reassign(_global,command_registry[ts] or {pretarget_cast_delay = 0,precast_cast_delay=0,cancel_spell = false, new_target=false})
+    table.reassign(_global,command_registry[ts] or {pretarget_cast_delay = 0,precast_cast_delay=0,cancel_spell = false, new_target=false,target_arrow={x=0,y=0,z=0}})
     _global.current_event = tostring(swap_type)
+    
+    if _global.current_event == 'precast' and val1 and val1.english and val1.english:find('Geo-') then
+        _global.target_arrow = initialize_arrow_offset(val1.target)
+    end
     
     windower.debug(tostring(swap_type)..' enter')
     if showphase or debugging.general then msg.debugging(8,windower.to_shift_jis(tostring(swap_type))..' enter') end
@@ -160,7 +164,6 @@ function equip_sets(swap_type,ts,...)
             print_set(tempset,tostring(swap_type))
         end
         
-        
         if (buffactive.charm or player.charmed) or (player.status == 2 or player.status == 3) then -- dead or engaged dead statuses
             local failure_reason
             if (buffactive.charm or player.charmed) then
@@ -251,7 +254,7 @@ function equip_sets_exit(swap_type,ts,val1)
                     end
                 elseif outgoing_action_category_table[unify_prefix[val1.prefix]] then
                     if filter_precast(val1) then
-                        command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id,val1.target.index,outgoing_action_category_table[unify_prefix[val1.prefix]],val1.id,windower.ffxi.get_info().target_arrow)
+                        command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id,val1.target.index,outgoing_action_category_table[unify_prefix[val1.prefix]],val1.id,command_registry[ts].target_arrow)
                         if not command_registry[ts].proposed_packet then
                             command_registry:delete_entry(ts)
                             
@@ -292,6 +295,10 @@ function equip_sets_exit(swap_type,ts,val1)
             end
 
         elseif swap_type == 'precast' then
+            -- Update the target_arrow
+            if val1.prefix ~= '/item' then
+                command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id,val1.target.index,outgoing_action_category_table[unify_prefix[val1.prefix]],val1.id,command_registry[ts].target_arrow)
+            end
             return precast_send_check(ts)
         elseif swap_type == 'filtered_action' and command_registry[ts] and command_registry[ts].cancel_spell then
             storedcommand = nil
