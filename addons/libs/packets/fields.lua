@@ -2841,7 +2841,7 @@ fields.incoming[0x067] = L{
 fields.incoming[0x068] = L{
     {ctype='bit[6]',            label='Message Type',       const=0x04},        -- 04   Seems to always be 4
     {ctype='bit[10]',           label='Message Length'},                        -- 05   Number of bytes from the start of the packet (including header) until the last non-null character in the name
-    {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 0C
+    {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 06
     {ctype='unsigned int',      label='Owner ID',           fn=id},             -- 08
     {ctype='unsigned short',    label='Pet Index',          fn=index},          -- 0C
     {ctype='unsigned char',     label='Current HP%',        fn=percent},        -- 0E
