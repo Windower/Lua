@@ -362,7 +362,6 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
     elseif id == 0x0E and pet.index and pet.index == data:unpack('H',9) and math.floor((data:byte(11)%8)/4)== 1 then
         local status_id = data:byte(32)
         -- Filter all statuses aside from Idle/Engaged/Dead/Engaged dead.
-        print(status_id,pet.status_id)
         if pet.status_id ~= status_id and (status_id < 4 or status_id == 33 or status_id == 47) then
             if not next_packet_events then next_packet_events = {sequence_id = data:unpack('H',3)} end
             next_packet_events.pet_status_change = {newstatus=res.statuses[status_id][language],oldstatus=pet.status}
