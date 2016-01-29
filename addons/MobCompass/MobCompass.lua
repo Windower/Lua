@@ -223,7 +223,7 @@ do
             end
             local next45angle = math.ceil((angle+pi/8)/(pi/4))
             if next45angle ~= last45angle then
-			   if next45angle ~= nil and last45angle ~=nil then
+            	if next45angle ~= nil and last45angle ~=nil then
                 arrow_map[last45angle]:color(255,255,255)
                 arrow_map[next45angle]:color(255,0,0)
                 last45angle = next45angle
