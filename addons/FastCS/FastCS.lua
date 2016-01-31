@@ -1,6 +1,6 @@
 _addon.name = "FastCS"
 _addon.author = "Cairthenn"
-_addon.version = "1.1"
+_addon.version = "1.2"
 _addon.commands = {"FastCS","FCS"}
 
 --Requires:
@@ -14,6 +14,11 @@ defaults.frame_rate_divisor = 2
 defaults.exclusions = S{"home point #1", "home point #2", "home point #3", "home point #4", "home point #5", "survival guide", "waypoint"}
 settings = config.load(defaults)
 
+-- Globals:
+__Globals = {
+    enabled = false, -- Boolean that indicates whether the Config speed-up is currently enabled
+    zoning  = false, -- Boolean that indicates whether the player is zoning with the config speed-up enabled
+}
 
 -- Help text definition:
 
@@ -27,17 +32,61 @@ helptext = [[FastCS - Command List:
     - Adds or removes a target from the exclusions list. Case insensitive.
  ]]
  
+function disable()
+
+    __Globals.enabled = false
+    
+    windower.send_command("config FrameRateDivisor ".. (settings.frame_rate_divisor or 2))
+    
+end
+
+function enable()
+    
+    __Globals.enabled = true
+    
+    windower.send_command("config FrameRateDivisor 0")
+
+end
+
+windower.register_event('unload',disable)
+windower.register_event('logout',disable)
+windower.register_event('outgoing chunk',function(id)
+
+    if id == 0x00D and __Globals.enabled then -- Last packet sent when zoning out
+        disable()
+        __Globals.zoning = true
+    end
+    
+end)
+
+windower.register_event('incoming chunk',function(id,o,m,is_inj)
+
+    if id == 0x00A and not is_inj and __Globals.zoning then
+        enable()
+        __Globals.zoning = false
+    end
+    
+end)
+
+windower.register_event('load',function()
+    local player = windower.ffxi.get_player()
+    
+    if player and player.status == 4 then
+        windower.send_command("config FrameRateDivisor 0")
+    end
+    
+end)
 
 windower.register_event("status change", function(new,old)
-    local fps_divisor = settings.frame_rate_divisor or 2
+    
     local target = windower.ffxi.get_mob_by_target('t')
     
     if not target or target and not settings.exclusions:contains(target.name:lower()) then
     
         if new == 4 then
-            windower.send_command("config FrameRateDivisor 0")
+            enable()
         elseif old == 4 then
-            windower.send_command("config FrameRateDivisor ".. fps_divisor)
+            disable()
         end
 
     end

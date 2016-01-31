@@ -1,6 +1,6 @@
 **Author:**  Cairthenn<br>
-**Version:**  1.0<br>
-**Date:** Jan. 7, 2016<br>
+**Version:**  1.2<br>
+**Date:** Jan. 31, 2016<br>
 
 # FastCS #
 
