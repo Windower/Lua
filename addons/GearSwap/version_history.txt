@@ -1,4 +1,13 @@
 -------------------------------------------------
+GearSwap 0.913 - Fixed japanese job point filter in filter_pretarget
+- Fixed command handling so filtered_action will be called for spells you haven't learned
+- Fixed pet_status_change so it will always be called (including in cases where the pet is dead)
+- Re-implemented pet.tp
+- Added player.base_str, player.add_str, and player.str, which is your total strength stat. Did this for all base stats as well as resistances and attack/defense. May not be reliable, but was requested.
+- Added spell.value, but there is no filter determining when it's meaningful or not. Mostly useful for COR rolls, which people should be able to filter out on their own.
+-------------------------------------------------
+GearSwap 0.912 - Added Geo- spell positioning.
+-------------------------------------------------
 GearSwap 0.911 - Removed dependence of Unbridled Wisdom spells on the respective buff.
 -------------------------------------------------
 GearSwap 0.910 - Fixed set_combine so it does not respect the disable_table and updated copyright statements.

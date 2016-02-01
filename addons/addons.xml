@@ -213,6 +213,13 @@
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>FastCS</name>
+    <author>Cairthenn</author>
+    <description>Dramatically speeds up cutscenes by disabling the frame rate cap. Requires the config plugin.</description>
+    <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
+    <support>http://mibbit.com/#windower@irc.ffochat.com</support>
+  </addon>
+  <addon>
     <name>FFOColor</name>
     <author>Nitrous (Shiva)</author>
     <description>Allows you to show FFOChat text in one of the 5 game chat channels. As well as specify colors for the text</description>

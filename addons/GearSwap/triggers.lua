@@ -40,7 +40,7 @@
 --Returns:
 ---- none or ''
 -----------------------------------------------------------------------------------
-windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
+windower.register_event('outgoing text',function(original,modified,blocked,ffxi,extra_stuff,extra2)
     windower.debug('outgoing text')
     if gearswap_disabled then return modified end
     
@@ -127,8 +127,9 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi)
                             command_registry[ts].proposed_packet = assemble_menu_item_packet(spell.target.id,spell.target.index,spell.id)
                         end
                     else
-                        command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id,windower.ffxi.get_info().target_arrow)
+                        command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id,spell.target.index,outgoing_action_category_table[unify_prefix[spell.prefix]],spell.id,initialize_arrow_offset(spell.target))
                     end
+                    -- The packets created above should not be used.
                     if command_registry[ts].proposed_packet then
                         equip_sets('precast',ts,spell)
                         return true
@@ -222,6 +223,8 @@ function inc_action(act)
         if uses[act.category] and act.param == 28787 then
             spell.action_type = 'Interruption'
             spell.interrupted = true
+        else
+            spell.value = act.targets[1].actions[1].param
         end
         if ts then --or spell.prefix == '/item' then
             -- Only aftercast things that were precasted.

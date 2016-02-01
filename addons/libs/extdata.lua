@@ -1903,13 +1903,20 @@ end
 function extdata.compare_augments(goal_augs,current)
     if not current then return false end
     local cur = T{}
-    for i,v in pairs(table.filter(current,-functions.equals('none'))) do
+    
+    local fn = function (str)
+        return type(str) == 'string' and str ~= 'none'
+    end
+    
+    for i,v in pairs(table.filter(current,fn)) do
         cur:append(v)
     end
+    
     local goal = T{}
-    for i,v in pairs(table.filter(goal_augs,-functions.equals('none'))) do
+    for i,v in pairs(table.filter(goal_augs,fn)) do
         goal:append(v)
     end
+    
     local num_augments = 0
     local aug_strip = function(str)
         return str:lower():gsub('[^%-%w,]','')
