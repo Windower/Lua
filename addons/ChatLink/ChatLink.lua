@@ -42,7 +42,17 @@ end)
 windower.register_event('addon command', function(command, id)
     command = command and command:lower() or 'help'
 
-    if command == 'open' or command == 'o' then
+    if command == 'list' or command == 'l' then
+        if urls:empty() then
+            return log('No URLs found.')
+        end
+
+        log('%u %s found.':format(#urls, 'URL':plural(urls)))
+        for url, key in urls:it() do
+            log('%s    [%u]: %s':format(identifier, key, url))
+        end
+
+    else
         local key = tonumber(id)
         if not key then
             return error('The ID "%s" is not a number.':format(id))
@@ -52,16 +62,12 @@ windower.register_event('addon command', function(command, id)
             return error('The ID "%s" was not found. Currently the highest ID is %u: %s':format(#urls, urls[#urls]))
         end
 
-        windower.open_url(urls[key])
+        if command == 'open' or command == 'o' then
+            windower.open_url(urls[key])
 
-    elseif command == 'list' or command == 'l' then
-        if urls:empty() then
-            return log('No URLs found.')
-        end
+        elseif command == 'copy' or command == 'c' then
+            windower.copy_to_clipboard(urls[key])
 
-        log('%u %s found.':format(#urls, 'URL':plural(urls)))
-        for url, key in urls:it() do
-            log('%s    [%u]: %s':format(identifier, key, url))
         end
 
     end
