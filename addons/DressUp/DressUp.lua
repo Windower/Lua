@@ -129,39 +129,38 @@ windower.register_event('incoming chunk',function (id, data)
     -- Check whether the character is loaded into memory yet.
     local character = windower.ffxi.get_mob_by_index(packet.Index or player.index) -- Target of 0x00D or yourself for 0x051
     local blink_type, models, name = 'others'
-    if character and character.models and table.length(character.models) == 9 and
-        (not packet["Character Name"] or character.name == packet["Character Name"]) then
-            -- 0x00A = "Player Name", but 0x00A should never reach this far
-            -- 0x00D = "Character Name"
-            -- 0x051 = Doesn't contain name
-            models = {Race=character.race,
-                Face = character.models[1],
-                Head=character.models[2]+0x1000,
-                Body=character.models[3]+0x2000,
-                Hands=character.models[4]+0x3000,
-                Legs=character.models[5]+0x4000,
-                Feet=character.models[6]+0x5000,
-                Main=character.models[7]+0x6000,
-                Sub=character.models[8]+0x7000,
-                Ranged=character.models[9]+0x8000}
+    if character and character.models and table.length(character.models) == 9 then
+        models = {Race=character.race,
+            Face = character.models[1],
+            Head=character.models[2]+0x1000,
+            Body=character.models[3]+0x2000,
+            Hands=character.models[4]+0x3000,
+            Legs=character.models[5]+0x4000,
+            Feet=character.models[6]+0x5000,
+            Main=character.models[7]+0x6000,
+            Sub=character.models[8]+0x7000,
+            Ranged=character.models[9]+0x8000}
     else
-        -- The character is new to you (doesn't exist in memory or the name doesn't match memory)
         return
     end
     
-    if player.follow_index == character.index then
-        blink_type = "follow"
-    elseif character.in_alliance then
-        blink_type = "party"
-    else
-        blink_type = "others"
-    end
+    if character then
+        if player.follow_index == character.index then
+            blink_type = "follow"
+        elseif character.in_alliance then
+            blink_type = "party"
+        else
+            blink_type = "others"
+        end
 
-    if character.name == player.name then
-        name = _char
-        blink_type = "self"
-    elseif settings[character.name:lower()] then
-        name = character.name:lower()
+        if character.name == player.name then
+            name = _char
+            blink_type = "self"
+        elseif settings[character.name:lower()] then
+            name = character.name:lower()
+        else
+            name = "others"
+        end
     else
         name = "others"
     end
