@@ -166,7 +166,7 @@ windower.register_event('incoming chunk',function (id, data)
     end
     
     -- Model ID 0xFFFF in ranged slot signifies a monster. This prevents undesired results.
-    modified,packet = modify_gear(packet, name or _char, blink_logic(player.autorun and "follow" or "self", character, player), models)
+    modified,packet = modify_gear(packet, name or _char, blink_logic(blink_type, character, player), models)
     return packet['Ranged'] ~= 0xFFFF and modified and packets.build(packet)
 end)
 
