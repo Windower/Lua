@@ -243,7 +243,7 @@ function command_logic(original,modified)
     elseif command2_list[command] and not valid_target(potential_targ,true) then
         -- If the command is legitimate and requires target completion but not ability interpretation
         
-        if not command2_list[command].args then -- If there are not any excluded secondary commands
+        if not command2_list[command].args then -- If there are not any secondary commands
             local temptarg = valid_target(potential_targ) or target_make(command2_list[command]) -- Complete the target or make one.
             if temptarg ~= '<me>' then -- These commands, like emotes, check, etc., don't need to default to <me>
                 lastsent = '/'..command..' '..temptarg -- Push the command and target together and send it out.
@@ -258,7 +258,7 @@ function command_logic(original,modified)
             end
             windower.send_command('@input '..lastsent)
             return '',false
-        else -- If there are excluded secondary commands (like /pcmd add <name>)
+        else -- If there are secondary commands (like /pcmd add <name>)
             local tempcmd = command
             local passback
             local targs = command2_list[command]
@@ -273,7 +273,7 @@ function command_logic(original,modified)
             local temptarg = ''
             if targs ~= true then
                 -- Target is required
-                if command == potential_targ or passback and passback == potential_targ then
+                if command == potential_targ or passback and passback == potential_targ or potential_targ == '/nope//' then
                     -- No target is provided
                     temptarg = target_make(targs)
                 else
