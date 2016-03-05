@@ -28,11 +28,13 @@
  
 unify_prefix = {['/ma'] = '/ma', ['/magic']='/ma',['/jobability'] = '/ja',['/ja']='/ja',['/item']='/item',['/song']='/ma',
     ['/so']='/ma',['/ninjutsu']='/ma',['/weaponskill']='/ws',['/ws']='/ws',['/ra']='/ra',['/rangedattack']='/ra',['/nin']='/ma',
-    ['/throw']='/ra',['/range']='/ra',['/shoot']='/ra',['/monsterskill']='/ms',['/ms']='/ms',['/pet']='/ja',['Monster']='Monster'}
+    ['/throw']='/ra',['/range']='/ra',['/shoot']='/ra',['/monsterskill']='/ms',['/ms']='/ms',['/pet']='/ja',['Monster']='Monster',['/bstpet']='/ja'}
 
 action_type_map = {['/ja']='Ability',['/jobability']='Ability',['/so']='Magic',['/song']='Magic',['/ma']='Magic',['/magic']='Magic',['/nin']='Magic',['/ninjutsu']='Magic',
     ['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/ms']='Ability',['/monsterskill']='Ability',
-    ['/ws']='Ability',['/weaponskill']='Ability',['/item']='Item',['/pet']='Ability',['Monster']='Monster Move'}
+    ['/ws']='Ability',['/weaponskill']='Ability',['/item']='Item',['/pet']='Ability',['/bstpet']='Ability',['Monster']='Monster Move'}
+
+bstpet_range = {min=672,max=782} -- Range of the JA resource devoted to BST jugpet abilities
     
 delay_map_to_action_type = {['Ability']=3,['Magic']=20,['Ranged Attack']=10,['Item']=10,['Monster Move']=10,['Interruption']=3}
     
@@ -333,7 +335,7 @@ region_to_zone_map = {
     [22] = S{11,12,13},
     [24] = S{24,25,26,27,28,29,30,31,32},
     }
-
+    
 
 function initialize_globals()
     local pl = windower.ffxi.get_player()

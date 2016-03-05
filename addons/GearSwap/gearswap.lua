@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.913'
+_addon.version = '0.914'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -62,18 +62,19 @@ end
 
 windower.text.delete = function (str)
     if __raw.text.registry[str] then
-        local deleted = false
+        local library = false
         if windower.text.saved_texts then
             for i,v in pairs(windower.text.saved_texts) do
                 if v._name == str then
                     __raw.text.registry[str] = nil
                     windower.text.saved_texts[i]:destroy()
-                    deleted = true
+                    library = true
                     break
                 end
             end
         end
-        if not deleted then
+        if not library then
+            -- Text was not created through the library, so delete it normally
             __raw.text.registry[str] = nil
             __raw.text.delete(str)
         end
