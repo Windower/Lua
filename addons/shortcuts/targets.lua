@@ -101,7 +101,7 @@ function target_make(targets)
         -- rest of the processing and just return <me>.
     elseif target.hpp == 0 then
         target_type = 'Corpse'
-    elseif target.is_npc then
+    elseif target.is_npc and target.spawn_type ~= 14 then
         target_type = 'Enemy'
         -- Need to add handling that differentiates 'Enemy' and 'NPC' here.
     else
@@ -116,7 +116,7 @@ function target_make(targets)
                         target_type = 'Party'
                     end
                 end
-                if target.charmed then
+                if target.charmed and not target.is_npc then
                     target_type = 'Enemy'
                 end
                 break

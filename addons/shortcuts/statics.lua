@@ -50,6 +50,7 @@ local All_targets = {['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true
 local PC_targets = {['Player']=true,['Enemy']=false,['Party']=true,['Ally']=true,['NPC']=false,['Self']=true,['Corpse']=true}
 local Party_targets = {['Player']=false,['Enemy']=false,['Party']=true,['Ally']=false,['NPC']=false,['Self']=true,['Corpse']=true}
 local Alliance_targets = {['Player']=false,['Enemy']=false,['Party']=false,['Ally']=true,['NPC']=false,['Self']=true,['Corpse']=true}
+local BST_targets = {['Player']=true,['Enemy']=false,['Party']=false,['Ally']=false,['NPC']=false,['Self']=true,['Corpse']=false}
 
 local function new_cmd_entry(default_targets,subcommands)
     local rettab = table.reassign({},default_targets)
@@ -158,6 +159,7 @@ command2_list = {
     ['returntrust']=new_cmd_entry(Party_targets,{all=No_targets}),
     ['refa']=new_cmd_entry(Party_targets,{all=No_targets}),
     ['returnfaith']=new_cmd_entry(Party_targets,{all=No_targets}),
+    ['bstpet']=new_cmd_entry(No_targets,{['1']=BST_targets,['2']=BST_targets,['3']=BST_targets,['4']=BST_targets,['5']=BST_targets,['6']=BST_targets,['7']=BST_targets}),
     }
 	
 unhandled_list = {['p']=true,['s']=true,['sh']=true,['yell']=true,['echo']=true,['t']=true,['l']=true,['breaklinkshell']=true}

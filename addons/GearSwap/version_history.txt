@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.914 - Added /bstpet handling.
+-------------------------------------------------
 GearSwap 0.913 - Fixed japanese job point filter in filter_pretarget
 - Fixed command handling so filtered_action will be called for spells you haven't learned
 - Fixed pet_status_change so it will always be called (including in cases where the pet is dead)

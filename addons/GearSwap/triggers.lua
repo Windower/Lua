@@ -51,10 +51,21 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
     if splitline.n == 0 then return end
 
     local command = splitline[1]
+    local bstpet = command == '/bstpet'
     local unified_prefix = unify_prefix[command]
     local abil, temptarg, temp_mob_arr
-    if splitline[2] then
-        abil = splitline[2]:gsub(string.char(7),' '):lower()
+    if splitline[2] and not bstpet then
+        abil = splitline[2]:gsub(string.char(7),' '):lower() -- Why am I removing \x7?
+    elseif splitline[2] and bstpet and tonumber(splitline[2]) then
+        local pet_abilities = {}
+        for _,v in ipairs(windower.ffxi.get_abilities().job_abilities) do
+            if v >= bstpet_range.min and v <= bstpet_range.max then
+                pet_abilities[#pet_abilities+1] = v
+            end
+        end
+        if pet_abilities[splitline[2]] then
+            abil = res.job_abilities[pet_abilities[tonumber(splitline[2])]].name:gsub(string.char(7),' '):lower() -- .name, or .english?
+        end
     end
     
     if validabils[language][unified_prefix] and validabils[language][unified_prefix][abil] then
@@ -97,7 +108,11 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
                 storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
             elseif unified_prefix == '/ja' then
                 r_line = copy_entry(res.job_abilities[validabils[language][unified_prefix][abil]])
-                storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
+                if bstpet then
+                    storedcommand = command..' '..splitline[2]
+                else
+                    storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
+                end
             elseif unified_prefix == '/item' then
                 r_line = copy_entry(res.items[validabils[language][unified_prefix][abil]])
                 r_line.prefix = '/item'
@@ -115,6 +130,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
             
             if filter_pretarget(spell) then
                 if tonumber(splitline[splitline.n]) then
+                    -- If the target is a number
                     local ts = command_registry:new_entry(spell)
                     
                     if spell.prefix == '/item' then
