@@ -1012,17 +1012,6 @@ end
 ---- rline - modified resource line
 -----------------------------------------------------------------------------------
 function spell_complete(rline)
-    -- Hardcoded adjustments
-    if rline.skill == 40 and buffactive.Pianissimo and rline.cast_time == 8 then
-        -- Pianissimo halves song casting time for buffs
-        rline.cast_time = 4
-    end
-    if rline.skill == 44 and buffactive.Entrust and string.find(rline.en,"Indi") then
-        -- Entrust allows Indi- spells to be cast on party members
-        rline.targets.Party = true
-    end
-
-    -- Generic adjustments
     if rline == nil then
         return {tpaftercast = player.tp, mpaftercast = player.mp, mppaftercast = player.mpp}
     end
