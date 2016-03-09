@@ -25,12 +25,12 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'instaLS'
-_addon.version = 0.151212
+_addon.version = 0.160309
 _addon.author = 'Byrth'
 
 flag=false
-chatmode = false
-chatcolor = false
+chatmode = {}
+chatcolor = {}
 message = false
 require 'strings'
 
@@ -50,20 +50,18 @@ windower.register_event('incoming chunk',function(id)
 end)
 
 windower.register_event('outgoing chunk',function(id,org,mod,inj)
-    if id == 0xB5 and not inj and chatmode and mod:byte(5) == 0 then -- and org:unpack('z',7) == message
+    if id == 0xB5 and not inj and #chatmode>0 and mod:byte(5) == 0 then -- and org:unpack('z',7) == message
         -- Not injected, message currently queued
-        local outpack = mod:sub(1,4)..string.char(chatmode)..mod:sub(6)
-        chatmode = false
+        local outpack = mod:sub(1,4)..string.char(table.remove(chatmode,1))..mod:sub(6)
         return outpack
     end
 end)
 
 windower.register_event('incoming text',function(org, mod, col)
-    if message and chatcolor and string.find(org,translate_escape(message)) then
+    if message and #chatcolor>0 and string.find(org,translate_escape(message)) then
         local a,b = string.find(mod,windower.ffxi.get_player().name)
-        mod = mod:sub(1,a-1)..'['..(chatcolor==6 and '1' or '2')..']<'..mod:sub(a,b)..'>'..mod:sub(b+3)
-        local retarr = {mod, chatcolor}
-        chatcolor = false
+        mod = mod:sub(1,a-1)..'['..(chatcolor[1]==6 and '1' or '2')..']<'..mod:sub(a,b)..'>'..mod:sub(b+3)
+        local retarr = {mod, table.remove(chatcolor,1)}
         message = nil
         return unpack(retarr)
     end
@@ -72,24 +70,24 @@ end)
 windower.register_event('outgoing text',function(org,mod,bool)
     if bool or flag then return end
     if mod:sub(1,3) == '/l ' then
-        chatmode = 0x05
-        chatcolor = 6
+        chatmode[#chatmode+1] = 0x05
+        chatcolor[#chatcolor+1] = 6
         message = mod:sub(4)
     elseif mod:sub(1,11) == '/linkshell ' then
-        chatmode = 0x05
-        chatcolor = 6
+        chatmode[#chatmode+1] = 0x05
+        chatcolor[#chatcolor+1] = 6
         message = mod:sub(12)
     elseif mod:sub(1,4) == '/l2 ' then
-        chatmode = 0x1B
-        chatcolor = 213
+        chatmode[#chatmode+1] = 0x1B
+        chatcolor[#chatcolor+1] = 213
         message = mod:sub(5)
     elseif mod:sub(1,12) == '/linkshell2 ' then
-        chatmode = 0x1B
-        chatcolor = 213
+        chatmode[#chatmode+1] = 0x1B
+        chatcolor[#chatcolor+1] = 213
         message = mod:sub(13)
+    else
+        return
     end
     
-    if chatmode and message then
-        return '/s '..message
-    end
+    return '/s '..message
 end)
