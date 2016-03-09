@@ -861,7 +861,7 @@ function cmd_reg:find_by_time(target_time)
         end
     end
     if time_stamp then
-        return ts,table.copy(self[ts])
+        return ts,table.reassign({},self[ts])
     end
 end
 
@@ -880,7 +880,7 @@ function cmd_reg:delete_by_id(id)
     for i,v in pairs(self) do
         if v.spell and v.spell.target then
             if v.spell.target.id == id then
-                last_entry = table.copy(self[i])
+                last_entry = table.reassign({},self[i])
                 ts = i
                 self[i] = nil
             end
@@ -902,7 +902,7 @@ end
 -----------------------------------------------------------------------------------
 function copy_entry(tab)
     if not tab then return nil end
-    local ret = setmetatable(table.copy(tab),getmetatable(tab))
+    local ret = setmetatable(table.reassign({},tab),getmetatable(tab))
     return ret
 end
 
@@ -1012,18 +1012,6 @@ end
 ---- rline - modified resource line
 -----------------------------------------------------------------------------------
 function spell_complete(rline)
-    -- Hardcoded adjustments
-    if rline.skill == 40 and buffactive.Pianissimo and rline.cast_time == 8 then
-        -- Pianissimo halves song casting time for buffs
-        rline.cast_time = 4
-        rline.targets.Party = true
-    end
-    if rline.skill == 44 and buffactive.Entrust and string.find(rline.en,"Indi") then
-        -- Entrust allows Indi- spells to be cast on party members
-        rline.targets.Party = true
-    end
-
-    -- Generic adjustments
     if rline == nil then
         return {tpaftercast = player.tp, mpaftercast = player.mp, mppaftercast = player.mpp}
     end
