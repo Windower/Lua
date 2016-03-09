@@ -309,7 +309,7 @@ xml_to_lua = {
 }
 
 prefix={
-    ["Blindna"]='/ja',
+    ["Blindna"]='/ma',
     ["Poisona"]='/ma',
     ["Cure III"]='/ma',
     ["Curaga V"]='/ma',
