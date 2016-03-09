@@ -479,7 +479,7 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             refresh_globals()
             pet.isvalid = false
             _ExtraData.pet = {}
-            next_packet_events.pet_change = {pet = table.reassign({},pet)}
+            next_packet_events.pet_change = {pet = table.copy(pet)}
         elseif subj_ind ~= 0 and not pet.isvalid then
             if not next_packet_events then next_packet_events = {sequence_id = data:unpack('H',3)} end
             _ExtraData.pet.tp = 0

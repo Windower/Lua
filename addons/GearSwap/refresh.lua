@@ -237,7 +237,7 @@ function refresh_player(dt,user_event_flag)
     end
     
     -- This being nil does not cause a return, but items should not really be changing when zoning.
-    local cur_equip = table.reassign({},items.equipment)
+    local cur_equip = table.copy(items.equipment)
             
     -- Assign player.equipment to be the gear that has been sent out and the server currently thinks
     -- you are wearing. (the sent_out_equip for loop above).

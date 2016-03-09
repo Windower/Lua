@@ -188,7 +188,7 @@ current_job_file = nil
 disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
 disable_table[0] = false
 outgoing_action_category_table = {['/ma']=3,['/ws']=7,['/ja']=9,['/ra']=16,['/ms']=25}
-encumbrance_table = table.reassign({},disable_table)
+encumbrance_table = table.copy(disable_table)
 registered_user_events = {}
 unhandled_command_events = {}
 empty = {name="empty"}

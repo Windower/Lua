@@ -113,7 +113,7 @@ function export_set(options)
     else
 ------------------------------------------ CHECK WHETHER THIS STILL WORKS --------------------------------------------------
         -- Default to loading the currently worn gear.
-        local gear = table.reassign({},items.equipment)
+        local gear = table.copy(items.equipment)
         local ward = items.wardrobe
 
         for i = 1,16 do -- ipairs will be used on item_list
