@@ -123,12 +123,14 @@ function target_make(targets)
             end
         end
     end
-
+        
     if targets[target_type] and target_type ~= 'Self' then
         return '<t>'
     elseif targets.Self then
         return '<me>'
-    else
+    elseif targets.Self or targets.Party or targets.Enemy or targets.NPC or targets.Ally or targets.Corpse then
         return '<t>'
+    else
+        return ''
     end
 end
