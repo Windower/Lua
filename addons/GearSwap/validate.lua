@@ -62,7 +62,7 @@ function validate_inventory(filter)
     local extra_items = search_sets_for_items_in_bag(items.inventory, filter)
     
     local display_list = get_item_names(extra_items):sort(insensitive_sort)
-    display_list:map(function(item) msg.add_to_chat(120, (string.gsub(item, "^%l", string.upper)) ) end)
+    display_list:map(function(item) msg.add_to_chat(120, windower.to_shift_jis((string.gsub(item, "^%l", string.upper))) ) end)
     msg.addon_msg(123,'Final count = '..tostring(display_list:length()))
 end
 
@@ -73,7 +73,7 @@ function validate_sets(filter)
     local missing_items = search_bags_for_items_in_set(sets, filter)
 
     local display_list = get_item_names(missing_items):sort(insensitive_sort)
-    display_list:map(function(item) msg.add_to_chat(120, (string.gsub(item, "^%l", string.upper)) ) end)
+    display_list:map(function(item) msg.add_to_chat(120, windower.to_shift_jis((string.gsub(item, "^%l", string.upper))) ) end)
     msg.addon_msg(123,'Final count = '..tostring(display_list:length()))
 end
 
