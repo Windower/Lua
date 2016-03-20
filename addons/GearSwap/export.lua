@@ -96,7 +96,7 @@ function export_set(options)
                         local augments = extdata.decode(v).augments or {}
                         local aug_str = ''
                         for aug_ind,augment in pairs(augments) do
-                            if augment ~= 'none' then aug_str = aug_str.."'"..augment.."'," end
+                            if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
                         end
                         if string.len(aug_str) > 0 then
                             item_list[#item_list].augments = aug_str
@@ -141,7 +141,7 @@ function export_set(options)
                         local augments = extdata.decode(item_tab).augments or {}
                         local aug_str = ''
                         for aug_ind,augment in pairs(augments) do
-                            if augment ~= 'none' then aug_str = aug_str.."'"..augment.."'," end
+                            if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
                         end
                         if string.len(aug_str) > 0 then
                             item_list[slot_map[slot_name]+1].augments = aug_str
@@ -245,13 +245,13 @@ function unpack_names(ret_tab,up,tab_level,unpacked_table,exported)
                 if tab_level.augments then
                     local aug_str = ''
                     for aug_ind,augment in pairs(tab_level.augments) do
-                        if augment ~= 'none' then aug_str = aug_str.."'"..augment.."'," end
+                        if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
                     end
                     if aug_str ~= '' then unpacked_table[#unpacked_table].augments = aug_str end
                 end
                 if tab_level.augment then
                     local aug_str = unpacked_table[#unpacked_table].augments or ''
-                    if tab_level.augment ~= 'none' then aug_str = aug_str.."'"..augment.."'," end
+                    if tab_level.augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
                     if aug_str ~= '' then unpacked_table[#unpacked_table].augments = aug_str end
                 end
                 exported[tempname:lower()] = true
