@@ -75,41 +75,94 @@ function set_spells(spellset)
         error(spellset..' was already equipped.')
         return
     end
-    windower.ffxi.reset_blue_magic_spells()
+    --[[windower.ffxi.reset_blue_magic_spells() ]]--
     log('Starting to set '..spellset..'.')
-    set_spells_from_spellset(spellset,1)
+    set_spells_from_spellset(spellset)
     return
 end
 
-function set_spells_from_spellset(spellset,slot)
-    local islot
-    if tonumber(slot) < 10 then 
-        islot = '0'..slot
-    else islot = slot end
-    local tempname = settings.spellsets[spellset]['slot'..islot]
-    if tempname ~= nil then
-        for spell in spells:it() do
-                if spell['english']:lower() == tempname:lower() then
-                    windower.ffxi.set_blue_magic_spell(spell['id'], tonumber(slot))
-                    break
-                end
+function set_spells_from_spellset(spellset)
+    local setToSet = settings.spellsets[spellset]
+    local currentSet = get_current_spellset()
+    local setSlot = 'none'
+    local spellToSet = 'none'
+    local slotToSetTo = 0
+    for k,v in pairs(currentSet) do
+      if not set_contains_value(setToSet, v) then
+        setSlot = k
+        slotToSetTo = tonumber(k:sub(5, k:len()))
+        --log('Found spell to remove: '..v..','..slotToSetTo)
+        break
+      end
+    end
+    if slotToSetTo == 0 then
+      --log('No spell to remove. Look for empty')
+      -- Find an empty slot
+      for i = 1, 20 do
+        local t = ''
+        if i < 10 then t = '0' end
+        local slotName = 'slot'..t..i
+        if currentSet[slotName] == nil then
+          slotToSetTo = i
+          --log('Found empty at: '..slotToSetTo)
+          break
         end
+      end
     end
-    if tonumber(slot) < 20 then
-        windower.send_command('@wait .5;lua i azuresets set_spells_from_spellset '..spellset..' '..slot+1)
+    for k,v in pairs(setToSet) do
+      if not set_contains_value(currentSet, v) then
+        spellToSet = k
+        --log('Found spell to set: '..v)
+        break
+      end
+    end
+    if setSlot ~= 'none' then
+      windower.ffxi.remove_blue_magic_spell(tonumber(slotToSetTo))
+      --log('Removed spell at: '..slotToSetTo)
+    end
+    if spellToSet ~= 'none' then
+      local spellName = setToSet[spellToSet]
+      if spellName ~= nil then
+        local spellID = find_spell_id_by_name(spellName)
+        if spellID ~= -1 then
+          windower.ffxi.set_blue_magic_spell(spellID, tonumber(slotToSetTo))
+          --log('Set spell:'..spellName..' at: '..slotToSetTo)
+        end
+      end
+    end
+    if setSlot == 'none' and spellToSet == 'none' then
+      log(spellset..' has been equipped.')
+      windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
     else
-        log(spellset..' has been equipped.')
-        windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
+      --log('Finding next spell: '..setSlot..','..spellToSet)
+      windower.send_command('@wait .5;lua i azuresets set_spells_from_spellset '..spellset)
     end
-    
+end
+
+function set_contains_value(set, value)
+  for k,v in pairs(set) do
+    if v:lower() == value:lower() then
+      return true
+    end
+  end
+  return false
+end
+
+function find_spell_id_by_name(spellname)
+  for spell in spells:it() do
+    if spell['english']:lower() == spellname:lower() then
+        return spell['id']
+    end
+  end
+  return -1
 end
 
 function set_single_spell(setspell,slot)
     if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
-    
+
     local tmpTable = T(get_current_spellset())
     for key,val in pairs(tmpTable) do
-        if tmpTable[key]:lower() == setspell then 
+        if tmpTable[key]:lower() == setspell then
             error('That spell is already set.')
             return
         end
