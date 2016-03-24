@@ -88,7 +88,7 @@ end
 -----------------------------------------------------------------------------------
 --Name: target_make(targarr)
 --Args:
----- targarr (table of booleans): Keyed to potential targets
+---- targets (table of booleans): Keyed to potential targets
 -----------------------------------------------------------------------------------
 --Returns:
 ---- Created valid target, defaulting to '<me>'
@@ -123,12 +123,13 @@ function target_make(targets)
             end
         end
     end
-    
+        
     if targets[target_type] and target_type ~= 'Self' then
         return '<t>'
     elseif targets.Self then
---    windower.add_to_chat(8,"got to the end "..tostring(target_type))
         return '<me>'
+    elseif targets.Self or targets.Party or targets.Enemy or targets.NPC or targets.Ally or targets.Corpse then
+        return '<t>'
     else
         return ''
     end

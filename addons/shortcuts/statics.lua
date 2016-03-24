@@ -60,7 +60,7 @@ local function new_cmd_entry(default_targets,subcommands)
     return rettab
 end
 
-local emote_table = new_cmd_entry(PC_targets,{motion=true})
+local emote_table = new_cmd_entry(All_targets,{motion=true})
 
 command2_list = {
     --['kick']=true, --Is this actually a command?

@@ -377,8 +377,8 @@ function interp_text(splitline,offset,modified)
         -- Handling for abilities that change potential targets.
         if r_line.skill == 40 and r_line.cast_time == 8 and L(player.buffs):contains(409) then
             targets.Party = true -- Pianissimo changes the target list of 
-        elseif r_line.skill == 44 and r_line.en:find('Indi-') and not L(player.buffs):contains(584) then
-            targets.Party = false -- Indi- spells default to castable on party for some reason
+        elseif r_line.skill == 44 and r_line.en:find('Indi-') and L(player.buffs):contains(584) then
+            targets.Party = true -- Indi- spells can be cast on others when Entrust is up
         end
         
         local abil_name = r_line.english -- Remove spaces at the end of the ability name.
