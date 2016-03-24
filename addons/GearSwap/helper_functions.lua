@@ -568,7 +568,7 @@ function find_usable_item(item_id,bool)
     -- Should I add some kind of filter for enchanted items?
     if not inventory_index then
         for i,v in pairs(items.inventory) do
-            if type(v) == 'table' and v.id == item_id and (not bool or is_usable_item(v)) then
+            if type(v) == 'table' and v.id == item_id and (v.status == 5 or v.status == 0) and (not bool or is_usable_item(v)) then
                 inventory_index = i
                 bag_id = 0
                 break
@@ -577,7 +577,7 @@ function find_usable_item(item_id,bool)
     end
     if not inventory_index then
         for i,v in pairs(items.wardrobe) do
-            if type(v) == 'table' and v.id == item_id and (not bool or is_usable_item(v)) then
+            if type(v) == 'table' and v.id == item_id and (v.status == 5 or v.status == 0) and (not bool or is_usable_item(v)) then
                 inventory_index = i
                 bag_id = 8
                 break
@@ -639,7 +639,7 @@ function filter_pretarget(spell)
         local spell_jobs = copy_entry(res.spells[spell.id].levels)
         
         -- Filter for spells that you do not know. Exclude Impact.
-        if not available_spells[spell.id] and not (spell.id == 503) then
+        if not available_spells[spell.id] and not (spell.id == 503 or spell.id == 417) then
             msg.debugging("Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
         -- Filter for spells that you know, but do not currently have access to
@@ -1013,12 +1013,12 @@ end
 -----------------------------------------------------------------------------------
 function spell_complete(rline)
     -- Hardcoded adjustments
-    if rline.skill == 40 and buffactive.Pianissimo and rline.cast_time == 8 then
+    if rline and rline.skill == 40 and buffactive.Pianissimo and rline.cast_time == 8 then
         -- Pianissimo halves song casting time for buffs
         rline.cast_time = 4
         rline.targets.Party = true
     end
-    if rline.skill == 44 and buffactive.Entrust and string.find(rline.en,"Indi") then
+    if rline and rline.skill == 44 and buffactive.Entrust and string.find(rline.en,"Indi") then
         -- Entrust allows Indi- spells to be cast on party members
         rline.targets.Party = true
     end
