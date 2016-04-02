@@ -63,7 +63,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
                 pet_abilities[#pet_abilities+1] = v
             end
         end
-        if pet_abilities[splitline[2]] then
+        if pet_abilities[tonumber(splitline[2])] then
             abil = res.job_abilities[pet_abilities[tonumber(splitline[2])]].name:gsub(string.char(7),' '):lower() -- .name, or .english?
         end
     end
