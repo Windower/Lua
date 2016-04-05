@@ -155,7 +155,7 @@ function equip_sets(swap_type,ts,...)
             end
         end
 
-        -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v={bag_id=0 or 8, slot=inventory slot}.
+        -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v={bag_id=0 or 8 or 10, slot=inventory slot}.
         local equip_next,priorities = unpack_equip_list(equip_list)
         equip_next = eliminate_redundant(cur_equip,equip_next) -- Eliminate the equip commands for items that are already equipped
         

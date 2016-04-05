@@ -250,6 +250,7 @@ function refresh_player(dt,user_event_flag)
     if items.satchel then player.satchel = refresh_item_list(items.satchel) end
     if items.case then player.case = refresh_item_list(items.case) end
     if items.wardrobe then player.wardrobe = refresh_item_list(items.wardrobe) end
+    if items.wardrobe2 then player.wardrobe2 = refresh_item_list(items.wardrobe2) end
     
     -- Monster tables for the target and subtarget.
     player.target = target_complete(windower.ffxi.get_mob_by_target('t'))
@@ -490,6 +491,12 @@ function refresh_group_info(dt,user_event_flag)
     local c_alliance = make_alliance()
     
     local j = windower.ffxi.get_party() or {}
+    
+    c_alliance.leader = j.alliance_leader -- Test whether this works
+    c_alliance[1].leader = j.party1_leader
+    c_alliance[2].leader = j.party2_leader
+    c_alliance[3].leader = j.party3_leader
+    
     for i,v in pairs(j) do
         if type(v) == 'table' and v.mob and v.mob.race then
             v.mob.race_id = v.mob.race
@@ -510,17 +517,31 @@ function refresh_group_info(dt,user_event_flag)
         end
         
         if allyIndex and partyIndex then
-            local mob = windower.ffxi.get_mob_by_name(v.name)
-            if mob and partybuffs[mob.index] then
-                v.buffactive = convert_buff_list(partybuffs[mob.index].buffs)
-            elseif mob and mob.index == player.index then
+            if v.mob and partybuffs[v.mob.index] then
+                v.buffactive = convert_buff_list(partybuffs[v.mob.index].buffs)
+            elseif v.mob and v.mob.index == player.index then
                 v.buffactive = buffactive
             end
             c_alliance[allyIndex][partyIndex] = v
             c_alliance[allyIndex].count = c_alliance[allyIndex].count + 1
             c_alliance.count = c_alliance.count + 1
+            
+            if v.mob then
+                if v.mob.id == c_alliance[1].leader then
+                    c_alliance[1].leader = v
+                elseif v.mob.id == c_alliance[2].leader then
+                    c_alliance[2].leader = v
+                elseif v.mob.id == c_alliance[3].leader then
+                    c_alliance[3].leader = v
+                end
+                
+                if v.mob.id == c_alliance.leader then
+                    c_alliance.leader = v
+                end
+            end
         end
     end
+    
         
     -- Clear the old structure while maintaining the party references:
     for ally_party = 1,3 do
@@ -530,12 +551,14 @@ function refresh_group_info(dt,user_event_flag)
         alliance[ally_party].count = 0
     end
     alliance.count = 0
+    alliance.leader = nil
     
     -- Reassign to the new structure
     table.reassign(alliance[1],c_alliance[1])
     table.reassign(alliance[2],c_alliance[2])
     table.reassign(alliance[3],c_alliance[3])
     alliance.count = c_alliance.count
+    alliance.leader = c_alliance.leader
 end
 
 -----------------------------------------------------------------------------------
@@ -548,10 +571,11 @@ end
 -----------------------------------------------------------------------------------
 function make_alliance()
     local all = make_user_table()
-    all[1]={count=0}
-    all[2]={count=0}
-    all[3]={count=0}
+    all[1]={count=0,leader=nil}
+    all[2]={count=0,leader=nil}
+    all[3]={count=0,leader=nil}
     all.count=0
+    all.leader=nil
     return all
 end
 
