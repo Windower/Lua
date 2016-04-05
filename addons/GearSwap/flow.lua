@@ -462,7 +462,7 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
             
             for id,name in pairs(default_slot_map) do
                 if items.equipment[name].slot ~= empty then
-                    local bag = to_windower_api(res.bags[items.equipment[name].bag_id].english)
+                    local bag = to_bag_api(res.bags[items.equipment[name].bag_id].english)
                     items[bag][items.equipment[name].slot].status = 0
                     items.equipment[name] = {slot=empty,bag_id=0}
                 end

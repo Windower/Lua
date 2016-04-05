@@ -203,6 +203,19 @@ function to_windower_api(str)
 end
 
 -----------------------------------------------------------------------------------
+----Name: to_bag_api(str)
+-- Takes strings and converts them to resources table key format
+----Args:
+-- str - String to be converted to the windower bag API version
+-----------------------------------------------------------------------------------
+----Returns:
+-- a lower case string with ' ' eliminated
+-----------------------------------------------------------------------------------
+function to_bag_api(str)
+    return __raw.lower(str:gsub(' ',''))
+end
+
+-----------------------------------------------------------------------------------
 ----Name: to_windower_compact(str)
 -- Takes strings and converts them to a compact version of the resource table key
 ----Args:
