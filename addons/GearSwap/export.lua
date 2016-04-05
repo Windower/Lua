@@ -115,6 +115,7 @@ function export_set(options)
         -- Default to loading the currently worn gear.
         local gear = table.reassign({},items.equipment)
         local ward = items.wardrobe
+        local ward2 = items.wardrobe2
 
         for i = 1,16 do -- ipairs will be used on item_list
             if not item_list[i] then
@@ -131,6 +132,8 @@ function export_set(options)
                     item_tab = inv[gs_item_tab.slot]
                 elseif gs_item_tab.bag_id == 8 and res.items[ward[gs_item_tab.slot].id] then
                     item_tab = ward[gs_item_tab.slot]
+                elseif gs_item_tab.bag_id == 10 and res.items[ward2[gs_item_tab.slot].id] then
+                    item_tab = ward2[gs_item_tab.slot]
                 end
                 if res.items[item_tab.id] then
                     item_list[slot_map[slot_name]+1] = {

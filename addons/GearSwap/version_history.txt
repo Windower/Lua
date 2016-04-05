@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.915 - Added wardrobe2.
+-------------------------------------------------
 GearSwap 0.914 - Added /bstpet handling.
 -------------------------------------------------
 GearSwap 0.913 - Fixed japanese job point filter in filter_pretarget

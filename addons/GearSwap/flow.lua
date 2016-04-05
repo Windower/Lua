@@ -155,7 +155,7 @@ function equip_sets(swap_type,ts,...)
             end
         end
 
-        -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v={bag_id=0 or 8, slot=inventory slot}.
+        -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v={bag_id=0 or 8 or 10, slot=inventory slot}.
         local equip_next,priorities = unpack_equip_list(equip_list)
         equip_next = eliminate_redundant(cur_equip,equip_next) -- Eliminate the equip commands for items that are already equipped
         
@@ -462,7 +462,7 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
             
             for id,name in pairs(default_slot_map) do
                 if items.equipment[name].slot ~= empty then
-                    local bag = to_windower_api(res.bags[items.equipment[name].bag_id].english)
+                    local bag = to_bag_api(res.bags[items.equipment[name].bag_id].english)
                     items[bag][items.equipment[name].slot].status = 0
                     items.equipment[name] = {slot=empty,bag_id=0}
                 end

@@ -203,6 +203,19 @@ function to_windower_api(str)
 end
 
 -----------------------------------------------------------------------------------
+----Name: to_bag_api(str)
+-- Takes strings and converts them to resources table key format
+----Args:
+-- str - String to be converted to the windower bag API version
+-----------------------------------------------------------------------------------
+----Returns:
+-- a lower case string with ' ' eliminated
+-----------------------------------------------------------------------------------
+function to_bag_api(str)
+    return __raw.lower(str:gsub(' ',''))
+end
+
+-----------------------------------------------------------------------------------
 ----Name: to_windower_compact(str)
 -- Takes strings and converts them to a compact version of the resource table key
 ----Args:
@@ -580,6 +593,15 @@ function find_usable_item(item_id,bool)
             if type(v) == 'table' and v.id == item_id and (v.status == 5 or v.status == 0) and (not bool or is_usable_item(v)) then
                 inventory_index = i
                 bag_id = 8
+                break
+            end
+        end
+    end
+    if not inventory_index then
+        for i,v in pairs(items.wardrobe2) do
+            if type(v) == 'table' and v.id == item_id and (v.status == 5 or v.status == 0) and (not bool or is_usable_item(v)) then
+                inventory_index = i
+                bag_id = 10
                 break
             end
         end
