@@ -75,7 +75,7 @@ function set_spells(spellset)
         error(spellset..' was already equipped.')
         return
     end
-    --[[windower.ffxi.reset_blue_magic_spells() ]]--
+
     log('Starting to set '..spellset..'.')
     set_spells_from_spellset(spellset, 'remove')
     return
@@ -84,7 +84,7 @@ end
 function set_spells_from_spellset(spellset, setPhase)
     local setToSet = settings.spellsets[spellset]
     local currentSet = get_current_spellset()
-    --log_set(currentSet)
+    
     if setPhase == 'remove' then
       -- Remove Phase
       for k,v in pairs(currentSet) do
