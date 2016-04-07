@@ -88,7 +88,7 @@ function set_spells_from_spellset(spellset, setPhase)
     if setPhase == 'remove' then
       -- Remove Phase
       for k,v in pairs(currentSet) do
-        if not set_contains_value(setToSet, v) then
+        if not setToSet:contains(v:lower()) then
           setSlot = k
           local slotToRemove = tonumber(k:sub(5, k:len()))
 
@@ -102,24 +102,22 @@ function set_spells_from_spellset(spellset, setPhase)
     end
     -- Did not find spell to remove. Start set phase
     -- Find empty slot:
-    local slotToSetTo = -1
+    local slotToSetTo
     for i = 1, 20 do
-      local t = ''
-      if i < 10 then t = '0' end
-      local slotName = 'slot'..t..i
+      local slotName = 'slot%02u':format(i)
       if currentSet[slotName] == nil then
         slotToSetTo = i
         break
       end
     end
 
-    if slotToSetTo ~= -1 then
+    if slotToSetTo ~= nil then
       -- We found an empty slot. Find a spell to set.
       for k,v in pairs(setToSet) do
-        if not set_contains_value(currentSet, v) then
+        if not currentSet:contains(v:lower()) then
           if v ~= nil then
             local spellID = find_spell_id_by_name(v)
-            if spellID ~= -1 then
+            if spellID ~= nil then
               windower.ffxi.set_blue_magic_spell(spellID, tonumber(slotToSetTo))
               --log('Set spell: '..v..' ('..spellID..') at: '..slotToSetTo)
               windower.send_command('@wait .65;lua i azuresets set_spells_from_spellset '..spellset..' add')
@@ -135,22 +133,13 @@ function set_spells_from_spellset(spellset, setPhase)
     windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
 end
 
-function set_contains_value(set, value)
-  for k,v in pairs(set) do
-    if v:lower() == value:lower() then
-      return true
-    end
-  end
-  return false
-end
-
 function find_spell_id_by_name(spellname)
   for spell in spells:it() do
     if spell['english']:lower() == spellname:lower() then
         return spell['id']
     end
   end
-  return -1
+  return nil
 end
 
 function set_single_spell(setspell,slot)
@@ -178,27 +167,14 @@ function set_single_spell(setspell,slot)
 end
 
 function get_current_spellset()
-    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
-    local spellTable = T{}
-    local tmpTable = T{}
-    if windower.ffxi.get_player()['main_job_id'] == 16 then
-        local tmp = windower.ffxi.get_mjob_data()['spells']
-        for k,v in pairs(tmp) do
-            if tonumber(v) ~= 512 then
-                for spell in spells:it() do
-                    if tonumber(v) == tonumber(spell['id']) then
-                        if tonumber(k) < 10 then
-                          spellTable['slot0'..k] = spell['english']:lower()
-                        else
-                          spellTable['slot'..k] = spell['english']:lower()
-                        end
-                        break
-                    end
-                end
-            end
-        end
-    end
-    return spellTable
+    if windower.ffxi.get_player().main_job_id ~= 16 then return nil end
+    return T(windower.ffxi.get_mjob_data().spells)
+        -- Returns all values but 512
+        :filter(function(id) return id ~= 512 end)
+        -- Transforms them from IDs to lowercase English names
+        :map(function(id) return spells[id].english:lower() end)
+        -- Transform the keys from numeric x or xx to string 'slot0x' or 'slotxx'
+        :key_map(function(slot) return 'slot%02u':format(slot) end)
 end
 
 function remove_all_spells(trigger)
