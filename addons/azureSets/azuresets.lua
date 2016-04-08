@@ -5,14 +5,14 @@ All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-    * Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
-    * Neither the name of azureSets nor the
-    names of its contributors may be used to endorse or promote products
-    derived from this software without specific prior written permission.
+* Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+* Neither the name of azureSets nor the
+names of its contributors may be used to endorse or promote products
+derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -84,48 +84,48 @@ end
 function set_spells_from_spellset(spellset, setPhase)
     local setToSet = settings.spellsets[spellset]
     local currentSet = get_current_spellset()
-    
+
     if setPhase == 'remove' then
-      -- Remove Phase
-      for k,v in pairs(currentSet) do
-        if not setToSet:contains(v:lower()) then
-          setSlot = k
-          local slotToRemove = tonumber(k:sub(5, k:len()))
+        -- Remove Phase
+        for k,v in pairs(currentSet) do
+            if not setToSet:contains(v:lower()) then
+                setSlot = k
+                local slotToRemove = tonumber(k:sub(5, k:len()))
 
-          windower.ffxi.remove_blue_magic_spell(slotToRemove)
-          --log('Removed spell: '..v..' at #'..slotToRemove)
+                windower.ffxi.remove_blue_magic_spell(slotToRemove)
+                --log('Removed spell: '..v..' at #'..slotToRemove)
 
-          windower.send_command('@wait .65;lua i azuresets set_spells_from_spellset '..spellset..' remove')
-          return
+                windower.send_command('@wait .65;lua i azuresets set_spells_from_spellset '..spellset..' remove')
+                return
+            end
         end
-      end
     end
     -- Did not find spell to remove. Start set phase
     -- Find empty slot:
     local slotToSetTo
     for i = 1, 20 do
-      local slotName = 'slot%02u':format(i)
-      if currentSet[slotName] == nil then
-        slotToSetTo = i
-        break
-      end
+        local slotName = 'slot%02u':format(i)
+        if currentSet[slotName] == nil then
+            slotToSetTo = i
+            break
+        end
     end
 
     if slotToSetTo ~= nil then
-      -- We found an empty slot. Find a spell to set.
-      for k,v in pairs(setToSet) do
-        if not currentSet:contains(v:lower()) then
-          if v ~= nil then
-            local spellID = find_spell_id_by_name(v)
-            if spellID ~= nil then
-              windower.ffxi.set_blue_magic_spell(spellID, tonumber(slotToSetTo))
-              --log('Set spell: '..v..' ('..spellID..') at: '..slotToSetTo)
-              windower.send_command('@wait .65;lua i azuresets set_spells_from_spellset '..spellset..' add')
-              return
+        -- We found an empty slot. Find a spell to set.
+        for k,v in pairs(setToSet) do
+            if not currentSet:contains(v:lower()) then
+                if v ~= nil then
+                    local spellID = find_spell_id_by_name(v)
+                    if spellID ~= nil then
+                        windower.ffxi.set_blue_magic_spell(spellID, tonumber(slotToSetTo))
+                        --log('Set spell: '..v..' ('..spellID..') at: '..slotToSetTo)
+                        windower.send_command('@wait .65;lua i azuresets set_spells_from_spellset '..spellset..' add')
+                        return
+                    end
+                end
             end
-          end
         end
-      end
     end
 
     -- Unable to find any spells to set. Must be complete.
@@ -134,12 +134,12 @@ function set_spells_from_spellset(spellset, setPhase)
 end
 
 function find_spell_id_by_name(spellname)
-  for spell in spells:it() do
-    if spell['english']:lower() == spellname:lower() then
-        return spell['id']
+    for spell in spells:it() do
+        if spell['english']:lower() == spellname:lower() then
+            return spell['id']
+        end
     end
-  end
-  return nil
+    return nil
 end
 
 function set_single_spell(setspell,slot)
@@ -154,27 +154,27 @@ function set_single_spell(setspell,slot)
     end
     if tonumber(slot) < 10 then slot = '0'..slot end
     --insert spell add code here
-        for spell in spells:it() do
-            if spell['english']:lower() == setspell then
-                --This is where single spell setting code goes.
-                --Need to set by spell id rather than name.
-                windower.ffxi.set_blue_magic_spell(spell['id'], tonumber(slot))
-                windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
-                tmpTable['slot'..slot] = setspell
-            end
+    for spell in spells:it() do
+        if spell['english']:lower() == setspell then
+            --This is where single spell setting code goes.
+            --Need to set by spell id rather than name.
+            windower.ffxi.set_blue_magic_spell(spell['id'], tonumber(slot))
+            windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
+            tmpTable['slot'..slot] = setspell
         end
+    end
     tmpTable = nil
 end
 
 function get_current_spellset()
     if windower.ffxi.get_player().main_job_id ~= 16 then return nil end
     return T(windower.ffxi.get_mjob_data().spells)
-        -- Returns all values but 512
-        :filter(function(id) return id ~= 512 end)
-        -- Transforms them from IDs to lowercase English names
-        :map(function(id) return spells[id].english:lower() end)
-        -- Transform the keys from numeric x or xx to string 'slot0x' or 'slotxx'
-        :key_map(function(slot) return 'slot%02u':format(slot) end)
+    -- Returns all values but 512
+    :filter(function(id) return id ~= 512 end)
+    -- Transforms them from IDs to lowercase English names
+    :map(function(id) return spells[id].english:lower() end)
+    -- Transform the keys from numeric x or xx to string 'slot0x' or 'slotxx'
+    :key_map(function(slot) return 'slot%02u':format(slot) end)
 end
 
 function remove_all_spells(trigger)
@@ -246,17 +246,16 @@ windower.register_event('addon command', function(...)
             end
         elseif comm == 'help' then
             local helptext = [[AzureSets - Command List:')
-  1. removeall - Unsets all spells.
-  2. spellset <setname> -- Set (setname)'s spells.
-  3. add <slot> <spell> -- Set (spell) to slot (slot (number)).
-  4. save <setname> -- Saves current spellset as (setname).
-  5. currentlist -- Lists currently set spells.
-  6. setlist -- Lists all spellsets.
-  7. spelllist <setname> -- List spells in (setname)
-  8. help --Shows this menu.]]
+            1. removeall - Unsets all spells.
+            2. spellset <setname> -- Set (setname)'s spells.
+            3. add <slot> <spell> -- Set (spell) to slot (slot (number)).
+            4. save <setname> -- Saves current spellset as (setname).
+            5. currentlist -- Lists currently set spells.
+            6. setlist -- Lists all spellsets.
+            7. spelllist <setname> -- List spells in (setname)
+            8. help --Shows this menu.]]
             for _, line in ipairs(helptext:split('\n')) do
                 windower.add_to_chat(207, line..chat.controls.reset)
-
             end
         end
     end
