@@ -5,14 +5,14 @@ All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-    * Redistributions of source code must retain the above copyright
-    notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-    notice, this list of conditions and the following disclaimer in the
-    documentation and/or other materials provided with the distribution.
-    * Neither the name of azureSets nor the
-    names of its contributors may be used to endorse or promote products
-    derived from this software without specific prior written permission.
+* Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+* Neither the name of azureSets nor the
+names of its contributors may be used to endorse or promote products
+derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -45,8 +45,8 @@ defaults.spellsets = {}
 defaults.spellsets.default = T{}
 defaults.spellsets.vw1 = T{slot01='Firespit', slot02='Heat Breath', slot03='Thermal Pulse', slot04='Blastbomb',
 slot05='Infrasonics', slot06='Frost Breath', slot07='Ice Break', slot08='Cold Wave',
-slot09='Sandspin', slot10='Magnetite Cloud', slot11='Cimicine Discharge', slot12='Bad Breath', 
-slot13='Acrid Stream', slot14='Maelstrom', slot15='Corrosive Ooze', slot16='Cursed Sphere', 
+slot09='Sandspin', slot10='Magnetite Cloud', slot11='Cimicine Discharge', slot12='Bad Breath',
+slot13='Acrid Stream', slot14='Maelstrom', slot15='Corrosive Ooze', slot16='Cursed Sphere',
 slot17='Awful Eye'
 }
 defaults.spellsets.vw2 = T{slot01='Hecatomb Wave', slot02='Mysterious Light', slot03='Leafstorm', slot04='Reaving Wind',
@@ -75,80 +75,106 @@ function set_spells(spellset)
         error(spellset..' was already equipped.')
         return
     end
-    windower.ffxi.reset_blue_magic_spells()
+
     log('Starting to set '..spellset..'.')
-    set_spells_from_spellset(spellset,1)
+    set_spells_from_spellset(spellset, 'remove')
     return
 end
 
-function set_spells_from_spellset(spellset,slot)
-    local islot
-    if tonumber(slot) < 10 then 
-        islot = '0'..slot
-    else islot = slot end
-    local tempname = settings.spellsets[spellset]['slot'..islot]
-    if tempname ~= nil then
-        for spell in spells:it() do
-                if spell['english']:lower() == tempname:lower() then
-                    windower.ffxi.set_blue_magic_spell(spell['id'], tonumber(slot))
-                    break
-                end
+function set_spells_from_spellset(spellset, setPhase)
+    local setToSet = settings.spellsets[spellset]
+    local currentSet = get_current_spellset()
+
+    if setPhase == 'remove' then
+        -- Remove Phase
+        for k,v in pairs(currentSet) do
+            if not setToSet:contains(v:lower()) then
+                setSlot = k
+                local slotToRemove = tonumber(k:sub(5, k:len()))
+
+                windower.ffxi.remove_blue_magic_spell(slotToRemove)
+                --log('Removed spell: '..v..' at #'..slotToRemove)
+
+                windower.send_command('@wait .65;lua i azuresets set_spells_from_spellset '..spellset..' remove')
+                return
+            end
         end
     end
-    if tonumber(slot) < 20 then
-        windower.send_command('@wait .5;lua i azuresets set_spells_from_spellset '..spellset..' '..slot+1)
-    else
-        log(spellset..' has been equipped.')
-        windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
+    -- Did not find spell to remove. Start set phase
+    -- Find empty slot:
+    local slotToSetTo
+    for i = 1, 20 do
+        local slotName = 'slot%02u':format(i)
+        if currentSet[slotName] == nil then
+            slotToSetTo = i
+            break
+        end
     end
-    
+
+    if slotToSetTo ~= nil then
+        -- We found an empty slot. Find a spell to set.
+        for k,v in pairs(setToSet) do
+            if not currentSet:contains(v:lower()) then
+                if v ~= nil then
+                    local spellID = find_spell_id_by_name(v)
+                    if spellID ~= nil then
+                        windower.ffxi.set_blue_magic_spell(spellID, tonumber(slotToSetTo))
+                        --log('Set spell: '..v..' ('..spellID..') at: '..slotToSetTo)
+                        windower.send_command('@wait .65;lua i azuresets set_spells_from_spellset '..spellset..' add')
+                        return
+                    end
+                end
+            end
+        end
+    end
+
+    -- Unable to find any spells to set. Must be complete.
+    log(spellset..' has been equipped.')
+    windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
+end
+
+function find_spell_id_by_name(spellname)
+    for spell in spells:it() do
+        if spell['english']:lower() == spellname:lower() then
+            return spell['id']
+        end
+    end
+    return nil
 end
 
 function set_single_spell(setspell,slot)
     if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
-    
+
     local tmpTable = T(get_current_spellset())
     for key,val in pairs(tmpTable) do
-        if tmpTable[key]:lower() == setspell then 
+        if tmpTable[key]:lower() == setspell then
             error('That spell is already set.')
             return
         end
     end
     if tonumber(slot) < 10 then slot = '0'..slot end
     --insert spell add code here
-        for spell in spells:it() do
-            if spell['english']:lower() == setspell then
-                --This is where single spell setting code goes.
-                --Need to set by spell id rather than name.
-                windower.ffxi.set_blue_magic_spell(spell['id'], tonumber(slot))
-                windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
-                tmpTable['slot'..slot] = setspell
-            end
+    for spell in spells:it() do
+        if spell['english']:lower() == setspell then
+            --This is where single spell setting code goes.
+            --Need to set by spell id rather than name.
+            windower.ffxi.set_blue_magic_spell(spell['id'], tonumber(slot))
+            windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
+            tmpTable['slot'..slot] = setspell
         end
+    end
     tmpTable = nil
 end
 
 function get_current_spellset()
-    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
-    local spellTable = T{}
-    local tmpTable = T{}
-    if windower.ffxi.get_player()['main_job_id'] == 16 then
-        local tmpTable = T(windower.ffxi.get_mjob_data()['spells'])
-        local i,id
-        for i = 1, #tmpTable do
-            local t = ''
-            if tonumber(tmpTable[i]) ~= 512 then
-                for spell in spells:it() do
-                    if tonumber(tmpTable[i]) == tonumber(spell['id']) then
-                        if i < 10 then t = '0' end
-                        spellTable['slot'..t..i] = spell['english']:lower()
-                        break
-                    end
-                end
-            end
-        end
-    end
-    return spellTable
+    if windower.ffxi.get_player().main_job_id ~= 16 then return nil end
+    return T(windower.ffxi.get_mjob_data().spells)
+    -- Returns all values but 512
+    :filter(function(id) return id ~= 512 end)
+    -- Transforms them from IDs to lowercase English names
+    :map(function(id) return spells[id].english:lower() end)
+    -- Transform the keys from numeric x or xx to string 'slot0x' or 'slotxx'
+    :key_map(function(slot) return 'slot%02u':format(slot) end)
 end
 
 function remove_all_spells(trigger)
@@ -157,9 +183,9 @@ function remove_all_spells(trigger)
 end
 
 function save_set(setname)
-    if setname == 'default' then 
-        error('Please choose a name other than default.') 
-        return 
+    if setname == 'default' then
+        error('Please choose a name other than default.')
+        return
     end
     local curSpells = T(get_current_spellset())
     settings.spellsets[setname] = curSpells
@@ -188,7 +214,7 @@ end
 windower.register_event('addon command', function(...)
     if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then
         error('You are not on (main) Blue Mage.')
-        return nil 
+        return nil
     end
     local args = T{...}
     if args ~= nil then
@@ -205,7 +231,7 @@ windower.register_event('addon command', function(...)
             if args[1] ~= nil then
                 save_set(args[1])
             end
-            
+
         elseif comm == 'spellset' then
             if args[1] ~= nil then
                 set_spells(args[1])
@@ -220,17 +246,16 @@ windower.register_event('addon command', function(...)
             end
         elseif comm == 'help' then
             local helptext = [[AzureSets - Command List:')
-  1. removeall - Unsets all spells.
-  2. spellset <setname> -- Set (setname)'s spells.
-  3. add <slot> <spell> -- Set (spell) to slot (slot (number)).
-  4. save <setname> -- Saves current spellset as (setname).
-  5. currentlist -- Lists currently set spells.
-  6. setlist -- Lists all spellsets.
-  7. spelllist <setname> -- List spells in (setname)
-  8. help --Shows this menu.]]
+            1. removeall - Unsets all spells.
+            2. spellset <setname> -- Set (setname)'s spells.
+            3. add <slot> <spell> -- Set (spell) to slot (slot (number)).
+            4. save <setname> -- Saves current spellset as (setname).
+            5. currentlist -- Lists currently set spells.
+            6. setlist -- Lists all spellsets.
+            7. spelllist <setname> -- List spells in (setname)
+            8. help --Shows this menu.]]
             for _, line in ipairs(helptext:split('\n')) do
                 windower.add_to_chat(207, line..chat.controls.reset)
-                
             end
         end
     end
