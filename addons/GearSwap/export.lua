@@ -25,12 +25,14 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 function export_set(options)
-    local item_list = {}
+    local item_list = T{}
     local targinv,xml,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing
     if #options > 0 then
         for _,v in ipairs(options) do
             if S{'inventory','inv','i'}:contains(v:lower()) then
                 targinv = true
+            elseif v:lower() == 'all' then
+                all_items = true
             elseif S{'xml'}:contains(v:lower()) then
                 xml = true
             elseif S{'sets','set','s'}:contains(v:lower()) then
@@ -50,7 +52,9 @@ function export_set(options)
     end
     
     local buildmsg = 'Exporting '
-    if targinv then
+    if all_items then
+        buildmsg = buildmsg..'your all items'
+    elseif targinv then
         buildmsg = buildmsg..'your current inventory'
     elseif all_sets then
         buildmsg = buildmsg..'your current sets table'
@@ -80,33 +84,13 @@ function export_set(options)
     end
     
     local inv = items.inventory
-    if targinv then
-        -- Load the entire inventory
-        for _,v in pairs(inv) do
-            if type(v) == 'table' and v.id ~= 0 then
-                if res.items[v.id] then
-                    item_list[#item_list+1] = {}
-                    item_list[#item_list].name = res.items[v.id][language]
-                    local potslots,slot = copy_entry(res.items[v.id].slots)
-                    if potslots then
-                        slot = res.slots[potslots:it()()].english:gsub(' ','_'):lower() -- Multi-lingual support requires that we add more languages to slots.lua
-                    end
-                    item_list[#item_list].slot = slot or 'item'
-                    if not xml then
-                        local augments = extdata.decode(v).augments or {}
-                        local aug_str = ''
-                        for aug_ind,augment in pairs(augments) do
-                            if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
-                        end
-                        if string.len(aug_str) > 0 then
-                            item_list[#item_list].augments = aug_str
-                        end
-                    end
-                else
-                    msg.addon_msg(123,'You possess an item that is not in the resources yet.')
-                end
-            end
+    local bag_list = {'inventory', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case', 'wardrobe', 'safe2', 'wardrobe2'}
+    if all_items then
+        for _, bag in ipairs(bag_list) do
+            item_list = table.extend(item_list, get_item_list(items[bag]))
         end
+    elseif targinv then
+        item_list = table.extend(item_list, get_item_list(inv))
     elseif all_sets then
         -- Iterate through user_env.sets and find all the gear.
         item_list,exported = unpack_names({},'L1',user_env.sets,{},{empty=true})
@@ -291,4 +275,35 @@ end
 function xmlify(phrase)
     if tonumber(phrase:sub(1,1)) then phrase = 'NUM'..phrase end
     return phrase --:gsub('"','&quot;'):gsub("'","&apos;"):gsub('<','&lt;'):gsub('>','&gt;'):gsub('&&','&amp;')
+end
+
+function get_item_list(bag)
+    local items_in_bag = {}
+    -- Load the entire inventory
+    for _,v in pairs(bag) do
+        if type(v) == 'table' and v.id ~= 0 then
+            if res.items[v.id] then
+                items_in_bag[#items_in_bag+1] = {}
+                items_in_bag[#items_in_bag].name = res.items[v.id][language]
+                local potslots,slot = copy_entry(res.items[v.id].slots)
+                if potslots then
+                    slot = res.slots[potslots:it()()].english:gsub(' ','_'):lower() -- Multi-lingual support requires that we add more languages to slots.lua
+                end
+                items_in_bag[#items_in_bag].slot = slot or 'item'
+                if not xml then
+                    local augments = extdata.decode(v).augments or {}
+                    local aug_str = ''
+                    for aug_ind,augment in pairs(augments) do
+                        if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
+                    end
+                    if string.len(aug_str) > 0 then
+                        items_in_bag[#items_in_bag].augments = aug_str
+                    end
+                end
+            else
+                msg.addon_msg(123,'You possess an item that is not in the resources yet.')
+            end
+        end
+    end
+    return items_in_bag
 end
