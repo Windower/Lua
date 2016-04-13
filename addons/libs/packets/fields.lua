@@ -1471,7 +1471,8 @@ fields.incoming[0x01E] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 04
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 08
     {ctype='unsigned char',     label='Index',              fn=inv+{0}},        -- 09
-    {ctype='unsigned short',    label='_junk1'},                                -- 10
+    {ctype='unsigned char',     label='Status',             fn=e+{'itemstat'}}, -- 0A
+    {ctype='unsigned char',     label='_junk1'},                                -- 0B
 }
 
 -- Item Assign
