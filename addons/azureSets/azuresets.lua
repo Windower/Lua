@@ -232,7 +232,7 @@ windower.register_event('addon command', function(...)
                 save_set(args[1])
             end
 
-        elseif comm == 'spellset' then
+        elseif comm == 'spellset' or comm == 'set' then
             if args[1] ~= nil then
                 set_spells(args[1])
             end
@@ -248,12 +248,13 @@ windower.register_event('addon command', function(...)
             local helptext = [[AzureSets - Command List:')
             1. removeall - Unsets all spells.
             2. spellset <setname> -- Set (setname)'s spells.
-            3. add <slot> <spell> -- Set (spell) to slot (slot (number)).
-            4. save <setname> -- Saves current spellset as (setname).
-            5. currentlist -- Lists currently set spells.
-            6. setlist -- Lists all spellsets.
-            7. spelllist <setname> -- List spells in (setname)
-            8. help --Shows this menu.]]
+            3. set <setname> -- Same as spellset
+            4. add <slot> <spell> -- Set (spell) to slot (slot (number)).
+            5. save <setname> -- Saves current spellset as (setname).
+            6. currentlist -- Lists currently set spells.
+            7. setlist -- Lists all spellsets.
+            8. spelllist <setname> -- List spells in (setname)
+            9. help --Shows this menu.]]
             for _, line in ipairs(helptext:split('\n')) do
                 windower.add_to_chat(207, line..chat.controls.reset)
             end
