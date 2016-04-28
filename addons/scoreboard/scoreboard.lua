@@ -2,7 +2,7 @@
 
 _addon.name = 'Scoreboard'
 _addon.author = 'Suji'
-_addon.version = '1.10'
+_addon.version = '1.11'
 _addon.commands = {'sb', 'scoreboard'}
 
 require('tables')
@@ -73,6 +73,11 @@ windower.register_event('addon command', function()
     return function(command, ...)
         if command == 'e' then
             assert(loadstring(table.concat({...}, ' ')))()
+            return
+        end
+        
+        if command == nil then
+	    error('No command given. See //sb help')
             return
         end
 
