@@ -2,7 +2,7 @@
 
 _addon.name = 'Scoreboard'
 _addon.author = 'Suji'
-_addon.version = '1.10'
+_addon.version = '1.11'
 _addon.commands = {'sb', 'scoreboard'}
 
 require('tables')
@@ -76,7 +76,7 @@ windower.register_event('addon command', function()
             return
         end
 
-        command = command:lower() or 'help'
+        command = (command or 'help'):lower()
         local params = {...}
 
         if command == 'help' then
