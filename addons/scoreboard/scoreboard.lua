@@ -75,13 +75,8 @@ windower.register_event('addon command', function()
             assert(loadstring(table.concat({...}, ' ')))()
             return
         end
-        
-        if command == nil then
-	    error('No command given. See //sb help')
-            return
-        end
 
-        command = command:lower() or 'help'
+        command = (command or 'help'):lower()
         local params = {...}
 
         if command == 'help' then
