@@ -131,6 +131,12 @@ augment_values = {
         [0x04B] = {{stat="Cap. Point", offset=33,percent=true}},
         [0x04C] = {{stat="DMG:", offset=33}},
         [0x04D] = {{stat="Delay:", offset=33,multiplier=-1,percent=true}},
+        [0x04E] = {{stat="HP", offset=1,multiplier=2}},
+        [0x04F] = {{stat="HP", offset=1,multiplier=3}},
+        [0x050] = {{stat="Mag. Acc", offset=1}, {stat="/Mag. Dmg.", offset=1}},
+        [0x051] = {{stat="Eva.", offset=1}, {stat="/Mag. Eva.", offset=1}},
+        [0x052] = {{stat="MP", offset=1,multiplier=2}},
+        [0x053] = {{stat="MP", offset=1,multiplier=3}},
 
         
         -- Need to figure out how to handle this section. The Pet: prefix is only used once despite how many augments are used.
@@ -162,6 +168,9 @@ augment_values = {
         [0x079] = {{stat='Pet: Breath', offset=1}},
         [0x07A] = {{stat='Pet: TP Bonus', offset=1, multiplier=20}},
         [0x07B] = {{stat='Pet: "Dbl. Atk."', offset=1}},
+        [0x07C] = {{stat="Pet: Acc.", offset=1}, {stat="Pet: R.Acc.", offset=1}, {stat="Pet: Atk.", offset=1}, {stat="Pet: R.Atk.", offset=1}},
+        [0x07D] = {{stat="Pet: M.Acc.", offset=1}, {stat="Pet: M.Dmg.", offset=1}},
+        [0x07E] = {{stat='Pet: Magic Damage', offset=1}},
 
         [0x080] = {{stat="Pet:",offset = 0}},
         --[0x081: Accuracy +1 Ranged Acc. +0 | value + 1
@@ -182,7 +191,6 @@ augment_values = {
 
         [0x085] = {{stat='"Mag.Atk.Bns."', offset=1}},
         [0x086] = {{stat='"Mag.Def.Bns."', offset=1}},
-
         [0x087] = {{stat="Avatar:",offset=0}},
         
         [0x089] = {{stat='"Regen"', offset=1}},
@@ -816,7 +824,6 @@ augment_values = {
         [0x70C] = {{stat="Pet: MND", offset=1,multiplier=-1}},
         [0x70D] = {{stat="Pet: CHR", offset=1,multiplier=-1}},
         [0x70E] = {{stat="Pet: STR", offset=1},{stat="Pet: DEX", offset=1},{stat="Pet: VIT", offset=1}},
-        [0x70E] = {{stat="Pet:", offset=0,multiplier=0}},
         [0x70F] = {{stat="Pet:", offset=0,multiplier=0}},
         [0x710] = {{stat="Pet:", offset=0,multiplier=0}},
         [0x711] = {{stat="Pet:", offset=0,multiplier=0}},

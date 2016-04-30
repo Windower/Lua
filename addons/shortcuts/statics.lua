@@ -37,12 +37,12 @@ validabils = {}
 -- List of valid prefixes to be interpreted with the resources. The values currently have no use.
 command_list = {['ja']='job_abilities',['jobability']='job_abilities',['so']='spells',['song']='spells',['ma']='spells',['magic']='spells',['nin']='spells',['ninjutsu']='spells',
 	['ra']='Ranged Attack',['range']='Ranged Attack',['throw']='Ranged Attack',['shoot']='Ranged Attack',['monsterskill']='monster_abilities',['ms']='monster_abilities',
-	['ws']='weapon_skills',['weaponskill']='weapon_skills',['item']='Ability',['pet']='job_abilities'}
+	['ws']='weapon_skills',['weaponskill']='weapon_skills',['item']='Ability',['pet']='job_abilities',['mo']='mounts',['mount']='mounts'}
     
 in_game_res_commands = {['ja']='/ja',['jobability']='/ja',['pet']='/ja',
     ['so']='/ma',['song']='/ma',['ma']='/ma',['magic']='/ma',['nin']='/ma',['ninjutsu']='/ma',
     ['monsterskill']='/ms',['ms']='/ms',['ws']='/ws',['weaponskill']='/ws',
-	['ra']='/ra',['range']='/ra',['throw']='/ra',['shoot']='/ra'}
+	['ra']='/ra',['range']='/ra',['throw']='/ra',['shoot']='/ra',['mount']='/mo',['mo']='/mo'}
 
 -- List of other commands that might use name completion.
 local No_targets = {['Player']=false,['Enemy']=false,['Party']=false,['Ally']=false,['NPC']=false,['Self']=false,['Corpse']=false}
@@ -209,3 +209,4 @@ validabils_it('spells')
 validabils_it('job_abilities')
 validabils_it('weapon_skills')
 validabils_it('monster_abilities')
+validabils_it('mounts')

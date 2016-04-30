@@ -343,6 +343,7 @@ enums['action'] = {
     [0x12] = 'Dismount Chocobo',
     [0x14] = 'Zoning/Appear', -- I think, the resource for this is ambiguous.
     [0x19] = 'Monsterskill',
+    [0x1A] = 'Mount',
 }
 
 -- Action
@@ -1471,7 +1472,8 @@ fields.incoming[0x01E] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 04
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 08
     {ctype='unsigned char',     label='Index',              fn=inv+{0}},        -- 09
-    {ctype='unsigned short',    label='_junk1'},                                -- 10
+    {ctype='unsigned char',     label='Status',             fn=e+{'itemstat'}}, -- 0A
+    {ctype='unsigned char',     label='_junk1'},                                -- 0B
 }
 
 -- Item Assign
@@ -3018,6 +3020,8 @@ fields.incoming[0x0A0] = L{
     {ctype='float',             label='Z'},                                     -- 10
     {ctype='float',             label='Y'},                                     -- 14
 }
+
+--0x0AA, 0x0AC, and 0x0AE are all bitfields where the lsb indicates whether you have index 0 of the related resource.
 
 -- Help Desk submenu open
 fields.incoming[0x0B5] = L{

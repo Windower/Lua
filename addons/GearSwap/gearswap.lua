@@ -395,8 +395,10 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
         local bag = to_windower_compact(res.bags[data:byte(0x09)].english)
         local slot = data:byte(0x0A)
         local count = data:unpack('I',5)
+        local status = data:byte(0x0B)
         if not items[bag][slot] then items[bag][slot] = make_empty_item_table(slot) end
         items[bag][slot].count = count
+        items[bag][slot].status = status
         if count == 0 then
             items[bag][slot].id = 0
             items[bag][slot].bazaar = 0

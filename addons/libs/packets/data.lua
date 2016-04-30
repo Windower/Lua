@@ -200,6 +200,7 @@ data.incoming[0x08D] = {name='Job Points',          description='Contains all jo
 data.incoming[0x0A0] = {name='Party Map Marker',    description='Marks where players are on your map.'}
 data.incoming[0x0AA] = {name='Spell List',          description='Packet that shows the spells that you know.'}
 data.incoming[0x0AC] = {name='Ability List',        description='Packet that shows your current abilities and traits.'}
+data.incoming[0x0AE] = {name='Mount List',          description='Packet that shows your current mounts.'}
 data.incoming[0x0B4] = {name='Seek AnonResp',       description='Server response sent after you put up party or anon flag.'}
 data.incoming[0x0B5] = {name='Help Desk Open',      description='Sent when you open the Help Desk submenu.'}
 data.incoming[0x0C8] = {name='Party Struct Update', description='Updates all party member info in one struct. No player vital data (HP/MP/TP) or names are sent here.'}
