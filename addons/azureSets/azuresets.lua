@@ -251,11 +251,7 @@ windower.register_event('addon command', function(...)
 
         elseif comm == 'spellset' or comm == 'set' then
             if args[1] ~= nil then
-                if args[2] ~= nil then
-                    set_spells(args[1], args[2])
-                else
-                    set_spells(args[1])
-                end
+                set_spells(args[1], args[2])
             end
         elseif comm == 'currentlist' then
             get_current_spellset():print()
@@ -268,10 +264,11 @@ windower.register_event('addon command', function(...)
         elseif comm == 'help' then
             local helptext = [[AzureSets - Command List:')
             1. removeall - Unsets all spells.
-            2. spellset <setname> (clearfirst|preservetraits) -- Set (setname)'s spells,
+            2. spellset <setname> [clearfirst|preservetraits] -- Set (setname)'s spells,
                              optional parameter: clearfirst or preservetraits: overrides
                              setting to clear spells first or remove individually,
-                             preserving traits where possible.
+                             preserving traits where possible. Default: use settings or
+                             preservetraits if settings not configured.
             3. set <setname> (clearfirst|preservetraits) -- Same as spellset
             4. add <slot> <spell> -- Set (spell) to slot (slot (number)).
             5. save <setname> -- Saves current spellset as (setname).
