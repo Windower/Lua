@@ -3,6 +3,8 @@
 	<global>
 		<assimilation>5</assimilation>
 		<language>English</language>
+		<!-- <setmode>clearfirst</setmode> -->
+		<setmode>preservetraits</setmode>
 		<spellsets>
 			<default />
 			<failtest>

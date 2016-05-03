@@ -68,7 +68,7 @@ windower.register_event('login', initialize)
 
 windower.register_event('job change', initialize:cond(function(job) return job == 16 end))
 
-function set_spells(spellset)
+function set_spells(spellset, setmode)
     if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
     if settings.spellsets[spellset] == nil then return end
     if settings.spellsets[spellset]:equals(get_current_spellset()) then
@@ -77,7 +77,12 @@ function set_spells(spellset)
     end
 
     log('Starting to set '..spellset..'.')
-    set_spells_from_spellset(spellset, 'remove')
+    if setmode=='clearfirst' or (setmode == nil and settings.setmode == 'clearfirst') then
+        remove_all_spells(nil)
+        windower.send_command('@wait .65;lua i azuresets set_spells_from_spellset '..spellset..' add')
+    elseif setmode == 'preservetraits' or (setmode == nil and settings.setmode == 'preservetraits') or settings.setmode == nil then
+        set_spells_from_spellset(spellset, 'remove')
+    end
     return
 end
 
@@ -234,7 +239,11 @@ windower.register_event('addon command', function(...)
 
         elseif comm == 'spellset' or comm == 'set' then
             if args[1] ~= nil then
-                set_spells(args[1])
+                if args[2] ~= nil then
+                    set_spells(args[1], args[2])
+                else
+                    set_spells(args[1])
+                end
             end
         elseif comm == 'currentlist' then
             get_current_spellset():print()
