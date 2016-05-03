@@ -268,8 +268,11 @@ windower.register_event('addon command', function(...)
         elseif comm == 'help' then
             local helptext = [[AzureSets - Command List:')
             1. removeall - Unsets all spells.
-            2. spellset <setname> -- Set (setname)'s spells.
-            3. set <setname> -- Same as spellset
+            2. spellset <setname> (clearfirst|preservetraits) -- Set (setname)'s spells,
+                             optional parameter: clearfirst or preservetraits: overrides
+                             setting to clear spells first or remove individually,
+                             preserving traits where possible.
+            3. set <setname> (clearfirst|preservetraits) -- Same as spellset
             4. add <slot> <spell> -- Set (spell) to slot (slot (number)).
             5. save <setname> -- Saves current spellset as (setname).
             6. currentlist -- Lists currently set spells.
