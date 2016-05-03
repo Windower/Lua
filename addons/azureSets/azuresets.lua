@@ -71,7 +71,7 @@ windower.register_event('job change', initialize:cond(function(job) return job =
 function set_spells(spellset, setmode)
     if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
     if settings.spellsets[spellset] == nil then return end
-    if settings.spellsets[spellset]:equals(get_current_spellset()) then
+    if is_spellset_equipped(settings.spellsets[spellset]) then
         error(spellset..' was already equipped.')
         return
     end
@@ -84,6 +84,18 @@ function set_spells(spellset, setmode)
         set_spells_from_spellset(spellset, 'remove')
     end
     return
+end
+
+function is_spellset_equipped(spellset)
+    if spellset:equals(get_current_spellset()) then return true end
+    local currentSet = get_current_spellset()
+    for k,v in pairs(spellset) do
+        if not currentSet:contains(v:lower()) then return false end
+    end
+    for k,v in pairs(currentSet) do
+        if not spellset:contains(v:lower()) then return false end
+    end
+    return true
 end
 
 function set_spells_from_spellset(spellset, setPhase)
