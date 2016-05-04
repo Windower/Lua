@@ -72,18 +72,17 @@ function set_spells(spellset, setmode)
     if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
     if settings.spellsets[spellset] == nil then return end
     if is_spellset_equipped(settings.spellsets[spellset]) then
-        Log(spellset..' was already equipped.')
+        log(spellset..' was already equipped.')
         return
     end
 
     log('Starting to set '..spellset..'.')
-    if setmode=='clearfirst' or (setmode == nil and settings.setmode == 'clearfirst') then
+    if setmode:lower()=='clearfirst' then
         remove_all_spells()
         set_spells_from_spellset:schedule(0.65, spellset, 'add')
-    elseif setmode == 'preservetraits' or (setmode == nil and settings.setmode == 'preservetraits') or settings.setmode == nil then
+    else -- if setmode:lower() == 'preservetraits' then
         set_spells_from_spellset(spellset, 'remove')
     end
-    return
 end
 
 function is_spellset_equipped(spellset)
@@ -250,7 +249,7 @@ windower.register_event('addon command', function(...)
 
         elseif comm == 'spellset' or comm == 'set' then
             if args[1] ~= nil then
-                set_spells(args[1], args[2])
+                set_spells(args[1], args[2] or settings.setmode)
             end
         elseif comm == 'currentlist' then
             get_current_spellset():print()
