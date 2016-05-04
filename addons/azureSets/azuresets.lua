@@ -78,8 +78,8 @@ function set_spells(spellset, setmode)
 
     log('Starting to set '..spellset..'.')
     if setmode=='clearfirst' or (setmode == nil and settings.setmode == 'clearfirst') then
-        remove_all_spells(nil)
-        windower.send_command('@wait .65;lua i azuresets set_spells_from_spellset '..spellset..' add')
+        remove_all_spells()
+        set_spells_from_spellset:schedule(0.65, spellset, 'add')
     elseif setmode == 'preservetraits' or (setmode == nil and settings.setmode == 'preservetraits') or settings.setmode == nil then
         set_spells_from_spellset(spellset, 'remove')
     end
@@ -111,8 +111,7 @@ function set_spells_from_spellset(spellset, setPhase)
 
                 windower.ffxi.remove_blue_magic_spell(slotToRemove)
                 --log('Removed spell: '..v..' at #'..slotToRemove)
-
-                windower.send_command('@wait .65;lua i azuresets set_spells_from_spellset '..spellset..' remove')
+                set_spells_from_spellset:schedule(0.65, spellset, 'remove')
                 return
             end
         end
@@ -137,7 +136,7 @@ function set_spells_from_spellset(spellset, setPhase)
                     if spellID ~= nil then
                         windower.ffxi.set_blue_magic_spell(spellID, tonumber(slotToSetTo))
                         --log('Set spell: '..v..' ('..spellID..') at: '..slotToSetTo)
-                        windower.send_command('@wait .65;lua i azuresets set_spells_from_spellset '..spellset..' add')
+                        set_spells_from_spellset:schedule(0.65, spellset, 'add')
                         return
                     end
                 end
