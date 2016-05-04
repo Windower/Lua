@@ -41,7 +41,8 @@ res = require('resources')
 chat = require('chat')
 
 defaults = {}
-defaults.settype = 'PreserveTraits'
+defaults.setmode = 'PreserveTraits'
+defaults.setspeed = 0.65
 defaults.spellsets = {}
 defaults.spellsets.default = T{}
 defaults.spellsets.vw1 = T{slot01='Firespit', slot02='Heat Breath', slot03='Thermal Pulse', slot04='Blastbomb',
@@ -80,7 +81,7 @@ function set_spells(spellset, setmode)
     log('Starting to set '..spellset..'.')
     if setmode:lower()=='clearfirst' then
         remove_all_spells()
-        set_spells_from_spellset:schedule(0.65, spellset, 'add')
+        set_spells_from_spellset:schedule(settings.setspeed, spellset, 'add')
     else -- if setmode:lower() == 'preservetraits' then
         set_spells_from_spellset(spellset, 'remove')
     end
@@ -111,7 +112,7 @@ function set_spells_from_spellset(spellset, setPhase)
 
                 windower.ffxi.remove_blue_magic_spell(slotToRemove)
                 --log('Removed spell: '..v..' at #'..slotToRemove)
-                set_spells_from_spellset:schedule(0.65, spellset, 'remove')
+                set_spells_from_spellset:schedule(settings.setspeed, spellset, 'remove')
                 return
             end
         end
@@ -136,7 +137,7 @@ function set_spells_from_spellset(spellset, setPhase)
                     if spellID ~= nil then
                         windower.ffxi.set_blue_magic_spell(spellID, tonumber(slotToSetTo))
                         --log('Set spell: '..v..' ('..spellID..') at: '..slotToSetTo)
-                        set_spells_from_spellset:schedule(0.65, spellset, 'add')
+                        set_spells_from_spellset:schedule(settings.setspeed, spellset, 'add')
                         return
                     end
                 end
