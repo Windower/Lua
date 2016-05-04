@@ -41,6 +41,7 @@ res = require('resources')
 chat = require('chat')
 
 defaults = {}
+defaults.settype = 'PreserveTraits'
 defaults.spellsets = {}
 defaults.spellsets.default = T{}
 defaults.spellsets.vw1 = T{slot01='Firespit', slot02='Heat Breath', slot03='Thermal Pulse', slot04='Blastbomb',
