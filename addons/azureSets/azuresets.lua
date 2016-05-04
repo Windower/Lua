@@ -72,7 +72,7 @@ function set_spells(spellset, setmode)
     if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
     if settings.spellsets[spellset] == nil then return end
     if is_spellset_equipped(settings.spellsets[spellset]) then
-        error(spellset..' was already equipped.')
+        Log(spellset..' was already equipped.')
         return
     end
 
