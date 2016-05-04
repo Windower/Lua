@@ -88,15 +88,7 @@ function set_spells(spellset, setmode)
 end
 
 function is_spellset_equipped(spellset)
-    if spellset:equals(get_current_spellset()) then return true end
-    local currentSet = get_current_spellset()
-    for k,v in pairs(spellset) do
-        if not currentSet:contains(v:lower()) then return false end
-    end
-    for k,v in pairs(currentSet) do
-        if not spellset:contains(v:lower()) then return false end
-    end
-    return true
+    return S(spellset):map(string.lower) == S(get_current_spellset())
 end
 
 function set_spells_from_spellset(spellset, setPhase)
