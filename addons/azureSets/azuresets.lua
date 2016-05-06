@@ -71,19 +71,27 @@ windower.register_event('login', initialize)
 windower.register_event('job change', initialize:cond(function(job) return job == 16 end))
 
 function set_spells(spellset, setmode)
-    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
-    if settings.spellsets[spellset] == nil then return end
+    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then
+        error('Main job not set to Blue Mage.')
+        return
+    end
+    if settings.spellsets[spellset] == nil then
+        error('Set not defined: '..spellset)
+        return
+    end
     if is_spellset_equipped(settings.spellsets[spellset]) then
         log(spellset..' was already equipped.')
         return
     end
 
     log('Starting to set '..spellset..'.')
-    if setmode:lower()=='clearfirst' then
+    if setmode:lower() == 'clearfirst' then
         remove_all_spells()
         set_spells_from_spellset:schedule(settings.setspeed, spellset, 'add')
-    else -- if setmode:lower() == 'preservetraits' then
+    elseif setmode:lower() == 'preservetraits' then
         set_spells_from_spellset(spellset, 'remove')
+    else
+        error('Unexpected setmode: '..setmode)
     end
 end
 
