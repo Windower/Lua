@@ -41,6 +41,8 @@ res = require('resources')
 chat = require('chat')
 
 defaults = {}
+defaults.setmode = 'PreserveTraits'
+defaults.setspeed = 0.65
 defaults.spellsets = {}
 defaults.spellsets.default = T{}
 defaults.spellsets.vw1 = T{slot01='Firespit', slot02='Heat Breath', slot03='Thermal Pulse', slot04='Blastbomb',
@@ -68,17 +70,33 @@ windower.register_event('login', initialize)
 
 windower.register_event('job change', initialize:cond(function(job) return job == 16 end))
 
-function set_spells(spellset)
-    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
-    if settings.spellsets[spellset] == nil then return end
-    if settings.spellsets[spellset]:equals(get_current_spellset()) then
-        error(spellset..' was already equipped.')
+function set_spells(spellset, setmode)
+    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then
+        error('Main job not set to Blue Mage.')
+        return
+    end
+    if settings.spellsets[spellset] == nil then
+        error('Set not defined: '..spellset)
+        return
+    end
+    if is_spellset_equipped(settings.spellsets[spellset]) then
+        log(spellset..' was already equipped.')
         return
     end
 
     log('Starting to set '..spellset..'.')
-    set_spells_from_spellset(spellset, 'remove')
-    return
+    if setmode:lower() == 'clearfirst' then
+        remove_all_spells()
+        set_spells_from_spellset:schedule(settings.setspeed, spellset, 'add')
+    elseif setmode:lower() == 'preservetraits' then
+        set_spells_from_spellset(spellset, 'remove')
+    else
+        error('Unexpected setmode: '..setmode)
+    end
+end
+
+function is_spellset_equipped(spellset)
+    return S(spellset):map(string.lower) == S(get_current_spellset())
 end
 
 function set_spells_from_spellset(spellset, setPhase)
@@ -94,8 +112,7 @@ function set_spells_from_spellset(spellset, setPhase)
 
                 windower.ffxi.remove_blue_magic_spell(slotToRemove)
                 --log('Removed spell: '..v..' at #'..slotToRemove)
-
-                windower.send_command('@wait .65;lua i azuresets set_spells_from_spellset '..spellset..' remove')
+                set_spells_from_spellset:schedule(settings.setspeed, spellset, 'remove')
                 return
             end
         end
@@ -120,7 +137,7 @@ function set_spells_from_spellset(spellset, setPhase)
                     if spellID ~= nil then
                         windower.ffxi.set_blue_magic_spell(spellID, tonumber(slotToSetTo))
                         --log('Set spell: '..v..' ('..spellID..') at: '..slotToSetTo)
-                        windower.send_command('@wait .65;lua i azuresets set_spells_from_spellset '..spellset..' add')
+                        set_spells_from_spellset:schedule(settings.setspeed, spellset, 'add')
                         return
                     end
                 end
@@ -234,7 +251,7 @@ windower.register_event('addon command', function(...)
 
         elseif comm == 'spellset' or comm == 'set' then
             if args[1] ~= nil then
-                set_spells(args[1])
+                set_spells(args[1], args[2] or settings.setmode)
             end
         elseif comm == 'currentlist' then
             get_current_spellset():print()
@@ -247,8 +264,12 @@ windower.register_event('addon command', function(...)
         elseif comm == 'help' then
             local helptext = [[AzureSets - Command List:')
             1. removeall - Unsets all spells.
-            2. spellset <setname> -- Set (setname)'s spells.
-            3. set <setname> -- Same as spellset
+            2. spellset <setname> [ClearFirst|PreserveTraits] -- Set (setname)'s spells,
+                             optional parameter: ClearFirst or PreserveTraits: overrides
+                             setting to clear spells first or remove individually,
+                             preserving traits where possible. Default: use settings or
+                             preservetraits if settings not configured.
+            3. set <setname> (clearfirst|preservetraits) -- Same as spellset
             4. add <slot> <spell> -- Set (spell) to slot (slot (number)).
             5. save <setname> -- Saves current spellset as (setname).
             6. currentlist -- Lists currently set spells.
