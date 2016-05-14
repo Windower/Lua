@@ -26,7 +26,7 @@
 
 _addon.name = 'gametime'
 _addon.author = 'Omnys'
-_addon.version = '0.6'
+_addon.version = '0.7'
 _addon.commands = {'gametime','gt'}
 
 require('chat')
@@ -42,6 +42,7 @@ res = require('resources')
 visible = false
 
 local gt = {}
+gt.delimiter = ' '
 gt.days = {}
 gt.days[1] = {}
 gt.days[1][1] = 'Firesday'
@@ -111,7 +112,6 @@ gt.WeekReport = ''
 gt.MoonPct = ''
 gt.MoonPhase = ''
 
-
 defaults = {}
 defaults.saved = 0
 defaults.mode = 1
@@ -148,9 +148,9 @@ defaults.days.bg.red = 0
 defaults.days.bg.green = 0
 defaults.days.bg.blue = 0
 defaults.days.axis = 'horizontal'
-defaults.days.change = true
+defaults.numdays = 8
 defaults.moon = {}
-defaults.moon.change = true
+defaults.alert = true
 settings = config.load(defaults)
 
 
@@ -184,7 +184,7 @@ Cycles.whitegate.route[3] = "Arrives in Whitegate and Mhaura|2:40"
 
 Cycles.windurst = T{}
 Cycles.windurst.rname = "Ship between Windurst and Jeuno"
-Cycles.windurst.route = {T}
+Cycles.windurst.route = T{}
 Cycles.windurst.route[1] = "Arrives in Windurst|4:47"
 Cycles.windurst.route[2] = "Arrives in Jeuno|7:41"
 Cycles.windurst.route[3] = "Arrives in Windurst|10:47"
@@ -196,7 +196,7 @@ Cycles.windurst.route[8] = "Arrives in Jeuno|1:41"
 
 Cycles.bastok = T{}
 Cycles.bastok.rname = "Ship between Bastok and Jeuno"
-Cycles.bastok.route = {T}
+Cycles.bastok.route = T{}
 Cycles.bastok.route[1] = "Arrives in Bastok|0:13"
 Cycles.bastok.route[2] = "Arrives in Jeuno|3:11"
 Cycles.bastok.route[3] = "Arrives in Bastok|6:13"
@@ -208,7 +208,7 @@ Cycles.bastok.route[8] = "Arrives in Jeuno|21:41"
 
 Cycles.sandy = T{}
 Cycles.sandy.rname = "Ship between San d'Oria and Jeuno"
-Cycles.sandy.route = {T}
+Cycles.sandy.route = T{}
 Cycles.sandy.route[1] = "Arrives in San d'Oria|7:10"
 Cycles.sandy.route[2] = "Arrives in Jeuno|6:11"
 Cycles.sandy.route[3] = "Arrives in San d'Oria|9:10"
@@ -220,7 +220,7 @@ Cycles.sandy.route[8] = "Arrives in Jeuno|00:41"
 
 Cycles.kazham = T{}
 Cycles.kazham.rname = "Ship between Kazham and Jeuno"
-Cycles.kazham.route = {T}
+Cycles.kazham.route = T{}
 Cycles.kazham.route[1] = "Arrives in Kazham|1:48"
 Cycles.kazham.route[2] = "Arrives in Jeuno|4:49"
 Cycles.kazham.route[3] = "Arrives in Kazham|7:48"
@@ -247,6 +247,14 @@ config.register(settings, function()
     end
     gt.gtd:text('${day|} ${MoonPhase|Unknown} (${MoonPct|-}%); ${WeekReport|}')
 
+	if tonumber(settings.numdays) ~= nil and settings.numdays > 0 and settings.numdays < 9 then
+		gt.numdays = settings.numdays
+	else
+		gt.numdays = 8
+	end
+	
+
+	gt.gtd:text('${day|} ${MoonPhase|Unknown} (${MoonPct|-}%); ${WeekReport|}')
     local info = windower.ffxi.get_info()
     if info.logged_in then
         day_change(info.day)
@@ -297,9 +305,6 @@ function moon_change()
 	gt.MoonPhase = res.moon_phases[info.moon_phase].english
 	gt.MoonPct = info.moon
 	gt.gtd:update(gt)
-	if settings.moon.change == true then
-		log('Day: '..gt.day..'; Moon: '..gt.MoonPhase..' ('..gt.MoonPct..'%);')
-	end
 end
 
 function day_change(day)
@@ -324,7 +329,7 @@ function day_change(day)
 	
 	dpos = 0
 	daystring = ''
-	while dpos < 8 do
+	while dpos < gt.numdays do
 		dpos = dpos + 1
 		dval = dlist[dpos]
 		daystring = ''..daystring..gt.delimiter..' \\cs'..gt.days[(dval+0)][10]..gt.days[(dval+0)][settings.mode]
@@ -334,6 +339,12 @@ function day_change(day)
 	gt.WeekReport = daystring
 	gt.gtd:update(gt)
 	moon_change()
+end
+
+function tolog()
+	if settings.alert == true then
+		log('Day: '..gt.day..'; Moon: '..gt.MoonPhase..' ('..gt.MoonPct..'%);')
+	end
 end
 
 windower.register_event('day change', moon_change .. day_change)
@@ -359,21 +370,15 @@ windower.register_event('addon command', function (...)
 		log('//gt axis [horizontal/vertical] :: week display axis')
 		log('//gt [time/days] alpha 1-255. :: Sets the transparency. Lowest numbers = more transparent.')
 		log('//gt mode 1-4 :: Fullday; Abbreviated; Element names; Compact')
+		
+		log('Routes:')
 		log('//gt route :: Displays route names.')
 		log('//gt route [route name] :: Displays arrival time for route.')
-		log('//gt zero [on/off] :: Displays the time with leading zeros. 04:05 instead of 4:5')
-		-- log('Log Reporting -- Day and Moon Phase (Not Moon %) change') not implemented yet
-		-- log('//gt [days/moon] change [true/false]')
-		-- log('Positioning:')
-		-- log('//gt timex <pos> //gt timey <pos> //gt daysx <pos> //gt daysy <pos>')
-		-- log('//gt time reset //gt days reset :: resets reset both coordinates.')
-		-- log('Visibility:')
-		-- log('//gt time show //gt time hide')
-		-- log('//gt days show //gt days hide')
-		-- log('//gt axis horizontal //gt axis vertical :: changes the display axis of gamedays.')
-		-- log('//gt mode 1-3 :: 1: Fullday names; 2: Short names; 3: Element names.')
-		-- log('//gt time alpha 1-255 :: sets transarency of Gametime\'s clock')
-		-- log('//gt days alpha 1-255 :: sets transparency of Gametime\'s day-display')
+		
+		log('Misc:')
+		log('//gt zero [on/off] :: Displays the time with leading zeros. 04:05 instead of 4:05')
+		log('//gt days [1-8] :: Limits the number of days displayed')
+		log('//gt alert :: Toggle display in chat log for day and moon changes')
 		log('Remember to //gt save when you\'re happy with your settings.')
 	elseif args[1] == 'routes' or args[1] == 'route' then
 		if args[2] == nil then
@@ -417,6 +422,12 @@ windower.register_event('addon command', function (...)
 	elseif args[1] == 'daysy' then
 		gt.gtd:pos_y(tonumber(args[2]))
 		
+	elseif args[1] == 'alert' then
+		settings.alert = (settings.alert == false)
+		gt.alert = settings.alert
+		log('Show alerts in log when day / moon-phase changes: '..tostring(settings.alert))
+		tolog()
+	
 	elseif args[1] == 'time' then
 		if args[2] == 'alpha' then
 			inalpha = tostring(args[3]):zfill(3)
@@ -446,6 +457,10 @@ windower.register_event('addon command', function (...)
 				gt.gtd:alpha(inalpha)
 				log('Day transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
 			end
+		elseif tonumber(args[2]) > 0 and tonumber(args[2]) < 9 then
+			gt.numdays = tonumber(args[2])
+			settings.numdays = tonumber(args[2])
+			day_change(windower.ffxi.get_info().day)
 		elseif args[2] == 'x' or args[2] == 'posx' then
 			windower.send_command('gt daysx '..args[3])
 		elseif args[2] == 'y' or args[2] == 'posy' then
