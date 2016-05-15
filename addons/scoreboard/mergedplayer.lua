@@ -234,8 +234,21 @@ function MergedPlayer:wsavg()
     end
 end
 
-
-
+function MergedPlayer:wsacc()
+    local hits, misses = 0, 0, 0
+    
+    for _, p in ipairs(self.players) do
+        for _ in pairs(p.ws) do hits = hits + 1 end
+        misses = misses + p.ws_misses
+    end
+    
+    local total = hits + misses
+    if total > 0 then
+        return {hits / total, total}
+    else
+        return {0, 0}
+    end
+end
 
 -- Unused atm
 function MergedPlayer:merge(other)

@@ -416,6 +416,8 @@ function action_handler(raw_actionpacket)
                     dps_db:add_r_crit(target:get_name(), create_mob_name(actionpacket), main.param)
                 elseif main.message_id == 354 then
                     dps_db:incr_r_misses(target:get_name(), create_mob_name(actionpacket))
+                elseif main.message_id == 188 then
+                    dps_db:incr_ws_misses(target:get_name(), create_mob_name(actionpacket))
                 elseif main.resource and main.resource == 'weapon_skills' and main.conclusion then
                     dps_db:add_ws_damage(target:get_name(), create_mob_name(actionpacket), main.param, main.spell_id)
                 elseif main.conclusion then
