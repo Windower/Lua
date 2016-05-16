@@ -238,7 +238,7 @@ function MergedPlayer:wsacc()
     local hits, misses = 0, 0
     
     for _, p in ipairs(self.players) do
-        for _ in pairs(p.ws) do hits = hits + 1 end
+        hits = hits + table.length(p.ws)
         misses = misses + p.ws_misses
     end
     
