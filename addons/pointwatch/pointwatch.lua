@@ -126,6 +126,11 @@ windower.register_event('zone change',function(new,old)
         dynamis.time_limit = 3600
         dynamis.zone = new
         cur_func,loadstring_err = loadstring("current_string = "..settings.strings.dynamis)
+    elseif res.zones[new].english:sub(1,7) == 'Abyssea' then
+        dynamis.entry_time = 0
+        dynamis.time_limit = 0
+        dynamis.zone = 0
+        cur_func,loadstring_err = loadstring("current_string = "..settings.strings.abyssea)
     else
         dynamis.entry_time = 0
         dynamis.time_limit = 0
@@ -152,7 +157,7 @@ windower.register_event('addon command',function(...)
         end
         texts[first_cmd](box,unpack(tab))
         settings.text_box_settings = box._settings
-        config.save(settings)
+        --config.save(settings)
     elseif first_cmd == 'reload' then
         windower.send_command('lua r pointwatch')
     elseif first_cmd == 'unload' then
