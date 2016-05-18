@@ -157,7 +157,7 @@ windower.register_event('addon command',function(...)
         end
         texts[first_cmd](box,unpack(tab))
         settings.text_box_settings = box._settings
-        --config.save(settings)
+        config.save(settings)
     elseif first_cmd == 'reload' then
         windower.send_command('lua r pointwatch')
     elseif first_cmd == 'unload' then
