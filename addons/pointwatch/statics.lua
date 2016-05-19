@@ -129,6 +129,7 @@ function initialize()
         ebon = 0,
         silvery = 0,
         golden = 0,
+        update_time = 0,
         time_remaining = 0,
     }
     
