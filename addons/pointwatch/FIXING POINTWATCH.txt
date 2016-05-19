@@ -17,7 +17,6 @@ Method 1 - POLUtils
 5) Wait for it to load, then export the entire table as xml
 6) Open the xml file up in a text editor, like Notepad or Notepad++.
 7) Control-F for the key phrase.
- --look for: ≺Set Color #5≻Visitant Light Intensity≺Set Color #1≻
 8) The associated message ID is the offset value for that zone.
 
 Method 2 - message_printing
