@@ -83,14 +83,12 @@ function export_set(options)
         windower.create_dir(windower.addon_path..'data/export')
     end
     
-    local inv = items.inventory
-    local bag_list = {'inventory', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case', 'wardrobe', 'safe2', 'wardrobe2'}
     if all_items then
-        for _, bag in ipairs(bag_list) do
+        for _, bag in ipairs(res.bags:map(function(bag) return bag.english:gsub(' ', ''):lower() end)) do
             item_list = table.extend(item_list, get_item_list(items[bag]))
         end
     elseif targinv then
-        item_list = table.extend(item_list, get_item_list(inv))
+        item_list = table.extend(item_list, get_item_list(items.inventory))
     elseif all_sets then
         -- Iterate through user_env.sets and find all the gear.
         item_list,exported = unpack_names({},'L1',user_env.sets,{},{empty=true})
@@ -112,8 +110,8 @@ function export_set(options)
         for slot_name,gs_item_tab in pairs(gear) do
             if gs_item_tab.slot ~= empty then
                 local item_tab
-                if gs_item_tab.bag_id == 0 and res.items[inv[gs_item_tab.slot].id] then
-                    item_tab = inv[gs_item_tab.slot]
+                if gs_item_tab.bag_id == 0 and res.items[items.inventory[gs_item_tab.slot].id] then
+                    item_tab = items.inventory[gs_item_tab.slot]
                 elseif gs_item_tab.bag_id == 8 and res.items[ward[gs_item_tab.slot].id] then
                     item_tab = ward[gs_item_tab.slot]
                 elseif gs_item_tab.bag_id == 10 and res.items[ward2[gs_item_tab.slot].id] then
