@@ -84,11 +84,11 @@ function export_set(options)
     end
     
     if all_items then
-        for _, bag in ipairs(res.bags:map(function(bag) return bag.english:gsub(' ', ''):lower() end)) do
-            item_list = table.extend(item_list, get_item_list(items[bag]))
+        for i = 0, #res.bags do
+            item_list:extend(get_item_list(items[res.bags[i].en:gsub(' ', ''):lower()]))
         end
     elseif targinv then
-        item_list = table.extend(item_list, get_item_list(items.inventory))
+        item_list:extend(get_item_list(items.inventory))
     elseif all_sets then
         -- Iterate through user_env.sets and find all the gear.
         item_list,exported = unpack_names({},'L1',user_env.sets,{},{empty=true})
