@@ -85,7 +85,7 @@ function export_set(options)
     
     if all_items then
         for i = 0, #res.bags do
-            item_list:extend(get_item_list(items[res.bags[i].en:gsub(' ', ''):lower()]))
+            item_list:extend(get_item_list(items[res.bags[i].english:gsub(' ', ''):lower()]))
         end
     elseif targinv then
         item_list:extend(get_item_list(items.inventory))
