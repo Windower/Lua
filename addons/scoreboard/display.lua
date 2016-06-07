@@ -364,6 +364,7 @@ Display.stat_summaries._all_stats = T{
     ['crit']       = {percent=true,  category="average", name='Melee Crit. Rate'},
     ['rcrit']      = {percent=true,  category="average", name='Ranged Crit. Rate'},
     ['wsavg']      = {percent=false, category="average", name='WS Average'}, 
+    ['wsacc']      = {percent=true,  category="average", name='WS Accuracy'}, 
     ['mavg']       = {percent=false, category="average", name='Melee Non-Crit. Avg. Damage'},
     ['mrange']     = {percent=false, category="range",   name='Melee Non-Crit. Range'},
     ['critavg']    = {percent=false, category="average", name='Melee Crit. Avg. Damage'},

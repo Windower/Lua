@@ -234,8 +234,8 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
-    <author>Omnys@Valefor</author>
     <name>Gametime</name>
+    <author>Omnys@Valefor</author>
     <description>Displays game time, game-week, moon information, and travel times.</description>
     <bugtracker>https://github.com/thatdudegrim/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Valefor/Omnys</support>
@@ -388,6 +388,13 @@
     <description>Shows the slips' items highlighting those that are stored.</description>
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
+    <name>Pouches</name>
+    <author>Omnys@Valefor</author>
+    <description>Simple addon to use all of a named item in player's main inventory, like //pouches bead pouch.</description>
+    <bugtracker>https://github.com/thatdudegrim/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Valefor/Omnys</support>
   </addon>
   <addon>
     <name>RAWR</name>
