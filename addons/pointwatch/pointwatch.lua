@@ -70,6 +70,9 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
                     if zone_message_functions[i] then
                         zone_message_functions[i](param_1,param_2,param_3,param_4)
                     end
+                    if i:contains("visitant_status_") then
+                        abyssea.update_time = os.clock()
+                    end
                 end
             end
         end
@@ -123,15 +126,21 @@ end)
 windower.register_event('zone change',function(new,old)
     if res.zones[new].english:sub(1,7) == 'Dynamis' then
         dynamis.entry_time = os.clock()
+        abyssea.update_time = 0
+        abyssea.time_remaining = 0
         dynamis.time_limit = 3600
         dynamis.zone = new
         cur_func,loadstring_err = loadstring("current_string = "..settings.strings.dynamis)
     elseif res.zones[new].english:sub(1,7) == 'Abyssea' then
+        abyssea.update_time = os.clock()
+        abyssea.time_remaining = 5
         dynamis.entry_time = 0
         dynamis.time_limit = 0
         dynamis.zone = 0
         cur_func,loadstring_err = loadstring("current_string = "..settings.strings.abyssea)
     else
+        abyssea.update_time = 0
+        abyssea.time_remaining = 0
         dynamis.entry_time = 0
         dynamis.time_limit = 0
         dynamis.zone = 0
@@ -189,6 +198,12 @@ function update_box()
     if dynamis.entry_time ~= 0 and dynamis.entry_time+dynamis.time_limit-os.clock() > 0 then
         dynamis.time_remaining = os.date('!%H:%M:%S',dynamis.entry_time+dynamis.time_limit-os.clock())
         dynamis.KIs = X_or_O(dynamis._KIs.Crimson)..X_or_O(dynamis._KIs.Azure)..X_or_O(dynamis._KIs.Amber)..X_or_O(dynamis._KIs.Alabaster)..X_or_O(dynamis._KIs.Obsidian)
+    elseif abyssea.update_time ~= 0 then
+        local time_less_then = math.floor((os.clock() - abyssea.update_time)/60)
+        abyssea.time_remaining = abyssea.time_remaining-time_less_then
+        if time_less_then >= 1 then
+            abyssea.update_time = os.clock()
+        end
     else
         dynamis.time_remaining = 0
         dynamis.KIs = ''
@@ -264,6 +279,9 @@ zone_message_functions = {
         abyssea.amber = p3
     end,
     visitant_status_gain = function(p1,p2,p3,p4)
+        abyssea.time_remaining = p1
+    end,
+    visitant_status_update = function(p1,p2,p3,p4)
         abyssea.time_remaining = p1
     end,
     visitant_status_wears_off = function(p1,p2,p3,p4)
