@@ -398,6 +398,13 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
+    <name>TaruChat</name>
+    <author>Genoxd</author>
+    <description>Server wide chat room.</description>
+    <bugtracker>https://github.com/geno3302/Lua</bugtracker>
+    <support>http://www.ffxiah.com/player/Lakshmi/Genoxd</support>
+  </addon>
+  <addon>
     <name>Treasury</name>
     <author>Arcon</author>
     <description>Lots or passes items based on configurable lists, drops unwanted items from the inventory and automatically stacks items when they drop.</description>
