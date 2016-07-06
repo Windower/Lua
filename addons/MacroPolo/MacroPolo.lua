@@ -25,7 +25,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.]]
 
-_addon.version = '0.5'
+_addon.version = '0.51'
 _addon.name = 'MacroPolo'
 _addon.author = 'Omnys@Valefor'
 _addon.commands = {'macropolo','mp'}
@@ -47,10 +47,10 @@ windower.register_event('outgoing text',function(original,modified)
 			return ""
 		end
 	elseif original == "/macro back" or original == "/macropolo back" then
-		windower.send_command("input /macro book "..mHistory[#mHistory][1].."; input /macro set "..mHistory[#mHistory][2])
-		-- if #mHistory then
+		if #mHistory then
+			windower.send_command("input /macro book "..mHistory[#mHistory][1].."; input /macro set "..mHistory[#mHistory][2])
 			-- table.remove(mHistory) -- doesn't eally seem necessary to remove the most recent macro position
-		-- end
+		end
 		return ""
 	end
 end)
@@ -74,6 +74,11 @@ windower.register_event('addon command', function(...)
 		log("You may then use '/macro back' or ")
 		log("'/macropolo back' to return to the")
 		log("previous book and set.")
+	elseif args[1] == "back" then
+		if #mHistory then
+			windower.send_command("input /macro book "..mHistory[#mHistory][1].."; input /macro set "..mHistory[#mHistory][2])
+			-- table.remove(mHistory) -- doesn't eally seem necessary to remove the most recent macro position
+		end
 	end
 end)
 
