@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -- addon information
 
 _addon.name = 'digger'
-_addon.version = '2.1.0'
+_addon.version = '2.1.1'
 _addon.command = 'digger'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
@@ -103,7 +103,7 @@ function display_stats()
     if settings.accuracy.total > 0 then
         accuracy = (successful / settings.accuracy.total) * 100
     end
-    windower.add_to_chat(207, 'dig accuracy: %d%% (%d/%d), todays digs: %d, todays items: %d gysahl greens remaining: %d':format(accuracy, successful, settings.accuracy.total, successful + settings.fatigue.diff, settings.fatigue.items, get_gysahl_count()))
+    windower.add_to_chat(207, 'dig accuracy: %d%% (%d/%d), digs today: %d, items today: %d gysahl greens remaining: %d':format(accuracy, successful, settings.accuracy.total, successful + settings.fatigue.diff, settings.fatigue.items, get_gysahl_count()))
 end
 
 function update_stats(mode)
@@ -139,7 +139,7 @@ function check_incoming_chunk(id, original, modified, injected, blocked)
     if messages[zone_id] then
         if id == 0x2A then
             local message_id = original:unpack('H', 27) % 0x8000
-            if messages[zone_id].full == message_id or messages[zone_id].success == message_id or messages[zone_id].points == message_id or messages[zone_id].standing == message_id and get_chocobo_buff() then
+            if (messages[zone_id].full == message_id or messages[zone_id].success == message_id or messages[zone_id].points == message_id or messages[zone_id].standing == message_id or messages[zone_id].notes == message_id) and get_chocobo_buff() then
                 update_stats(2)
             elseif messages[zone_id].ease == message_id then
                 update_stats(3)
