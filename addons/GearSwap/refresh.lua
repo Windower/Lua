@@ -251,7 +251,9 @@ function refresh_player(dt,user_event_flag)
     if items.case then player.case = refresh_item_list(items.case) end
     if items.wardrobe then player.wardrobe = refresh_item_list(items.wardrobe) end
     if items.wardrobe2 then player.wardrobe2 = refresh_item_list(items.wardrobe2) end
-    
+    if items.wardrobe3 then player.wardrobe3 = refresh_item_list(items.wardrobe3) end
+    if items.wardrobe4 then player.wardrobe4 = refresh_item_list(items.wardrobe4) end
+
     -- Monster tables for the target and subtarget.
     player.target = target_complete(windower.ffxi.get_mob_by_target('t'))
     player.subtarget = target_complete(windower.ffxi.get_mob_by_target('st'))

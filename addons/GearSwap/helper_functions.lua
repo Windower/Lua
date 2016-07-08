@@ -606,6 +606,24 @@ function find_usable_item(item_id,bool)
             end
         end
     end
+    if not inventory_index then
+        for i,v in pairs(items.wardrobe3) do
+            if type(v) == 'table' and v.id == item_id and (v.status == 5 or v.status == 0) and (not bool or is_usable_item(v)) then
+                inventory_index = i
+                bag_id = 11
+                break
+            end
+        end
+    end
+    if not inventory_index then
+        for i,v in pairs(items.wardrobe4) do
+            if type(v) == 'table' and v.id == item_id and (v.status == 5 or v.status == 0) and (not bool or is_usable_item(v)) then
+                inventory_index = i
+                bag_id = 12
+                break
+            end
+        end
+    end
     return inventory_index,bag_id
 end
 
