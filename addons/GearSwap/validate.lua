@@ -187,7 +187,7 @@ function search_bags_for_items_in_set(gear_table, filter, missing_items, stack)
         if type(name) == 'string' and name ~= 'empty' and name ~= '' and type(i) == 'string' then
             if not slot_map[i] then
                 msg.addon_msg(123,windower.to_shift_jis(tostring(i))..' contains a "name" element but is not a valid slot.')
-            elseif tryfilter(lowercase_name(name), filter) and not find_in_inv(items.inventory, name, aug) and not find_in_inv(items.wardrobe, name, aug) and not find_in_inv(items.wardrobe2, name, aug) then
+            elseif tryfilter(lowercase_name(name), filter) and not find_in_inv(items.inventory, name, aug) and not find_in_inv(items.wardrobe, name, aug) and not find_in_inv(items.wardrobe2, name, aug) and not find_in_inv(items.wardrobe3, name, aug) and not find_in_inv(items.wardrobe4, name, aug) then
                 missing_items:add(lowercase_name(name))
             end
         elseif type(name) == 'table' and name ~= empty  then
