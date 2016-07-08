@@ -26,7 +26,7 @@
 
 function export_set(options)
     local item_list = T{}
-    local targinv,xml,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing
+    local targinv,all_items,xml,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing
     if #options > 0 then
         for _,v in ipairs(options) do
             if S{'inventory','inv','i'}:contains(v:lower()) then
@@ -83,14 +83,12 @@ function export_set(options)
         windower.create_dir(windower.addon_path..'data/export')
     end
     
-    local inv = items.inventory
-    local bag_list = {'inventory', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case', 'wardrobe', 'safe2', 'wardrobe2', 'wardrobe3', 'wardrobe4'}
     if all_items then
-        for _, bag in ipairs(bag_list) do
-            item_list = table.extend(item_list, get_item_list(items[bag]))
+        for i = 0, #res.bags do
+            item_list:extend(get_item_list(items[res.bags[i].english:gsub(' ', ''):lower()]))
         end
     elseif targinv then
-        item_list = table.extend(item_list, get_item_list(inv))
+        item_list:extend(get_item_list(items.inventory))
     elseif all_sets then
         -- Iterate through user_env.sets and find all the gear.
         item_list,exported = unpack_names({},'L1',user_env.sets,{},{empty=true})
@@ -102,7 +100,7 @@ function export_set(options)
         local ward2 = items.wardrobe2
         local ward3 = items.wardrobe3
         local ward4 = items.wardrobe4
-        
+
         for i = 1,16 do -- ipairs will be used on item_list
             if not item_list[i] then
                 item_list[i] = {}
@@ -114,8 +112,8 @@ function export_set(options)
         for slot_name,gs_item_tab in pairs(gear) do
             if gs_item_tab.slot ~= empty then
                 local item_tab
-                if gs_item_tab.bag_id == 0 and res.items[inv[gs_item_tab.slot].id] then
-                    item_tab = inv[gs_item_tab.slot]
+                if gs_item_tab.bag_id == 0 and res.items[items.inventory[gs_item_tab.slot].id] then
+                    item_tab = items.inventory[gs_item_tab.slot]
                 elseif gs_item_tab.bag_id == 8 and res.items[ward[gs_item_tab.slot].id] then
                     item_tab = ward[gs_item_tab.slot]
                 elseif gs_item_tab.bag_id == 10 and res.items[ward2[gs_item_tab.slot].id] then
