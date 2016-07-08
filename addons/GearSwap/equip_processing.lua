@@ -89,7 +89,7 @@ function expand_entry(entry)
             augments = {entry.augment}
         end
         if entry.bag and type(entry.bag) == 'string' then
-            local bag_list = {inventory = 0, wardrobe = 8, wardrobe2 = 10, wardrobe3 = 11, wardrobe4 =12}
+            local bag_list = {inventory = 0, wardrobe = 8, wardrobe2 = 10, wardrobe3 = 11, wardrobe4 = 12}
             bag = bag_list[entry.bag:lower()]
         end
     elseif type(entry) == 'string' and entry ~= '' then
