@@ -1,27 +1,40 @@
 messages = {}
-messages[2] = {ease=7351, fail=7276, full=7274, success=6383}
-messages[4] = {ease=7345, fail=7270, full=7268, success=6383}
-messages[51] = {ease=7130, fail=7055, full=7053, success=6383}
-messages[52] = {ease=7130, fail=7055, full=7053, success=6383}
-messages[100] = {ease=7303, fail=7228, full=7226, success=6397}
-messages[101] = {ease=7303, fail=7228, full=7226, success=6397}
-messages[102] = {ease=7293, fail=7218, full=7216, success=6383}
-messages[103] = {ease=7303, fail=7228, full=7226, success=6397}
-messages[104] = {ease=7777, fail=7702, full=7700, success=6397}
-messages[105] = {ease=7303, fail=7228, full=7226, success=6397}
-messages[106] = {ease=7303, fail=7228, full=7226, success=6556}
-messages[107] = {ease=7303, fail=7228, full=7226, success=6397}
-messages[108] = {ease=7293, fail=7218, full=7216, success=6383}
-messages[109] = {ease=7303, fail=7228, full=7226, success=6397}
-messages[110] = {ease=7303, fail=7228, full=7226, success=6397}
-messages[114] = {ease=7631, fail=7556, full=7554, success=6383}
-messages[115] = {ease=7130, fail=7055, full=7053, success=6383}
-messages[116] = {ease=7289, fail=7214, full=7212, success=6383}
-messages[117] = {ease=7303, fail=7228, full=7226, success=6556}
-messages[118] = {ease=7322, fail=7247, full=7245, success=6410}
-messages[119] = {ease=7303, fail=7228, full=7226, success=6397}
-messages[120] = {ease=7311, fail=7236, full=7234, success=6397}
-messages[121] = {ease=7631, fail=7556, full=7554, success=6383}
-messages[123] = {ease=7631, fail=7556, full=7554, success=6383}
-messages[124] = {ease=7631, fail=7556, full=7554, success=6383}
-messages[125] = {ease=7289, fail=7214, full=7212, success=6383}
+messages[2] = {ease=7356, fail=7281, full=7279, notes=7363, points=7361, standing=7362, success=6384}
+messages[4] = {ease=7350, fail=7275, full=7273, notes=7357, points=7355, standing=7356, success=6384}
+messages[5] = {ease=7307, fail=7232, full=7230, notes=7314, points=7312, standing=7313, success=6397}
+messages[7] = {ease=7301, fail=7226, full=7224, notes=7308, points=7306, standing=7307, success=6384}
+messages[24] = {ease=7637, fail=7562, full=7560, notes=7644, points=7642, standing=7643, success=6384}
+messages[25] = {ease=7157, fail=7082, full=7080, notes=7164, points=7162, standing=7163, success=6384}
+messages[51] = {ease=7135, fail=7060, full=7058, notes=7142, points=7140, standing=7141, success=6384}
+messages[52] = {ease=7135, fail=7060, full=7058, notes=7142, points=7140, standing=7141, success=6384}
+messages[61] = {ease=7135, fail=7060, full=7058, notes=7142, points=7140, standing=7141, success=6384}
+messages[79] = {ease=7135, fail=7060, full=7058, notes=7142, points=7140, standing=7141, success=6384}
+messages[100] = {ease=7316, fail=7241, full=7239, notes=7323, points=7321, standing=7322, success=6406}
+messages[101] = {ease=7316, fail=7241, full=7239, notes=7323, points=7321, standing=7322, success=6406}
+messages[102] = {ease=7298, fail=7223, full=7221, notes=7305, points=7303, standing=7304, success=6384}
+messages[103] = {ease=7316, fail=7241, full=7239, notes=7323, points=7321, standing=7322, success=6406}
+messages[104] = {ease=7790, fail=7715, full=7713, notes=7797, points=7795, standing=7796, success=6406}
+messages[105] = {ease=7316, fail=7241, full=7239, notes=7323, points=7321, standing=7322, success=6406}
+messages[106] = {ease=7316, fail=7241, full=7239, notes=7323, points=7321, standing=7322, success=6565}
+messages[107] = {ease=7316, fail=7241, full=7239, notes=7323, points=7321, standing=7322, success=6406}
+messages[108] = {ease=7298, fail=7223, full=7221, notes=7305, points=7303, standing=7304, success=6384}
+messages[109] = {ease=7316, fail=7241, full=7239, notes=7323, points=7321, standing=7322, success=6406}
+messages[110] = {ease=7316, fail=7241, full=7239, notes=7323, points=7321, standing=7322, success=6406}
+messages[111] = {ease=7316, fail=7241, full=7239, notes=7323, points=7321, standing=7322, success=6565}
+messages[112] = {ease=7333, fail=7258, full=7256, notes=7340, points=7338, standing=7339, success=6397}
+messages[113] = {ease=7636, fail=7561, full=7559, notes=7643, points=7641, standing=7642, success=6384}
+messages[114] = {ease=7636, fail=7561, full=7559, notes=7643, points=7641, standing=7642, success=6384}
+messages[115] = {ease=7135, fail=7060, full=7058, notes=7142, points=7140, standing=7141, success=6384}
+messages[116] = {ease=7294, fail=7219, full=7217, notes=7301, points=7299, standing=7300, success=6384}
+messages[117] = {ease=7316, fail=7241, full=7239, notes=7323, points=7321, standing=7322, success=6565}
+messages[118] = {ease=7335, fail=7260, full=7258, notes=7342, points=7340, standing=7341, success=6419}
+messages[119] = {ease=7316, fail=7241, full=7239, notes=7323, points=7321, standing=7322, success=6406}
+messages[120] = {ease=7324, fail=7249, full=7247, notes=7331, points=7329, standing=7330, success=6406}
+messages[121] = {ease=7636, fail=7561, full=7559, notes=7643, points=7641, standing=7642, success=6384}
+messages[122] = {ease=7294, fail=7219, full=7217, notes=7301, points=7299, standing=7300, success=6384}
+messages[123] = {ease=7636, fail=7561, full=7559, notes=7643, points=7641, standing=7642, success=6384}
+messages[124] = {ease=7636, fail=7561, full=7559, notes=7643, points=7641, standing=7642, success=6384}
+messages[125] = {ease=7294, fail=7219, full=7217, notes=7301, points=7299, standing=7300, success=6384}
+messages[126] = {ease=7294, fail=7219, full=7217, notes=7301, points=7299, standing=7300, success=6384}
+messages[127] = {ease=7294, fail=7219, full=7217, notes=7301, points=7299, standing=7300, success=6384}
+messages[128] = {ease=7294, fail=7219, full=7217, notes=7301, points=7299, standing=7300, success=6384}

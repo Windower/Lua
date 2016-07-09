@@ -2511,8 +2511,8 @@ fields.incoming[0x053] = L{
 fields.incoming[0x055] = L{
     -- There are 6 of these packets sent on zone, which likely corresponds to the 6 categories of key items.
     -- FFing these packets between bytes 0x14 and 0x82 gives you access to all (or almost all) key items.
-    {ctype='data[0x40]',        label='Key item available', fn=hex},            -- 04
-    {ctype='data[0x40]',        label='Key item examined',  fn=hex},            -- 44   Bit field correlating to the previous, 1 if KI has been examined, 0 otherwise
+    {ctype='data[0x40]',        label='Key item available', fn=hex+{0x40}},     -- 04
+    {ctype='data[0x40]',        label='Key item examined',  fn=hex+{0x40}},     -- 44   Bit field correlating to the previous, 1 if KI has been examined, 0 otherwise
     {ctype='unsigned int',      label='Type'},                                  -- 84   Goes from 0 to 5, determines which KI are being sent
 }
 
@@ -3025,7 +3025,7 @@ fields.incoming[0x0A0] = L{
 
 -- Help Desk submenu open
 fields.incoming[0x0B5] = L{
-    {ctype='data[20]',          label='_unknown1'},                             -- 04
+    {ctype='data[0x14]',        label='_unknown1'},                             -- 04
     {ctype='unsigned int',      label='Number of Opens'},                       -- 18
     {ctype='unsigned int',      label='_unknown2'},                             -- 1C
 }
@@ -3035,14 +3035,14 @@ fields.incoming[0x0C8] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04
     {ctype='data[3]',           label='_junk1'},                                -- 05
     {ref=types.alliance_member, count=18},                                      -- 08
-    {ctype='data[24]',          label='_unknown3',          const=''},          -- E0   Always 0?
+    {ctype='data[0x18]',        label='_unknown3',          const=''},          -- E0   Always 0?
 }
 
 types.check_item = L{
     {ctype='unsigned short',    label='Item',               fn=item},           -- 00
     {ctype='unsigned char',     label='Slot',               fn=slot},           -- 02
     {ctype='unsigned char',     label='_unknown1'},                             -- 03
-    {ctype='data[24]',          label='ExtData',            fn=hex+{24}},       -- 04
+    {ctype='data[0x18]',        label='ExtData',            fn=hex+{0x18}},     -- 04
 }
 
 -- Check data

@@ -98,6 +98,8 @@ function export_set(options)
         local gear = table.reassign({},items.equipment)
         local ward = items.wardrobe
         local ward2 = items.wardrobe2
+        local ward3 = items.wardrobe3
+        local ward4 = items.wardrobe4
 
         for i = 1,16 do -- ipairs will be used on item_list
             if not item_list[i] then
