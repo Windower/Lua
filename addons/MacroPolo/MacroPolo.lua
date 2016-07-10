@@ -25,7 +25,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.]]
 
-_addon.version = '0.51'
+_addon.version = '0.52'
 _addon.name = 'MacroPolo'
 _addon.author = 'Omnys@Valefor'
 _addon.commands = {'macropolo','mp'}
@@ -38,10 +38,10 @@ mHistory = {}
 
 windower.register_event('outgoing text',function(original,modified)
 	if windower.regex.match(original,"^/macro(polo)? [0-9]+[-][0-9]+ [0-9]+[-][0-9]+") then
-		local coms = split(string.lower(original)," ")
+		local coms = string.lower(original):split(" ")
 		if windower.regex.match(coms[2],"[0-9]+[-][0-9]+") and windower.regex.match(coms[3],"[0-9]+[-][0-9]+") then
-			local pos2 = split(coms[2],"-")
-			local pos3 = split(coms[3],"-")
+			local pos2 = coms[2]:split("-")
+			local pos3 = coms[3]:split("-")
 			windower.send_command("input /macro book "..pos3[1].."; input /macro set "..pos3[2])
 			mHistory[#mHistory+1] = {pos2[1],pos2[2]}
 			return ""
@@ -81,27 +81,3 @@ windower.register_event('addon command', function(...)
 		end
 	end
 end)
-
---This function was made by Byrth. It's used to split strings
---at a specific character and store them in a table
-function split(msg, match)
-    if msg == nil then return '' end
-    local length = msg:len()
-    local splitarr = {}
-    local u = 1
-    while u <= length do
-        local nextanch = msg:find(match,u)
-        if nextanch ~= nil then
-            splitarr[#splitarr+1] = msg:sub(u,nextanch-match:len())
-            if nextanch~=length then
-                u = nextanch+match:len()
-            else
-                u = length
-            end
-        else
-            splitarr[#splitarr+1] = msg:sub(u,length)
-            u = length+1
-        end
-    end
-    return splitarr
-end
