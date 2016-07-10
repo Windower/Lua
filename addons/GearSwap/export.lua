@@ -118,6 +118,10 @@ function export_set(options)
                     item_tab = ward[gs_item_tab.slot]
                 elseif gs_item_tab.bag_id == 10 and res.items[ward2[gs_item_tab.slot].id] then
                     item_tab = ward2[gs_item_tab.slot]
+                elseif gs_item_tab.bag_id == 11 and res.items[ward3[gs_item_tab.slot].id] then
+                    item_tab = ward3[gs_item_tab.slot]
+                elseif gs_item_tab.bag_id == 12 and res.items[ward4[gs_item_tab.slot].id] then
+                    item_tab = ward4[gs_item_tab.slot]
                 end
                 if res.items[item_tab.id] then
                     item_list[slot_map[slot_name]+1] = {
