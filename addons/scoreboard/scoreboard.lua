@@ -18,6 +18,8 @@ local display
 dps_clock = require('dpsclock'):new() -- global for now
 dps_db    = require('damagedb'):new() -- global for now
 
+local enemies = {}
+
 -------------------------------------------------------
 
 -- Conventional settings layout
@@ -29,6 +31,7 @@ default_settings.resetfilters = true
 default_settings.visible = true
 default_settings.showfellow = true
 default_settings.UpdateFrequency = 0.5
+default_settings.requireEngaged = true
 
 default_settings.display = {}
 default_settings.display.pos = {}
@@ -90,6 +93,7 @@ windower.register_event('addon command', function()
             sb_output('sb filter add <mob1> <mob2> ... : Add mob patterns to the filter (substrings ok)')
             sb_output('sb filter clear : Clears mob filter')
             sb_output('sb visible : Toggles scoreboard visibility')
+            sb_output('sb requireEngaged [<bool>]: Toggles or sets requiring a party member to be engaged to record damage/DPS')
             sb_output('sb stat <stat> [<player>]: Shows specific damage stats. Respects filters. If player isn\'t specified, ' ..
                   'stats for everyone are displayed. Valid stats are:')
             sb_output(dps_db.player_stat_fields:tostring():stripchars('{}"'))
@@ -265,11 +269,27 @@ windower.register_event('addon command', function()
             else
                 save()
             end
+        elseif command == 'requireengaged' then
+            local cmd = params[1] and params[1]:lower() or (settings.requireEngaged and 'false' or 'true')
+            if S{'on','true'}:contains(cmd) then
+                settings.requireEngaged = true
+            elseif S{'off','false'}:contains(cmd) then
+                settings.requireEngaged = false
+            else
+                error('Invalid argument for requireEngaged: '..params[1])
+                return
+            end
+            settings:save()
+            sb_output("Setting 'requireEngaged' set to " .. tostring(settings.requireEngaged))
         else
             error('Unrecognized command. See //sb help')
         end
     end
 end())
+
+windower.register_event('zone change', function(new_id, old_id)
+	enemies = {}
+end)
 
 local months = {
     'jan', 'feb', 'mar', 'apr',
@@ -321,23 +341,35 @@ display = Display:new(settings, dps_db)
 
 -- Keep updates flowing
 local function update_dps_clock()
-    local player = windower.ffxi.get_player()
-    local pet
-    if player ~= nil then
-        local player_mob = windower.ffxi.get_mob_by_id(player.id)
-        if player_mob ~= nil then
-            local pet_index = player_mob.pet_index
-            if pet_index ~= nil then
-                pet = windower.ffxi.get_mob_by_index(pet_index)
+    local fighting = false
+    if settings.requireEngaged then
+        local player = windower.ffxi.get_player()
+        local pet
+        if player ~= nil then
+            local player_mob = windower.ffxi.get_mob_by_id(player.id)
+            if player_mob ~= nil then
+                local pet_index = player_mob.pet_index
+                if pet_index ~= nil then
+                    pet = windower.ffxi.get_mob_by_index(pet_index)
+                end
+            end
+        end
+        fighting = player and (player.in_combat or (pet ~= nil and pet.status == 1))
+    else
+        for id,_ in pairs(enemies) do
+            local mob = windower.ffxi.get_mob_by_id(id)
+            if (mob ~= nil) and (mob.hpp > 0) and (mob.status == 1) then
+                fighting = true
+            else
+                enemies[id] = nil
             end
         end
     end
-    if player and (player.in_combat or (pet ~= nil and pet.status == 1)) then
+    if fighting then
         dps_clock:advance()
     else
         dps_clock:pause()
     end
-
     display:update()
 end
 
@@ -376,28 +408,32 @@ end
 
 function action_handler(raw_actionpacket)
     local actionpacket = ActionPacket.new(raw_actionpacket)
-    
     local category = actionpacket:get_category_string()
-
-    local player = windower.ffxi.get_player()
-    local pet
-    if player ~= nil then
-        local player_mob = windower.ffxi.get_mob_by_id(player.id)
-        if player_mob ~= nil then
-            local pet_index = player_mob.pet_index
-            if pet_index ~= nil then
-                pet = windower.ffxi.get_mob_by_index(pet_index)
+    
+    if settings.requireEngaged then
+        local player = windower.ffxi.get_player()
+        local pet
+        if player ~= nil then
+            local player_mob = windower.ffxi.get_mob_by_id(player.id)
+            if player_mob ~= nil then
+                local pet_index = player_mob.pet_index
+                if pet_index ~= nil then
+                    pet = windower.ffxi.get_mob_by_index(pet_index)
+                end
             end
         end
-    end
-    if not player or not (windower.ffxi.get_player().in_combat or (pet ~= nil and pet.status == 1)) then
-        -- nothing to do
-        return
+        if not player or not (windower.ffxi.get_player().in_combat or (pet ~= nil and pet.status == 1)) then
+            -- nothing to do
+            return
+        end
     end
     
     for target in actionpacket:get_targets() do
         for subactionpacket in target:get_actions() do
             if (mob_is_ally(actionpacket.raw.actor_id) and not mob_is_ally(target.raw.id)) then
+                if (not settings.requireEngaged) and (not enemies[target.raw.id]) then
+                    enemies[target.raw.id] = true
+                end
                 -- Ignore actions within the alliance, but parse all alliance-outwards or outwards-alliance packets.
                 local main  = subactionpacket:get_basic_info()
                 local add   = subactionpacket:get_add_effect()
