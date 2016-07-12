@@ -93,14 +93,8 @@ function export_set(options)
         -- Iterate through user_env.sets and find all the gear.
         item_list,exported = unpack_names({},'L1',user_env.sets,{},{empty=true})
     else
------------------------------------------- CHECK WHETHER THIS STILL WORKS --------------------------------------------------
         -- Default to loading the currently worn gear.
-        local gear = table.reassign({},items.equipment)
-        local ward = items.wardrobe
-        local ward2 = items.wardrobe2
-        local ward3 = items.wardrobe3
-        local ward4 = items.wardrobe4
-
+        
         for i = 1,16 do -- ipairs will be used on item_list
             if not item_list[i] then
                 item_list[i] = {}
@@ -109,21 +103,12 @@ function export_set(options)
             end
         end
         
-        for slot_name,gs_item_tab in pairs(gear) do
+        for slot_name,gs_item_tab in pairs(table.reassign({},items.equipment)) do -- Not sure why I have to reassign it here
             if gs_item_tab.slot ~= empty then
                 local item_tab
-                if gs_item_tab.bag_id == 0 and res.items[items.inventory[gs_item_tab.slot].id] then
-                    item_tab = items.inventory[gs_item_tab.slot]
-                elseif gs_item_tab.bag_id == 8 and res.items[ward[gs_item_tab.slot].id] then
-                    item_tab = ward[gs_item_tab.slot]
-                elseif gs_item_tab.bag_id == 10 and res.items[ward2[gs_item_tab.slot].id] then
-                    item_tab = ward2[gs_item_tab.slot]
-                elseif gs_item_tab.bag_id == 11 and res.items[ward3[gs_item_tab.slot].id] then
-                    item_tab = ward3[gs_item_tab.slot]
-                elseif gs_item_tab.bag_id == 12 and res.items[ward4[gs_item_tab.slot].id] then
-                    item_tab = ward4[gs_item_tab.slot]
-                end
-                if res.items[item_tab.id] then
+                local bag_name = to_windower_bag_api(res.bags[gs_item_tab.bag_id].en)
+                if res.items[items[bag_name][gs_item_tab.slot].id] then
+                    item_tab = items[bag_name][gs_item_tab.slot]
                     item_list[slot_map[slot_name]+1] = {
                         name = res.items[item_tab.id][language],
                         slot = slot_name

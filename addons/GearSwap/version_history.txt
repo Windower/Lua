@@ -1,4 +1,8 @@
 -------------------------------------------------
+GearSwap 0.917 - Added code to ignore already-equipped items when searching for items to equip.
+-------------------------------------------------
+GearSwap 0.916 - Added wardrobes 3 and 4.
+-------------------------------------------------
 GearSwap 0.915 - Added wardrobe2.
 -------------------------------------------------
 GearSwap 0.914 - Added /bstpet handling.

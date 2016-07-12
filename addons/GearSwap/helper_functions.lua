@@ -202,6 +202,20 @@ function to_windower_api(str)
     return __raw.lower(str:gsub(' ','_'))
 end
 
+
+-----------------------------------------------------------------------------------
+----Name: to_windower_bag_api(str)
+-- Takes strings and converts them to resources table key format
+----Args:
+-- str - String to be converted to the windower bag API version
+-----------------------------------------------------------------------------------
+----Returns:
+-- a lower case string with ' ' replaced with ''
+-----------------------------------------------------------------------------------
+function to_windower_bag_api(str)
+    return __raw.lower(str:gsub(' ',''))
+end
+
 -----------------------------------------------------------------------------------
 ----Name: to_bag_api(str)
 -- Takes strings and converts them to resources table key format
@@ -569,62 +583,13 @@ end
 ---- bag_id - The item's bag ID (if it exists)
 -----------------------------------------------------------------------------------
 function find_usable_item(item_id,bool)
-    local inventory_index,bag_id
-    for i,v in pairs(items.temporary) do
-        if type(v) == 'table' and v.id == item_id then
-            inventory_index = i
-            bag_id = 3
-            break
-        end
-    end
-    
-    -- Should I add some kind of filter for enchanted items?
-    if not inventory_index then
-        for i,v in pairs(items.inventory) do
+    for _,bag in ipairs(usable_item_bags) do
+        for i,v in pairs(items[to_windower_bag_api(bag.en)]) do
             if type(v) == 'table' and v.id == item_id and (v.status == 5 or v.status == 0) and (not bool or is_usable_item(v)) then
-                inventory_index = i
-                bag_id = 0
-                break
+                return i, bag.id
             end
         end
     end
-    if not inventory_index then
-        for i,v in pairs(items.wardrobe) do
-            if type(v) == 'table' and v.id == item_id and (v.status == 5 or v.status == 0) and (not bool or is_usable_item(v)) then
-                inventory_index = i
-                bag_id = 8
-                break
-            end
-        end
-    end
-    if not inventory_index then
-        for i,v in pairs(items.wardrobe2) do
-            if type(v) == 'table' and v.id == item_id and (v.status == 5 or v.status == 0) and (not bool or is_usable_item(v)) then
-                inventory_index = i
-                bag_id = 10
-                break
-            end
-        end
-    end
-    if not inventory_index then
-        for i,v in pairs(items.wardrobe3) do
-            if type(v) == 'table' and v.id == item_id and (v.status == 5 or v.status == 0) and (not bool or is_usable_item(v)) then
-                inventory_index = i
-                bag_id = 11
-                break
-            end
-        end
-    end
-    if not inventory_index then
-        for i,v in pairs(items.wardrobe4) do
-            if type(v) == 'table' and v.id == item_id and (v.status == 5 or v.status == 0) and (not bool or is_usable_item(v)) then
-                inventory_index = i
-                bag_id = 12
-                break
-            end
-        end
-    end
-    return inventory_index,bag_id
 end
 
 -----------------------------------------------------------------------------------

@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.915'
+_addon.version = '0.917'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -270,7 +270,7 @@ function disenable(tab,funct,functname,pol)
     end
 end
 
-windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
+function incoming_chunk(id,data,modified,injected,blocked)
     windower.debug('incoming chunk '..id)
     
     if next_packet_events and next_packet_events.sequence_id ~= data:unpack('H',3) then
@@ -697,7 +697,9 @@ windower.register_event('incoming chunk',function(id,data,modified,injected,bloc
             end
         end
     end
-end)
+end
+
+windower.register_event('incoming chunk',incoming_chunk)
 
 windower.register_event('status change',function(new,old)
     windower.debug('status change '..new)
@@ -744,3 +746,15 @@ windower.register_event('login',function(name)
     initialize_globals()
     windower.send_command('@wait 2;lua i gearswap refresh_user_env;')
 end)
+
+
+
+
+
+-- On load, pull out previous packets to parse for _ExtraData --
+for _,v in pairs({0x00A, 0x037, 0x05E, 0x061, 0x067, 0x068}) do
+    local potential_packet = windower.packets.last_incoming(v)
+    if potential_packet then
+        incoming_chunk(v,potential_packet,potential_packet,false,false)
+    end
+end
