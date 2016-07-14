@@ -38,7 +38,9 @@ function check_wearable(item_id)
     elseif not res.items[item_id] then
         msg.debugging("Item "..item_id.." has not been added to resources yet.")
     elseif not res.items[item_id].jobs then -- Make sure item can be equipped by specific jobs (unlike pearlsacks).
-        --msg.debugging('GearSwap (Debug Mode): Item '..(res.items[item_id][language] or item_id)..' does not have a jobs field in the resources.')
+        msg.debugging('GearSwap (Debug Mode): Item '..(res.items[item_id][language] or item_id)..' does not have a jobs field in the resources.')
+    elseif not res.items[item_id].slots then
+        -- Item is not equippable
     else
         return (res.items[item_id].jobs[player.main_job_id]) and (res.items[item_id].level<=player.jobs[res.jobs[player.main_job_id].ens]) and (res.items[item_id].races[player.race_id]) and
             (player.superior_level >= (res.items[item_id].superior_level or 0))
@@ -72,12 +74,13 @@ end
 ---- name - Name of the current piece of equipment
 ---- priority - Priority of the current piece as defined in the advanced table
 ---- augments - Augments for the current piece as defined in the advanced table
+---- designated_bag - Bag for the current piece as defined in the advanced table
 -----------------------------------------------------------------------------------
 function expand_entry(entry)
     if not entry then
         return
     end
-    local augments,name,priority,bag
+    local augments,name,priority,designated_bag
     if type(entry) == 'table' and entry == empty then
         name = empty
     elseif type(entry) == 'table' and entry.name and type(entry.name) == 'string' then
@@ -89,13 +92,12 @@ function expand_entry(entry)
             augments = {entry.augment}
         end
         if entry.bag and type(entry.bag) == 'string' then
-            local bag_list = {inventory = 0, wardrobe = 8, wardrobe2 = 10, wardrobe3 = 11, wardrobe4 = 12}
-            bag = bag_list[entry.bag:lower()]
+            designated_bag = bag_string_lookup[to_windower_bag_api(entry.bag)]
         end
     elseif type(entry) == 'string' and entry ~= '' then
         name = entry
     end
-    return name,priority,augments,bag -- all nil if they don't exist
+    return name,priority,augments,designated_bag -- all nil if they don't exist
 end
 
 -----------------------------------------------------------------------------------
@@ -112,38 +114,44 @@ function unpack_equip_list(equip_list)
     local error_list = {}
     local priorities = Priorities:new()
     for slot_id,slot_name in pairs(default_slot_map) do
-        local name,priority,extgoal_1,extgoal_2 = expand_entry(equip_list[slot_name])
+        local name,priority,augments,designated_bag = expand_entry(equip_list[slot_name])
         priorities[slot_id] = priority
         if name == empty then
             ret_list[slot_id] = {bag_id=0,slot=empty}
             equip_list[slot_name] = nil
+        elseif name and items.equipment[slot_name].slot ~= empty then
+            local item_tab = items[to_windower_bag_api(res.bags[items.equipment[slot_name].bag_id].en)][items.equipment[slot_name].slot]
+            if name_match(item_tab.id,name) and
+            (not augments or (#augments ~= 0 and extdata.compare_augments(augments,extdata.decode(item_tab).augments))) and
+            (not bag or bag == items.equipment[slot_name].bag_id) then
+                equip_list[slot_name] = nil
+                ret_list[slot_id] = {bag_id=items.equipment[slot_name].bag_id,slot=items.equipment[slot_name].slot}
+            end
         end
     end
     
-    local inventories = {[0]=items.inventory,[8]=items.wardrobe,[10]=items.wardrobe2,[11]=items.wardrobe3,[12]=items.wardrobe4}
-    
-    for bag_id,inventory in pairs(inventories) do
-        for _,item_tab in ipairs(inventory) do
+    for _,bag in pairs(equippable_item_bags) do
+        for _,item_tab in ipairs(items[to_windower_bag_api(bag.en)]) do -- Iterate over the current bag
             if type(item_tab) == 'table' and check_wearable(item_tab.id) then
-                if item_tab.status == 0 or item_tab.status == 5 then -- Make sure the item is either equipped or not otherwise committed. eliminate_redundant will take care of the already-equipped gear.
+                if item_tab.status == 0 then -- Make sure the item is not already equipped or otherwise in use.
                     for slot_id,slot_name in pairs(default_slot_map) do
                         -- equip_list[slot_name] can also be a table (that doesn't contain a "name" property) or a number, which are both cases that should not generate any kind of equipment changing.
                         -- Hence the "and name" below.
                         
                         if not ret_list[slot_id] and equip_list[slot_name] then 
-                            local name,priority,augments,bag = expand_entry(equip_list[slot_name])
+                            local name,priority,augments,designated_bag = expand_entry(equip_list[slot_name])
                             
-                            if (not bag or bag == bag_id) and name and name_match(item_tab.id,name) then
+                            if (not designated_bag or designated_bag == bag.id) and name and name_match(item_tab.id,name) then
                                 if res.items[item_tab.id].slots[slot_id] then
                                     if augments and #augments ~=0 then
                                         if extdata.compare_augments(augments,extdata.decode(item_tab).augments) then
                                             equip_list[slot_name] = nil
-                                            ret_list[slot_id] = {bag_id=bag_id,slot=item_tab.slot}
+                                            ret_list[slot_id] = {bag_id=bag.id,slot=item_tab.slot}
                                             break
                                         end
                                     else
                                         equip_list[slot_name] = nil
-                                        ret_list[slot_id] = {bag_id=bag_id,slot=item_tab.slot}
+                                        ret_list[slot_id] = {bag_id=bag.id,slot=item_tab.slot}
                                         break
                                     end
                                 else
@@ -154,7 +162,7 @@ function unpack_equip_list(equip_list)
                             end
                         end
                     end
-                elseif item_tab.status > 0 then
+                else -- item_tab.status > 0
                     for __,slot_name in pairs(default_slot_map) do
                         local name = expand_entry(equip_list[slot_name])
                         if name and name ~= empty then -- If "name" isn't a piece of gear, then it won't have a valid value at this point and should be ignored.
@@ -174,8 +182,7 @@ function unpack_equip_list(equip_list)
             else
                 for __,slot_name in pairs(default_slot_map) do
                     local name = expand_entry(equip_list[slot_name])
-                    if name == empty then
-                    elseif name_match(item_id,name) then
+                    if name ~= empty and name_match(item_id,name) then
                         if not res.items[item_tab.id].jobs[player.main_job_id] then
                             equip_list[slot_name] = nil
                             error_list[slot_name] = name..' (cannot be worn by this job)'
@@ -185,6 +192,9 @@ function unpack_equip_list(equip_list)
                         elseif not res.items[item_tab.id].races[player.race_id] then
                             equip_list[slot_name] = nil
                             error_list[slot_name] = name..' (cannot be worn by your race)'
+                        elseif not res.items[item_tab.id].slots then
+                            equip_list[slot_name] = nil
+                            error_list[slot_name] = name..' (cannot be worn)'
                         end
                         break
                     end

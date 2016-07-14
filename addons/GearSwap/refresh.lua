@@ -245,14 +245,10 @@ function refresh_player(dt,user_event_flag)
     table.reassign(player.equipment,to_names_set(cur_equip))
     
     -- Assign player.inventory to be keyed to item.inventory[i][language] and to have a value of count, similar to buffactive
-    if items.inventory then player.inventory = refresh_item_list(items.inventory) end
-    if items.sack then player.sack = refresh_item_list(items.sack) end
-    if items.satchel then player.satchel = refresh_item_list(items.satchel) end
-    if items.case then player.case = refresh_item_list(items.case) end
-    if items.wardrobe then player.wardrobe = refresh_item_list(items.wardrobe) end
-    if items.wardrobe2 then player.wardrobe2 = refresh_item_list(items.wardrobe2) end
-    if items.wardrobe3 then player.wardrobe3 = refresh_item_list(items.wardrobe3) end
-    if items.wardrobe4 then player.wardrobe4 = refresh_item_list(items.wardrobe4) end
+    for i,bag in pairs(res.bags) do
+        local bag_name = to_windower_bag_api(bag.en)
+        if items[bag_name] then player[bag_name] = refresh_item_list(items[bag_name]) end
+    end
 
     -- Monster tables for the target and subtarget.
     player.target = target_complete(windower.ffxi.get_mob_by_target('t'))
