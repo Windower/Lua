@@ -133,7 +133,7 @@ function unpack_equip_list(equip_list)
     for _,bag in pairs(equippable_item_bags) do
         for _,item_tab in ipairs(items[to_windower_bag_api(bag.en)]) do -- Iterate over the current bag
             if type(item_tab) == 'table' and check_wearable(item_tab.id) then
-                if item_tab.status == 0 then -- Make sure the item is not already equipped or otherwise in use.
+                if item_tab.status == 0 or item_tab.status == 5 then -- Need to fix this for real at some point.
                     for slot_id,slot_name in pairs(default_slot_map) do
                         -- equip_list[slot_name] can also be a table (that doesn't contain a "name" property) or a number, which are both cases that should not generate any kind of equipment changing.
                         -- Hence the "and name" below.
