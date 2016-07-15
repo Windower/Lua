@@ -312,7 +312,7 @@
   <addon>
     <name>MacroPolo</name>
     <author>Omnys@Valefor</author>
-    <description>Enables the use of /macro back for macro navigation</description>
+    <description>Enables the use of /macropolo back for macro navigation</description>
     <bugtracker>https://github.com/thatdudegrim/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Valefor/Omnys</support>
   </addon>
