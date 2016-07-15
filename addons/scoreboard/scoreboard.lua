@@ -29,6 +29,7 @@ default_settings.resetfilters = true
 default_settings.visible = true
 default_settings.showfellow = true
 default_settings.UpdateFrequency = 0.5
+default_settings.combinepets = true
 
 default_settings.display = {}
 default_settings.display.pos = {}
@@ -107,7 +108,18 @@ windower.register_event('addon command', function()
             end
 
             local setting = params[1]
-            if setting == 'numplayers' then
+            if setting == 'combinepets' then
+                if params[2] == 'true' then
+                    settings.combinepets = true
+                elseif params[2] == 'false' then
+                    settings.combinepets = false
+                else
+                    error("Invalid value for 'combinepets'. Must be true or false.")
+                    return
+                end
+                settings:save()
+                sb_output("Setting 'combinepets' set to " .. tostring(settings.combinepets))
+            elseif setting == 'numplayers' then
                 settings.numplayers = tonumber(params[2])
                 settings:save()
                 display:update()
@@ -483,6 +495,11 @@ function create_mob_name(actionpacket)
     if owner ~= nil then
         if string.len(actor) > 8 then
             result = string.sub(actor, 1, 7)..'.'
+        else
+            result = actor
+        end
+        if settings.combinepets then
+            result = 'Pets'
         else
             result = actor
         end
