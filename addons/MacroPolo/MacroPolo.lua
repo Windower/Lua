@@ -25,59 +25,48 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.]]
 
-_addon.version = '0.52'
+_addon.version = '0.55'
 _addon.name = 'MacroPolo'
 _addon.author = 'Omnys@Valefor'
-_addon.commands = {'macropolo','mp'}
+_addon.commands = {'macropolo'}
 
-require('strings')
 require('tables')
 require('logger')
 
 mHistory = {}
 
-windower.register_event('outgoing text',function(original,modified)
-	if windower.regex.match(original,"^/macro(polo)? [0-9]+[-][0-9]+ [0-9]+[-][0-9]+") then
-		local coms = string.lower(original):split(" ")
-		if windower.regex.match(coms[2],"[0-9]+[-][0-9]+") and windower.regex.match(coms[3],"[0-9]+[-][0-9]+") then
-			local pos2 = coms[2]:split("-")
-			local pos3 = coms[3]:split("-")
-			windower.send_command("input /macro book "..pos3[1].."; input /macro set "..pos3[2])
-			mHistory[#mHistory+1] = {pos2[1],pos2[2]}
-			return ""
-		end
-	elseif original == "/macro back" or original == "/macropolo back" then
-		if #mHistory then
-			windower.send_command("input /macro book "..mHistory[#mHistory][1].."; input /macro set "..mHistory[#mHistory][2])
-			-- table.remove(mHistory) -- doesn't eally seem necessary to remove the most recent macro position
-		end
-		return ""
-	end
+function Commander(...)
+    local args = T{...}:map(string.lower)
+    if args[1] == nil or args[1] == "help" then
+        log("Usage: /macropolo [current_book]-[current_set] [destination_book] [destination_set]")
+        log("/macropolo back to return to the previous set.")
+        log("Please see README.md for more details.")
+    elseif args[1] == "back" then
+        if #mHistory then
+            windower.send_command("input /macro book "..mHistory[#mHistory][1].."; input /macro set "..mHistory[#mHistory][2])
+        else
+            error("No previous macro location recorded.")
+        end
+    else
+        local argstring = table.concat(args)
+        local current_book, current_set, target_book, target_set = argstring:match('(%d+)-(%d+) (%d+)-(%d+)$')
+        
+        if target_set then
+            windower.send_command("input /macro book "..target_book.."; input /macro set "..target_set)
+            mHistory[#mHistory+1] = {current_book,current_set}
+            return ""
+        else
+            error('Invalid Command: Syntax should be: /macropolo current_book-current_set target_book-target_set')
+            log('See README.md for more details.')
+        end
+    end
+end
+
+windower.register_event('outgoing text', function(original)
+    if original:startswith('/macropolo ') then
+        Commander(original:sub(tonumber(original:find(" "))))
+        return ""
+    end
 end)
 
-windower.register_event('addon command', function(...)
-    local args    = T{...}:map(string.lower)
-    if args[1] == nil or args[1] == "help" then
-		log("MacroPolo is a macro management addon that")
-		log("enables the use of a single 'back' command")
-		log("thus allowing shared sets across different")
-		log("macro books.")
-		log("")
-		log("Usage: /macropolo [current_book]-[current_set] [destination_book] [destination_set]")
-		log("/macro prefix also works")
-		log("Example: '/macro 3-1 1-5': records the")
-		log("current macro position, as book 3 set 1")
-		log("and then effectively executes:")
-		log("  /macro book 1")
-		log("  /macro set 5")
-		log("")
-		log("You may then use '/macro back' or ")
-		log("'/macropolo back' to return to the")
-		log("previous book and set.")
-	elseif args[1] == "back" then
-		if #mHistory then
-			windower.send_command("input /macro book "..mHistory[#mHistory][1].."; input /macro set "..mHistory[#mHistory][2])
-			-- table.remove(mHistory) -- doesn't eally seem necessary to remove the most recent macro position
-		end
-	end
-end)
+windower.register_event('addon command', Commander)
