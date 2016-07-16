@@ -1,4 +1,4 @@
---[[Copyright © 2015, Kenshi
+--[[Copyright © 2016, Kenshi
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -9,7 +9,7 @@ modification, are permitted provided that the following conditions are met:
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name of BCTimer nor the
+    * Neither the name of TreasurePool nor the
       names of its contributors may be used to endorse or promote products
       derived from this software without specific prior written permission.
 
@@ -54,7 +54,6 @@ defaults.display.text.alpha = 255
 defaults.display.text.size = 12
 
 settings = config.load(defaults)
-settings:save()
 
 treasure_text = texts.new(settings.display, settings)
 
@@ -70,14 +69,19 @@ lotter = {}
 lot = {}
 
 windower.register_event('incoming chunk', function(id, data)
+
     if id == 0x0D2 then
+    
     local packet = packets.parse('incoming', data)
+    
         -- Ignore gil drop
         if packet.Item == 0xFFFF then
             return
         end
+    
     local time_check = packet.Timestamp + 300
     local diff = os.difftime(time_check, os.time())
+    
         if diff <= 300 then
             goals[packet.Index] = packet.Timestamp + 300
             lotter[packet.Index] = ' '
@@ -85,9 +89,13 @@ windower.register_event('incoming chunk', function(id, data)
             goals[packet.Index] = os.time() + 300
             lotter[packet.Index] = ' '
         end
+    
     end
+    
     if id == 0x0D3 then
+    
     local lotpacket = packets.parse('incoming', data)
+    
         -- Ignore drop to a player or floored
         if lotpacket.Drop ~= 0 then
             return
@@ -95,22 +103,23 @@ windower.register_event('incoming chunk', function(id, data)
             lotter[lotpacket.Index] = lotpacket['Highest Lotter Name']
             lot[lotpacket.Index] = lotpacket['Highest Lot']
         end
+    
     end
+    
     -- Check to hide text box if zoning with treasure up
     if id == 0xB then
         zoning_bool = true
     elseif id == 0xA and zoning_bool then
         zoning_bool = false
     end
+    
 end)
 
 windower.register_event('prerender', function()
     local treasure = T(windower.ffxi.get_items().treasure)
     local remove = S{}
-    local info = {}
+    local info = S{}
     if zoning_bool or treasure:empty() then
-        remove:add('index0') remove:add('index1') remove:add('index2') remove:add('index3') remove:add('index4') remove:add('index5') remove:add('index6') remove:add('index7') remove:add('index8') remove:add('index9')
-        remove:add('lotting0') remove:add('lotting1') remove:add('lotting2') remove:add('lotting3') remove:add('lotting4') remove:add('lotting5') remove:add('lotting6') remove:add('lotting7') remove:add('lotting8') remove:add('lotting9')
         treasure_text:update(info)
         treasure_text:hide()
         return
@@ -119,21 +128,21 @@ windower.register_event('prerender', function()
         if treasure[i] then
             if goals[i] then
                 local diff = os.difftime(goals[i], os.time())
-                local timer = {}
-                local item = {}
-                item[i] = res.items[treasure[i].item_id].name
+                local timer = {}    
                 timer[i] = os.date('!%M:%S', diff)
-                if diff < 0 then -- stop the timer when 00:00 so it don't show 59:59 for a brief moment
-                    remove:add('index' .. i)
-                    remove:add('lotting' .. i)
-                else
-                    info['index' .. i] = (
-                        diff < 60 and
-                            '\\cs(255,0,0)' .. item[i] .. ' → ' .. timer[i]
-                        or diff > 180 and
-                            '\\cs(0,255,0)' .. item[i] .. ' → ' .. timer[i]
-                        or
-                            '\\cs(255,128,0)' .. item[i] .. ' → ' .. timer[i]) .. '\\cr'
+                if treasure[i].item_id and timer[i] then
+                    if diff < 0 then -- stop the timer when 00:00 so it don't show 59:59 for a brief moment
+                        remove:add('index' .. i)
+                        remove:add('lotting' .. i)
+                    else
+                        info['index' .. i] = (
+                            diff < 60 and
+                                '\\cs(255,0,0)' .. res.items[treasure[i].item_id].name .. ' → ' .. timer[i]
+                            or diff > 180 and
+                                '\\cs(0,255,0)' .. res.items[treasure[i].item_id].name .. ' → ' .. timer[i]
+                            or
+                                '\\cs(255,128,0)' .. res.items[treasure[i].item_id].name .. ' → ' .. timer[i]) .. '\\cr'
+                    end
                 end
             else -- show item name in case the addon is loaded with items on tresure box
                 info['index' .. i] = res.items[treasure[i].item_id].name
@@ -157,4 +166,3 @@ windower.register_event('prerender', function()
         treasure_text[entry] = nil
     end
 end)
-
