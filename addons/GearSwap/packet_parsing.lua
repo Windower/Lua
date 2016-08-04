@@ -368,16 +368,53 @@ parse.i[0x063] = function (data)
             end
         end
         if seen_0x063_type9 then
-            for _,new in pairs(newbuffs) do
-                local accounted_for
-                -- Commonly the entire buff line can shift left or right
+        
+            -- Look for exact matches
+            for n,new in pairs(newbuffs) do
+                newbuffs[n].matched_exactly = nil
                 for i,old in pairs(_ExtraData.player.buff_details) do
-                    if old.id == new.id and math.abs(old.time-new.time) < 1 and not old.used then
-                        accounted_for = true
-                        _ExtraData.player.buff_details[i].used = true
+                    -- Find unchanged buffs
+                    if old.id == new.id and math.abs(old.time-new.time) < 1 and not old.matched_exactly then
+                        newbuffs[n].matched_exactly = true
+                        _ExtraData.player.buff_details[i].matched_exactly = true
+                        break
                     end
                 end
-                if not accounted_for then
+            end
+            
+            -- Look for time-independent matches, which are assumedly a spell overwriting itself
+            for n,new in pairs(newbuffs) do
+                newbuffs[n].matched_imprecisely = nil
+                if not new.matched_exactly then
+                    for i,old in pairs(_ExtraData.player.buff_details) do
+                        -- Buffs can be overwritten
+                        if old.id == new.id and not (old.matched_exactly or old.matched_imprecisely) then
+                            newbuffs[n].matched_imprecisely = true
+                            _ExtraData.player.buff_details[i].matched_imprecisely = true
+                            break
+                        end
+                    end
+                end
+            end
+            
+            for n,new in pairs(newbuffs) do
+                if new.matched_exactly then
+                    newbuffs[n].matched_exactly = nil
+                elseif new.matched_imprecisely then
+                    newbuffs[n].matched_imprecisely = nil
+                    -- Matched a previous buff, but the time didn't jive so it's assumed
+                    -- that it was overwritten with the same status effect
+                    if not res.buffs[new.id] then
+                        error('GearSwap: No known status for buff id #'..tostring(new.id))
+                    end
+                    local buff_name = res.buffs[new.id][language]
+                    windower.debug('refresh buff '..buff_name..' ('..tostring(new.id)..')')
+                    if not gearswap_disabled then
+                        refresh_globals()
+                        equip_sets('buff_refresh',nil,buff_name,new)
+                    end
+                else
+                    -- Not matched, so it's assumed the buff is new
                     if not res.buffs[new.id] then
                         error('GearSwap: No known status for buff id #'..tostring(new.id))
                     end
@@ -398,7 +435,8 @@ parse.i[0x063] = function (data)
                 end
             end
             for i,old in pairs(_ExtraData.player.buff_details) do
-                if not old.used then
+                if not (old.matched_exactly or old.matched_imprecisely) then
+                    -- Old status was not matched to any new status, so it's assumed it was lost
                     if not res.buffs[old.id] then
                         error('GearSwap: No known status for buff id #'..tostring(old.id))
                     end

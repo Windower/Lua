@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.921 - Split a buff overwriting itself off into a separate event, buff_refresh, and adjusted documentation.
+-------------------------------------------------
 GearSwap 0.920 - Made file_unload fire on load commands and changed its argument to be the previous file name.
 -------------------------------------------------
 GearSwap 0.919 - Switched handling of buff_change to rely on 0x063 incoming v9, which includes the durations.
