@@ -350,9 +350,10 @@ parse.i[0x063] = function (data)
         local newbuffs = {}
         for i=1,32 do
             local buff_id = data:unpack('H',i*2+7)
-            if buff_id ~= 255 then -- 255 is used for "no buff"
+            if buff_id ~= 255 and buff_id ~= 0 then -- 255 is used for "no buff"
                 local t = data:unpack('I',i*4+0x45)/60+1439307535
                 newbuffs[i] = setmetatable({
+                    name=res.buffs[buff_id].name,
                     buff=copy_entry(res.buffs[buff_id]),
                     id = buff_id,
                     time=t,
