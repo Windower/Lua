@@ -89,6 +89,13 @@ parse.i[0x00A] = function (data)
     _ExtraData.player.mnd = _ExtraData.player.base_mnd + _ExtraData.player.add_mnd
     _ExtraData.player.chr = _ExtraData.player.base_chr + _ExtraData.player.add_chr
     refresh_ffxi_info()
+    
+    delay_0x063_v9 = true
+end
+
+parse.i[0x00B] = function(data)
+    -- Blank temporary items when zoning.
+    items.temporary = make_inventory_table()
 end
 
 parse.i[0x00E] = function (data)
@@ -346,7 +353,7 @@ parse.i[0x062] = function (data)
 end
 
 parse.i[0x063] = function (data)
-    if data:byte(0x05) == 0x09 then
+    if data:byte(0x05) == 0x09 and not delay_0x063_v9 then
         local newbuffs = {}
         for i=1,32 do
             local buff_id = data:unpack('H',i*2+7)
@@ -458,6 +465,8 @@ parse.i[0x063] = function (data)
         -- Cannot reliably recall this packet using last_incoming on load because there
         -- are 9 version of it and you only get the last one. Hence, this flag:
         seen_0x063_type9 = true
+    elseif data:byte(0x05) == 0x09 then
+        delay_0x063_v9 = false
     end
 end
 

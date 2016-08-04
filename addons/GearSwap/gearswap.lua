@@ -306,9 +306,6 @@ function incoming_chunk(id,data,modified,injected,blocked)
     if injected then
     elseif parse.i[id] then
         parse.i[id](data)
-    elseif id == 0x00B then
-        -- Blank temporary items when zoning.
-        items.temporary = make_inventory_table()
     end
 end
 
