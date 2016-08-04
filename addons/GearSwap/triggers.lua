@@ -164,7 +164,7 @@ end)
 
 
 -----------------------------------------------------------------------------------
---Name: inc_action(act)
+--Name: parse.i[0x028](act)
 --Desc: Calls midcast or aftercast functions as appropriate in response to incoming
 --      action packets.
 --Args:
@@ -173,7 +173,8 @@ end)
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function inc_action(act)
+parse.i[0x028] = function (data)
+    local act = windower.packets.parse_action(data)
     if gearswap_disabled or act.category == 1 then return end
     
 --    local spell_res = ActionPacket.new(act):get_spell()
@@ -275,9 +276,8 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: inc_action_message(arr)
---Desc: Calls midcast or aftercast functions as appropriate in response to incoming
---      action message packets.
+--Name: parse.i[0x029](data)
+--Desc: Responds to incoming action message packets.
 --Args:
 ---- arr - Action message packet arguments (described on the dev wiki):
   -- actor_id,target_id,param_1,param_2,param_3,actor_index,target_index,message_id)
@@ -285,9 +285,20 @@ end
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function inc_action_message(arr)
-    windower.debug('action message')
+parse.i[0x029] = function (data)
     if gearswap_disabled then return end
+    local arr = {}
+    arr.actor_id = data:unpack('I',0x05)
+    arr.target_id = data:unpack('I',0x09)
+    arr.param_1 = data:unpack('I',0x0D)
+    arr.param_2 = data:unpack('I',0x11)%64 -- First 6 bits
+    arr.param_3 = math.floor(data:unpack('I',0x11)/64) -- Rest
+    arr.actor_index = data:unpack('H',0x15)
+    arr.target_index = data:unpack('H',0x17)
+    arr.message_id = data:unpack('H',0x19)%32768
+    
+    
+    windower.debug('action message')
     if T{6,20,113,406,605,646}:contains(arr.message_id) then -- death messages
         local ts,tab = command_registry:delete_by_id(arr.target_id)
         if tab and tab.spell and tab.spell.prefix == '/pet' then

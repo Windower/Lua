@@ -590,19 +590,19 @@ end
 -----------------------------------------------------------------------------------
 function convert_buff_list(bufflist)
     local buffarr = {}
-    for i,v in pairs(bufflist) do
-        if res.buffs[v] then -- For some reason we always have buff 255 active, which doesn't have an entry.
-            local buff = res.buffs[v][language]:lower()
+    for i,id in pairs(bufflist) do
+        if res.buffs[id] then -- For some reason we always have buff 255 active, which doesn't have an entry.
+            local buff = res.buffs[id][language]:lower()
             if buffarr[buff] then
                 buffarr[buff] = buffarr[buff] +1
             else
                 buffarr[buff] = 1
             end
             
-            if buffarr[v] then
-                buffarr[v] = buffarr[v] +1
+            if buffarr[id] then
+                buffarr[id] = buffarr[id] +1
             else
-                buffarr[v] = 1
+                buffarr[id] = 1
             end
         end
     end

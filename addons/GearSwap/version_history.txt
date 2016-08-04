@@ -1,4 +1,8 @@
 -------------------------------------------------
+GearSwap 0.919 - Switched handling of buff_change to rely on 0x063 incoming v9, which includes the durations.
+-------------------------------------------------
+GearSwap 0.918 - Added player.buff_details and made it so buff_change triggers when buffs are overwritten.
+-------------------------------------------------
 GearSwap 0.917 - Added code to ignore already-equipped items when searching for items to equip.
 -------------------------------------------------
 GearSwap 0.916 - Added wardrobes 3 and 4.

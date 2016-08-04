@@ -48,7 +48,7 @@ equippable_item_bags = {
     res.bags[10], -- Wardrobe 2
     res.bags[11], -- Wardrobe 3
     res.bags[12]} -- Wardrobe 4
-
+    
 bag_string_lookup = {}
 for i,v in pairs(res.bags) do
     bag_string_lookup[to_windower_bag_api(v.en)]=i
@@ -196,7 +196,8 @@ slot_map.back = 15
 
 
 
-gearswap_disabled = false
+gearswap_disabled = true
+seen_0x063_type9 = false
 not_sent_out_equip = {}
 command_registry = Command_Registry.new()
 equip_list = {}
@@ -228,7 +229,7 @@ _settings = {debug_mode = false, demo_mode = false, show_swaps = false}
 -- Because player, pet, and so forth are regularly regenerated from the windower API,
 -- this table is necessary to maintain information that goes beyond the windower API.
 _ExtraData = {
-        player = {},
+        player = {buff_details = {}},
         pet = {},
         world = {in_mog_house = false,conquest=false},
     }
