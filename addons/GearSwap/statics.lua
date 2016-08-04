@@ -205,7 +205,7 @@ world = make_user_table()
 buffactive = make_user_table()
 alliance = make_user_table()
 st_targs = {['<st>']=true,['<stpc>']=true,['<stal>']=true,['<stnpc>']=true,['<stpt>']=true}
-current_job_file = nil
+current_file = nil
 disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
 disable_table[0] = false
 outgoing_action_category_table = {['/ma']=3,['/ws']=7,['/ja']=9,['/ra']=16,['/ms']=25}

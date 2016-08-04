@@ -61,9 +61,9 @@ end
 -----------------------------------------------------------------------------------
 function load_user_files(job_id,user_file)
     job_id = tonumber(job_id)
-
-    if job_id and res.jobs[job_id] then
-        user_pcall('file_unload',res.jobs[job_id][language..'_short'])
+    
+    if current_file then
+        user_pcall('file_unload',current_file)
     end
     
     for i in pairs(registered_user_events) do
@@ -78,6 +78,9 @@ function load_user_files(job_id,user_file)
         windower.prim.delete(i)
     end
     
+    current_file = nil
+    gearswap_disabled = true
+    sets = nil
     user_env = nil
     unhandled_command_events = {}
     --registered_user_events = {}
@@ -92,19 +95,19 @@ function load_user_files(job_id,user_file)
     end
     
     
-    local path
-    path = pathsearch({user_file})
+    local path,base_dir,filename
+    path,base_dir,filename = pathsearch({user_file})
     if not path then
         local long_job = res.jobs[job_id].english
         local short_job = res.jobs[job_id].english_short
         local tab = {player.name..'_'..short_job..'.lua',player.name..'-'..short_job..'.lua',
             player.name..'_'..long_job..'.lua',player.name..'-'..long_job..'.lua',
             player.name..'.lua',short_job..'.lua',long_job..'.lua','default.lua'}
-        path = pathsearch(tab)
+        path,base_dir,filename = pathsearch(tab)
     end
     
     if not path then
-        current_job_file = nil
+        current_file = nil
         gearswap_disabled = true
         sets = nil
         return
@@ -152,13 +155,13 @@ function load_user_files(job_id,user_file)
     -- If the file cannot be loaded, print the error and load the default.
     if funct == nil then
         print('User file problem: '..err)
-        current_job_file = nil
+        current_file = nil
         gearswap_disabled = true
         sets = nil
         return
     else
-        current_job_file = user_file or res.jobs[job_id][language..'_short']
-        print('GearSwap: Loaded your '..current_job_file..' Lua file!')
+        current_file = filename
+        print('GearSwap: Loaded your '..current_file..' file!')
     end
     
     setfenv(funct, user_env)
@@ -722,9 +725,9 @@ function pathsearch(files_list)
                     normal_path = basepath .. v
                     
                     if user_path and windower.file_exists(user_path) then
-                        return user_path
+                        return user_path,basepath,v
                     elseif normal_path and windower.file_exists(normal_path) then
-                        return normal_path
+                        return normal_path,basepath,v
                     end
                 end
             end

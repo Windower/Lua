@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.919'
+_addon.version = '0.920'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -188,6 +188,9 @@ windower.register_event('addon command',function (...)
     elseif cmd == 'l' or cmd == 'load' then
         if splitup[1] then
             local f_name = table.concat(splitup,' ')
+            if f_name:sub(-4):lower() ~= '.lua' then
+                f_name = f_name..'.lua'
+            end
             if pathsearch({f_name}) then
                 refresh_globals()
                 command_registry = Command_Registry.new()

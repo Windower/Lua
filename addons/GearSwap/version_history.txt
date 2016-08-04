@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.920 - Made file_unload fire on load commands and changed its argument to be the previous file name.
+-------------------------------------------------
 GearSwap 0.919 - Switched handling of buff_change to rely on 0x063 incoming v9, which includes the durations.
 -------------------------------------------------
 GearSwap 0.918 - Added player.buff_details and made it so buff_change triggers when buffs are overwritten.
