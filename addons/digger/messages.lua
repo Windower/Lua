@@ -9,6 +9,18 @@ messages[51] = {ease=7135, fail=7060, full=7058, notes=7142, points=7140, standi
 messages[52] = {ease=7135, fail=7060, full=7058, notes=7142, points=7140, standing=7141, success=6384}
 messages[61] = {ease=7135, fail=7060, full=7058, notes=7142, points=7140, standing=7141, success=6384}
 messages[79] = {ease=7135, fail=7060, full=7058, notes=7142, points=7140, standing=7141, success=6384}
+messages[81] = {ease=7816, fail=7741, full=7739, notes=7823, points=7821, standing=7822, success=6384}
+messages[82] = {ease=7448, fail=7373, full=7371, notes=7455, points=7453, standing=7454, success=6384}
+messages[83] = {ease=7135, fail=7060, full=7058, notes=7142, points=7140, standing=7141, success=6384}
+messages[84] = {ease=7155, fail=7080, full=7078, notes=7162, points=7160, standing=7161, success=6384}
+messages[88] = {ease=7441, fail=7366, full=7364, notes=7448, points=7446, standing=7447, success=6384}
+messages[89] = {ease=7135, fail=7060, full=7058, notes=7142, points=7140, standing=7141, success=6384}
+messages[90] = {ease=7232, fail=7157, full=7155, notes=7239, points=7237, standing=7238, success=6384}
+messages[91] = {ease=7155, fail=7080, full=7078, notes=7162, points=7160, standing=7161, success=6384}
+messages[95] = {ease=7162, fail=7087, full=7085, notes=7169, points=7167, standing=7168, success=6384}
+messages[96] = {ease=7135, fail=7060, full=7058, notes=7142, points=7140, standing=7141, success=6384}
+messages[97] = {ease=7693, fail=7618, full=7616, notes=7700, points=7698, standing=7699, success=6384}
+messages[98] = {ease=7693, fail=7618, full=7616, notes=7700, points=7698, standing=7699, success=6384}
 messages[100] = {ease=7316, fail=7241, full=7239, notes=7323, points=7321, standing=7322, success=6406}
 messages[101] = {ease=7316, fail=7241, full=7239, notes=7323, points=7321, standing=7322, success=6406}
 messages[102] = {ease=7298, fail=7223, full=7221, notes=7305, points=7303, standing=7304, success=6384}
@@ -38,3 +50,5 @@ messages[125] = {ease=7294, fail=7219, full=7217, notes=7301, points=7299, stand
 messages[126] = {ease=7294, fail=7219, full=7217, notes=7301, points=7299, standing=7300, success=6384}
 messages[127] = {ease=7294, fail=7219, full=7217, notes=7301, points=7299, standing=7300, success=6384}
 messages[128] = {ease=7294, fail=7219, full=7217, notes=7301, points=7299, standing=7300, success=6384}
+messages[136] = {ease=7135, fail=7060, full=7058, notes=7142, points=7140, standing=7141, success=6384}
+messages[137] = {ease=7657, fail=7582, full=7580, notes=7664, points=7662, standing=7663, success=6384}
