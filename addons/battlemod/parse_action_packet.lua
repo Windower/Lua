@@ -10,6 +10,7 @@ function parse_action_packet(act)
     end
     act.actor = player_info(act.actor_id)
     act.action = get_spell(act) -- Pulls the resources line for the action
+    
     if not act.action then
         return act
     end
@@ -253,6 +254,8 @@ function parse_action_packet(act)
                 local color = color_filt(res.action_messages[m.add_effect_message].color,v.target[1].id==Self.id)
                 if m.add_effect_message > 287 and m.add_effect_message < 303 then m.simp_add_name = skillchain_arr[m.add_effect_message-287]
                 elseif m.add_effect_message > 384 and m.add_effect_message < 399 then m.simp_add_name = skillchain_arr[m.add_effect_message-384]
+                elseif m.add_effect_message > 766 and m.add_effect_message < 769 then m.simp_add_name = skillchain_arr[m.add_effect_message-752]
+                elseif m.add_effect_message > 768 and m.add_effect_message < 771 then m.simp_add_name = skillchain_arr[m.add_effect_message-754]
                 elseif m.add_effect_message ==603 then m.simp_add_name = 'TH'
                 else m.simp_add_name = 'AE'
                 end
@@ -338,7 +341,7 @@ function simplify_message(msg_ID)
         if msg_ID == 31 then
             fields.actor = true
         end    
-        if (msg_ID > 287 and msg_ID < 303) or (msg_ID > 384 and msg_ID < 399) or
+        if (msg_ID > 287 and msg_ID < 303) or (msg_ID > 384 and msg_ID < 399) or (msg_ID > 766 and msg_ID < 771) or
             T{152,161,162,163,165,229,384,603,652}:contains(msg_ID) then
                 fields.ability = true
         end
@@ -453,9 +456,24 @@ function player_info(id)
             else
                 typ = 'mob'
                 filt = 'monsters'
-                for i,v in pairs(windower.ffxi.get_party()) do
-                    if type(v) == 'table' and nf(v.mob,'id') == player_table.claim_id and filter.enemies then
-                        filt = 'enemies'
+                
+                if filter.enemies then
+                    for i,v in pairs(Self.buffs) do
+                        if domain_buffs:contains(v) then
+                            -- If you are in Domain Invasion, or a Reive, or various other places
+                            -- then all monsters should be considered enemies.
+                            filt = 'enemies'
+                            break
+                        end
+                    end
+                    
+                    if filt ~= 'enemies' then
+                        for i,v in pairs(windower.ffxi.get_party()) do
+                            if type(v) == 'table' and nf(v.mob,'id') == player_table.claim_id then
+                                filt = 'enemies'
+                                break
+                            end
+                        end
                     end
                 end
             end
