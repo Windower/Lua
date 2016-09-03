@@ -44,7 +44,7 @@ function establishTrusts()
 
     MyTrusts = T{}
     for k, v in pairs(known) do
-        if spells[k] then 
+        if spells[k] and spells[k].type == "Trust" then 
             MyTrusts[string.lower(spells[k].english)] = v
         end
     end
