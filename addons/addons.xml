@@ -600,6 +600,13 @@
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>Trustworthy</name>
+    <author>Omnys@Valefor</author>
+    <description>Simple addon to search trusts. //tw find partial-name</description>
+    <bugtracker>https://github.com/thatdudegrim/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Valefor/Omnys</support>
+  </addon>
+  <addon>
     <name>Update</name>
     <author>Arcon</author>
     <description>Updates and reloads all plugins and addons when typing //update.</description>
