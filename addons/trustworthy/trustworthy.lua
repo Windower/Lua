@@ -51,7 +51,7 @@ function establishTrusts()
 end
 establishTrusts()
 
-windower.register_event('zone change',function(original,modified)
+windower.register_event('zone change',function()
     -- Get Trust list again in case ciphers were learned, makes searches accurate
     establishTrusts:schedule(10)
 end)
