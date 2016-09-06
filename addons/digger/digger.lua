@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -- addon information
 
 _addon.name = 'digger'
-_addon.version = '2.1.1'
+_addon.version = '2.2.0'
 _addon.command = 'digger'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
@@ -53,6 +53,7 @@ defaults.fatigue = {}
 defaults.fatigue.date = os.date('!%Y-%m-%d', os.time() + 32400)
 defaults.fatigue.items = 0
 defaults.fatigue.diff = 0
+defaults.fatigue.free = 0
 defaults.accuracy = {}
 defaults.accuracy.failed = 0
 defaults.accuracy.total = 0
@@ -93,6 +94,7 @@ function update_day()
     if settings.fatigue.date ~= today then
         settings.fatigue.date = today
         settings.fatigue.items = 0
+        settings.fatigue.free = 0
         settings.fatigue.diff = settings.accuracy.failed - settings.accuracy.total
     end
 end
@@ -103,14 +105,13 @@ function display_stats()
     if settings.accuracy.total > 0 then
         accuracy = (successful / settings.accuracy.total) * 100
     end
-    windower.add_to_chat(207, 'dig accuracy: %d%% (%d/%d), digs today: %d, items today: %d gysahl greens remaining: %d':format(accuracy, successful, settings.accuracy.total, successful + settings.fatigue.diff, settings.fatigue.items, get_gysahl_count()))
+    windower.add_to_chat(207, 'dig accuracy: %d%% (%d/%d), fatigue today: %d, items today: %d gysahl greens remaining: %d':format(accuracy, successful, settings.accuracy.total, successful - settings.fatigue.free + settings.fatigue.diff, settings.fatigue.items, get_gysahl_count()))
 end
 
 function update_stats(mode)
     update_day()
     if mode == 3 then
-        settings.fatigue.diff = settings.fatigue.diff + 1
-        display_stats()
+        settings.fatigue.free = settings.fatigue.free + 1
     elseif mode == 2 then
         settings.fatigue.items = settings.fatigue.items + 1
         display_stats()
@@ -139,7 +140,7 @@ function check_incoming_chunk(id, original, modified, injected, blocked)
     if messages[zone_id] then
         if id == 0x2A then
             local message_id = original:unpack('H', 27) % 0x8000
-            if (messages[zone_id].full == message_id or messages[zone_id].success == message_id or messages[zone_id].points == message_id or messages[zone_id].standing == message_id or messages[zone_id].notes == message_id) and get_chocobo_buff() then
+            if (messages[zone_id].full == message_id or messages[zone_id].success == message_id or messages[zone_id].points == message_id or messages[zone_id].standing == message_id or messages[zone_id].notes == message_id or messages[zone_id].bayld == message_id) and get_chocobo_buff() then
                 update_stats(2)
             elseif messages[zone_id].ease == message_id then
                 update_stats(3)
