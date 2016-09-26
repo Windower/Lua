@@ -1448,8 +1448,12 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned char',     label='Sack Size'},                             -- 0A
     {ctype='unsigned char',     label='Case Size'},                             -- 0B
     {ctype='unsigned char',     label='Wardrobe Size'},                         -- 0C
-    {ctype='data[7]',           label='_padding1',          const=''},          -- 0D
-    {ctype='unsigned short',    label='_dupeInventory Size'},                   -- 14
+    {ctype='unsigned char',     label='Safe 2 Size'},                           -- 0D
+    {ctype='unsigned char',     label='Wardrobe 2 Size'},                       -- 0E
+    {ctype='unsigned char',     label='Wardrobe 3 Size'},                       -- 0F
+    {ctype='unsigned char',     label='Wardrobe 4 Size'},                       -- 10
+    {ctype='data[3]',           label='_padding1',          const=''},          -- 11
+    {ctype='unsigned short',    label='_dupeInventory Size'},                   -- 14   These "dupe" sizes are set to 0 if the inventory disabled.
     {ctype='unsigned short',    label='_dupeSafe Size'},                        -- 16
     {ctype='unsigned short',    label='_dupeStorage Size'},                     -- 18   The accumulated storage from all items (uncapped) -1
     {ctype='unsigned short',    label='_dupeTemporary Size'},                   -- 1A
@@ -1458,7 +1462,11 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned short',    label='_dupeSack Size'},                        -- 20
     {ctype='unsigned short',    label='_dupeCase Size'},                        -- 22
     {ctype='unsigned short',    label='_dupeWardrobe Size'},                    -- 24
-    {ctype='data[14]',          label='_padding2',          const=''},          -- 26
+    {ctype='unsigned short',    label='_dupeSafe 2 Size'},                      -- 26
+    {ctype='unsigned short',    label='_dupeWardrobe 2 Size'},                  -- 28
+    {ctype='unsigned short',    label='_dupeWardrobe 3 Size'},                  -- 2A   This is not set to 0 despite being disabled for whatever reason
+    {ctype='unsigned short',    label='_dupeWardrobe 4 Size'},                  -- 2C   This is not set to 0 despite being disabled for whatever reason
+    {ctype='data[6]',          label='_padding2',          const=''},           -- 2E
 }
 
 -- Finish Inventory
@@ -2038,6 +2046,7 @@ fields.incoming[0x037] = L{
     {ctype='bit[7]',            label='Indi Buff',          fn=e+{'indi'}},     -- 58
     {ctype='bit[9]',            label='_unknown5'},                             -- 58
     {ctype='unsigned short',    label='_junk1'},                                -- 5A
+    {ctype='unsigned int',      label='_flags8'},                               -- 5C   Two least significant bits seem to indicate whether Wardrobes 3 and 4, respectively, are enabled
 }
 
 -- Entity Animation
