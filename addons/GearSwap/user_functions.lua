@@ -45,8 +45,10 @@ function debug_mode(boolean)
     if type(boolean) == "boolean" then _settings.debug_mode = boolean
     elseif boolean == nil then
         _settings.debug_mode = true
+    elseif boolean == "Check" then
+        return _settings.debug_mode
     else
-        error('\nGearSwap: show_swaps() was passed an invalid value ('..tostring(boolean)..'). (true/no value/nil=on, false=off)', 2)
+        error('\nGearSwap: show_swaps() was passed an invalid value ('..tostring(boolean)..'). (true/no value/nil=on, false=off, "Check" returns current setting)', 2)
     end
 end
 
@@ -54,8 +56,10 @@ function show_swaps(boolean)
     if type(boolean) == "boolean" then _settings.show_swaps = boolean
     elseif boolean == nil then
         _settings.show_swaps = true
+    elseif boolean == "Check" then
+        return _settings.show_swaps
     else
-        error('\nGearSwap: show_swaps() was passed an invalid value ('..tostring(boolean)..'). (true/no value/nil=on, false=off)', 2)
+        error('\nGearSwap: show_swaps() was passed an invalid value ('..tostring(boolean)..'). (true/no value/nil=on, false=off, "Check" returns current setting)', 2)
     end
 end
 
