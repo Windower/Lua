@@ -640,6 +640,7 @@ function refresh_item_list(itemlist)
             -- If we don't already have the primary item name in the table, add it.
             if res.items[v.id] and res.items[v.id][language] and not retarr[res.items[v.id][language]] then
                 retarr[res.items[v.id][language]] = v
+                retarr[gearswap.res.items[v.id][language]].decoded_extdata = gearswap.extdata.decode(v)
                 retarr[res.items[v.id][language]].shortname=res.items[v.id][language]:lower()
                 -- If a long version of the name exists, and is different from the short version,
                 -- add the long name to the info table and point the long name's key at that table.
