@@ -593,6 +593,13 @@
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>TreasurePool</name>
+    <author>Kenshi</author>
+    <description>Replacement for the Treasure Pool thats shows time till the item auto drop and who is the current winning lot.</description>
+    <bugtracker>https://github.com/KenshiDRK/Lua/issues</bugtracker>
+    <support>https://www.ffxiah.com/player/Ragnarok/Kenshi</support>
+  </addon>
+  <addon>
     <name>Update</name>
     <author>Arcon</author>
     <description>Updates and reloads all plugins and addons when typing //update.</description>
