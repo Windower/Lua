@@ -159,7 +159,7 @@ function export_set(options)
     elseif use_subjob_in_filename then
         path = path..'_'..windower.ffxi.get_player().main_job..'_'..windower.ffxi.get_player().sub_job
     else
-        path = path..os.date(' %H %M %S%p  %y-%d-%m')
+        path = path..os.date(' %Y-%m-%d %H-%M-%S')
     end
     if xml then
         -- Export in .xml

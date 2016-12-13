@@ -237,6 +237,97 @@ function refresh_player(dt,user_event_flag)
             player.race_id = player.race
             player.race = res.races[player.race][language]
         end
+        
+        -- If we have a pet, create or update the table info.
+        if player_mob_table and player_mob_table.pet_index then
+            local player_pet_table = windower.ffxi.get_mob_by_index(player_mob_table.pet_index)
+            if player_pet_table then
+                table.reassign(pet, target_complete(player_pet_table))
+                pet.claim_id = nil
+                pet.is_npc = nil
+                pet.isvalid = true
+                if pet.tp then pet.tp = pet.tp/10 end
+                
+                if avatar_element[pet.name] then
+                    pet.element = res.elements[avatar_element[pet.name]][language]
+                else
+                    pet.element = res.elements[-1][language] -- Physical
+                end
+            else
+                table.reassign(pet, {isvalid=false})
+            end
+        else
+            table.reassign(pet, {isvalid=false})
+        end
+        
+        if player.main_job_id == 18 or player.sub_job_id == 18 then
+            local auto_tab
+            if player.main_job_id == 18 then auto_tab = windower.ffxi.get_mjob_data()
+            else auto_tab = windower.ffxi.get_sjob_data() end
+            
+            if auto_tab.name then
+                for i,v in pairs(auto_tab) do
+                    if not T{'available_heads','attachments','available_frames','available_attachments','frame','head'}:contains(i) then
+                        pet[i] = v
+                    end
+                end
+                pet.available_heads = make_user_table()
+                pet.attachments = make_user_table()
+                pet.available_frames = make_user_table()
+                pet.available_attachments = make_user_table()
+
+                -- available parts
+                for i,id in pairs(auto_tab.available_heads) do
+                    if res.items[id] and type(res.items[id]) == 'table' then
+                        pet.available_heads[res.items[id][language]] = true
+                    end
+                end
+                for i,id in pairs(auto_tab.available_frames) do
+                    if res.items[id] and type(res.items[id]) == 'table' then
+                        pet.available_frames[res.items[id][language]] = true
+                    end
+                end
+                for i,id in pairs(auto_tab.available_attachments) do
+                    if res.items[id] and type(res.items[id]) == 'table' then
+                        pet.available_attachments[res.items[id][language]] = true
+                    end
+                end
+
+                -- actual parts
+                pet.head = res.items[auto_tab.head][language]
+                pet.frame = res.items[auto_tab.frame][language]
+                for i,id in pairs(auto_tab.attachments) do
+                    if res.items[id] and type(res.items[id]) == 'table' then
+                        pet.attachments[res.items[id][language]] = true
+                    end
+                end
+                
+                if pet.max_mp ~= 0 then
+                    pet.mpp = math.floor(pet.mp/pet.max_mp*100)
+                else
+                    pet.mpp = 0
+                end
+            end
+        elseif player.main_job_id == 23 then
+            local species_id = windower.ffxi.get_mjob_data().species
+            -- Should add instincts when they become available
+            
+            if species_id then
+                player.species = {}
+                for i,v in pairs(res.monstrosity[species_id]) do
+                    player.species[i] = v
+                end
+                player.species.name = player.species[language] 
+                player.species.tp_moves = copy_entry(res.monstrosity[species_id].tp_moves)
+                for i,v in pairs(player.species.tp_moves) do
+                    if v > player.main_job_level then
+                        player.species.tp_moves[i] = nil
+                    end
+                end
+            end
+        else
+            player.species = nil
+        end
     end
     
     -- This being nil does not cause a return, but items should not really be changing when zoning.
@@ -258,96 +349,7 @@ function refresh_player(dt,user_event_flag)
     player.subtarget = target_complete(windower.ffxi.get_mob_by_target('st'))
     player.last_subtarget = target_complete(windower.ffxi.get_mob_by_target('lastst'))
     
-    -- If we have a pet, create or update the table info.
-    if player_mob_table and player_mob_table.pet_index then
-        local player_pet_table = windower.ffxi.get_mob_by_index(player_mob_table.pet_index)
-        if player_pet_table then
-            table.reassign(pet, target_complete(player_pet_table))
-            pet.claim_id = nil
-            pet.is_npc = nil
-            pet.isvalid = true
-            if pet.tp then pet.tp = pet.tp/10 end
-            
-            if avatar_element[pet.name] then
-                pet.element = res.elements[avatar_element[pet.name]][language]
-            else
-                pet.element = res.elements[-1][language] -- Physical
-            end
-        else
-            table.reassign(pet, {isvalid=false})
-        end
-    else
-        table.reassign(pet, {isvalid=false})
-    end
     
-    if player.main_job_id == 18 or player.sub_job_id == 18 then
-        local auto_tab
-        if player.main_job_id == 18 then auto_tab = windower.ffxi.get_mjob_data()
-        else auto_tab = windower.ffxi.get_sjob_data() end
-        
-        if auto_tab.name then
-            for i,v in pairs(auto_tab) do
-                if not T{'available_heads','attachments','available_frames','available_attachments','frame','head'}:contains(i) then
-                    pet[i] = v
-                end
-            end
-            pet.available_heads = make_user_table()
-            pet.attachments = make_user_table()
-            pet.available_frames = make_user_table()
-            pet.available_attachments = make_user_table()
-
-            -- available parts
-            for i,id in pairs(auto_tab.available_heads) do
-                if res.items[id] and type(res.items[id]) == 'table' then
-                    pet.available_heads[res.items[id][language]] = true
-                end
-            end
-            for i,id in pairs(auto_tab.available_frames) do
-                if res.items[id] and type(res.items[id]) == 'table' then
-                    pet.available_frames[res.items[id][language]] = true
-                end
-            end
-            for i,id in pairs(auto_tab.available_attachments) do
-                if res.items[id] and type(res.items[id]) == 'table' then
-                    pet.available_attachments[res.items[id][language]] = true
-                end
-            end
-
-            -- actual parts
-            pet.head = res.items[auto_tab.head][language]
-            pet.frame = res.items[auto_tab.frame][language]
-            for i,id in pairs(auto_tab.attachments) do
-                if res.items[id] and type(res.items[id]) == 'table' then
-                    pet.attachments[res.items[id][language]] = true
-                end
-            end
-            
-            if pet.max_mp ~= 0 then
-                pet.mpp = math.floor(pet.mp/pet.max_mp*100)
-            else
-                pet.mpp = 0
-            end
-        end
-    elseif player.main_job_id == 23 then
-        local species_id = windower.ffxi.get_mjob_data().species
-        -- Should add instincts when they become available
-        
-        if species_id then
-            player.species = {}
-            for i,v in pairs(res.monstrosity[species_id]) do
-                player.species[i] = v
-            end
-            player.species.name = player.species[language] 
-            player.species.tp_moves = copy_entry(res.monstrosity[species_id].tp_moves)
-            for i,v in pairs(player.species.tp_moves) do
-                if v > player.main_job_level then
-                    player.species.tp_moves[i] = nil
-                end
-            end
-        end
-    else
-        player.species = nil
-    end
     
     table.reassign(fellow,target_complete(windower.ffxi.get_mob_by_target('<ft>')))
     if fellow.name then
@@ -637,8 +639,8 @@ function refresh_item_list(itemlist)
         if type(v) == 'table' and v.id and v.id ~= 0 then
             -- If we don't already have the primary item name in the table, add it.
             if res.items[v.id] and res.items[v.id][language] and not retarr[res.items[v.id][language]] then
-                -- We add the entry as a sub-table containing the id and count
-                retarr[res.items[v.id][language]] = {id=v.id, count=v.count, shortname=res.items[v.id][language]:lower()}
+                retarr[res.items[v.id][language]] = v
+                retarr[res.items[v.id][language]].shortname=res.items[v.id][language]:lower()
                 -- If a long version of the name exists, and is different from the short version,
                 -- add the long name to the info table and point the long name's key at that table.
                 if res.items[v.id][language..'_log'] and res.items[v.id][language..'_log']:lower() ~= res.items[v.id][language]:lower() then

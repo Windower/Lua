@@ -451,10 +451,10 @@ function set_elemental_obi_cape_ring(spell)
     gear.ElementalObi.name = obi_name or gear.default.obi_waist  or ""
     
     if obi_name then
-        if player.inventory['Twilight Cape'] or player.wardrobe['Twilight Cape'] or player.wardrobe2['Twilight Cape'] then
+        if player.inventory['Twilight Cape'] or player.wardrobe['Twilight Cape'] or player.wardrobe2['Twilight Cape'] or player.wardrobe3['Twilight Cape'] or player.wardrobe4['Twilight Cape'] then
             gear.ElementalCape.name = "Twilight Cape"
         end
-        if (player.inventory['Zodiac Ring'] or player.wardrobe['Zodiac Ring'] or player.wardrobe2['Zodiac Ring']) and spell.english ~= 'Impact' and
+        if (player.inventory['Zodiac Ring'] or player.wardrobe['Zodiac Ring'] or player.wardrobe2['Zodiac Ring'] or player.wardrobe3['Zodiac Ring'] or player.wardrobe4['Zodiac Ring']) and spell.english ~= 'Impact' and
             not S{'Divine Magic','Dark Magic','Healing Magic'}:contains(spell.skill) then
             gear.ElementalRing.name = "Zodiac Ring"
         end
