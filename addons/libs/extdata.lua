@@ -874,6 +874,9 @@ augment_values = {
         [0x1C] = {{stat="DMG:",offset=1}},
         [0x1D] = {{stat="DMG:",offset=256}},
         
+        [0x72] = {{stat='Weapon skill damage ',offset=1,percent=true}},
+        [0x73] = {{stat='Magic damage',offset=1}},
+        [0x74] = {{stat='Blood Pact Dmg.',offset=1}},
         [0x74] = {{stat='Blood Pact Dmg.',offset=1}},
         [0x75] = {{stat='"Avatar perpetuation cost"',offset=1}},
         [0x76] = {{stat='"Blood Pact" ability delay',offset=1}},
@@ -907,7 +910,7 @@ augment_values = {
         [0x9A] = {{stat='Pet: "Regen"',offset=1}},
         [0x9B] = {{stat='Pet: Haste',offset=1,percent=true}},
         [0x9C] = {{stat='Automaton: "Cure" potency ',offset=1,percent=true}},
-        [0x9C] = {{stat='Automaton: "Fast Cast"',offset=1}},
+        [0x9D] = {{stat='Automaton: "Fast Cast"',offset=1}},
         
         [0xAB] = {{stat='"Dual Wield"',offset=1}},
         [0xAC] = {{stat='Damage Taken ',offset=1,multiplier=-1,percent=true}},
