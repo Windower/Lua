@@ -108,7 +108,7 @@ local modify_gear = function(packet, name, freeze, models)
     return modified, packet
 end
 
-windower.register_event('incoming chunk',function (id, data)
+windower.register_event('incoming chunk',function (id, _, data)
     if id ~= 0x00A and id ~= 0x00D and id ~= 0x051 then
         return
     end
@@ -129,7 +129,8 @@ windower.register_event('incoming chunk',function (id, data)
     -- Check whether the character is loaded into memory yet.
     local character = windower.ffxi.get_mob_by_index(packet.Index or player.index) -- Target of 0x00D or yourself for 0x051
     local blink_type, models, name = 'others'
-    if character and character.models and table.length(character.models) == 9 then
+    if character and character.models and table.length(character.models) == 9 and
+        (id == 0x051 or (id == 0x00D and character.id == packet.Player) ) then
         models = {Race=character.race,
             Face = character.models[1],
             Head=character.models[2]+0x1000,
