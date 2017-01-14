@@ -1397,7 +1397,7 @@ fields.incoming[0x00E] = L{
 
 -- Incoming Chat
 fields.incoming[0x017] = L{
-    {ctype='unsigned char',     label='Mode'},                                  -- 04
+    {ctype='unsigned char',     label='Mode',               fn=chat},           -- 04
     {ctype='bool',              label='GM'},                                    -- 05
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 06   Set only for Yell
     {ctype='char[16]',          label='Sender Name'},                           -- 08
