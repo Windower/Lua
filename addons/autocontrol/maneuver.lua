@@ -38,6 +38,8 @@ threshItems = T
     ,[27960]=5  -- Foire Dastanas
     ,[27981]=5  -- Foire Dastanas +1
     ,[28634]=5  -- Dispersal Mantle
+    ,[26933]=40 -- Kara. Farsetto +1
+    ,[26932]=40 -- Kara. Farsetto
     }
 heat = T{}
 heat.Fire = 0
