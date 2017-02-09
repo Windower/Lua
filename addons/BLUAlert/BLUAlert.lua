@@ -1,25 +1,25 @@
 --[[
-BLUAlert v1.20131102
+BLUAlert v1.0.0.0
 
-Copyright (c) 2015, Kainsin
+Copyright © 2017, Christopher Szewczyk
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
 
-* Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
-* Neither the name of BLUAlert nor the
-names of its contributors may be used to endorse or promote products
-derived from this software without specific prior written permission.
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of <addon name> nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL Kainsin BE LIABLE FOR ANY
+DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -51,7 +51,7 @@ blu_different_names = {
 blu_spells = res.spells:type('BlueMagic')
 function find_blu_spell(monster_ability_name)
     for i,v in pairs(blu_spells) do
-        if (v.en == monster_ability_name) then
+        if (v.english == monster_ability_name) then
             return v.id
         end
     end
@@ -62,14 +62,14 @@ end
 -- corresponds to which spell.
 spell_id_map = {}
 for i,v in pairs(res.monster_abilities) do
-    monster_ability_name = blu_different_names[v.en] or v.en
+    local monster_ability_name = blu_different_names[v.english] or v.english
     spell_id_map[i] = find_blu_spell(monster_ability_name)
 end
 
 function get_action_id(targets)
     for i,v in pairs(targets) do
         for i2,v2 in pairs(v['actions']) do
-            if (v2['param']) then
+            if v2['param'] then
                 return v2['param']
             end
         end
@@ -79,9 +79,9 @@ end
 windower.register_event('action', function(action)
     -- Category 7 is the readies message for abilities.
     if (action['category'] == 7) then
-        action_id = get_action_id(action['targets'])
-        spell_id = spell_id_map[action_id]
-        if (spell_id) and not windower.ffxi.get_spells()[spell_id] then
+        local action_id = get_action_id(action['targets'])
+        local spell_id = spell_id_map[action_id]
+        if spell_id and not windower.ffxi.get_spells()[spell_id] then
             windower.add_to_chat(123, "Unknown Blue Magic Used!")
             windower.play_sound(windower.addon_path..'sounds/UnknownBlueMagicUsed.wav')
         end
