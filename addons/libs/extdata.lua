@@ -1585,7 +1585,12 @@ function decode.Augmented(str)
         rettab.trial_complete = str:byte(12)/128>=1
     end
     
-    if flag_2%64/32 >=1 then
+    if flag_2%16/8 >= 1 then -- Crafting shields
+        rettab.objective = str:byte(6)
+        local units = {30,40,50,100}
+        rettab.stage = math.min(1,math.max(4,str:byte(0x9)))
+        rettab.completion = str:unpack('H',7)/units[rettab.stage]
+    elseif flag_2%64/32 >=1 then
         rettab.augment_system = 2
         local path_map = {[0] = 'A',[1] = 'B', [2] = 'C', [3] = 'D'}
         local points_map = {[1] = 50, [2] = 80, [3] = 120, [4] = 170, [5] = 220, [6] = 280, [7] = 340, [8] = 410, [9] = 480, [10]=560, [11]=650, [12] = 750, [13] = 960, [14] = 980}
