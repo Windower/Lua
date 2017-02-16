@@ -56,7 +56,7 @@ function equip_sets(swap_type,ts,...)
     if showphase or debugging.general then msg.debugging(8,windower.to_shift_jis(tostring(swap_type))..' enter') end
     
     local cur_equip = table.reassign({},items.equipment)
-        
+    
     table.reassign(equip_list,{})
     table.reassign(player.equipment,to_names_set(cur_equip))
     for i,v in pairs(slot_map) do
@@ -154,7 +154,9 @@ function equip_sets(swap_type,ts,...)
                 msg.debugging(i..' slot was not equipped because you are encumbered.')
             end
         end
-
+        
+        table.update(equip_list_history,equip_list)
+        
         -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v={bag_id=0 or 8 or 10, slot=inventory slot}.
         local equip_next,priorities = unpack_equip_list(equip_list)
         equip_next = eliminate_redundant(cur_equip,equip_next) -- Eliminate the equip commands for items that are already equipped
@@ -175,9 +177,10 @@ function equip_sets(swap_type,ts,...)
             logit('\n\n'..tostring(os.clock)..'(69) failure_reason: '..tostring(failure_reason))
         else
             local chunk_table = L{}
-            for eq_slot_id,_ in priorities:it() do
+            for eq_slot_id,priority in priorities:it() do
                 if equip_next[eq_slot_id] and not encumbrance_table[eq_slot_id] and not _settings.demo_mode then
-                    chunk_table:append(equip_piece(eq_slot_id,equip_next[eq_slot_id].bag_id,equip_next[eq_slot_id].slot))
+                    local minichunk = equip_piece(eq_slot_id,equip_next[eq_slot_id].bag_id,equip_next[eq_slot_id].slot)
+                    chunk_table:append(minichunk)
                 end
             end
             if chunk_table.n >= 3 then
@@ -423,7 +426,6 @@ function send_action(ts)
         if not _settings.demo_mode then windower.packets.inject_outgoing(command_registry[ts].proposed_packet:byte(1),command_registry[ts].proposed_packet) end
         command_registry[ts].midaction = true
         equip_sets('midcast',ts,command_registry[ts].spell)
-        windower.send_command('input /assist <me>')
     end
 end
 
@@ -441,15 +443,11 @@ end
 ---- blocked - Boolean indicating whether or not the packet is currently blocked
 -----------------------------------------------------------------------------------
 --Returns:
----- true if blocking the packet (/assist <me>)
+---- nothing
 -----------------------------------------------------------------------------------
 windower.register_event('outgoing chunk',function(id,original,modified,injected,blocked)
     windower.debug('outgoing chunk '..id)
-    if id == 0x1A then
-        if not injected and original:unpack('H',0xB) == 12 and original:unpack('H',0x9) == player.index then
-           return true -- Blocks all /assist <me> commands that follow an action attempt through GearSwap
-        end
-    elseif id == 0x100 then
+    if id == 0x100 then
     -- Scrub the equipment array if a valid outgoing job change packet is sent.
         local newmain = modified:byte(5)
         if res.jobs[newmain] and newmain ~= 0 and newmain ~= player.main_job_id then

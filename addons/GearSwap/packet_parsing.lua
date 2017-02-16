@@ -90,7 +90,7 @@ parse.i[0x00A] = function (data)
     _ExtraData.player.chr = _ExtraData.player.base_chr + _ExtraData.player.add_chr
     refresh_ffxi_info()
     
-    delay_0x063_v9 = true
+    blank_0x063_v9_inc = true
 end
 
 parse.i[0x00B] = function(data)
@@ -235,17 +235,31 @@ parse.i[0x037] = function (data)
     end
 end
 
-parse.i[0x050] = function (data)
-    local inv = items[to_windower_compact(res.bags[data:byte(7)].english)]
-    if data:byte(5) ~= 0 then
-        items.equipment[toslotname(data:byte(6))] = {slot=data:byte(5),bag_id = data:byte(7)}
-        if not inv[data:byte(5)] then inv[data:byte(5)] = make_empty_item_table(data:byte(5)) end
-        items[to_windower_compact(res.bags[data:byte(7)].english)][data:byte(5)].status = 5 -- Set the status to "equipped"
+function parse_equip_chunk(chunk)
+    local inv_slot = chunk:byte(1) -- 0 indicates unequipping the item
+    local equip_slot = toslotname(chunk:byte(2))
+    if inv_slot == 0 then -- Unequipping
+        local bag_id = items.equipment[equip_slot].bag_id
+        inv_slot = items.equipment[equip_slot].slot
+        
+        if inv_slot == empty then return end -- unequipping something that was already unequipped?
+        
+        local inv = items[to_windower_compact(res.bags[bag_id].english)]
+        if not inv[inv_slot] then inv[inv_slot] = make_empty_item_table(inv_slot) end
+        
+        inv[inv_slot].status = 0 -- Set the status to "unequipped"
+        items.equipment[equip_slot] = {slot=empty,bag_id=0}
     else
-        items.equipment[toslotname(data:byte(6))] = {slot=empty,bag_id=0}
-        if not inv[data:byte(5)] then inv[data:byte(5)] = make_empty_item_table(data:byte(5)) end
-        items[to_windower_compact(res.bags[data:byte(7)].english)][data:byte(5)].status = 0 -- Set the status to "unequipped"
+        local bag_id = chunk:byte(3)
+        local inv = items[to_windower_compact(res.bags[bag_id].english)]
+        items.equipment[equip_slot] = {slot=inv_slot,bag_id = bag_id}
+        if not inv[inv_slot] then inv[inv_slot] = make_empty_item_table(inv_slot) end
+        inv[inv_slot].status = 5 -- Set the status to "equipped"
     end
+end
+
+parse.i[0x050] = function (data)
+    parse_equip_chunk(data:sub(5,8))
 end
 
 parse.i[0x053] = function (data)
@@ -353,7 +367,20 @@ parse.i[0x062] = function (data)
 end
 
 parse.i[0x063] = function (data)
-    if data:byte(0x05) == 0x09 and not delay_0x063_v9 then
+    if data:byte(0x05) == 0x09 and blank_0x063_v9_inc then
+        -- After zoning, players receive a blank 0x063 v9 packet
+        -- (because their buff line is temporarily empty)
+        -- So this flag is set in 0x00A 
+        blank_0x063_v9_inc = false
+        -- However, players can also reload gearswap and fail to get a 0x063 v9 packet from
+        -- windower.packets.last_incoming, which leaves them without buff information but with a
+        -- informative 0x063 v9 packet coming next. So this step checks confirms the packet is
+        -- empty before returning
+        if data:sub(0x49,0xC8) == string.char(0):rep(128) then
+            return
+        end
+    end
+    if data:byte(0x05) == 0x09 then
         local newbuffs = {}
         for i=1,32 do
             local buff_id = data:unpack('H',i*2+7)
@@ -465,8 +492,6 @@ parse.i[0x063] = function (data)
         -- Cannot reliably recall this packet using last_incoming on load because there
         -- are 9 version of it and you only get the last one. Hence, this flag:
         seen_0x063_type9 = true
-    elseif data:byte(0x05) == 0x09 then
-        delay_0x063_v9 = false
     end
 end
 
@@ -575,17 +600,7 @@ end
 
 parse.i[0x117] = function (data)
     for i=0x49,0x85,4 do
-        local arr = data:sub(i,i+3)
-        local inv = items[to_windower_compact(res.bags[arr:byte(3)].english)]
-        if arr:byte(1) ~= 0 then
-            items.equipment[toslotname(arr:byte(2))] = {slot=arr:byte(1),bag_id = arr:byte(3)}
-            if not inv[arr:byte(1)] then inv[arr:byte(1)] = make_empty_item_table(arr:byte(1)) end
-            items[to_windower_compact(res.bags[arr:byte(3)].english)][arr:byte(1)].status = 5 -- Set the status to "equipped"
-        else
-            items.equipment[toslotname(arr:byte(2))] = {slot=empty,bag_id=0}
-            if not inv[arr:byte(1)] then inv[arr:byte(1)] = make_empty_item_table(arr:byte(1)) end
-            items[to_windower_compact(res.bags[arr:byte(3)].english)][arr:byte(1)].status = 0 -- Set the status to "unequipped"
-        end
+        parse_equip_chunk(data:sub(i,i+3))
     end
 end
 
@@ -594,6 +609,10 @@ function initialize_packet_parsing()
         local lastpacket = windower.packets.last_incoming(i)
         if lastpacket then
             v(lastpacket)
+        end
+        if i == 0x63 and lastpacket and lastpacket:byte(5) ~= 9 then
+            -- Not receiving an accurate buff line on load because the wrong 0x063 packet was sent last
+            
         end
     end
 end

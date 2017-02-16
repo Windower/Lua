@@ -38,7 +38,7 @@ function check_wearable(item_id)
     elseif not res.items[item_id] then
         msg.debugging("Item "..item_id.." has not been added to resources yet.")
     elseif not res.items[item_id].jobs then -- Make sure item can be equipped by specific jobs (unlike pearlsacks).
-        msg.debugging('GearSwap (Debug Mode): Item '..(res.items[item_id][language] or item_id)..' does not have a jobs field in the resources.')
+        --msg.debugging('GearSwap (Debug Mode): Item '..(res.items[item_id][language] or item_id)..' does not have a jobs field in the resources.')
     elseif not res.items[item_id].slots then
         -- Item is not equippable
     else
@@ -296,6 +296,7 @@ function equip_piece(eq_slot_id,bag_id,inv_slot_id)
     
     if cur_eq_tab.slot ~= empty then
         items[to_bag_api(res.bags[cur_eq_tab.bag_id].english)][cur_eq_tab.slot].status = 0
+        -- This does not account for items like Onca Suit which take up multiple slots
     end
     
     if inv_slot_id ~= empty then
