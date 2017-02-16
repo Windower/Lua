@@ -534,18 +534,18 @@ function assemble_menu_item_packet(target_id,target_index,...)
             count = count + 1
         end
     end
-    if count > 9 then
-        msg.debugging('Too many items ('..count..') passed to the assemble_menu_item_packet function')
-        return
-    end
     
     local unique_items = 0
     for i,v in pairs(counts) do
         outstr = outstr.."I":pack(v)
         unique_items = unique_items + 1
     end
-    for i = 1,10-unique_items do
-        outstr = outstr..string.char(0,0,0,0)
+    if unique_items > 9 then
+        msg.debugging('Too many items ('..unique_items..') passed to the assemble_menu_item_packet function')
+        return
+    end
+    while #outstr < 0x30 do
+        outstr = outstr..string.char(0)
     end
     
     -- Inventory Index for the one unit
@@ -559,7 +559,7 @@ function assemble_menu_item_packet(target_id,target_index,...)
             return
         end
     end
-    for i = 1,10-unique_items do
+    while #outstr < 0x3A do
         outstr = outstr..string.char(0)
     end
     -- Target Index
@@ -650,7 +650,7 @@ function filter_pretarget(spell)
         -- Filter for spells that you know, but do not currently have access to
         elseif (not spell_jobs[player.main_job_id] or not (spell_jobs[player.main_job_id] <= player.main_job_level or
             (spell_jobs[player.main_job_id] >= 100 and number_of_jps(player.job_points[__raw.lower(res.jobs[player.main_job_id].ens)]) >= spell_jobs[player.main_job_id]) ) ) and
-            (not spell_jobs[player.sub_job_id] or not (spell_jobs[player.sub_job_id] <= player.sub_job_level)) then
+            (not spell_jobs[player.sub_job_id] or not (spell_jobs[player.sub_job_id] <= player.sub_job_level)) and not (player.main_job_id == 23) then
             msg.debugging("Unable to execute command. You do not have access to that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
         -- At this point, we know that it is technically castable by this job combination if the right conditions are met.

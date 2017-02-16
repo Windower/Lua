@@ -202,6 +202,7 @@ delay_0x063_v9 = false
 not_sent_out_equip = {}
 command_registry = Command_Registry.new()
 equip_list = {}
+equip_list_history = {}
 world = make_user_table()
 buffactive = make_user_table()
 alliance = make_user_table()
