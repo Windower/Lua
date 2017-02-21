@@ -99,8 +99,9 @@ function get_item_name(item)
         elseif item.name then
             name = item.name
         end
-
-        local aug = get_augment_string(item)
+        
+        
+        local aug = item.aug and table.concat(item.aug,', ') or get_augment_string(item)
         if aug then
             name = name .. ' {' .. aug .. '}'
         end
@@ -189,7 +190,7 @@ function search_bags_for_items_in_set(gear_table, filter, missing_items, stack)
                 msg.addon_msg(123,windower.to_shift_jis(tostring(i))..' contains a "name" element but is not a valid slot.')
             elseif tryfilter(lowercase_name(name), filter) and not find_in_equippable_inventories(name, aug) then
                 -- This is one spot where inventory names will be left hardcoded until an equippable bool is added to the resources
-                missing_items:add(lowercase_name(name))
+                missing_items:add({name=lowercase_name(name),aug=aug})
             end
         elseif type(name) == 'table' and name ~= empty  then
             if not stack then stack = S{} end

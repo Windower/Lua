@@ -1,4 +1,8 @@
 -------------------------------------------------
+GearSwap 0.923 - Added augments to //gs validate sets.
+-------------------------------------------------
+GearSwap 0.922 - Changed how the reload event works so it no longer causes stack problems.
+-------------------------------------------------
 GearSwap 0.921 - Split a buff overwriting itself off into a separate event, buff_refresh, and adjusted documentation.
 -------------------------------------------------
 GearSwap 0.920 - Made file_unload fire on load commands and changed its argument to be the previous file name.
