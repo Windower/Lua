@@ -454,9 +454,10 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
             windower.debug('job change')
             
             command_registry = Command_Registry.new()
-            load_user_files(newmain)
             
             table.clear(not_sent_out_equip)
+            table.clear(equip_list_history)
+            table.clear(equip_list)
             
             for id,name in pairs(default_slot_map) do
                 if items.equipment[name].slot ~= empty then
@@ -467,6 +468,7 @@ windower.register_event('outgoing chunk',function(id,original,modified,injected,
             end
             player.main_job_id = newmain
             update_job_names()
+            windower.send_command('lua i '.._addon.name..' load_user_files '..newmain)
         end
     end
     
