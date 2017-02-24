@@ -258,9 +258,86 @@ function parse_equip_chunk(chunk)
     end
 end
 
-parse.i[0x050] = function (data)
-    parse_equip_chunk(data:sub(5,8))
+parse.o[0x050] = function (data) --equip
+    injected_equipment_registry[data:byte(6)]:append(data:sub(5,7))
 end
+
+parse.i[0x050] = function (data)
+    -- should simplify this code using return when I gain confidence in it
+    local matched = false
+    local slot = data:byte(6)
+    for chunk,ind in injected_equipment_registry[slot]:it() do
+        if ind > unexpected_indices[slot] and chunk == data:sub(5,7) then
+            -- Matched
+            injected_equipment_registry[slot] = injected_equipment_registry[slot]:slice(ind) -- Eliminate all preceding packets if we get a match
+            unexpected_indices[slot] = 0
+            matched = true
+            break
+        end
+        --[[for i=9,9+4*(chunk:byte(5)-1),4 do -- The server replies to equipset packets with both single equip packets and equipset packets.
+            if chunk:sub(i,i+2) == data:sub(5,7) then
+                matched = true
+                break
+            end
+        end]]
+    end
+    if not matched then
+        -- Unexpected packet found!
+        unexpected_indices[slot] = unexpected_indices[slot] + 1
+        injected_equipment_registry[slot]:insert(unexpected_indices[slot],data:sub(5,7))
+    end
+    parse_equip_chunk(data:sub(5,7))
+end
+
+parse.o[0x051] = function (data) --equipset
+    for i=9,9+4*(data:byte(5)-1),4 do
+        injected_equipment_registry[data:byte(i+1)]:append(data:sub(i,i+2))
+    end
+end
+
+function update_equipment()
+    local tab = {}
+    for i,v in pairs(items.equipment) do
+        tab[i] = {bag_id = v.bag_id,slot=v.slot}
+    end
+    for i,v in pairs(injected_equipment_registry) do
+        local last = v:last()
+        if last then
+            tab[default_slot_map[i]].bag_id = last:byte(3)
+            tab[default_slot_map[i]].slot = last:byte(1) == 0 and empty or last:byte(1)
+        end
+    end
+    return tab
+end
+
+--[[ -- The server always sends both equip responses and equipset responses following an equipset command
+parse.i[0x117] = function (data)
+    -- should simplify this code using return when I gain confidence in it
+    local matched = false
+    for chunk,ind in injected_equipment_registry:it() do
+        if #chunk == 0x48 then -- equipset
+            local count = 0
+            for i=9,9+4*(chunk:byte(5)-1),4 do -- iterate over number of swapped pieces
+                if chunk:sub(i,i+2) == data:sub(i,i+2) and -- The first half of the equipset response echos back the equipset packet
+                    chunk:sub(i,i+2) == data:sub(0x49 + chunk:byte(i+1)*4,0x4B + chunk:byte(i+1)*4) then -- The second half tells you what gear is currently equipped, and its order is always 0x00 to 0x0F
+                    count = count + 1
+                end
+            end
+            if count == chunk:byte(5) then
+                injected_equipment_registry = injected_equipment_registry:slice(ind+1) -- Eliminate the current packet and all preceding packets
+                matched = true
+                break
+            end
+        end
+    end
+    if not matched then
+        -- This should almost never happen (partial encumbrance hitting while swapping gear)
+        print('Unexpected 0x117',#injected_equipment_registry)
+    end
+    for i=0x49,0x85,4 do
+        parse_equip_chunk(data:sub(i,i+3))
+    end
+end]]
 
 parse.i[0x053] = function (data)
     if data:unpack('H',0xD) == 0x12D and player then
@@ -598,9 +675,33 @@ parse.i[0x0E2] = function (data)
     end
 end
 
-parse.i[0x117] = function (data)
-    for i=0x49,0x85,4 do
-        parse_equip_chunk(data:sub(i,i+3))
+parse.o[0x100] = function(data)
+    -- Scrub the equipment array if a valid outgoing job change packet is sent.
+    local newmain = data:byte(5)
+    if res.jobs[newmain] and newmain ~= 0 and newmain ~= player.main_job_id then
+        windower.debug('job change')
+        
+        command_registry = Command_Registry.new()
+        
+        table.clear(not_sent_out_equip)
+        table.clear(equip_list_history)
+        table.clear(equip_list)
+        player.main_job_id = newmain
+        update_job_names()
+        for i=0,15 do
+            injected_equipment_registry[i]:clear()
+            unexpected_indices[i] = 1
+            injected_equipment_registry[i]:append(string.char(0,0,0))
+        end
+        windower.send_command('lua i '.._addon.name..' load_user_files '..newmain)
+    end
+    
+    
+    if gearswap_disabled then return end
+    
+    local newmain = data:byte(5)
+    if res.jobs[newmain] and newmain ~= player.main_job_id then
+        command_enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet') -- enable all slots
     end
 end
 

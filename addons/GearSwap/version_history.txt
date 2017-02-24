@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.924 - Fixed problems that arose when attempting to equip two of the same item in two different slots. Changed how player equipment is handled.
+-------------------------------------------------
 GearSwap 0.923 - Added augments to //gs validate sets.
 -------------------------------------------------
 GearSwap 0.922 - Changed how the reload event works so it no longer causes stack problems.

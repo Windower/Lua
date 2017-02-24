@@ -55,7 +55,7 @@ function equip_sets(swap_type,ts,...)
     windower.debug(tostring(swap_type)..' enter')
     if showphase or debugging.general then msg.debugging(8,windower.to_shift_jis(tostring(swap_type))..' enter') end
     
-    local cur_equip = table.reassign({},items.equipment)
+    local cur_equip = table.reassign({},update_equipment())
     
     table.reassign(equip_list,{})
     table.reassign(player.equipment,to_names_set(cur_equip))
@@ -157,9 +157,10 @@ function equip_sets(swap_type,ts,...)
         
         table.update(equip_list_history,equip_list)
         
-        -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v={bag_id=0 or 8 or 10, slot=inventory slot}.
-        local equip_next,priorities = unpack_equip_list(equip_list)
-        equip_next = eliminate_redundant(cur_equip,equip_next) -- Eliminate the equip commands for items that are already equipped
+        -- Attempts to identify the player-specified item in inventory
+        -- Starts with (i=slot name, v=item name) 
+        -- Ends with (i=slot id and v={bag_id=bag_id, slot=inventory slot}).
+        local equip_next,priorities = unpack_equip_list(equip_list,cur_equip)
         
         if (_settings.show_swaps and table.length(equip_next) > 0) or _settings.demo_mode then --and table.length(equip_next)>0 then
             local tempset = to_names_set(equip_next)
@@ -192,7 +193,8 @@ function equip_sets(swap_type,ts,...)
                 windower.packets.inject_outgoing(0x51,big_chunk)
             elseif chunk_table.n > 0 then
                 for i=1,chunk_table.n do
-                    windower.packets.inject_outgoing(0x50,string.char(0x50,4,0,0)..chunk_table[i])
+                    local chunk = string.char(0x50,4,0,0)..chunk_table[i]
+                    windower.packets.inject_outgoing(0x50,chunk)
                 end
             end
         end
@@ -428,57 +430,3 @@ function send_action(ts)
         equip_sets('midcast',ts,command_registry[ts].spell)
     end
 end
-
-
------------------------------------------------------------------------------------
---Name: outgoing chunk(id,original,modified,injected,blocked)
---Desc: Searches the outgoing chunks for a packet corresponding to /assist <me>.
---      If found, blocks that packet.
---Args:
----- id - ID of the current outgoing chunk
----- original - Original outgoing chunk from the buffer
----- modified - Outgoing chunk from the buffer after modification
-----      by other addons/plugins
----- injected - Boolean indicating whether or not the packet was injected
----- blocked - Boolean indicating whether or not the packet is currently blocked
------------------------------------------------------------------------------------
---Returns:
----- nothing
------------------------------------------------------------------------------------
-windower.register_event('outgoing chunk',function(id,original,modified,injected,blocked)
-    windower.debug('outgoing chunk '..id)
-    if id == 0x100 then
-    -- Scrub the equipment array if a valid outgoing job change packet is sent.
-        local newmain = modified:byte(5)
-        if res.jobs[newmain] and newmain ~= 0 and newmain ~= player.main_job_id then
-            windower.debug('job change')
-            
-            command_registry = Command_Registry.new()
-            
-            table.clear(not_sent_out_equip)
-            table.clear(equip_list_history)
-            table.clear(equip_list)
-            
-            for id,name in pairs(default_slot_map) do
-                if items.equipment[name].slot ~= empty then
-                    local bag = to_bag_api(res.bags[items.equipment[name].bag_id].english)
-                    items[bag][items.equipment[name].slot].status = 0
-                    items.equipment[name] = {slot=empty,bag_id=0}
-                end
-            end
-            player.main_job_id = newmain
-            update_job_names()
-            windower.send_command('lua i '.._addon.name..' load_user_files '..newmain)
-        end
-    end
-    
-    
-    if gearswap_disabled then return end
-    
-    if id == 0x100 then
-        local newmain = modified:byte(5)
-        if res.jobs[newmain] and newmain ~= player.main_job_id then
-            command_enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet') -- enable all slots
-        end
-    end
-end)
