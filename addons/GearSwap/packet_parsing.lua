@@ -269,7 +269,7 @@ parse.i[0x050] = function (data)
     for chunk,ind in injected_equipment_registry[slot]:it() do
         if ind > unexpected_indices[slot] and chunk == data:sub(5,7) then
             -- Matched
-            injected_equipment_registry[slot] = injected_equipment_registry[slot]:slice(ind) -- Eliminate all preceding packets if we get a match
+            injected_equipment_registry[slot] = injected_equipment_registry[slot]:slice(ind+1) -- Eliminate all preceding packets if we get a match
             unexpected_indices[slot] = 0
             matched = true
             break
@@ -303,8 +303,10 @@ function update_equipment()
     for i,v in pairs(injected_equipment_registry) do
         local last = v:last()
         if last then
-            tab[default_slot_map[i]].bag_id = last:byte(3)
-            tab[default_slot_map[i]].slot = last:byte(1) == 0 and empty or last:byte(1)
+            tab[default_slot_map[i]] = {
+                bag_id = last:byte(3),
+                slot = last:byte(1) == 0 and empty or last:byte(1),
+                }
         end
     end
     return tab
@@ -690,8 +692,8 @@ parse.o[0x100] = function(data)
         update_job_names()
         for i=0,15 do
             injected_equipment_registry[i]:clear()
-            unexpected_indices[i] = 1
-            injected_equipment_registry[i]:append(string.char(0,0,0))
+            unexpected_indices[i] = 0
+            items.equipment[default_slot_map[i]] = {bag_id=0,slot=empty}
         end
         windower.send_command('lua i '.._addon.name..' load_user_files '..newmain)
     end

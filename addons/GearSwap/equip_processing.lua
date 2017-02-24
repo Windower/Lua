@@ -119,6 +119,9 @@ function unpack_equip_list(equip_list,cur_equip)
         priorities[slot_id] = priority
         if name == empty then
             equip_list[slot_name] = nil
+            if cur_equip[slot_name].slot ~= empty then
+                ret_list[slot_id] = {bag_id=0,slot=empty}
+            end
         elseif name and cur_equip[slot_name].slot ~= empty then
             local item_tab = items[to_windower_bag_api(res.bags[cur_equip[slot_name].bag_id].en)][cur_equip[slot_name].slot]
             if name_match(item_tab.id,name) and
@@ -277,9 +280,11 @@ function equip_piece(eq_slot_id,bag_id,inv_slot_id)
     end
     
     if inv_slot_id ~= empty then
+        --items.equipment[toslotname(eq_slot_id)] = {slot=inv_slot_id,bag_id=bag_id}
         items[to_bag_api(res.bags[bag_id].english)][inv_slot_id].status = 5
         return string.char(inv_slot_id,eq_slot_id,bag_id,0)
     else
+        --items.equipment[toslotname(eq_slot_id)] = {slot=empty,bag_id=0}
         return string.char(0,eq_slot_id,0,0)
     end
 end

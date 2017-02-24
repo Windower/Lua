@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.925 - Fixed minor problem that arose with the previous version's implementation of the equip history.
+-------------------------------------------------
 GearSwap 0.924 - Fixed problems that arose when attempting to equip two of the same item in two different slots. Changed how player equipment is handled.
 -------------------------------------------------
 GearSwap 0.923 - Added augments to //gs validate sets.
