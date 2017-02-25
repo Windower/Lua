@@ -219,10 +219,8 @@ empty = {name="empty"}
 last_refresh = 0
 
 injected_equipment_registry = {}
-unexpected_indices = {}
 for i=0,15 do
     injected_equipment_registry[i] = L{}
-    unexpected_indices[i] = 0
 end
 
 

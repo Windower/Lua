@@ -264,15 +264,14 @@ end
 
 parse.i[0x050] = function (data)
     -- should simplify this code using return when I gain confidence in it
-    local matched = false
+    parse_equip_chunk(data:sub(5,7))
     local slot = data:byte(6)
     for chunk,ind in injected_equipment_registry[slot]:it() do
-        if ind > unexpected_indices[slot] and chunk == data:sub(5,7) then
+        if chunk == data:sub(5,7) then
             -- Matched
-            injected_equipment_registry[slot] = injected_equipment_registry[slot]:slice(ind+1) -- Eliminate all preceding packets if we get a match
-            unexpected_indices[slot] = 0
+            injected_equipment_registry[slot] = injected_equipment_registry[slot]:slice(ind+1) -- Eliminate current and all preceding packets if we get a match
             matched = true
-            break
+            return
         end
         --[[for i=9,9+4*(chunk:byte(5)-1),4 do -- The server replies to equipset packets with both single equip packets and equipset packets.
             if chunk:sub(i,i+2) == data:sub(5,7) then
@@ -281,12 +280,7 @@ parse.i[0x050] = function (data)
             end
         end]]
     end
-    if not matched then
-        -- Unexpected packet found!
-        unexpected_indices[slot] = unexpected_indices[slot] + 1
-        injected_equipment_registry[slot]:insert(unexpected_indices[slot],data:sub(5,7))
-    end
-    parse_equip_chunk(data:sub(5,7))
+    -- Unexpected packet found!
 end
 
 parse.o[0x051] = function (data) --equipset
@@ -312,34 +306,27 @@ function update_equipment()
     return tab
 end
 
---[[ -- The server always sends both equip responses and equipset responses following an equipset command
+-- The server always sends both equip responses and equipset responses following an equipset command
+-- Equip responses are sent for pieces the successfully equip
+-- The equipset response contains a copy of the original equipset and a new list of all your currently worn gear
+-- It always comes after the equip commands, so one way to address this is to simply read the new list of currently worn gear
+-- and act as if it's all unexpected.
 parse.i[0x117] = function (data)
     -- should simplify this code using return when I gain confidence in it
-    local matched = false
-    for chunk,ind in injected_equipment_registry:it() do
-        if #chunk == 0x48 then -- equipset
-            local count = 0
-            for i=9,9+4*(chunk:byte(5)-1),4 do -- iterate over number of swapped pieces
-                if chunk:sub(i,i+2) == data:sub(i,i+2) and -- The first half of the equipset response echos back the equipset packet
-                    chunk:sub(i,i+2) == data:sub(0x49 + chunk:byte(i+1)*4,0x4B + chunk:byte(i+1)*4) then -- The second half tells you what gear is currently equipped, and its order is always 0x00 to 0x0F
-                    count = count + 1
-                end
-            end
-            if count == chunk:byte(5) then
-                injected_equipment_registry = injected_equipment_registry:slice(ind+1) -- Eliminate the current packet and all preceding packets
-                matched = true
-                break
+    for i=9,9+4*(data:byte(5)-1),4 do -- Byte position for the start of the current chunk
+        local slot = data:byte(i+1)
+        for chunk,ind in injected_equipment_registry[slot]:it() do
+            if chunk == data:sub(i,i+2) then
+                -- This is the response to an injected equipset packet, so remove those packets from the registry even if it actually failed to swap.
+                injected_equipment_registry[slot] = injected_equipment_registry[slot]:slice(ind+1)
             end
         end
     end
-    if not matched then
-        -- This should almost never happen (partial encumbrance hitting while swapping gear)
-        print('Unexpected 0x117',#injected_equipment_registry)
-    end
     for i=0x49,0x85,4 do
-        parse_equip_chunk(data:sub(i,i+3))
+        -- Update items.equipment
+        parse_equip_chunk(data:sub(i,i+2))
     end
-end]]
+end
 
 parse.i[0x053] = function (data)
     if data:unpack('H',0xD) == 0x12D and player then
@@ -692,7 +679,6 @@ parse.o[0x100] = function(data)
         update_job_names()
         for i=0,15 do
             injected_equipment_registry[i]:clear()
-            unexpected_indices[i] = 0
             items.equipment[default_slot_map[i]] = {bag_id=0,slot=empty}
         end
         windower.send_command('lua i '.._addon.name..' load_user_files '..newmain)
