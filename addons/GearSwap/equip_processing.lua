@@ -136,48 +136,46 @@ function unpack_equip_list(equip_list,cur_equip)
     for _,bag in pairs(equippable_item_bags) do
         for _,item_tab in ipairs(items[to_windower_bag_api(bag.en)]) do -- Iterate over the current bag
             if type(item_tab) == 'table' and check_wearable(item_tab.id) then
-                if item_tab.status == 0 or item_tab.status == 5 then -- Already eliminated equipped gear that's being re-equipped in the same slot
-                    for slot_id,slot_name in pairs(default_slot_map) do
+                if item_tab.status == 0 or item_tab.status == 5 then
+                    for slot_id in res.items[item_tab.id].slots:it() do
+                        local slot_name = default_slot_map[slot_id]
                         -- equip_list[slot_name] can also be a table (that doesn't contain a "name" property) or a number, which are both cases that should not generate any kind of equipment changing.
                         -- Hence the "and name" below.
-                        
-                        if not ret_list[slot_id] and equip_list[slot_name] then 
+                        if not ret_list[slot_id] and equip_list[slot_name] then -- If we haven't already found something for this slot and still want to equip something there
+                            -- Make sure we're not already planning to equip this item in another slot.
+                            if  (slot_id == 0  and used_list[1]  and used_list[1].bag_id  == bag.id and used_list[1].slot  == item_tab.slot) or -- main vs. sub
+                                (slot_id == 1  and used_list[0]  and used_list[0].bag_id  == bag.id and used_list[0].slot  == item_tab.slot) or -- sub vs. main
+                                (slot_id == 11 and used_list[12] and used_list[12].bag_id == bag.id and used_list[12].slot == item_tab.slot) or --left_earring vs. right_earring
+                                (slot_id == 12 and used_list[11] and used_list[11].bag_id == bag.id and used_list[11].slot == item_tab.slot) or --right_earring vs. left_earring
+                                (slot_id == 13 and used_list[14] and used_list[14].bag_id == bag.id and used_list[14].slot == item_tab.slot) or --left_ring vs. right_ring
+                                (slot_id == 14 and used_list[13] and used_list[13].bag_id == bag.id and used_list[13].slot == item_tab.slot) then --right_ring vs. left_ring
+                                    break
+                            end
                             local name,priority,augments,designated_bag = expand_entry(equip_list[slot_name])
                             
                             if (not designated_bag or designated_bag == bag.id) and name and name_match(item_tab.id,name) then
-                                -- Make sure we're not already planning to equip the item in another slot.
-                                if  (slot_id == 0  and used_list[1]  and used_list[1].bag_id  == bag.id and used_list[1].slot  == item_tab.slot) or -- main vs. sub
-                                    (slot_id == 1  and used_list[0]  and used_list[0].bag_id  == bag.id and used_list[0].slot  == item_tab.slot) or -- sub vs. main
-                                    (slot_id == 11 and used_list[12] and used_list[12].bag_id == bag.id and used_list[12].slot == item_tab.slot) or --left_earring vs. right_earring
-                                    (slot_id == 12 and used_list[11] and used_list[11].bag_id == bag.id and used_list[11].slot == item_tab.slot) or --right_earring vs. left_earring
-                                    (slot_id == 13 and used_list[14] and used_list[14].bag_id == bag.id and used_list[14].slot == item_tab.slot) or --left_ring vs. right_ring
-                                    (slot_id == 14 and used_list[13] and used_list[13].bag_id == bag.id and used_list[13].slot == item_tab.slot) then --right_ring vs. left_ring
-                                        break
-                                end
-                                if res.items[item_tab.id].slots[slot_id] then
-                                    if augments and #augments ~=0 then
-                                        if extdata.compare_augments(augments,extdata.decode(item_tab).augments) then
-                                            equip_list[slot_name] = nil
-                                            ret_list[slot_id] = {bag_id=bag.id,slot=item_tab.slot}
-                                            used_list = ret_list[slot_id]
-                                            break
-                                        end
-                                    else
+                                if augments and #augments ~=0 then
+                                    if res.items[item_tab.id].flags.Rare or extdata.compare_augments(augments,extdata.decode(item_tab).augments) then
+                                    -- Check if the augments are right
+                                    -- If the item is Rare, then even if the augments are wrong try to equip it anyway because you only have one
                                         equip_list[slot_name] = nil
                                         ret_list[slot_id] = {bag_id=bag.id,slot=item_tab.slot}
                                         used_list = ret_list[slot_id]
                                         break
+                                    --else the piece specifies augments that don't match the current piece, so don't break and keep trying.
                                     end
                                 else
                                     equip_list[slot_name] = nil
-                                    error_list[slot_name] = name..' (cannot be worn in this slot)'
+                                    ret_list[slot_id] = {bag_id=bag.id,slot=item_tab.slot}
+                                    used_list = ret_list[slot_id]
                                     break
                                 end
                             end
                         end
                     end
                 else -- item_tab.status > 0
-                    for __,slot_name in pairs(default_slot_map) do
+                    for slot_id in res.items[item_tab.id].slots:it() do
+                        local slot_name = default_slot_map[slot_id]
                         local name = expand_entry(equip_list[slot_name])
                         if name and name ~= empty then -- If "name" isn't a piece of gear, then it won't have a valid value at this point and should be ignored.
                             if name_match(item_tab.id,name) then
