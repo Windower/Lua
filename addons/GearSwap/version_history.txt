@@ -1,5 +1,7 @@
 -------------------------------------------------
-GearSwap 0.927 - Speed up equipment handling and make Rare items ignore augments.
+GearSwap 0.928 - Changed how the outgoing equipment chunks were parsed due to a changing understanding of how the windower packet events work.
+-------------------------------------------------
+GearSwap 0.927 - Sped up equipment handling and made Rare items ignore augments.
 -------------------------------------------------
 GearSwap 0.926 - Simplified the equipment handling and used 0x117 incoming.
 -------------------------------------------------

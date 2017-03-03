@@ -258,8 +258,19 @@ function parse_equip_chunk(chunk)
     end
 end
 
-parse.o[0x050] = function (data) --equip
-    injected_equipment_registry[data:byte(6)]:append(data:sub(5,7))
+parse.o[0x050] = function (data,injected) --equip
+    if injected then return end
+    -- Because of the way windower works, uninjected chunks will appear after
+    -- injected chunks in the chunk events but will hit the server before them.
+    -- Thus, I use insert here instead of append
+    injected_equipment_registry[data:byte(6)]:insert(1,data:sub(5,7))
+end
+
+parse.o[0x051] = function (data,injected) --equipset
+    if injected then return end
+    for i=9,9+4*(data:byte(5)-1),4 do
+        injected_equipment_registry[data:byte(i+1)]:insert(1,data:sub(i,i+2))
+    end
 end
 
 parse.i[0x050] = function (data)
@@ -281,12 +292,6 @@ parse.i[0x050] = function (data)
         end]]
     end
     -- Unexpected packet found!
-end
-
-parse.o[0x051] = function (data) --equipset
-    for i=9,9+4*(data:byte(5)-1),4 do
-        injected_equipment_registry[data:byte(i+1)]:append(data:sub(i,i+2))
-    end
 end
 
 function update_equipment()

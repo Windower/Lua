@@ -280,9 +280,13 @@ function equip_piece(eq_slot_id,bag_id,inv_slot_id)
     if inv_slot_id ~= empty then
         --items.equipment[toslotname(eq_slot_id)] = {slot=inv_slot_id,bag_id=bag_id}
         items[to_bag_api(res.bags[bag_id].english)][inv_slot_id].status = 5
-        return string.char(inv_slot_id,eq_slot_id,bag_id,0)
+        local minichunk = string.char(inv_slot_id,eq_slot_id,bag_id,0)
+        injected_equipment_registry[minichunk:byte(2)]:append(minichunk:sub(1,3))
+        return minichunk
     else
         --items.equipment[toslotname(eq_slot_id)] = {slot=empty,bag_id=0}
-        return string.char(0,eq_slot_id,0,0)
+        local minichunk = string.char(0,eq_slot_id,0,0)
+        injected_equipment_registry[minichunk:byte(2)]:append(minichunk:sub(1,3))
+        return minichunk
     end
 end

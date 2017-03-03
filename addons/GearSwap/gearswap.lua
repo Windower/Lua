@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.927'
+_addon.version = '0.928'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -304,7 +304,7 @@ function incoming_chunk(id,data,modified,injected,blocked)
     end
     
     if not injected and parse.i[id] then
-        parse.i[id](data)
+        parse.i[id](data,blocked)
     end
 end
 
@@ -312,7 +312,7 @@ function outgoing_chunk(id,original,data,injected,blocked)
     windower.debug('outgoing chunk '..id)
     
     if not blocked and parse.o[id] then
-        parse.o[id](data)
+        parse.o[id](data,injected)
     end
 end
 
