@@ -106,7 +106,7 @@ windower.register_event('addon command', function(command, ...)
 end)
 
 windower.register_event('incoming text',function (original, modified, color)
-    if debugging then windower.debug('outgoing text') end
+    if debugging then windower.debug('incoming text') end
     local redcol = color%256
     
     if redcol == 121 and cancelmulti then
