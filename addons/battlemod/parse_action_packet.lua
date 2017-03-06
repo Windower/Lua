@@ -233,7 +233,7 @@ function parse_action_packet(act)
                     end
                 end
             
-                windower.add_to_chat(color,make_condensedamage_number(m.number)..( (msg or tostring(m.message))
+                windower.add_to_chat(color,(m.unknown%2==1 and "Cover! " or "")..make_condensedamage_number(m.number)..( (msg or tostring(m.message))
                     :gsub('${spell}',color_it(act.action.spell or 'ERROR 111',color_arr.spellcol))
                     :gsub('${ability}',color_it(act.action.ability or 'ERROR 112',color_arr.abilcol))
                     :gsub('${item}',color_it(act.action.item or 'ERROR 113',color_arr.itemcol))
