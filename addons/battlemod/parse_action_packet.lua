@@ -232,8 +232,8 @@ function parse_action_packet(act)
                         msg = msg:gsub(' his ',' her ')
                     end
                 end
-            
-                windower.add_to_chat(color,(m.unknown%2==1 and "Cover! " or "")..make_condensedamage_number(m.number)..( (msg or tostring(m.message))
+                local prefix = (bit.band(m.unknown,1)==1 and "Cover! " or "")..(bit.band(m.unknown,2)==1 and "Resist! " or "")..(bit.band(m.unknown,4)==1 and "Magic Burst! " or "")..(bit.band(m.unknown,8)==1 and "Immunobreak! " or "")..(bit.band(m.unknown,16)==1 and "Critical Hit! " or "")
+                windower.add_to_chat(color,prefix..make_condensedamage_number(m.number)..( (msg or tostring(m.message))
                     :gsub('${spell}',color_it(act.action.spell or 'ERROR 111',color_arr.spellcol))
                     :gsub('${ability}',color_it(act.action.ability or 'ERROR 112',color_arr.abilcol))
                     :gsub('${item}',color_it(act.action.item or 'ERROR 113',color_arr.itemcol))
