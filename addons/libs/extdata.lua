@@ -289,7 +289,7 @@ augment_values = {
         [0x14B] = {{stat='"Waltz" ability delay ', offset=1,multiplier=-1}},
         [0x14C] = {{stat="Sklchn.dmg.", offset=1,percent=true}},
         [0x14D] = {{stat='"Conserve TP"', offset=1}},
-        [0x14E] = {{stat="Magic burst mdg.", offset=1,percent=true}},
+        [0x14E] = {{stat="Magic burst dmg.", offset=1,percent=true}},
         [0x14F] = {{stat="Mag. crit. hit dmg. ", offset=1,percent=true}},
         [0x150] = {{stat='"Sic" and "Ready" ability delay ', offset=1,multiplier=-1}},
         [0x151] = {{stat="Song recast delay ", offset=1,multiplier=-1}},
