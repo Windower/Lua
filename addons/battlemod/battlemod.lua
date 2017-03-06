@@ -6,6 +6,7 @@ require 'strings'
 res = require 'resources'
 require 'actions'
 require 'pack'
+bit = require 'bit'
 
 require 'generic_helpers'
 require 'parse_action_packet'
