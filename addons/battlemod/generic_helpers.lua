@@ -95,36 +95,21 @@ function check_filter(actor,target,category,msg)
     
     if not filter[actor.filter] and debugging then windower.add_to_chat(8,'Battlemod - Filter Not Recognized: '..tostring(actor.filter)) end
     
-    if actor.filter ~= 'monsters' and actor.filter ~= 'enemies' then
-        if filter[actor.filter]['all']
-        or category == 1 and filter[actor.filter]['melee']
-        or category == 2 and filter[actor.filter]['ranged']
-        or category == 12 and filter[actor.filter]['ranged']
-        or category == 5 and filter[actor.filter]['items']
-        or category == 9 and filter[actor.filter]['uses']
-        or nf(res.action_messages[msg],'color')=='D' and filter[actor.filter]['damage']
-        or nf(res.action_messages[msg],'color')=='M' and filter[actor.filter]['misses']
-        or nf(res.action_messages[msg],'color')=='H' and filter[actor.filter]['healing']
-        or msg == 43 and filter[actor.filter]['readies'] or msg == 326 and filter[actor.filter]['readies']
-        or msg == 3 and filter[actor.filter]['casting'] or msg == 327 and filter[actor.filter]['casting']
-        then
-            return false
-        end
-    else
-        if filter[actor.filter][target.filter]['all']
-        or category == 1 and filter[actor.filter][target.filter]['melee']
-        or category == 2 and filter[actor.filter][target.filter]['ranged']
-        or category == 12 and filter[actor.filter]['ranged']
-        or category == 5 and filter[actor.filter]['items']
-        or category == 9 and filter[actor.filter]['uses']
-        or nf(res.action_messages[msg],'color')=='D' and filter[actor.filter][target.filter]['damage']
-        or nf(res.action_messages[msg],'color')=='M' and filter[actor.filter][target.filter]['misses']
-        or nf(res.action_messages[msg],'color')=='H' and filter[actor.filter][target.filter]['healing']
-        or msg == 43 and filter[actor.filter][target.filter]['readies'] or msg == 326 and filter[actor.filter][target.filter]['readies']
-        or msg == 3 and filter[actor.filter][target.filter]['casting'] or msg == 327 and filter[actor.filter][target.filter]['casting']
-        then
-            return false
-        end
+    local filtertab = (filter[actor.filter] and filter[actor.filter][target.filter]) or filter[actor.filter]
+
+    if filtertab['all']
+    or category == 1 and filtertab['melee']
+    or category == 2 and filtertab['ranged']
+    or category == 12 and filtertab['ranged']
+    or category == 5 and filtertab['items']
+    or category == 9 and filtertab['uses']
+    or nf(res.action_messages[msg],'color')=='D' and filtertab['damage']
+    or nf(res.action_messages[msg],'color')=='M' and filtertab['misses']
+    or nf(res.action_messages[msg],'color')=='H' and filtertab['healing']
+    or (msg == 43 or msg == 326) and filtertab['readies']
+    or (msg == 3 or msg==327) and filtertab['casting']
+    then
+        return false
     end
 
     return true

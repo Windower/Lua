@@ -11,7 +11,7 @@ require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
 
-_addon.version = '3.21'
+_addon.version = '3.22'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth, maintainer: SnickySnacks'
 _addon.commands = {'bm','battlemod'}
@@ -330,10 +330,12 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                 :gsub('$\123lb\125','\7'))
             windower.add_to_chat(res.action_messages[am.message_id]['color'],outstr)
             am.message_id = false
-        elseif debugging then 
+        elseif debugging and res.action_messages[am.message_id] then 
         -- 38 is the Skill Up message, which (interestingly) uses all the number params.
         -- 202 is the Time Remaining message, which (interestingly) uses all the number params.
             print('debug_EAM#'..am.message_id..': '..res.action_messages[am.message_id][language]..' '..am.param_1..'   '..am.param_2..'   '..am.param_3)
+        elseif debugging then
+            print('debug_EAM#'..am.message_id..': '..'Unknown'..' '..am.param_1..'   '..am.param_2..'   '..am.param_3)
         end
         if not am.message_id then
             return true
@@ -343,7 +345,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
     elseif id == 0x030 then
         if windower.ffxi.get_player().id == original:unpack("I",5) or windower.ffxi.get_mob_by_target('t') and windower.ffxi.get_mob_by_target('t').id == original:unpack("I",5) then
             local crafter_name = (windower.ffxi.get_player().id == original:unpack("I",5) and windower.ffxi.get_player().name) or windower.ffxi.get_mob_by_target('t').name
-            local result = original:byte(13,13)
+            local result = original:byte(13)
             if result == 0 then
                 windower.add_to_chat(8,' ------------- NQ Synthesis ('..crafter_name..') -------------')
             elseif result == 1 then
@@ -354,7 +356,6 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                 windower.add_to_chat(8,'Craftmod: Unhandled result '..tostring(result))
             end
         end
-        
     elseif id == 0x06F then
         if original:byte(5) == 0 then
             local result = original:byte(6)
