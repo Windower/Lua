@@ -196,34 +196,48 @@ function print_set(set,title)
         else
             error('\nGearSwap: print_set error, set is not a table.', 2)
         end
-    elseif table.length(set) == 0 then
+    end
+    if table.length(set) == 0 then
         if title then
             msg.add_to_chat(1,'------------------'.. windower.to_shift_jis(tostring(title))..' -- Empty Table -----------------')
         else
             msg.add_to_chat(1,'-------------------------- Empty Table -------------------------')
         end
         return
-    end
-    
-    if title then
+    elseif title then
         msg.add_to_chat(1,'------------------------- '..windower.to_shift_jis(tostring(title))..' -------------------------')
     else
         msg.add_to_chat(1,'----------------------------------------------------------------')
     end
-    if #set == table.length(set) then
-        for i,v in ipairs(set) do
-            if type(v) == 'table' and v.name then
-                msg.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v.name))..' (Adv.)')
-            else
-                msg.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v)))
+    local function print_element(key,value)
+        if type(value) == 'table' and value.name then
+            msg.add_to_chat(8,windower.to_shift_jis(tostring(key))..' '..windower.to_shift_jis(tostring(value.name))..' (Adv.)')
+        else
+            msg.add_to_chat(8,windower.to_shift_jis(tostring(key))..' '..windower.to_shift_jis(tostring(value)))
+        end
+    end
+    local function cmp_key(key,tab)
+        for k in pairs(tab) do
+            if k:lower() == key:lower() then
+                return k
             end
         end
-    else
-        for i,v in pairs(set) do
-            if type(v) == 'table' and v.name then
-                msg.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v.name))..' (Adv.)')
-            else
-                msg.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v)))
+    end
+    
+    if #set == table.length(set) then -- If it is a list (keyed by continuous whole number starting at 1), then print it out in order
+        for key,value in ipairs(set) do
+            print_element(key,value)
+        end
+    else -- Otherwise, try to print out the gear in order and then everything else.
+        for _,key in ipairs({'main','sub','ranged','range','ammo','head','neck','lear','ear1','learring','left_ear','rear','ear2','rearring','right_ear','body','hands','lring','ring1','left_ring','rring','ring2','right_ring','back','waist','legs','feet'}) do
+            local k = cmp_key(key,set)
+            if k then
+                print_element(k,set[k])
+            end
+        end
+        for key,value in pairs(set) do
+            if not slot_map[key] then
+                print_element(key,set[key])
             end
         end
     end

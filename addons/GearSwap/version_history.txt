@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.929 - Adjusted the print_set function to give preference and order to slot name keys.
+-------------------------------------------------
 GearSwap 0.928 - Changed how the outgoing equipment chunks were parsed due to a changing understanding of how the windower packet events work.
 -------------------------------------------------
 GearSwap 0.927 - Sped up equipment handling and made Rare items ignore augments.
