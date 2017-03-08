@@ -14,6 +14,7 @@ Colours are expressed in R, G, B values and they range from 0 to 255
 **To-Do list:**
 * Fix or remove completely the audio warnings for main and secondary floor completitions
 * Evaluate the possibility to add custom in-game commands to change values without having to manually edit the xml config file
+* Add customizable transparency values for the window into the config file
 * The addon, once loaded, is always active and waiting for relative messages in the chatlog. I would like to change this and make so the addon is in full sleep mode when loaded and activates only on zone change into Reisen_Henge
 
 **Bugs list:**
