@@ -103,7 +103,7 @@ function export_set(options)
             end
         end
         
-        for slot_name,gs_item_tab in pairs(table.reassign({},items.equipment)) do -- Not sure why I have to reassign it here
+        for slot_name,gs_item_tab in pairs(items.equipment) do
             if gs_item_tab.slot ~= empty then
                 local item_tab
                 local bag_name = to_windower_bag_api(res.bags[gs_item_tab.bag_id].en)

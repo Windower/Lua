@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.921'
+_addon.version = '0.929'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -303,13 +303,21 @@ function incoming_chunk(id,data,modified,injected,blocked)
         end
     end
     
-    if injected then
-    elseif parse.i[id] then
-        parse.i[id](data)
+    if not injected and parse.i[id] then
+        parse.i[id](data,blocked)
+    end
+end
+
+function outgoing_chunk(id,original,data,injected,blocked)
+    windower.debug('outgoing chunk '..id)
+    
+    if not blocked and parse.o[id] then
+        parse.o[id](data,injected)
     end
 end
 
 windower.register_event('incoming chunk',incoming_chunk)
+windower.register_event('outgoing chunk',outgoing_chunk)
 
 windower.register_event('status change',function(new,old)
     windower.debug('status change '..new)

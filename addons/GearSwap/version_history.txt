@@ -1,4 +1,20 @@
 -------------------------------------------------
+GearSwap 0.929 - Adjusted the print_set function to give preference and order to slot name keys.
+-------------------------------------------------
+GearSwap 0.928 - Changed how the outgoing equipment chunks were parsed due to a changing understanding of how the windower packet events work.
+-------------------------------------------------
+GearSwap 0.927 - Sped up equipment handling and made Rare items ignore augments.
+-------------------------------------------------
+GearSwap 0.926 - Simplified the equipment handling and used 0x117 incoming.
+-------------------------------------------------
+GearSwap 0.925 - Fixed minor problem that arose with the previous version's implementation of the equip history.
+-------------------------------------------------
+GearSwap 0.924 - Fixed problems that arose when attempting to equip two of the same item in two different slots. Changed how player equipment is handled.
+-------------------------------------------------
+GearSwap 0.923 - Added augments to //gs validate sets.
+-------------------------------------------------
+GearSwap 0.922 - Changed how the reload event works so it no longer causes stack problems.
+-------------------------------------------------
 GearSwap 0.921 - Split a buff overwriting itself off into a separate event, buff_refresh, and adjusted documentation.
 -------------------------------------------------
 GearSwap 0.920 - Made file_unload fire on load commands and changed its argument to be the previous file name.

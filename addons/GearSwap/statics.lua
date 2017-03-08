@@ -107,8 +107,8 @@ default_slot_map = T{'sub','range','ammo','head','body','hands','legs','feet','n
     'left_ear', 'right_ear', 'left_ring', 'right_ring','back'}
 default_slot_map[0]= 'main'
 
-jas = {false,false,false,false,false,true,false,false,false,false,false,false,false,true,true,false}--6,14,15}
-readies = {false,false,false,false,false,false,true,true,true,false,false,true,false,false,false,false}--{7,8,9,12}
+jas = {false,false,false,false,false,true,false,false,false,false,false,false,false,true,true,false}-- {6,14,15}
+readies = {false,false,false,false,false,false,true,true,true,false,false,true,false,false,false,false} -- {7,8,9,12}
 uses = {false,true,true,true,true,false,false,false,false,false,true,false,true,false,false,false}--{2,3,4,5,11,13}
 unable_to_use = T{17,18,55,56,87,88,89,90,104,191,308,313,325,410,428,561,574,579,580,581,661,665,
     12,16,34,35,40,47,48,49,71,72,76,78,84,91,92,95,96,106,111,128,154,155,190,192,193,198,
@@ -217,6 +217,11 @@ unhandled_command_events = {}
 empty = {name="empty"}
 --outgoing_packet_table = {}
 last_refresh = 0
+
+injected_equipment_registry = {}
+for i=0,15 do
+    injected_equipment_registry[i] = L{}
+end
 
 
 _global = make_user_table()
@@ -385,7 +390,14 @@ function initialize_globals()
     fellow = make_user_table()
     fellow.isvalid = false
     partybuffs = {}
-
+    
+    -- GearSwap effectively needs to maintain two inventory structures:
+    --  one is the proposed current inventory based on equip packets sent to the server,
+    --  the other is the currently reported inventory based on packets sent from the server.
+    -- The problem with proposed_inv is that it doesn't know when actions force items to unequip or prevent them from equipping.
+    -- The problem with reported_inv is that packets can be dropped, so it doesn't always report everything accurately.
+    -- In an ideal world, gearswap would maintain a registry of expected changes for each slot,
+    --  and would advance along the registry as changes are reported by the server.
     items = windower.ffxi.get_items()
     if not items then
         items = {
