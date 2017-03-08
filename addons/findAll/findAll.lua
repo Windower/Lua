@@ -457,7 +457,7 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
     local seq = original:byte(4)*256+original:byte(3)
 	if (next_sequence and seq + next_sequence_offset >= next_sequence) or (time_out and seq + time_out_offset >= time_out) then
         zone_search = true
-		update()
+		windower.send_command('wait 0.1;lua i findAll update')
 		next_sequence = nil
         time_out = nil
         sequence_offset = 0
