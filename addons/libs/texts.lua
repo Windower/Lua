@@ -80,17 +80,16 @@ default_settings.text.stroke.blue = 0
 math.randomseed(os.clock())
 
 local amend
-amend = function(settings, text)
-    for key, val in pairs(text) do
-        local sval = settings[key]
-        if sval == nil then
+amend = function(settings, defaults)
+    for key, val in pairs(defaults) do
+        if type(val) == 'table' then
+            settings[key] = amend(settings[key] or {}, val)
+        elseif settings[key] == nil then
             settings[key] = val
-        else
-            if type(sval) == 'table' and type(val) == 'table' then
-                amend(sval, val)
-            end
         end
     end
+
+    return settings
 end
 
 local call_events = function(t, event, ...)
@@ -176,10 +175,11 @@ function texts.new(str, settings, root_settings)
                 nil
     end
 
-    t = {}
+    local t = {}
     local m = {}
     meta[t] = m
     m.name = (_addon and _addon.name or 'text') .. '_gensym_' .. tostring(t):sub(8) .. '_%.8X':format(16^8 * math.random()):sub(3)
+    t._name = m.name
     m.settings = settings or {}
     m.status = m.status or {visible = false, text = {}}
     m.root_settings = root_settings

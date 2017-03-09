@@ -43,7 +43,7 @@ Command list:
   RS <stat> [<playerName>] [<target>]
   Reports the given stat. Supported stats are:
       mavg, mrange, acc, ravg, rrange, racc, critavg, critrange, crit,
-      rcritavg, rcritrange, rcrit, wsavg
+      rcritavg, rcritrange, rcrit, wsavg, wsacc
   
   'playerName' may be the name of a player if you wish to see only one player.
   
@@ -98,6 +98,7 @@ additional configuration options:
 * sbcolor - Color of scoreboard's chat log output
 * showallidps - Set to true to display the alliance DPS, false otherwise.
 * resetfilters - Set to true if you want filters reset when you "//sb reset", false otherwise.
+* showfellow - Set to true to display your adventuring fellow's DPS, false otherwise.
  
 Caveats:
 * DPS is an approximation, although I tested it manually and found it to

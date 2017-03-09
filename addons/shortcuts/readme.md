@@ -1,4 +1,4 @@
-#Shortcuts v2.7
+#Shortcuts v2.9
 ####written by Byrth  
 
 Completes and properly formats commands (prefixed by at least one '/'),
@@ -9,6 +9,8 @@ spellcast" project, and represents the interpretation part of spellcast.
 None  
 
 ####Changelog:  
+v2.9 - 03/05/16 - Adjusted default target logic when the target is a Trust.
+v2.8 - 11/27/15 - Changed how the non-action commands are handled (including secondary arguments).
 v2.7 - 11/15/14 - Totally gutted and reworked the ambiguous spell handling system. It is much simpler now.
 v2.6 -  9/27/14 - Fixed an error with absolute remapping of ambiguous spells
 v2.5 -  8/30/14 - Expanded shortcuts to include single-slash commands. Expanded command prefixes to include double-slash commands.

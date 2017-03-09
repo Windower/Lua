@@ -1,4 +1,4 @@
--- Copyright (c) 2013, Cairthenn
+-- Copyright © 2013-2015, Cairthenn
 -- All rights reserved.
 
 -- Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@
 function get_item_id(str,slot)
     local item_result = false
     
-    if T{"none"}:contains(str) then
+    if str == "none" then
         return "None"
     else
     
@@ -45,7 +45,7 @@ function get_item_id(str,slot)
 end
 
 function update_model(index)
-    windower.packets.inject_outgoing(0x16,string.char(0,0,0,0)..Int2LE(index,2)..string.char(0,0))
+    packets.inject(packets.new('outgoing', 0x016, { ['Target Index'] = index }))
 end
 
 function load_profile(name)
@@ -71,48 +71,26 @@ function save_profile(name)
     notice('Saved your current settings to the profile: ' .. name)
 end
 
-function blink_logic(blink_type,index)
+function blink_logic(blink_type,character,player)
     if settings.blinking["all"]["always"] then
         return true
     elseif settings.blinking[blink_type]["always"] then
         return true
     end
     
-    if settings.blinking["all"]["combat"] and windower.ffxi.get_player().in_combat then
+    if settings.blinking["all"]["combat"] and player.in_combat then
         return true
-    elseif settings.blinking[blink_type]["combat"] and windower.ffxi.get_player().in_combat then
+    elseif settings.blinking[blink_type]["combat"] and player.in_combat then
         return true
     end
     
-    if settings.blinking["all"]["target"] and windower.ffxi.get_player().target_index == index then
+    if settings.blinking["all"]["target"] and player.target_index == character.index then
         return true
-    elseif settings.blinking[blink_type]["target"] and windower.ffxi.get_player().target_index == index then
+    elseif settings.blinking[blink_type]["target"] and player.target_index == character.index then
         return true
     end
     
     return false
-end
-
-function Int2LE(num,number_of_bytes)
-    local these_bytes = ''
-
-    num = num or 0
-
-    if S{"Race","Face"}:contains(number_of_bytes) then
-        number_of_bytes = 1
-    elseif S{"Head","Body","Hands","Legs","Feet","Sub","Main","Ranged"}:contains(number_of_bytes) then
-        number_of_bytes = 2
-    else
-        number_of_bytes = number_of_bytes or 4
-    end
-
-
-    for i=1,number_of_bytes do
-        these_bytes = these_bytes..string.char(num%256)
-        num = math.floor(num/256)
-    end
-
-    return these_bytes
 end
 
 function print_blink_settings(option)

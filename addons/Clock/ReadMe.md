@@ -26,7 +26,7 @@ If `order` is provided, will set that as the new sorting order. If omitted, will
 #### Add time zone
 
 ```
-clock add <timezone>
+clock add <timezones...>
 ```
 
 Appends a time zone to the list of currently displayed time zones. The `timezone` parameter needs to be one of [these abbreviations](https://github.com/Windower/Lua/blob/4.1-dev/addons/Clock/time_zones.lua).
@@ -34,7 +34,15 @@ Appends a time zone to the list of currently displayed time zones. The `timezone
 #### Remove time zone
 
 ```
-clock remove <timezone>
+clock remove <timezones...>
 ```
 
 Removes a time zone from the list of currently displayed time zones. The `timezone` parameter needs to be one of [these abbreviations](https://github.com/Windower/Lua/blob/4.1-dev/addons/Clock/time_zones.lua).
+
+#### Set up time zone display
+
+```
+clock display <timezone> <name>
+```
+
+Sets the display name for a time zone, instead of displaying the time zone identifier. So `clock display jst JP clock` would display `JP clock` before the time instead of `JST`.

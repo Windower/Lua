@@ -437,7 +437,13 @@ function action:get_spell()
     local resource
     if not fields or message_id == 31 then
         -- If there is no message, assume the resources type based on the category.
-        resource = rawget(cat_to_res_map,category) or false
+        if category == 'weaponskill_begin' and spell_id <= 256 then
+            resource = 'weapon_skills'
+        elseif category == 'weaponskill_begin' then
+            resource = 'monster_abilities'
+        else
+            resource = rawget(cat_to_res_map,category) or false
+        end
     else
         local msgID_to_res_map = {
             [244] = 'job_abilities', -- Mug
@@ -445,7 +451,9 @@ function action:get_spell()
             }
         -- If there is a message, interpret the fields.
         resource = msgID_to_res_map[message_id] or fields.spell and 'spells' or
-            fields.weapon_skill and 'weapon_skills' or fields.ability and 'job_abilities' or
+            fields.weapon_skill and spell_id <= 256 and 'weapon_skills' or
+            fields.weapon_skill and spell_id > 256 and 'monster_abilities' or
+            fields.ability and 'job_abilities' or
             fields.item and 'items' or rawget(cat_to_res_map,category)
         local msgID_to_spell_id_map = {
             [240] = 43, -- Hide

@@ -39,18 +39,6 @@ function set.empty(s)
     return next(s) == nil
 end
 
-function set.length(s)
-    local count = 0
-
-    for _ in pairs(s) do
-        count = count + 1
-    end
-
-    return count
-end
-
-_meta.S.__len = set.length
-
 function set.flat(s)
     for el in pairs(s) do
         if type(el) == 'table' then
@@ -218,7 +206,7 @@ function set.clear(s)
 end
 
 function set.copy(s, deep)
-    deep = deep or true
+    deep = deep ~= false and true
     local res = {}
 
     for el in pairs(s) do

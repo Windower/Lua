@@ -10,6 +10,10 @@ function parse_action_packet(act)
     end
     act.actor = player_info(act.actor_id)
     act.action = get_spell(act) -- Pulls the resources line for the action
+    
+    if not act.action then
+        return act
+    end
     for i,v in ipairs(act.targets) do
         v.target = {}
         v.target[1] = player_info(v.id)
@@ -39,7 +43,7 @@ function parse_action_packet(act)
                     m.message = 0
                     m.add_effect_message = 0
                 end
-                if not check_filter(v.target[1],act.actor,act.category,m.message) then
+                if m.spike_effect_message ~= 0 and not check_filter(v.target[1],act.actor,act.category,m.message) then
                     m.spike_effect_message = 0
                 end
                 if condensedamage and n > 1 then -- Damage/Action condensation within one target
@@ -116,7 +120,7 @@ function parse_action_packet(act)
                 tempact.message = 0
                 tempact.add_effect_message = 0
             end
-            if not check_filter(v.target[1],act.actor,act.category,tempact.message) then
+            if tempact.spike_effect_message ~= 0 and not check_filter(v.target[1],act.actor,act.category,tempact.message) then
                 tempact.spike_effect_message = 0
             end
             tempact.number = 1
@@ -228,8 +232,8 @@ function parse_action_packet(act)
                         msg = msg:gsub(' his ',' her ')
                     end
                 end
-            
-                windower.add_to_chat(color,make_condensedamage_number(m.number)..( (msg or tostring(m.message))
+                local prefix = (bit.band(m.unknown,1)==1 and "Cover! " or "")..(bit.band(m.unknown,2)==1 and "Resist! " or "")..(bit.band(m.unknown,4)==1 and "Magic Burst! " or "")..(bit.band(m.unknown,8)==1 and "Immunobreak! " or "")..(bit.band(m.unknown,16)==1 and "Critical Hit! " or "")
+                windower.add_to_chat(color,prefix..make_condensedamage_number(m.number)..( (msg or tostring(m.message))
                     :gsub('${spell}',color_it(act.action.spell or 'ERROR 111',color_arr.spellcol))
                     :gsub('${ability}',color_it(act.action.ability or 'ERROR 112',color_arr.abilcol))
                     :gsub('${item}',color_it(act.action.item or 'ERROR 113',color_arr.itemcol))
@@ -250,6 +254,8 @@ function parse_action_packet(act)
                 local color = color_filt(res.action_messages[m.add_effect_message].color,v.target[1].id==Self.id)
                 if m.add_effect_message > 287 and m.add_effect_message < 303 then m.simp_add_name = skillchain_arr[m.add_effect_message-287]
                 elseif m.add_effect_message > 384 and m.add_effect_message < 399 then m.simp_add_name = skillchain_arr[m.add_effect_message-384]
+                elseif m.add_effect_message > 766 and m.add_effect_message < 769 then m.simp_add_name = skillchain_arr[m.add_effect_message-752]
+                elseif m.add_effect_message > 768 and m.add_effect_message < 771 then m.simp_add_name = skillchain_arr[m.add_effect_message-754]
                 elseif m.add_effect_message ==603 then m.simp_add_name = 'TH'
                 else m.simp_add_name = 'AE'
                 end
@@ -328,14 +334,14 @@ function simplify_message(msg_ID)
     local msg = res.action_messages[msg_ID][language]
     local fields = fieldsearch(msg)
 
-    if simplify and not T{23,64,125,129,133,139,140,153,204,210,211,212,213,214,244,350,442,453,531,557,565,582,593,594,595,596,597,598,599,674}:contains(msg_ID) then
+    if simplify and not T{23,64,125,129,133,139,140,153,204,210,211,212,213,214,244,350,442,453,516,531,557,565,582,593,594,595,596,597,598,599,674}:contains(msg_ID) then
         if T{93,273,522,653,654,655,656,85,284,75,114,156,189,248,283,312,323,336,351,355,408,422,423,425,659,158,245,324,658}:contains(msg_ID) then
             fields.status = true
         end
         if msg_ID == 31 then
             fields.actor = true
         end    
-        if (msg_ID > 287 and msg_ID < 303) or (msg_ID > 384 and msg_ID < 399) or
+        if (msg_ID > 287 and msg_ID < 303) or (msg_ID > 384 and msg_ID < 399) or (msg_ID > 766 and msg_ID < 771) or
             T{152,161,162,163,165,229,384,603,652}:contains(msg_ID) then
                 fields.ability = true
         end
@@ -450,9 +456,24 @@ function player_info(id)
             else
                 typ = 'mob'
                 filt = 'monsters'
-                for i,v in pairs(windower.ffxi.get_party()) do
-                    if type(v) == 'table' and nf(v.mob,'id') == player_table.claim_id and filter.enemies then
-                        filt = 'enemies'
+                
+                if filter.enemies then
+                    for i,v in pairs(Self.buffs) do
+                        if domain_buffs:contains(v) then
+                            -- If you are in Domain Invasion, or a Reive, or various other places
+                            -- then all monsters should be considered enemies.
+                            filt = 'enemies'
+                            break
+                        end
+                    end
+                    
+                    if filt ~= 'enemies' then
+                        for i,v in pairs(windower.ffxi.get_party()) do
+                            if type(v) == 'table' and nf(v.mob,'id') == player_table.claim_id then
+                                filt = 'enemies'
+                                break
+                            end
+                        end
                     end
                 end
             end
@@ -468,7 +489,7 @@ end
 function get_spell(act)
     local spell, abil_ID, effect_val = {}
     local msg_ID = act.targets[1].actions[1].message
-    
+
     if T{7,8,9}:contains(act['category']) then
         abil_ID = act.targets[1].actions[1].param
     elseif T{3,4,5,6,11,13,14,15}:contains(act.category) then
@@ -484,10 +505,14 @@ function get_spell(act)
     elseif act.category == 2 and act.category == 12 then
         if msg_ID == 77 then
             spell = res.job_abilities[171] -- Sange
-            spell.name = color_it(spell[language],color_arr.abilcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.abilcol)
+            end
         elseif msg_ID == 157 then
             spell = res.job_abilities[60] -- Barrage
-            spell.name = color_it(spell[language],color_arr.abilcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.abilcol)
+            end
         else
             spell.english = 'Ranged Attack'
             spell.german = spell.english
@@ -518,12 +543,16 @@ function get_spell(act)
         
         if fields.spell then
             spell = res.spells[abil_ID]
-            spell.name = color_it(spell[language],color_arr.spellcol)
-            spell.spell = color_it(spell[language],color_arr.spellcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.spellcol)
+                spell.spell = color_it(spell[language],color_arr.spellcol)
+            end
         elseif fields.ability then
             spell = res.job_abilities[abil_ID]
-            spell.name = color_it(spell[language],color_arr.abilcol)
-            spell.ability = color_it(spell[language],color_arr.abilcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.abilcol)
+                spell.ability = color_it(spell[language],color_arr.abilcol)
+            end
         elseif fields.weapon_skill then
             if abil_ID > 256 then -- WZ_RECOVER_ALL is used by chests in Limbus
                 spell = res.monster_abilities[abil_ID]
@@ -533,37 +562,51 @@ function get_spell(act)
             elseif abil_ID <= 256 then
                 spell = res.weapon_skills[abil_ID]
             end
-            spell.name = color_it(spell[language],color_arr.wscol)
-            spell.weapon_skill = color_it(spell[language],color_arr.wscol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.wscol)
+                spell.weapon_skill = color_it(spell[language],color_arr.wscol)
+            end
         elseif msg_ID == 303 then
             spell = res.job_abilities[74] -- Divine Seal
-            spell.name = color_it(spell[language],color_arr.abilcol)
-            spell.ability = color_it(spell[language],color_arr.abilcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.abilcol)
+                spell.ability = color_it(spell[language],color_arr.abilcol)
+            end
         elseif msg_ID == 304 then
             spell = res.job_abilities[75] -- 'Elemental Seal'
-            spell.name = color_it(spell[language],color_arr.abilcol)
-            spell.ability = color_it(spell[language],color_arr.abilcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.abilcol)
+                spell.ability = color_it(spell[language],color_arr.abilcol)
+            end
         elseif msg_ID == 305 then
             spell = res.job_abilities[76] -- 'Trick Attack'
-            spell.name = color_it(spell[language],color_arr.abilcol)
-            spell.ability = color_it(spell[language],color_arr.abilcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.abilcol)
+                spell.ability = color_it(spell[language],color_arr.abilcol)
+            end
         elseif msg_ID == 311 or msg_ID == 312 then
             spell = res.job_abilities[79] -- 'Cover'
-            spell.name = color_it(spell[language],color_arr.abilcol)
-            spell.ability = color_it(spell[language],color_arr.abilcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.abilcol)
+                spell.ability = color_it(spell[language],color_arr.abilcol)
+            end
         elseif msg_ID == 240 or msg_ID == 241 then
             spell = res.job_abilities[43] -- 'Hide'
-            spell.name = color_it(spell[language],color_arr.abilcol)
-            spell.ability = color_it(spell[language],color_arr.abilcol)
+            if spell then
+                spell.name = color_it(spell[language],color_arr.abilcol)
+                spell.ability = color_it(spell[language],color_arr.abilcol)
+            end
         end
-        
+
         if fields.item then
             if T{125,593,594,595,596,597,598,599}:contains(msg_ID) then
                 spell.item = color_it(res.items[effect_val]['english_log'], color_arr.itemcol)
             else
                 spell = res.items[abil_ID]
-                spell.name = color_it(spell['english_log'],color_arr.itemcol)
-                spell.item = color_it(spell['english_log'],color_arr.itemcol)
+                if spell then
+                    spell.name = color_it(spell['english_log'],color_arr.itemcol)
+                    spell.item = color_it(spell['english_log'],color_arr.itemcol)
+                end
             end
         end
         
@@ -576,7 +619,7 @@ function get_spell(act)
         end
     end
     
-    if not spell.name then spell.name = spell[language] end
+    if spell and not spell.name then spell.name = spell[language] end
     return spell
 end
 

@@ -112,39 +112,49 @@ function load_settings()
 		end
 		
 		-- Iterate over the blacklist and set blocked plugins to nil.
-		local blacklisttab = xml.read('../../updates/manifest.xml'):undomify()
-		for child in blacklisttab:it() do -- plugins
-			for child2 in child:it() do -- plugin
-				local blockload,name = false
-				for child3 in child2:it() do --name, autoload, description, etc.
-					if child3.name == 'autoload' and child3.children[1] == 'false' then
-                        blockload = true
-					end
-					if child3.name:lower() == 'name' then
-						name = child3.children[1]:lower()
-					end
-					if blockload and name then
-						general_array.plugin[name:lower()] = nil
-					end
-				end
-			end
-		end
-        
-		local blacklistadd = xml.read('../../updates/addons.xml'):undomify()
-		for child in blacklistadd:it() do -- plugins
-            local blockload,name = false
-            for child2 in child:it() do --name, autoload, description, etc.
-                if child2.name == 'autoload' and child2.children[1] == 'false' then
-                    blockload = true
-                end
-                if child2.name:lower() == 'name' then
-                    name = child2.children[1]:lower()
-                end
-                if blockload and name then
-                    general_array.addon[name:lower()] = nil
+		local blacklisttab = xml.read('../../updates/manifest.xml')
+        if not blacklisttab then
+            windower.add_to_chat(123,'Plugin_Manager: Cannot read windower/updates/manifest.xml, so plugin blacklist is broken')
+        else
+            blacklisttab = blacklisttab:undomify()
+            for child in blacklisttab:it() do -- plugins
+                for child2 in child:it() do -- plugin
+                    local blockload,name = false
+                    for child3 in child2:it() do --name, autoload, description, etc.
+                        if child3.name == 'autoload' and child3.children[1] == 'false' then
+                            blockload = true
+                        end
+                        if child3.name:lower() == 'name' then
+                            name = child3.children[1]:lower()
+                        end
+                        if blockload and name then
+                            general_array.plugin[name:lower()] = nil
+                        end
+                    end
                 end
             end
-		end
+        end
+        
+		local blacklistadd = xml.read('../../updates/addons.xml')
+        if not blacklistadd then
+            windower.add_to_chat(123,'Plugin_Manager: Cannot read windower/updates/addons.xml, so addon blacklist is broken')
+        else
+            blacklistadd = blacklistadd:undomify()
+            for child in blacklistadd:it() do -- plugins
+                local blockload,name = false
+                for child2 in child:it() do --name, autoload, description, etc.
+                    if child2.name == 'autoload' and child2.children[1] == 'false' then
+                        blockload = true
+                    end
+                    if child2.name:lower() == 'name' then
+                        name = child2.children[1]:lower()
+                    end
+                    if blockload and name then
+                        general_array.addon[name:lower()] = nil
+                    end
+                end
+            end
+        end
 	end
 end
 

@@ -2,7 +2,7 @@
 
 _addon.name = 'Scoreboard'
 _addon.author = 'Suji'
-_addon.version = '1.10'
+_addon.version = '1.11'
 _addon.commands = {'sb', 'scoreboard'}
 
 require('tables')
@@ -27,7 +27,9 @@ default_settings.sbcolor = 204
 default_settings.showallidps = true
 default_settings.resetfilters = true
 default_settings.visible = true
+default_settings.showfellow = true
 default_settings.UpdateFrequency = 0.5
+default_settings.combinepets = true
 
 default_settings.display = {}
 default_settings.display.pos = {}
@@ -75,7 +77,7 @@ windower.register_event('addon command', function()
             return
         end
 
-        command = command:lower() or 'help'
+        command = (command or 'help'):lower()
         local params = {...}
 
         if command == 'help' then
@@ -106,7 +108,18 @@ windower.register_event('addon command', function()
             end
 
             local setting = params[1]
-            if setting == 'numplayers' then
+            if setting == 'combinepets' then
+                if params[2] == 'true' then
+                    settings.combinepets = true
+                elseif params[2] == 'false' then
+                    settings.combinepets = false
+                else
+                    error("Invalid value for 'combinepets'. Must be true or false.")
+                    return
+                end
+                settings:save()
+                sb_output("Setting 'combinepets' set to " .. tostring(settings.combinepets))
+            elseif setting == 'numplayers' then
                 settings.numplayers = tonumber(params[2])
                 settings:save()
                 display:update()
@@ -149,6 +162,18 @@ windower.register_event('addon command', function()
                 
                 settings:save()
                 sb_output("Setting 'resetfilters' set to " .. tostring(settings.resetfilters))
+            elseif setting == 'showfellow' then
+                if params[2] == 'true' then
+                    settings.showfellow = true
+                elseif params[2] == 'false' then
+                    settings.showfellow = false
+                else
+                    error("Invalid value for 'showfellow'. Must be true or false.")
+                    return
+                end
+                
+                settings:save()
+                sb_output("Setting 'showfellow' set to " .. tostring(settings.showfellow))
             end
         elseif command == 'reset' then
             reset()
@@ -342,6 +367,13 @@ function get_ally_mob_ids()
             end
         end
     end
+
+    if settings.showfellow then
+        local fellow = windower.ffxi.get_mob_by_target("ft")
+        if fellow ~= nil then
+            allies:append(fellow.id)
+        end
+    end
     
     return allies
 end
@@ -396,6 +428,8 @@ function action_handler(raw_actionpacket)
                     dps_db:add_r_crit(target:get_name(), create_mob_name(actionpacket), main.param)
                 elseif main.message_id == 354 then
                     dps_db:incr_r_misses(target:get_name(), create_mob_name(actionpacket))
+                elseif main.message_id == 188 then
+                    dps_db:incr_ws_misses(target:get_name(), create_mob_name(actionpacket))
                 elseif main.resource and main.resource == 'weapon_skills' and main.conclusion then
                     dps_db:add_ws_damage(target:get_name(), create_mob_name(actionpacket), main.param, main.spell_id)
                 elseif main.conclusion then
@@ -461,6 +495,11 @@ function create_mob_name(actionpacket)
     if owner ~= nil then
         if string.len(actor) > 8 then
             result = string.sub(actor, 1, 7)..'.'
+        else
+            result = actor
+        end
+        if settings.combinepets then
+            result = 'Pets'
         else
             result = actor
         end

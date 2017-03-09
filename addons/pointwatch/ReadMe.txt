@@ -67,6 +67,7 @@ Here are the available values:
 
 
 Version History:
+0.150811 - Changed job_points from a char to a short.
 0.150201 - Added Unity Accolades.
 0.141111 - Adjusted Pointwatch to account for a recent packet change.
 0.141101 - Reversed my versioning scheme, adjusted the limit point and experience point calculations slightly.

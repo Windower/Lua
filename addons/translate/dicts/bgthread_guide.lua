@@ -148,6 +148,22 @@ local dict = {
     {en="Diabolos",ja="でぃあぼろす"},
     {en="Cait Sith",ja="けっとしー"},
     {en="Atomos",ja="あともす"},
+    
+    
+    {en="Vagary",ja="ベガリ"},
+    {en="Vagary",ja="ベガリーインスペクター"},
+    {en="Balamor",ja="バラモア"},
+    {en="Dhokmak",ja="ドクマク"},
+    {en="Ashrakk",ja="アシュラック"},
+    {en="Plouton",ja="上位 ハデス"},
+    {en="Perfidien",ja="下位 ハデス"},
+    {en="Plouton",ja="上位ハデス"},
+    {en="Perfidien",ja="下位ハデス"},
+    {en="Hades",ja="ハデス"},
+    {en="upper",ja="上位"},
+    {en="lower",ja="下位"},
+    
+    {en="Sinister Reign",ja="シニスターレイン"},
 }
 
 return dict

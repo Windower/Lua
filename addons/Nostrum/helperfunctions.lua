@@ -43,9 +43,9 @@ end
 function img_simple(name,texture,pos_x,pos_y)
     windower.prim.create(name)
     windower.prim.set_position(name,pos_x,pos_y)
-    windower.prim.set_size(name,10,10)
+    windower.prim.set_size(name,25,25)
     windower.prim.set_visibility(name,not is_hidden)
-    windower.prim.set_fit_to_texture(name, true)
+    windower.prim.set_fit_to_texture(name, false)
     windower.prim.set_texture(name, texture)
     saved_prims:add(name)
     prim_coordinates.x[name]=pos_x
@@ -70,57 +70,59 @@ function text_simple(name, settings_table, pos_x, pos_y, text)
 end
 
 function count_cures(t)
-    _cures=0
-    _curagas=0
-    for i=1,11 do
+    for i=options.cures.n,1,-1 do
         if t[options.cures[i]] then 
-            _cures=_cures+1 
-            macro_order.cures:append(options.cures[i]) 
+            macro_order[2]:append(xml_to_lua[options.cures[i]])
+        end
+        macro_order[3] = macro_order[2]
+    end
+    macro_order[1] = macro_order[2]:copy(false)
+    for i=options.curagas.n,1,-1 do
+        if t[options.curagas[i]] then
+            macro_order[1]:append(xml_to_lua[options.curagas[i]]) 
         end
     end
-    for i=11,18 do
-        if t[options.curagas[i]] then 
-            _curagas=_curagas+1 
-            macro_order.curagas:append(options.curagas[i]) 
-        end
-    end
-    macro_order.curagas:extend(macro_order.cures)
 end
 
 function count_na(t)
-    _na=0
     for i=1,options.na['n'] do
         if t[options.na[i]] then 
-            _na=_na+1 
-            macro_order.nas:append(options.na[i]) 
+            macro_order[4]:append(xml_to_lua[options.na[i]]) 
         end
     end
-    macro_order.nas = list.reverse(macro_order.nas)
+    if macro_order[4].n ~= 0 then
+        mouse_map2:append(T(macro_order[4]))
+    end
 end
 
 function count_buffs(t)
-    _buffs=0
     for i=1,options.buffs['n'] do
         if t[options.buffs[i]] then 
-            _buffs=_buffs+1 
-            macro_order.buffs:append(options.buffs[i]) 
+            macro_order[5]:append(xml_to_lua[options.buffs[i]]) 
         end
     end
-    macro_order.buffs = list.reverse(macro_order.buffs)
+    if macro_order[5].n ~= 0 then
+        mouse_map2:append(T(macro_order[5]))
+    end
 end
 
 function choose_color(hpp)
-    if hpp>=75 then return 'green'
-    elseif hpp>=50 then return 'yellow'
-    elseif hpp>=25 then return 'orange'
-    else return 'red'
+    if hpp >= 75 then
+        return 'green'
+    elseif hpp >= 50
+        then return 'yellow'
+    elseif hpp >= 25 then
+        return 'orange'
+    else
+        return 'red'
     end
 end
 
 function prepare_names(s)
     if string.len(s)>10 then 
         return(string.sub(s,1,10)..'.') 
-    else return(s) 
+    else
+        return(s) 
     end
 end
 
@@ -137,64 +139,36 @@ function merge_user_file_and_settings(t,u)
     return u
 end
 
-last_hover='BG1'
-function hover(p)
-    if is_hidden or p==last_hover then return end
-    
-    windower.prim.set_color(last_hover,prim_coordinates.a[last_hover],prim_coordinates.r[last_hover],prim_coordinates.g[last_hover],prim_coordinates.b[last_hover])
-    windower.prim.set_visibility(last_hover,prim_coordinates.visible[last_hover] and
-        (   
-           (macro[1]:contains(last_hover) and macro_visibility[1])
-        or (macro[2]:contains(last_hover) and macro_visibility[2])
-        or (macro[3]:contains(last_hover) and macro_visibility[3])
-        )
-    )
-    
-    last_hover=p
-
-    windower.prim.set_color(p,_settings.primitives.highlight.color.a,_settings.primitives.highlight.color.r,_settings.primitives.highlight.color.g,_settings.primitives.highlight.color.b)
-    windower.prim.set_visibility(p,true)
-
-end
-
-function get_vector_norm(x,y,z)
-    return math.sqrt((position[1][6] - x)^2 + (position[2][6] - y)^2 + (position[3][6] - z)^2)
-end
-
-function color_name(x,y,z,n,bool)
+function indicate_distance(bool,n,x,y)
     if bool then --Invisible conflict?
         out_of_view[n] = true
         if not out_of_range[n] then
             out_of_range[n] = true
-            windower.text.set_color('name' .. tostring(n), 206, 175, 98, 177)
+            windower.text.set_color('name'..tostring(n), 255, 175, 98, 177)
         end
-        for i=1,3 do
-            position[i][n] = 0
-        end
-    elseif get_vector_norm(x, y, z) > 21 then
+    elseif ((position[1][6] - x)^2 + (position[2][6] - y)^2) > 441 then
+        out_of_view[n] = false
         if not out_of_range[n] then
-            out_of_view[n] = false
             out_of_range[n] = true
-            windower.text.set_color('name' .. tostring(n), 206, 175, 98, 177)
+            windower.text.set_color('name'..tostring(n), 255, 175, 98, 177)
         end
     elseif out_of_range[n] then
         out_of_view[n] = false
         out_of_range[n] = false
-        windower.text.set_color('name' .. tostring(n), 255, 255, 255, 255)
+        windower.text.set_color('name'..tostring(n), 255, 255, 255, 255)
     end
 end
 
-function remove_macro_information(n,bool)
-        n = tostring(n)
-        windower.text.set_text('hp'..n,'')
-        windower.text.set_text('mp'..n,'')
-        windower.text.set_text('tp'..n,'')
-        windower.text.set_text('hpp'..n,'')
-        windower.text.set_text('mpp'..n,'')
-        windower.prim.set_size('phpp'..n,0,h)
-        windower.prim.set_size('pmpp'..n,0,5)
+function remove_macro_information(s,bool)
+    windower.text.set_text('hp'..s,'')
+    windower.text.set_text('mp'..s,'')
+    windower.text.set_text('tp'..s,'')
+    windower.text.set_text('hpp'..s,'')
+    windower.text.set_text('mpp'..s,'')
+    windower.prim.set_size('phpp'..s,0,h)
+    windower.prim.set_size('pmpp'..s,0,5)
     if bool then
-        windower.text.set_text('name'..n,'')
+        windower.text.set_text('name'..s,'')
     end
 end
 
@@ -216,10 +190,10 @@ function wrecking_ball()
         windower.prim.delete(key)
         saved_prims:remove(key)
     end
-    macro_order.cures:clear()
-    macro_order.curagas:clear()
-    macro_order.buffs:clear()
-    macro_order.nas:clear()
+    for i=1,5 do
+        macro_order[i]:clear()
+    end
+    mouse_map2:clear()
 end
 
 function toggle_visibility()
@@ -243,13 +217,31 @@ function toggle_visibility()
             windower.text.set_visibility(key,text_coordinates.visible[key])
         end
     end
+    toggle_buff_visibility(not is_hidden)
+end
+
+function toggle_buff_visibility(b)
+    local party = party[1]
+    for i = 1, party.n do
+        local id = party[i]
+        local buffs = stat_table[id].buffs[1]
+        local debuffs = stat_table[id].buffs[2]
+        local prims = buff_map[position_lookup[id]]
+
+        for j = 1, buffs.n do
+            prims[1][j]:visible(b)
+        end
+        for j = 1, debuffs.n do
+            prims[2][j]:visible(b)
+        end
+    end
 end
 
 function toggle_macro_visibility(n)
     macro_visibility[n] = not macro_visibility[n]
     if macro_visibility[n] then
         for key in pairs(macro[n]) do
-            if saved_prims[key] then
+            if saved_prims:contains(key) then
                 windower.prim.set_visibility(key,prim_coordinates.visible[key])
             else
                 windower.text.set_visibility(key,text_coordinates.visible[key])
@@ -257,25 +249,66 @@ function toggle_macro_visibility(n)
         end
     else
         for key in pairs(macro[n]) do
-            if saved_prims[key] then
+            if saved_prims:contains(key) then
                 windower.prim.set_visibility(key,false)
             else
                 windower.text.set_visibility(key,false)
             end
         end
-        windower.prim.set_color(last_hover,prim_coordinates.a[last_hover],prim_coordinates.r[last_hover],prim_coordinates.g[last_hover],prim_coordinates.b[last_hover])
-        last_hover='BG1'
+    end
+    if n == 1 then
+        toggle_buff_visibility(not macro_visibility[1])
     end
 end
 
 function switch_profiles()
     wrecking_ball()
     count_cures(profile)
-    count_buffs(profile)
     count_na(profile)
+    count_buffs(profile)
     coroutine.sleep(1)
     build_macro()
     define_active_regions()
+    last_index=-1
+end
+
+function image_row(t,x_start,y_start)
+    local s
+    for i = 1,t.n do
+        s = t[i]
+        prim_simple('p' .. s,_settings.primitives.buff_buttons,x_start-26*i-152,y_start,26,26)
+        img_simple(s..'i',windower.windower_path.."/plugins/icons/"..options.images[s],x_start-26*i-152,y_start)
+        text_simple(s, _settings.text.buffs, x_start-26*i-152, y_start, options.aliases[s])
+        misc_hold_for_up.texts:append(s)
+        misc_hold_for_up.prims:extend({s..'i','p' .. s})
+        macro[1]:add(s)
+        macro[1]:add(s..'i')
+        macro[1]:add('p' .. s)
+        windower.text.set_stroke_color(s, 255, 0, 0, 0)
+        windower.text.set_stroke_width(s, 1)
+    end
+end
+
+function prim_rose(t,pos,x_start,y_start,n) --Pun!
+    local spell
+    local s
+    local prim = _settings.primitives.buttons
+    local text = _settings.text.buttons
+    
+    for i = 1,t.n do
+        spell = t[i]
+        s = spell .. tostring(pos)
+        prim_simple('p' .. s,prim,x_start-(i)*(w+1)+1-153,y_start,w,h)
+        text_simple(s, text, x_start-(i)*(w+1)+1+((w-font_widths[options.aliases[spell]])/2)-153, y_start, options.aliases[spell])
+        prims_by_layer[pos]:append('p' .. s)
+        texts_by_layer[pos]:append(s)
+        macro[n]:add('p' .. s)
+        macro[n]:add(s)
+        if not macro_visibility[n] then
+            windower.prim.set_visibility('p' .. s,false)
+            windower.text.set_visibility(s,false)
+        end
+    end
 end
 
 last_hpp=0
@@ -304,29 +337,37 @@ function update_target(mob)
             prim_coordinates.visible["target_background"]=_settings.primitives.hp_bar_background.visible
             prim_coordinates.visible["target"]=true
         end
-        if index ~= last_index then
+        if mob.index ~= last_index then
             windower.text.set_text("target_name",string.sub(mob.name,1,20))
+            last_index = mob.index
         end
-        if mob.hpp~=last_hpp then
-            windower.text.set_text("targethpp",tostring(mob.hpp))
-            windower.prim.set_size("target",150/100*mob.hpp,30)
-            if math.floor(mob.hpp/25) ~= math.floor(last_hpp/25) then
-                local color=_settings.primitives.hp_bar[choose_color(mob.hpp)]
-                windower.prim.set_color("target",color.a,color.r,color.g,color.b)
-            end
-        end            
-        last_index = mob.index
-        last_hpp = mob.hpp
+        if mob.hpp ~= last_hpp then
+            update_target_hp(mob.hpp)
+        end
     end
 end
 
+function update_target_hp(hpp)
+    if hpp~=last_hpp then
+        windower.text.set_text("targethpp",tostring(hpp))
+        windower.prim.set_size("target",150/100*hpp,30)
+        if math.floor(hpp/25) ~= math.floor(last_hpp/25) then
+            local color=_settings.primitives.hp_bar[choose_color(hpp)]
+            windower.prim.set_color("target",color.a,color.r,color.g,color.b)
+        end
+    end            
+    last_hpp = hpp
+end
+
 function compare_alliance_to_memory()
-    alliance_clone = windower.ffxi.get_party()
+    local alliance_keys = {'p5', 'p4', 'p3', 'p2', 'p1', 'p0', 'a15', 'a14', 'a13', 'a12', 'a11', 'a10', 'a25', 'a24', 'a23', 'a22', 'a21', 'a20'}
+    local alliance_clone = windower.ffxi.get_party()
     local ally_id=(table.keyset(alliance_clone))
     local party1 = (party_keys * ally_id)
     local party2 = (party_two_keys * ally_id)
     local party3 = (party_three_keys * ally_id)
     local names = {}
+    local packet_pt_struc = {S{},S{},S{}}
     for i=1,18 do
         if ally_id[alliance_keys[i]] and alliance_clone[alliance_keys[i]].mob then
             names[alliance_clone[alliance_keys[i]].mob.id]=alliance_clone[alliance_keys[i]].mob.name
@@ -339,28 +380,18 @@ function compare_alliance_to_memory()
             packet_pt_struc[3]:add(alliance_clone[alliance_keys[i]].mob.id)
         end
     end
-    new_members()
+    new_members(packet_pt_struc)
     for k,v in pairs(names) do
         if who_am_i[k] then
             windower.text.set_text('name'..position_lookup[k],prepare_names(v))
             stat_table[k].name = v
             who_am_i[k] = nil
+            update_name_map(k,v)
         end
     end
 end
 
-function determine_response(x,region,w,y)
-    local target
-    local spell=xml_to_lua[macro_order[region_map[region]][math.ceil((x-l[region])/w)]]
-    if y then 
-        target = stat_table[party[region][math.ceil((y-b[region])/25)]].name
-    else
-        target = '<t>'
-    end
-    windower.send_command('%sinput %s "%s" %s':format(send_string, prefix[spell], spell, target))
-end
-
-function new_members() -- snippet from invite, reused in c_a_t_m
+function new_members(packet_pt_struc) -- snippet from invite, reused in c_a_t_m
     local p = {S(party[1]),S(party[2]),S(party[3])}
     local to_kick = p[1] + p[2] + p[3] - (packet_pt_struc[3] + packet_pt_struc[2] + packet_pt_struc[1])
     for k in pairs(to_kick) do
@@ -371,115 +402,59 @@ function new_members() -- snippet from invite, reused in c_a_t_m
         for k in pairs(to_invite) do
             invite(k,i)
         end
-        packet_pt_struc[i]:clear()
     end
     define_active_regions()
 end
 
 function invite(id,n)
+    local prim = _settings.primitives
+    local text = _settings.text
+    local x_start=_settings.window.x_res-1-_defaults.window.x_offset
     party[n]:append(id)
-    position_lookup[id] = 1 + 6 * n - party[n].n
-    stat_table[id]={hp=0,mp=0,mpp=0,hpp=0,name='???',tp=0,}
+    local ptn = party[n].n
+    position_lookup[id] = 1 + 6 * n - ptn
+    local pos_id = position_lookup[id]
+    stat_table[id]={hp=0,mp=0,mpp=0,hpp=0,name='???',tp=0,buffs={{n = 0},{n = 0}}}
     seeking_information[id] = true
     who_am_i[id] = true
     local m = tostring(n)
-    local pos_tostring = tostring(position_lookup[id])
-    if not saved_prims['phpp' .. pos_tostring] then
+    local pos_tostring = tostring(pos_id)
+    if vacancies[n] == 0 then
         lift_macro(n)
-        if n==1 then
-            windower.prim.set_size('info1',152,party[1].n*(h+1)+1)
-            windower.prim.set_size("BG1",(_cures+_curagas)*(w+1)+1,party[1].n*(h+1)+1)
-            local block_num=19
-            for i=11,1,-1 do
-                if profile[options.cures[i]] then 
-                    local s = options.cures[i] .. pos_tostring
-                    block_num=block_num-1
-                    prim_simple('p' .. s,_settings.primitives.buttons,x_start-(19-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1),w,h)
-                    text_simple(s,_settings.text.buttons, x_start-(19-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1), options.aliases[options.cures[i]])
-                    prims_by_layer[position_lookup[id]]:append('p' .. s)
-                    texts_by_layer[position_lookup[id]]:append(s)
-                    macro[1]:add('p' .. s)
-                    macro[1]:add(s)
-                    if not macro_visibility[1] then
-                        windower.prim.set_visibility('p' .. s,false)
-                        windower.text.set_visibility(s,false)
-                    end
-                end
-            end
-            for i=18,12,-1 do
-                if profile[options.curagas[i]] then
-                    local s = options.curagas[i] .. pos_tostring
-                    block_num=block_num-1
-                    prim_simple('p' .. s,_settings.primitives.curaga_buttons,x_start-(19-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1),w,h)
-                    text_simple(s,_settings.text.buttons, x_start-(19-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.curagas[i]]])/2)-153, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1), options.aliases[options.curagas[i]])
-                    prims_by_layer[position_lookup[id]]:append('p' .. s)
-                    texts_by_layer[position_lookup[id]]:append(s)
-                    macro[1]:add('p' .. s)
-                    macro[1]:add(s)
-                    if not macro_visibility[1] then
-                        windower.prim.set_visibility('p' .. s,false)
-                        windower.text.set_visibility(s,false)
-                    end
-                end
+        if not saved_prims:contains('BG'..m) then
+            local y_start = prim_coordinates.y['BG'..tostring(n-1)]-(175-75*(n-1))-ptn*(h+1)
+            prim_simple('BG'..m,prim.background,x_start-macro_order[n].n*(w+1)-153,y_start,macro_order[n].n*(w+1)+1,ptn*(h+1)+1)
+            prim_simple("info"..m,prim.hp_bar_background,x_start-152,y_start,152,ptn*(h+1)+1)
+            macro[n]:add('BG'..m)
+            if not macro_visibility[n] then
+                windower.prim.set_visibility('BG'..m,false)
             end
         else
-            if not saved_prims['BG'..m] then
-                if n==2 then
-                    prim_simple("BG2",_settings.primitives.background,x_start-(_cures)*(w+1)-153,prim_coordinates.y['BG1']-100-party[2].n*(h+1)+h,_cures*(w+1)+1,party[2].n*(h+1)+1)
-                    prim_simple("info2",_settings.primitives.hp_bar_background,x_start-152,prim_coordinates.y['BG1']-100-party[2].n*(h+1)+h,152,party[2].n*(h+1)+1)
-                    macro[2]:add("BG2")
-                    if not macro_visibility[2] then
-                        windower.prim.set_visibility('BG2',false)
-                    end
-                else
-                    prim_simple("BG3",_settings.primitives.background,x_start-(_cures)*(w+1)-153,prim_coordinates.y['BG2']-10-party[3].n*(h+1)+h,_cures*(w+1)+1,party[2].n*(h+1)+1)
-                    prim_simple("info3",_settings.primitives.hp_bar_background,x_start-152,prim_coordinates.y['BG2']-10-party[3].n*(h+1)+h,152,party[3].n*(h+1)+1)--prim_coordinates.y['BG2']-10-party[3].n*(h+1)
-                    macro[3]:add("BG3")
-                    if not macro_visibility[3] then
-                        windower.prim.set_visibility('BG3',false)
-                    end
-                end
-            else
-                windower.prim.set_size('info'..m,152,party[n].n*(h+1)+1)
-                windower.prim.set_size('BG'..m,(_cures)*(w+1)+1,party[n].n*(h+1)+1)
-            end
-            local block_num=12
-            for i=11,1,-1 do
-                if profile[options.cures[i]] then 
-                    local s = options.cures[i] .. pos_tostring
-                    block_num=block_num-1
-                    prim_simple('p' .. s,_settings.primitives.buttons,x_start-(12-block_num)*(w+1)+1-153,prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1),w,h)
-                    text_simple(s, _settings.text.buttons, x_start-(12-block_num)*(w+1)+1+((w-font_widths[options.aliases[options.cures[i]]])/2)-153, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1), options.aliases[options.cures[i]])
-                    prims_by_layer[position_lookup[id]]:append('p' .. s)
-                    texts_by_layer[position_lookup[id]]:append(s)
-                    macro[n]:add('p' .. s)
-                    macro[n]:add(s)
-                    if not macro_visibility[n] then
-                        windower.prim.set_visibility('p' .. s,false)
-                        windower.text.set_visibility(s,false)
-                    end
-                end
-            end
-
+            windower.prim.set_size('info'..m,152,ptn*(h+1)+1)
+            windower.prim.set_size('BG'..m,macro_order[n].n*(w+1)+1,ptn*(h+1)+1)
         end
-        prim_simple("phpp".. pos_tostring,_settings.primitives.hp_bar,x_start-151,prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1),150,h)
-        prim_simple("pmpp".. pos_tostring,_settings.primitives.mp_bar,x_start-151,prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)+19,150,5)
-        text_simple("tp".. pos_tostring, _settings.text.tp, x_start-151, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)+11, '')
-        text_simple("name".. pos_tostring, _settings.text.name, x_start-151, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)-3, stat_table[id].name)
-        text_simple("hpp".. pos_tostring, _settings.text.hpp, x_start, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)-4, '')
-        text_simple("hp".. pos_tostring, _settings.text.hp, x_start-40, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)-3, '')
-        text_simple("mp".. pos_tostring, _settings.text.mp, x_start-40, prim_coordinates.y['BG'..m]+1+(h+1)*(party[n].n-1)+11,'') 
-        prims_by_layer[position_lookup[id]]:extend(L{"phpp" .. pos_tostring,"pmpp" .. pos_tostring})
-        texts_by_layer[position_lookup[id]]:extend(L{"tp" .. pos_tostring,"name" .. pos_tostring,"hpp" .. pos_tostring,"hp" .. pos_tostring,"mp" .. pos_tostring})
+        local y_start = prim_coordinates.y['BG'..m]+1+(h+1)*(ptn-1)
+        prim_rose(macro_order[n],pos_id,x_start,y_start,n)
+        prim_simple("phpp"..pos_tostring,prim.hp_bar,x_start-151,y_start,150,h)
+        prim_simple("pmpp"..pos_tostring,prim.mp_bar,x_start-151,y_start+19,150,5)
+        text_simple("tp"..pos_tostring, text.tp, x_start-151, y_start+11, '')
+        text_simple("name"..pos_tostring, text.name, x_start-151, y_start-3, stat_table[id].name)
+        text_simple("hpp"..pos_tostring, text.hpp, x_start, y_start-4, '')
+        text_simple("hp"..pos_tostring, text.hp, x_start-40, y_start-3, '')
+        text_simple("mp"..pos_tostring, text.mp, x_start-40, y_start+11,'') 
+        prims_by_layer[pos_id]:extend(L{"phpp" ..pos_tostring,"pmpp" ..pos_tostring})
+        texts_by_layer[pos_id]:extend(L{"tp" ..pos_tostring,"name" ..pos_tostring,"hpp" ..pos_tostring,"hp" ..pos_tostring,"mp" ..pos_tostring})
     else
-        windower.text.set_text('name'..position_lookup[id],stat_table[id].name)
+        vacancies[n] = vacancies[n]-1
+        windower.text.set_text('name'..pos_id,stat_table[id].name)
     end
     local pos = windower.ffxi.get_mob_by_id(id)
     if pos then
-        position[1][position_lookup[id]] = pos.x
-        position[2][position_lookup[id]] = pos.y
-        position[3][position_lookup[id]] = pos.z
-        color_name(pos.x,pos.y,pos.z,position_lookup[id],false)
+        position[1][pos_id] = pos.x
+        position[2][pos_id] = pos.y
+        indicate_distance(false,pos_id,pos.x,pos.y)
+    elseif not out_of_view[pos_id] then
+        indicate_distance(true,pos_id)
     end
 end
 
@@ -489,7 +464,7 @@ function lift_macro(n)
         up(misc_hold_for_up.prims)
     end
     for k=n,3 do
-        if saved_prims["BG" .. k] then
+        if saved_prims:contains("BG" .. tostring(k)) then
             up("BG" .. tostring(k))
             up("info" .. tostring(k))
         end
@@ -502,31 +477,35 @@ end
 
 function up(t)
     if not t then return end
-    if class(t) == 'list' then
+    if class(t) == 'List' then
         for i=1,t.n do
-            if saved_prims[i] then
-                windower.prim.set_position(i,prim_coordinates.x[i],prim_coordinates.y[i]-25)
-                prim_coordinates.y[i]=prim_coordinates.y[i]-25
-            elseif saved_texts[i] then
-                windower.text.set_location(i,text_coordinates.x[i],text_coordinates.y[i]-25)
-                text_coordinates.y[i]=text_coordinates.y[i]-25
+            if saved_prims:contains(t[i]) then
+                windower.prim.set_position(t[i],prim_coordinates.x[t[i]],prim_coordinates.y[t[i]]-25)
+                prim_coordinates.y[t[i]]=prim_coordinates.y[t[i]]-25
+            elseif saved_texts:contains(t[i]) then
+                windower.text.set_location(t[i],text_coordinates.x[t[i]],text_coordinates.y[t[i]]-25)
+                text_coordinates.y[t[i]]=text_coordinates.y[t[i]]-25
+            elseif class(t[i]) == 'Prim' then
+                t[i]:up(25)
             end
         end
     elseif type(t) == 'table' then
         for _,v in pairs(t) do
-            if saved_prims[v] then
+            if saved_prims:contains(v) then
                 windower.prim.set_position(v,prim_coordinates.x[v],prim_coordinates.y[v]-25)
                 prim_coordinates.y[v]=prim_coordinates.y[v]-25
-            elseif saved_texts[v] then
+            elseif saved_texts:contains(v) then
                 windower.text.set_location(v,text_coordinates.x[v],text_coordinates.y[v]-25)
                 text_coordinates.y[v]=text_coordinates.y[v]-25
+            elseif class(v) == 'Prim' then
+                v:up(25)
             end
         end
     else
-        if saved_prims[t] then
+        if saved_prims:contains(t) then
             windower.prim.set_position(t,prim_coordinates.x[t],prim_coordinates.y[t]-25)
             prim_coordinates.y[t]=prim_coordinates.y[t]-25
-        elseif saved_texts[t] then
+        elseif saved_texts:contains(t) then
             windower.text.set_location(t,text_coordinates.x[t],text_coordinates.y[t]-25)
             text_coordinates.y[t]=text_coordinates.y[t]-25
         end
@@ -539,7 +518,7 @@ function lower_macro(n)
         down(misc_hold_for_up.prims)
     end
     for k=n,3 do
-        if saved_prims["BG" .. k] then
+        if saved_prims:contains("BG" .. k) then
             down("BG" .. tostring(k))
             down("info" .. tostring(k))
         end
@@ -554,29 +533,33 @@ function down(periscope)
     if not periscope then return end
     if class(periscope) == 'list' then
         for i=1,periscope.n do
-            if saved_prims[i] then
+            if saved_prims:contains(i) then
                 windower.prim.set_position(i,prim_coordinates.x[i],prim_coordinates.y[i]+25)
                 prim_coordinates.y[i]=prim_coordinates.y[i]+25
-            elseif saved_texts[i] then
+            elseif saved_texts:contains(i) then
                 windower.text.set_location(i,text_coordinates.x[i],text_coordinates.y[i]+25)
                 text_coordinates.y[i]=text_coordinates.y[i]+25
+            elseif class(i) == 'Prim' then
+                i:down(25)
             end
         end
     elseif type(periscope) == 'table' then
         for _,v in pairs(periscope) do
-            if saved_prims[v] then
+            if saved_prims:contains(v) then
                 windower.prim.set_position(v,prim_coordinates.x[v],prim_coordinates.y[v]+25)
                 prim_coordinates.y[v]=prim_coordinates.y[v]+25
-            elseif saved_texts[v] then
+            elseif saved_texts:contains(v) then
                 windower.text.set_location(v,text_coordinates.x[v],text_coordinates.y[v]+25)
                 text_coordinates.y[v]=text_coordinates.y[v]+25
+            elseif class(v) == 'Prim' then
+                v:down(25)
             end
         end
     else
-        if saved_prims[periscope] then
+        if saved_prims:contains(periscope) then
             windower.prim.set_position(periscope,prim_coordinates.x[periscope],prim_coordinates.y[periscope]+25)
             prim_coordinates.y[periscope]=prim_coordinates.y[periscope]+25
-        elseif saved_texts[periscope] then
+        elseif saved_texts:contains(periscope) then
             windower.text.set_location(periscope,text_coordinates.x[periscope],text_coordinates.y[periscope]+25)
             text_coordinates.y[periscope]=text_coordinates.y[periscope]+25
         end
@@ -586,32 +569,33 @@ end
 function trim_macro()
     for j = 1,3 do
         for i = 6*j-party[j].n,1+6*(j-1),-1 do
-            local condition = false
             local prim = prims_by_layer[i]
             for k=1,prim.n do
-                condition = true
-                windower.prim.delete(prim[k])
-                saved_prims:remove(prim[k])
-                prim_coordinates.x[prim[k]]=nil
-                prim_coordinates.y[prim[k]]=nil
-                macro[j]:remove(prim[k])
+                if class(prim[k]) == 'Prim' then
+                    prim[k]:destroy()
+                else
+                    windower.prim.delete(prim[k])
+                    saved_prims:remove(prim[k])
+                    prim_coordinates.x[prim[k]]=nil
+                    prim_coordinates.y[prim[k]]=nil
+                    macro[j]:remove(prim[k])
+                end
             end
             local text = texts_by_layer[i]
             for k=1,text.n do
-                condition = true
                 windower.text.delete(text[k])
                 saved_texts:remove(text[k])
                 text_coordinates.x[text[k]]=nil
                 text_coordinates.y[text[k]]=nil
                 macro[j]:remove(text[k])
             end
-            prims_by_layer[i]:clear()
-            texts_by_layer[i]:clear()
-            if condition then
+            if prim.n ~= 0 or text.n ~= 0 then
                 lower_macro(j)
             end
+            prims_by_layer[i]:clear()
+            texts_by_layer[i]:clear()
         end
-        if saved_prims['BG'..tostring(j)] then
+        if saved_prims:contains('BG'..tostring(j)) then
             local s1 = 'BG'..tostring(j)
             local s2 = 'info'..tostring(j)
             if party[j].n == 0 then
@@ -623,11 +607,12 @@ function trim_macro()
                 misc_hold_for_up.prims:delete(s1)
                 misc_hold_for_up.prims:delete(s2)
             else
-                windower.prim.set_size(s1,j == 1 and (_curagas+_cures)*(w+1)+1 or _cures*(w+1)+1,party[j].n*(h+1)+1)
+                windower.prim.set_size(s1,macro_order[j].n*(w+1)+1,party[j].n*(h+1)+1)
                 windower.prim.set_size(s2,152,party[j].n*(h+1)+1)
             end
         end
     end
+    vacancies={0,0,0}
     define_active_regions()
 end
 
@@ -639,12 +624,33 @@ end
 
 function kick(id,n)
     local i = position_lookup[id]
+    
+    if i < 6 then
+        local party = party[1]
+        local last = party[party.n]
+
+        for k = 1, 2 do
+            local prim = buff_map[position_lookup[last]][k]
+            for j = 1, stat_table[last].buffs[k].n do
+                prim[j]:hide()
+            end
+        end
+
+        for j = party.n, 8 - i, -1 do            
+            draw_buff_display(stat_table[party[j]].buffs[1], party[j - 1], 1)
+            draw_buff_display(stat_table[party[j]].buffs[2], party[j - 1], 1)
+        end
+    end
+
     party[n]:remove(6*n+1-i)
-    local j = 1+6*(n-1)+5-party[n].n
+    local j = 6*(n)-party[n].n
+    vacancies[n] = vacancies[n] + 1
+
     while i > j do
         local m = 6*n+1-i
         local m_id = party[n][m]
-        local pos_tostring = tostring(m_id)
+        local pos_tostring = tostring(i)
+
         position_lookup[m_id] = position_lookup[m_id] + 1
         update_macro_data(m_id,L{'tp','hp','mp','hpp','mpp'})
         windower.text.set_text('name'..pos_tostring,prepare_names(stat_table[m_id]['name']))--shouldn't send name to update_macro... since it won't truncate
@@ -652,96 +658,126 @@ function kick(id,n)
         windower.prim.set_color('phpp'..pos_tostring,color.a,color.r,color.g,color.b)
         windower.prim.set_size('phpp'..pos_tostring,150/100*stat_table[m_id]['hpp'],h)
         windower.prim.set_size('pmpp'..pos_tostring,150/100*stat_table[m_id]['mpp'],5)
+        if out_of_range[i] and not out_of_range[i-1] then
+            windower.text.set_color('name' .. tostring(i), 255, 255, 255, 255)
+        end
+        if out_of_range[i-1] and not out_of_range[i] then
+            windower.text.set_color('name' .. tostring(i), 255, 175, 98, 177)
+        end
+        out_of_range[i] = out_of_range[i-1]
+        out_of_view[i] = out_of_view[i-1]
+        position[1][i] = position[1][i-1]
+        position[2][i] = position[2][i-1]
+
         i = i - 1
     end
-    for k = 1,3 do
-        position[k]:insert((n-1)*6+1,0)
-        position[k]:remove(i+1)
-    end
-    remove_macro_information(6*n-party[n].n,true)
+    
+    remove_macro_information(tostring(i),true)
     stat_table[id] = nil
     out_of_zone[id] = nil
-    out_of_range[i] = false
-    out_of_view[i] = false
     who_am_i[id] = nil
+    seeking_information[id] = nil
     position_lookup[id] = nil
-    define_active_regions()
+end
+
+function draw_buff_display(t, id, type)
+    local p_id = position_lookup[id]
+    local buffs = stat_table[id].buffs[type]
+
+    for i = 1, t.n do
+        if t[i] ~= buffs[i] then
+            local prim = buff_map[p_id][type]
+            
+            if not prim[i] then
+                local hpp_string = 'phpp'..tostring(p_id)
+                prim[i] = prims.new({
+                    pos = {prim_coordinates.x[hpp_string] - 1 - 12 * i, prim_coordinates.y[hpp_string] + (type == 2 and 12 or 0)},
+                    w = 12,
+                    color = color_over_texture[t[i]],
+                    h = 12,
+                    visible = not is_hidden and not macro_visibility[1],
+                    set_texture = true,
+                    texture = tracked_buffs[type][t[i]],
+                    fit_texture = false,
+                })
+                prims_by_layer[p_id]:append(prim[i])
+            else
+                prim[i]:texture(tracked_buffs[type][t[i]])
+                if color_over_texture[t[i]] then
+                    prim[i]:argb(unpack(color_over_texture[t[i]]))
+                else
+                    prim[i]:argb(255, 255, 255, 255)
+                end
+                prim[i]:visible(not macro_visibility[1])
+            end
+        end
+    end
+    for i = t.n + 1, buffs.n do
+        buff_map[p_id][type][i]:hide()
+    end
+end
+
+function update_name_map(id,name)
+    local pos_id = position_lookup[id]
+    if pos_id < 7 then
+        region_to_name_map[pos_id-(6-(party[1].n+vacancies[1]))] = name
+    elseif pos_id < 13 then
+        region_to_name_map[party[1].n+vacancies[1]+pos_id-6-(6-(party[2].n+vacancies[2]))+4] = name
+    elseif pos_id < 19 then
+        region_to_name_map[party[1].n+vacancies[1]+party[2].n+vacancies[2]+pos_id-12-(6-(party[3].n+vacancies[3]))+5] = name
+    end
 end
 
 function define_active_regions()
-    regions = 1
-    l[1] = prim_coordinates.x['BG1']
-    r[1] = prim_coordinates.x['info1']
-    t[1] = prim_coordinates.y['BG1'] + party[1].n*(h+1)
-    b[1] = prim_coordinates.y['BG1']
-    l[6] = prim_coordinates.x['info1']
-    r[6] = prim_coordinates.x['info1']+152
-    t[6] = prim_coordinates.y['info1'] + party[1].n*(h+1)
-    b[6] = prim_coordinates.y['info1']
-    if party[2].n ~= 0 then
-        regions = regions + 1
-        l[2] = prim_coordinates.x['BG2']
-        r[2] = prim_coordinates.x['info2']
-        t[2] = prim_coordinates.y['BG2'] + party[2].n*(h+1)
-        b[2] = prim_coordinates.y['BG2']
-        l[7] = prim_coordinates.x['info2']
-        r[7] = prim_coordinates.x['info2']+152
-        t[7] = prim_coordinates.y['info2'] + party[2].n*(h+1)
-        b[7] = prim_coordinates.y['info2']
-    else
-        l[2] = 0
-        r[2] = 0
-        t[2] = 0
-        b[2] = 0
-        l[7] = 0
-        r[7] = 0
-        t[7] = 0
-        b[7] = 0
+    mouse_map=T{}
+    region_to_name_map=T{}
+    position_to_region_map=T{}
+    local copy={{},{},{}} -- lists accept negative indices
+    for j = 1,3 do
+        for i = 1,macro_order[j].n do
+            copy[j][i] = macro_order[j][i]
+        end
     end
-    
-    if party[3].n ~= 0 then
-        regions = regions + 1
-        l[3] = prim_coordinates.x['BG3']
-        r[3] = prim_coordinates.x['info3']
-        t[3] = prim_coordinates.y['BG3'] + party[3].n*(h+1)
-        b[3] = prim_coordinates.y['BG3']
-        l[8] = prim_coordinates.x['info3']
-        r[8] = prim_coordinates.x['info3']+152
-        t[8] = prim_coordinates.y['info3'] + party[3].n*(h+1)
-        b[8] = prim_coordinates.y['info3']
-    else
-        l[3] = 0
-        r[3] = 0
-        t[3] = 0
-        b[3] = 0
-        l[8] = 0
-        r[8] = 0
-        t[8] = 0
-        b[8] = 0
+    for i = 1,vacancies[1] do
+        mouse_map:append(false)
+        region_to_name_map:append(false)
+        position_to_region_map:append(false)
     end
-    
-    if _na ~= 0 then
-        l[4] = prim_coordinates.x['BGna']
-        r[4] = prim_coordinates.x['info1']
-        t[4] = prim_coordinates.y['BGna']+34
-        b[4] = prim_coordinates.y['BGna']
-    else
-        l[4] = 0
-        r[4] = 0
-        t[4] = 0
-        b[4] = 0
+    for i = 1,party[1].n do
+        mouse_map:append(copy[1])
+        region_to_name_map:append(stat_table[party[1][party[1].n-i+1]].name)
+        position_to_region_map:append(1)
     end
-    
-    if _buffs ~= 0 then
-        l[5] = prim_coordinates.x['BGbuffs']
-        r[5] = prim_coordinates.x['info1']
-        t[5] = prim_coordinates.y['BGbuffs']+34
-        b[5] = prim_coordinates.y['BGbuffs']
-    else
-        l[5] = 0
-        r[5] = 0
-        t[5] = 0
-        b[5] = 0
+    for i = 1,4 do
+        mouse_map:append(false)
+        region_to_name_map:append(false)
+        position_to_region_map:append(false)
     end
-    
+    for i = 1,vacancies[2] do
+        mouse_map:append(false)
+        region_to_name_map:append(false)
+        position_to_region_map:append(false)
+    end
+    for i = 1,party[2].n do
+        mouse_map:append(copy[2])
+        region_to_name_map:append(stat_table[party[2][party[2].n-i+1]].name)
+        position_to_region_map:append(2)
+    end
+    mouse_map:append(false)
+    region_to_name_map:append(false)
+    position_to_region_map:append(false)
+    for i = 1,vacancies[3] do
+        mouse_map:append(false)
+        region_to_name_map:append(false)
+        position_to_region_map:append(false)
+    end
+    for i = 1,party[3].n do
+        mouse_map:append(copy[3])
+        region_to_name_map:append(stat_table[party[3][party[3].n-i+1]].name)
+        position_to_region_map:append(3)
+    end
+end
+
+function bit.is_set(val, pos) -- Credit: Arcon
+    return bit.band(val, 2^(pos - 1)) > 0
 end

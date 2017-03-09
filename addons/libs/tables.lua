@@ -157,7 +157,7 @@ function table.count(t, fn)
         fn = functions.equals(fn)
     end
 
-    count = 0
+    local count = 0
     for _, val in pairs(t) do
         if fn(val) then
             count = count + 1
@@ -484,12 +484,14 @@ end
 -- Returns a copy of the table, including metatable and recursed over nested tables.
 -- The second argument indicates whether or not to perform a deep copy (defaults to true)
 function table.copy(t, deep)
-    deep = deep or true
+    deep = deep ~= false and true
     local res = {}
 
     for value, key in table.it(t) do
         -- If a value is a table, recursively copy that.
-        if type(value) == 'table' then
+        if type(value) == 'table' and deep then
+            -- If it has a copy function in its __index metatable (but not main table), use that.
+            -- Otherwise, default to the table.copy function.
             value = (not rawget(value, copy) and value.copy or table.copy)(value)
         end
         res[key] = value

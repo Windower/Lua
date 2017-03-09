@@ -25,8 +25,8 @@ colors[121] = 'Menu > Font Colors > System > Basic system messages'
 
 for v = 0, 255, 1 do
 	if(colors[v] ~= nil) then
-		add_to_chat(v, "Color "..v..": "..colors[v])
+		windower.add_to_chat(v, "Color "..v..": "..colors[v])
 	else
-		add_to_chat(v, "Color "..v..": This is some random text to display the color.")
+		windower.add_to_chat(v, "Color "..v..": This is some random text to display the color.")
 	end
 end

@@ -1,4 +1,4 @@
---Copyright (c) 2013-2014, Byrthnoth
+--Copyright (c) 2013~2016, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -204,6 +204,45 @@ end
 
 
 -----------------------------------------------------------------------------------
+----Name: to_windower_bag_api(str)
+-- Takes strings and converts them to resources table key format
+----Args:
+-- str - String to be converted to the windower bag API version
+-----------------------------------------------------------------------------------
+----Returns:
+-- a lower case string with ' ' replaced with ''
+-----------------------------------------------------------------------------------
+function to_windower_bag_api(str)
+    return __raw.lower(str:gsub(' ',''))
+end
+
+-----------------------------------------------------------------------------------
+----Name: to_bag_api(str)
+-- Takes strings and converts them to resources table key format
+----Args:
+-- str - String to be converted to the windower bag API version
+-----------------------------------------------------------------------------------
+----Returns:
+-- a lower case string with ' ' eliminated
+-----------------------------------------------------------------------------------
+function to_bag_api(str)
+    return __raw.lower(str:gsub(' ',''))
+end
+
+-----------------------------------------------------------------------------------
+----Name: to_windower_compact(str)
+-- Takes strings and converts them to a compact version of the resource table key
+----Args:
+-- str - String to be converted to the windower API version
+-----------------------------------------------------------------------------------
+----Returns:
+-- a lower case string with ' ' replaced with ''
+-----------------------------------------------------------------------------------
+function to_windower_compact(str)
+    return __raw.lower(str:gsub(' ',''))
+end
+
+-----------------------------------------------------------------------------------
 ----Name: get_job_names()
 -- Returns the short and long form of the job name
 ----Args:
@@ -258,12 +297,13 @@ end
 -- Merges any additional gear sets (...) into the provided base set.
 -- Ensures that only valid slot keys/elements are used in the combined set.
 ----Args:
+-- respect_disable - boolean indicating whether the disable_table should be respected.
 -- baseSet - The set that all the other sets are combined into.  May be an empty set.
 -----------------------------------------------------------------------------------
 ----Returns:
 -- Returns the modified base set, after all other sets have been merged into it.
 -----------------------------------------------------------------------------------
-function set_merge(baseSet, ...)
+function set_merge(respect_disable, baseSet, ...)
     local combineSets = {...}
 
     local canCombine = table.all(combineSets, function(t) return type(t) == 'table' end)
@@ -280,7 +320,7 @@ function set_merge(baseSet, ...)
     -- the slot disabled, assign the item to the not_sent_out_equip table.
     for _,set in pairs(cleanSetsList) do
         for slot,item in pairs(set) do
-            if disable_table[slot_map[slot]] then
+            if respect_disable and disable_table[slot_map[slot]] then
                 not_sent_out_equip[slot] = item
             else
                 baseSet[slot] = item
@@ -392,6 +432,31 @@ end
 
 
 -----------------------------------------------------------------------------------
+--Name: initialize_arrow_offset(mob_table)
+--Desc: Returns the current target arrow offset.
+--Args:
+---- mob_table - Monster table of the target monster
+-----------------------------------------------------------------------------------
+--Returns:
+---- table - Keys x, y, and z with the respective current offsets from the target.
+-----------------------------------------------------------------------------------
+function initialize_arrow_offset(mob_table)
+    local backtab = {}
+    local arrow = windower.ffxi.get_info().target_arrow
+    
+    if arrow.x == 0 and arrow.y == 0 and arrow.z == 0 then
+        return arrow
+    end
+    
+    backtab.x = arrow.x-mob_table.x
+    backtab.y = arrow.y-mob_table.y
+    backtab.z = arrow.z-mob_table.z
+    return backtab
+end
+
+
+
+-----------------------------------------------------------------------------------
 --Name: assemble_action_packet(target_id,target_index,category,spell_id)
 --Desc: Puts together an "action" packet (0x1A)
 --Args:
@@ -403,7 +468,7 @@ end
 --Returns:
 ---- string - An action packet. First four bytes are dummy bytes.
 -----------------------------------------------------------------------------------
-function assemble_action_packet(target_id,target_index,category,spell_id)
+function assemble_action_packet(target_id,target_index,category,spell_id,arrow_offset)
     local outstr = string.char(0x1A,0x08,0,0)
     outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
     outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
@@ -412,9 +477,9 @@ function assemble_action_packet(target_id,target_index,category,spell_id)
     if category == 16 then
         spell_id = 0
     end
-    
-    outstr = outstr..string.char( (spell_id%256), math.floor(spell_id/256)%256)
-    return outstr..string.char(0,0)
+        
+    outstr = outstr..string.char( (spell_id%256), math.floor(spell_id/256)%256)..string.char(0,0) .. 'fff':pack(arrow_offset.x,arrow_offset.z,arrow_offset.y)
+    return outstr
 end
 
 
@@ -469,18 +534,18 @@ function assemble_menu_item_packet(target_id,target_index,...)
             count = count + 1
         end
     end
-    if count > 9 then
-        msg.debugging('Too many items ('..count..') passed to the assemble_menu_item_packet function')
-        return
-    end
     
     local unique_items = 0
     for i,v in pairs(counts) do
         outstr = outstr.."I":pack(v)
         unique_items = unique_items + 1
     end
-    for i = 1,10-unique_items do
-        outstr = outstr..string.char(0,0,0,0)
+    if unique_items > 9 then
+        msg.debugging('Too many items ('..unique_items..') passed to the assemble_menu_item_packet function')
+        return
+    end
+    while #outstr < 0x30 do
+        outstr = outstr..string.char(0)
     end
     
     -- Inventory Index for the one unit
@@ -494,7 +559,7 @@ function assemble_menu_item_packet(target_id,target_index,...)
             return
         end
     end
-    for i = 1,10-unique_items do
+    while #outstr < 0x3A do
         outstr = outstr..string.char(0)
     end
     -- Target Index
@@ -518,35 +583,13 @@ end
 ---- bag_id - The item's bag ID (if it exists)
 -----------------------------------------------------------------------------------
 function find_usable_item(item_id,bool)
-    local inventory_index,bag_id
-    for i,v in pairs(items.temporary) do
-        if type(v) == 'table' and v.id == item_id then
-            inventory_index = i
-            bag_id = 3
-            break
-        end
-    end
-    
-    -- Should I add some kind of filter for enchanted items?
-    if not inventory_index then
-        for i,v in pairs(items.inventory) do
-            if type(v) == 'table' and v.id == item_id and (not bool or is_usable_item(v)) then
-                inventory_index = i
-                bag_id = 0
-                break
+    for _,bag in ipairs(usable_item_bags) do
+        for i,v in pairs(items[to_windower_bag_api(bag.en)]) do
+            if type(v) == 'table' and v.id == item_id and (v.status == 5 or v.status == 0) and (not bool or is_usable_item(v)) then
+                return i, bag.id
             end
         end
     end
-    if not inventory_index then
-        for i,v in pairs(items.wardrobe) do
-            if type(v) == 'table' and v.id == item_id and (not bool or is_usable_item(v)) then
-                inventory_index = i
-                bag_id = 8
-                break
-            end
-        end
-    end
-    return inventory_index,bag_id
 end
 
 -----------------------------------------------------------------------------------
@@ -601,12 +644,13 @@ function filter_pretarget(spell)
         local spell_jobs = copy_entry(res.spells[spell.id].levels)
         
         -- Filter for spells that you do not know. Exclude Impact.
-        if not available_spells[spell.id] and not (spell.id == 503) then
+        if not available_spells[spell.id] and not (spell.id == 503 or spell.id == 417) then
             msg.debugging("Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")")
+            return false
         -- Filter for spells that you know, but do not currently have access to
         elseif (not spell_jobs[player.main_job_id] or not (spell_jobs[player.main_job_id] <= player.main_job_level or
-            (spell_jobs[player.main_job_id] == 100 and number_of_jps(player.job_points[__raw.lower(player.main_job)]) >= 100) ) ) and
-            (not spell_jobs[player.sub_job_id] or not (spell_jobs[player.sub_job_id] <= player.sub_job_level)) then
+            (spell_jobs[player.main_job_id] >= 100 and number_of_jps(player.job_points[__raw.lower(res.jobs[player.main_job_id].ens)]) >= spell_jobs[player.main_job_id]) ) ) and
+            (not spell_jobs[player.sub_job_id] or not (spell_jobs[player.sub_job_id] <= player.sub_job_level)) and not (player.main_job_id == 23) then
             msg.debugging("Unable to execute command. You do not have access to that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
         -- At this point, we know that it is technically castable by this job combination if the right conditions are met.
@@ -624,7 +668,7 @@ function filter_pretarget(spell)
         elseif player.sub_job_id == 20 and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
             (addendum_black[spell.id] and not buffactive[402] and not buffactive[416])) and
             not (spell_jobs[player.main_job_id] and (spell_jobs[player.main_job_id] <= player.main_job_level or
-            (spell_jobs[player.main_job_id] == 100 and number_of_jps(player.job_points[__raw.lower(player.main_job)]) >= 100) ) ) then
+            (spell_jobs[player.main_job_id] >= 100 and number_of_jps(player.job_points[__raw.lower(res.jobs[player.main_job_id].ens)]) >= spell_jobs[player.main_job_id]) ) ) then
                         
             if addendum_white[spell.id] then
                 msg.debugging("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
@@ -633,9 +677,9 @@ function filter_pretarget(spell)
                 msg.debugging("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             end
             return false
-        elseif spell.type == 'BlueMagic' and not ((player.main_job_id == 16 and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) or
-            ((buffactive[485] or buffactive[505]) and unbridled_learning_set[spell.english])) and not
-            (player.sub_job_id == 16 and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
+        elseif spell.type == 'BlueMagic' and not ((player.main_job_id == 16 and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) 
+            or unbridled_learning_set[spell.english]) and
+            not (player.sub_job_id == 16 and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
             -- This code isn't hurting anything, but it doesn't need to be here either.
             msg.debugging("Unable to execute command. Blue magic must be set to cast that spell ("..(res.spells[spell.id][language] or spell.id)..")")
             return false
@@ -735,7 +779,7 @@ function cmd_reg:new_entry(sp)
     while rawget(self,ts) do
         ts = ts+0.001
     end
-    rawset(self,ts,{pretarget_cast_delay=0, precast_cast_delay=0, spell=sp, timestamp=ts})
+    rawset(self,ts,{pretarget_cast_delay=0, precast_cast_delay=0, cancel_spell=false, new_target=false, current_event='nascent', spell=sp, timestamp=ts,target_arrow={x=0,y=0,z=0}})
     if debugging.command_registry then
         msg.addon_msg('Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(self[ts])))
     end
@@ -809,14 +853,14 @@ end
 --Returns:
 ---- ts,discovered entry
 -----------------------------------------------------------------------------------
-function cmd_reg:find_by_time()
+function cmd_reg:find_by_time(target_time)
     local time_stamp,ts
-    local time_now = os.time()
+    target_time = target_time or os.time()
     
     -- Iterate over command_registry looking for the spell with the closest timestamp.
     -- Call aftercast with this spell's information (interrupted) if one is found.
     for i,v in pairs(self) do
-        if not time_stamp or (type(v) == 'table' and v.timestamp and ((time_now - v.timestamp) < (time_now - time_stamp))) then
+        if not time_stamp or (type(v) == 'table' and v.timestamp and ((target_time - v.timestamp) < (target_time - time_stamp))) then
             time_stamp = v.timestamp
             ts = i
         end
@@ -893,17 +937,18 @@ function get_spell(act)
     else
         if not res.action_messages[msg_ID] or msg_ID == 31 then
             if act.category == 4 or act.category == 8 then
-                spell = copy_entry(res.spells[abil_ID])
+                spell = spell_complete(copy_entry(res.spells[abil_ID]))
                 if act.category == 4 and spell then spell.recast = act.recast end
             elseif T{6,13,14,15}:contains(act.category) then
-                spell = copy_entry(res.job_abilities[abil_ID]) -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
+                spell = spell_complete(copy_entry(res.job_abilities[abil_ID])) -- May have to correct for charmed pets some day, but I'm not sure there are any monsters with TP moves that give no message.
             elseif T{3,7}:contains(act.category) then
-                spell = copy_entry(res.weapon_skills[abil_ID])
+                spell = spell_complete(copy_entry(res.weapon_skills[abil_ID]))
             elseif T{5,9}:contains(act.category) then
                 spell = copy_entry(res.items[abil_ID])
             else
                 spell = {name=tostring(msg_ID)}
             end
+            
             return spell
         end
         
@@ -972,6 +1017,17 @@ end
 ---- rline - modified resource line
 -----------------------------------------------------------------------------------
 function spell_complete(rline)
+    -- Hardcoded adjustments
+    if rline and rline.skill == 40 and buffactive.Pianissimo and rline.cast_time == 8 then
+        -- Pianissimo halves song casting time for buffs
+        rline.cast_time = 4
+        rline.targets.Party = true
+    end
+    if rline and rline.skill == 44 and buffactive.Entrust and string.find(rline.en,"Indi") then
+        -- Entrust allows Indi- spells to be cast on party members
+        rline.targets.Party = true
+    end
+    
     if rline == nil then
         return {tpaftercast = player.tp, mpaftercast = player.mp, mppaftercast = player.mpp}
     end

@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name    = 'findAll'
 _addon.author  = 'Zohno'
-_addon.version = '1.20150105'
+_addon.version = '1.20150521'
 _addon.commands = {'findall'}
 
 require('chat')
@@ -169,9 +169,28 @@ next_sequence_offset   = 0
 item_names             = T{}
 global_storages        = T{}
 storages_path          = 'data/storages.json'
-storages_order         = L{'temporary', 'inventory', 'wardrobe', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case'}
-storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14', 'slip 15', 'slip 16', 'slip 17', 'slip 18', 'slip 19'}
-merged_storages_orders = L{}:extend(storages_order):extend(storage_slips_order)
+storages_order_tokens  = L{'temporary', 'inventory', 'wardrobe', 'wardrobe 2', 'safe', 'safe 2', 'storage', 'locker', 'satchel', 'sack', 'case'}
+-- This is to maintain sorting order. I don't know why this was done, but omitting this will sort the bags arbitrarily, which (I guess) was not intended
+storages_order         = S(res.bags:map(string.gsub-{' ', ''} .. string.lower .. table.get-{'english'})):sort(function(name1, name2)
+    local index1 = storages_order_tokens:find(name1)
+    local index2 = storages_order_tokens:find(name2)
+
+    if not index1 and not index2 then
+        return name1 < name2
+    end
+
+    if not index1 then
+        return false
+    end
+
+    if not index2 then
+        return true
+    end
+
+    return index1 < index2
+end)
+storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14', 'slip 15', 'slip 16', 'slip 17', 'slip 18', 'slip 19', 'slip 20', 'slip 21', 'slip 22', 'slip 23'}
+merged_storages_orders = storages_order + storage_slips_order
 
 function search(query, export)
     update()
@@ -243,7 +262,7 @@ function search(query, export)
     end
 
     log('Searching: '..query:concat(' '))
-    
+
     local no_results   = true
     local sorted_names = global_storages:keyset():sort()
                                                  :reverse()
@@ -393,7 +412,7 @@ function update()
     if global_storages == nil then
         global_storages = T{}
     end
-	
+
 	local temp_storages = get_storages()
 
 	if temp_storages then
@@ -438,19 +457,19 @@ windower.register_event('incoming chunk', function(id,original,modified,injected
     local seq = original:byte(4)*256+original:byte(3)
 	if (next_sequence and seq + next_sequence_offset >= next_sequence) or (time_out and seq + time_out_offset >= time_out) then
         zone_search = true
-		update()
+		windower.send_command('wait 0.1;lua i findAll update')
 		next_sequence = nil
         time_out = nil
         sequence_offset = 0
 	end
-	
+
 	if id == 0x00A then -- First packet of a new zone
 		zone_search = false
         time_out = seq+33
         if time_out < time_out%0x100 then
             time_out_offset = 256
         end
-        
+
 --	elseif id == 0x01D then
 	-- This packet indicates that the temporary item structure should be copied over to
 	-- the real item structure, accessed with get_items(). Thus we wait one packet and
@@ -513,7 +532,7 @@ handle_command = function(...)
 
             query:append(params:concat(' '))
         end
-        
+
         search(query, export)
     end
 end
