@@ -26,11 +26,12 @@
 
 _addon.name    = 'Omen'
 _addon.author  = 'Braden, Sechs'
-_addon.version = '1.3'
+_addon.version = '1.4'
 _addon.command = 'omen'
 
 config = require ('config')
 texts = require('texts')
+--require('omen_test')
 
 defaults = T{}
 defaults.text_R = 255 --Color values are in RGB, ranging from 0 to 255
@@ -45,6 +46,7 @@ defaults.bad_B = 0
 defaults.pos_x = 0
 defaults.pos_y = 0
 defaults.font_size = 11
+defaults.bg_alpha = 255
 
 settings = config.load(defaults)
 
@@ -54,46 +56,48 @@ omens = 0
 obj_time = 0
 floor_obj = "Waiting for objectives..."
 floor_clear = ""
-IMAGE = texts.new("IMAGE")
+--image = texts.new("image", settings)
+image = texts.new("image")
 
-texts.color(IMAGE,settings.text_R,settings.text_G,settings.text_B)
-texts.size(IMAGE,settings.font_size)
-texts.pos_x(IMAGE,settings.pos_x)
-texts.pos_y(IMAGE,settings.pos_y)
+texts.color(image,settings.text_R,settings.text_G,settings.text_B)
+texts.size(image,settings.font_size)
+texts.pos_x(image,settings.pos_x)
+texts.pos_y(image,settings.pos_y)
+texts.bg_alpha(image,settings.bg_alpha)
 
 function reset_objectives()
-objectives = {
-[1] = {id=1,mes=0,amt=0,req=0},
-[2] = {id=2,mes=0,amt=0,req=0},
-[3] = {id=3,mes=0,amt=0,req=0},
-[4] = {id=4,mes=0,amt=0,req=0},
-[5] = {id=5,mes=0,amt=0,req=0},
-[6] = {id=6,mes=0,amt=0,req=0},
-[7] = {id=7,mes=0,amt=0,req=0},
-[8] = {id=8,mes=0,amt=0,req=0},
-[9] = {id=9,mes=0,amt=0,req=0},
-[10] = {id=10,mes=0,amt=0,req=0}
-}
-obj_time = 0
-floor_clear = ""
+    objectives = {
+    [1] = {id=1,mes=0,amt=0,req=0},
+    [2] = {id=2,mes=0,amt=0,req=0},
+    [3] = {id=3,mes=0,amt=0,req=0},
+    [4] = {id=4,mes=0,amt=0,req=0},
+    [5] = {id=5,mes=0,amt=0,req=0},
+    [6] = {id=6,mes=0,amt=0,req=0},
+    [7] = {id=7,mes=0,amt=0,req=0},
+    [8] = {id=8,mes=0,amt=0,req=0},
+    [9] = {id=9,mes=0,amt=0,req=0},
+    [10] = {id=10,mes=0,amt=0,req=0}
+    }
+    obj_time = 0
+    floor_clear = ""
 end
 reset_objectives()
 
 function refresh()
-header = floor_clear..floor_obj.."\\cr     Omens: "..omens
-body = "\n Bonus Objectives    "..os.date('%M:%S', obj_time)
+    header = floor_clear..floor_obj.."\\cr     Omens: "..omens
+    body = "\n Bonus Objectives    "..os.date('%M:%S', obj_time)
     for k,v in pairs (hide_timer) do
         if string.find(header,v) then
             body = ""
-            texts.text(IMAGE,header)
+            texts.text(image,header)
             return
         end
     end
-    for v=1,table.getn(objectives),1 do
-        if objectives[v].mes ~= 0 then
-            local msg = objectives[v].mes
-            local cur = objectives[v].amt
-            local fin = objectives[v].req
+    for v, objective in ipairs(objectives) do
+        if objective.mes ~= 0 then
+            local msg = objective.mes
+            local cur = objective.amt
+            local fin = objective.req
             if cur == fin then
                 body = body.."\n "..good_col..v..": "..messages[msg].short.." ["..cur.."/"..fin.."]\\cr"
             elseif obj_time < 1 and cur < fin then
@@ -103,41 +107,12 @@ body = "\n Bonus Objectives    "..os.date('%M:%S', obj_time)
             end
         end
     end
-body = string.gsub(body,"%-1","%?%?%?")
-texts.text(IMAGE,header..body)
+    body = string.gsub(body,"%-1","%?%?%?")
+    texts.text(image,header..body)
 end
 
-hide_timer = {"Kin","Gin","Kei","Kyou","Fu","Craver","Gorger","Thinker","Treasure","Waiting"}
+hide_timer = {"Kin","Gin","Kei","Kyou","Fu","Ou","Craver","Gorger","Thinker","Treasure","Waiting"}
 refresh()
-
-
-function test(str)
-windower.add_to_chat(161,tostring(str))
-end
-
-function floor_test()
-windower.add_to_chat(161,"Vanquish 18 sweetwater foes."..string.char(0x7f).."1")
---windower.add_to_chat(161,"Vanquish the Glassy Gorger."..string.char(0x7f).."1")
-coroutine.sleep(2)
-windower.add_to_chat(161,"You have 90 seconds remaining.")
-coroutine.sleep(2)
-windower.add_to_chat(161,"5: You have reduced your foe's HP by 1500 in a single auto-attack.")
-coroutine.sleep(1)
-windower.add_to_chat(161,"5: You have reduced your foe's HP by at least 2000 in a single auto-attack.")
-windower.add_to_chat(161,"3: You have reduced your foe's HP by 1500 using a single magic attack without performing a magic burst.")
-windower.add_to_chat(161,"3: You have reduced your foe's HP by 5000 using a single magic attack without performing a magic burst.")
-windower.add_to_chat(161,"3: You have reduced your foe's HP by 14999 using a single magic attack without performing a magic burst.")
-windower.add_to_chat(161,"3: You have reduced your foe's HP by at least 15000 using a single magic attack without performing a magic burst.")
-coroutine.sleep(1)
-windower.add_to_chat(161,"1: Vanquish 6 foes.")
-windower.add_to_chat(161,"2: Use 30 weapon skills on your foes.")
-windower.add_to_chat(161,"3: Reduce your foe's HP by at least 15000 using a single magic attack without performing a magic burst.")
-windower.add_to_chat(161,"4: Use 12 abilities on your foes.")
-windower.add_to_chat(161,"5: Reduce your foe's HP by at least 2000 in a single auto-attack.")
-coroutine.sleep(1)
-windower.add_to_chat(161,"A spectral light flares up."..string.char(0x7f).."1")
-end
-
 
 windower.register_event('prerender', function()
     if obj_time < 1 then return end
@@ -148,34 +123,35 @@ windower.register_event('prerender', function()
 end)
 
 windower.register_event('zone change', function(zone)
-    texts.visible(IMAGE,false)
+    image:hide()
     floor_obj = "Waiting for objectives..."
     reset_objectives()
-    if zone == 292 then -- Henge
-        texts.visible(IMAGE,true)
+    if zone == 292 then -- Reisenjima Henge
+        image:show()
     end
 end)
 
-texts.visible(IMAGE,false)
-if windower.ffxi.get_info() and windower.ffxi.get_info().zone == 292 then
-texts.visible(IMAGE,true)
+image:hide()
+if windower.ffxi.get_info().zone == 292 then -- 292 is the code for Reisenjima Henge
+    image:show()
 end
 
 windower.register_event('incoming text', function(original, modified, mode)
+	local objective = objectives[tonumber(original:match("^%d"))]
     if mode == 161 then -- Omen messages are 161 color, except total time extension messages which are 121 and irrelevant
         if string.match(original,"^%d") then
             for k,v in pairs (messages) do
                 if string.find(original,v.init) then
-                    if objectives[tonumber(original:match("%d"))].mes ~= tonumber(v.id) then -- New Objective
-                        objectives[tonumber(original:match("%d"))].amt = 0
+                    if objective.mes ~= tonumber(v.id) then -- New Objective
+                        objective.amt = 0
                     end
-                    objectives[tonumber(original:match("%d"))].mes = tonumber(v.id)
-                    objectives[tonumber(original:match("%d"))].req = tonumber(string.sub(original:match(v.check),1,-2))				
+                    objective.mes = tonumber(v.id)
+                    objective.req = tonumber(string.sub(original:match(v.check),1,-2))				
                 elseif string.find(original,v.eval) then
-                    objectives[tonumber(original:match("%d"))].amt = tonumber(string.sub(original:match(v.check),1,-2))
-                    if objectives[tonumber(original:match("%d"))].mes == 0 then -- if loading mid-floor
-                        objectives[tonumber(original:match("%d"))].mes = tonumber(v.id)
-                        objectives[tonumber(original:match("%d"))].req = -1
+                    objective.amt = tonumber(string.sub(original:match(v.check),1,-2))
+                    if objective.mes == 0 then -- if loading mid-floor
+                        objective.mes = tonumber(v.id)
+                        objective.req = -1
                     end
                 end
                 refresh()
@@ -216,16 +192,12 @@ end)
 
 windower.register_event('addon command',function(command)
     command = command and command:lower() or 'help'
-    if command == 'test' then
-        floor_test()
-    end
-    if texts.visible(IMAGE) then
-    texts.visible(IMAGE,false)
+    if texts.visible(image) then
+        image:hide()
     else
-    texts.visible(IMAGE,true)
+        image:show()
     end
 end)
-
 
 messages = {
 [1] = {id="1",long="Weapon Skill Damage",short="WS Damage",check="%d+%su",
