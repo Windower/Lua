@@ -1,95 +1,160 @@
-function get_sets()                
+include('organizer-lib')
+
+function get_sets()
+    sets.weapons = {main="Suwaiyas"}
     sets.precast = {}
-    sets.precast.Boost = {hands="Anchorite's Gloves +1"}
-    sets.precast.Chakra = {ammo="Iron Gobbet",body="Anchorite's Cyclas",hands="Melee Gloves +2",ring2="Dark Ring"}
-    sets.precast.Counterstance = {feet="Melee Gaiters +2"}
-    sets.precast.Dodge = {feet="Anchorite's Gaiters"}
-    sets.precast.Mantra = {feet="Melee Gaiters +2"}
-    sets.precast.Waltz = {head="Anwig Salade",neck="Dualism Collar +1",ring1="Valseur's Ring",ring2="Carbuncle Ring +1",
+    --sets.precast.Boost = {hands="Anchorite's Gloves +1"}
+    sets.precast.Chakra = {ammo="Iron Gobbet",body="Anchorite's Cyclas +1",hands="Hes. Gloves +1"}
+    sets.precast.Counterstance = {feet="Hes. Gaiters +1"}
+    sets.precast.Focus = {head="Anchorite's Crown +1"}
+    sets.precast.Dodge = {feet="Anchorite's Gaiters +1"}
+    sets.precast.Mantra = {feet="Hes. Gaiters +1"}
+    sets.precast.Footwork = {feet="Shukuyu Sune-Ate"}
+    sets.precast['Hundred Fists'] = {legs="Hes. Hose +1"}
+    sets.Waltz = {head="Anwig Salade",neck="Unmoving Collar +1",ring1="Valseur's Ring",ring2="Carbuncle Ring +1",
         waist="Aristo Belt",legs="Desultor Tassets",feet="Dance Shoes"}
         
-    sets.precast['Victory Smite'] = {main="Oatixur",ammo="Potestas Bomblet",head="Uk'uxkaj Cap",neck="Light Gorget",
-        ear1="Moonshade Earring",ear2="Brutal Earring",body="Manibozho Jerkin",hands="Otronif Gloves",
-        ring1="Ifrit Ring +1",ring2="Epona's Ring",back="Rancorous Mantle",waist="Windbuffet Belt +1",legs="Manibozho Brais",
-        feet="Manibozho Boots"}
+    sets.precast['Victory Smite'] = {
+        ammo="Floestone",
+        head={ name="Adhemar Bonnet +1", augments={'STR+12','DEX+12','Attack+20',}},
+        body={ name="Herculean Vest", augments={'Accuracy+21','Crit. hit damage +5%','DEX+9',}},
+        hands={ name="Adhemar Wrist. +1", augments={'DEX+12','AGI+12','Accuracy+20',}},
+        legs="Hiza. Hizayoroi +1",
+        feet={ name="Herculean Boots", augments={'Accuracy+29','Crit. hit damage +5%','DEX+7','Attack+13',}},
+        neck="Fotia Gorget",
+        waist="Moonbow Belt +1",
+        left_ear={ name="Moonshade Earring", augments={'Attack+4','TP Bonus +25',}},
+        right_ear="Sherida Earring",
+        left_ring="Begrudging Ring",
+        left_ring="Niqmaddu Ring",
+        back={ name="Segomo's Mantle", augments={'STR+20','Accuracy+20 Attack+20','STR+10','Weapon skill damage +10%',}},
+    }
+    
+    sets.test = {lring="Ramuh Ring +1",rring="Ramuh Ring +1"}
+    sets.test2 = {main="Numen Staff"}
+    
+    sets.precast['Howling Fist'] = {
+        ammo="Floestone",
+        head={ name="Adhemar Bonnet +1", augments={'STR+12','DEX+12','Attack+20',}},
+        body="Adhemar Jacket +1",
+        hands="Adhemar Wrist. +1",
+        legs="Hiza. Hizayoroi +1",
+        feet={ name="Herculean Boots", augments={'Accuracy+25','"Triple Atk."+4','DEX+10',}},
+        neck="Caro Necklace",
+        waist="Moonbow Belt +1",
+        left_ear="Cessance Earring",
+        right_ear="Sherida Earring",
+        left_ring="Ifrit Ring +1",
+        left_ring="Niqmaddu Ring",
+        back={ name="Segomo's Mantle", augments={'STR+20','Accuracy+20 Attack+20','STR+10','Weapon skill damage +10%',}},
+    }
+    sets.precast['Tornado Kick'] = {
+        ammo="Floestone",
+        head={ name="Adhemar Bonnet +1", augments={'STR+12','DEX+12','Attack+20',}},
+        body="Adhemar Jacket +1",
+        hands="Adhemar Wrist. +1",
+        legs="Hiza. Hizayoroi +1",
+        feet={ name="Herculean Boots", augments={'Accuracy+25','"Triple Atk."+4','DEX+10',}},
+        neck="Caro Necklace",
+        waist="Moonbow Belt +1",
+        left_ear="Moonshade Earring",
+        right_ear="Sherida Earring",
+        left_ring="Ifrit Ring +1",
+        left_ring="Niqmaddu Ring",
+        back={ name="Segomo's Mantle", augments={'STR+20','Accuracy+20 Attack+20','STR+10','Weapon skill damage +10%',}},
+    }
+    sets.precast['Spinning Attack'] = {
+        ammo="Floestone",
+        head={ name="Adhemar Bonnet +1", augments={'STR+12','DEX+12','Attack+20',}},
+        body="Adhemar Jacket +1",
+        hands="Adhemar Wrist. +1",
+        legs="Hiza. Hizayoroi +1",
+        feet={ name="Herculean Boots", augments={'Accuracy+25','"Triple Atk."+4','DEX+10',}},
+        neck="Caro Necklace",
+        waist="Moonbow Belt +1",
+        left_ear="Cessance Earring",
+        right_ear="Sherida Earring",
+        left_ring="Ifrit Ring +1",
+        left_ring="Niqmaddu Ring",
+        back={ name="Segomo's Mantle", augments={'STR+20','Accuracy+20 Attack+20','STR+10','Weapon skill damage +10%',}},
+    }
         
-    sets.precast.WS = {main="Oatixur",ammo="Potestas Bomblet",head="Whirlpool Mask",neck="Justiciar's Torque",
-        ear1="Steelflash Earring",ear2="Bladeborn Earring",body="Manibozho Jerkin",hands="Mel. Gloves +2",
-        ring1="Rajas Ring",ring2="Ifrit Ring +1",back="Atheling Mantle",waist="Black Belt",legs="Manibozho Brais",
-        feet="Manibozho Boots"}
+    sets.WS = {
+        ammo="Floestone",
+        head={ name="Adhemar Bonnet +1", augments={'STR+12','DEX+12','Attack+20',}},
+        body={ name="Herculean Vest", augments={'Accuracy+21','Crit. hit damage +5%','DEX+9',}},
+        hands="Adhemar Wrist. +1",
+        legs="Hiza. Hizayoroi +1",
+        feet={ name="Herculean Boots", augments={'Accuracy+29','Crit. hit damage +5%','DEX+7','Attack+13',}},
+        neck="Fotia Gorget",
+        waist="Fotia Belt",
+        left_ear="Moonshade Earring",
+        right_ear="Sherida Earring",
+        left_ring="Begrudging Ring",
+        left_ring="Niqmaddu Ring",
+        back={ name="Segomo's Mantle", augments={'STR+20','Accuracy+20 Attack+20','STR+10','Weapon skill damage +10%',}},
+    }
     
     sets.TP = {}
-    sets.TP.DD = {main="Oatixur",ammo="Potestas Bomblet",head="Uk'uxkaj Cap",neck="Asperity Necklace",
-        ear1="Steelflash Earring",ear2="Bladeborn Earring",body="Thaumas Coat",hands="Otronif Gloves",
-        ring1="Rajas Ring",ring2="Epona's Ring",back="Atheling Mantle",waist="Windbuffet Belt +1",legs="Quiahuiz Leggings",
-        feet="Anchorite's Gaiters"}
-	
-    sets.TP.Acc = {main="Oatixur",ammo="Potestas Bomblet",head="Whirlpool Mask",neck="Asperity Necklace",
-        ear1="Steelflash Earring",ear2="Bladeborn Earring",body="Manibozho Jerkin",hands="Otronif Gloves",
-        ring1="Defending Ring",ring2="Epona's Ring",back="Letalis Mantle",waist="Windbuffet Belt +1",legs="Manibozho Brais",
-        feet="Anchorite's Gaiters"}
-        
-    sets.TP.Solo = {main="Oatixur",ammo="Potestas Bomblet",head="Whirlpool Mask",neck="Twilight Torque",
-        ear1="Steelflash Earring",ear2="Bladeborn Earring",body="Thaumas Coat",hands="Otronif Gloves",
-        ring1="Rajas Ring",ring2="Epona's Ring",back="Atheling Mantle",waist="Black Belt",legs="Quiahuiz Leggings",
-        feet="Anchorite's Gaiters"}
     
-    sets.DT = {ammo="Iron Gobbet",neck="Twilight Torque",ear1="Merman's Earring",body="Manibozho Jerkin",
-        hands="Otronif Gloves",ring1="Defending Ring",ring2="Dark Ring",back="Mollusca Mantle",waist="Black Belt"}
+    sets.TP.DD = {
+        ammo="Ginsen",
+        head={ name="Adhemar Bonnet +1", augments={'STR+12','DEX+12','Attack+20',}},
+        body="Adhemar Jacket +1",
+        hands="Adhemar Wrist. +1",
+        legs={ name="Samnuha Tights", augments={'STR+8','DEX+9','"Dbl.Atk."+3','"Triple Atk."+2',}},
+        feet={ name="Herculean Boots", augments={'Accuracy+25','"Triple Atk."+4','DEX+10',}},
+        neck="Combatant's Torque",
+        waist="Moonbow Belt +1",
+        left_ear="Cessance Earring",
+        right_ear="Sherida Earring",
+        left_ring="Niqmaddu Ring",
+        right_ring="Epona's Ring",
+        back={ name="Segomo's Mantle", augments={'STR+20','Accuracy+20 Attack+20','"Dbl.Atk."+10',}},
+    }
     
-    sets.aftercast = {}
-    sets.aftercast.TP = sets.TP.Acc
+    sets.status = {}
+    sets.status.Engaged = sets.TP.DD
     
-    sets.aftercast.Idle = {main="Oatixur",ammo="Potestas Bomblet",head="Oce. Headpiece +1",neck="Wiglen Gorget",
-        ear1="Novia Earring",ear2="Phawaylla Earring",body="Khepri Jacket",hands="Otronif Gloves",
-        ring1="Paguroidea Ring",ring2="Sheltered Ring",back="Fugacity Mantle +1",waist="Black Belt",legs="Nahtirah trousers",
-        feet="Hermes' Sandals"}
+    sets.status.Idle = {
+        ammo="Iron Gobbet",
+        head="Lithelimb Cap",
+        body="Emet Harness +1",
+        hands={ name="Herculean Gloves", augments={'Accuracy+30','Damage taken-4%','STR+9','Attack+4',}},
+        legs="Mummu Kecks +1",
+        feet="Herald's Gaiters",
+        neck="Wiglen Gorget",
+        waist="Moonbow Belt +1",
+        left_ear="Novia Earring",
+        right_ear="Genmei Earring",
+        left_ring="Defending Ring",
+        right_ring={ name="Dark Ring", augments={'Breath dmg. taken -4%','Phys. dmg. taken -6%','Magic dmg. taken -5%',}},
+        back={ name="Segomo's Mantle", augments={'STR+20','Accuracy+20 Attack+20','"Dbl.Atk."+10',}},
+    }
     send_command('input /macro book 15;wait .1;input /macro set 1')
 end
 
-function precast(spell)
-    if player.equipment.head == 'Reraise Hairpin' then disable('head')
-    else enable('head') end
-    if player.equipment.left_ear == 'Reraise Earring' then disable('ear1')
-    else enable('ear1') end
-    if sets.precast[spell.english] then
+function precast(spell) 
+    if spell.english == 'Tornado Kick' and buffactive.Footwork then
+        equip(sets.precast[spell.english])
+        equip({feet="Shukuyu Sune-Ate"})
+    elseif sets.precast[spell.english] then
         equip(sets.precast[spell.english])
     elseif spell.type=="WeaponSkill" then
-        equip(sets.precast.WS)
+        equip(sets.WS)
     elseif string.find(spell.english,'Waltz') then
-        equip(sets.precast.Waltz)
+        equip(sets.Waltz)
     end
 end
 
-function midcast(spell)
-end
-
 function aftercast(spell)
-    if player.status =='Engaged' then
-        equip(sets.aftercast.TP)
-    else
-        equip(sets.aftercast.Idle)
+    if sets.status[player.status] then
+        equip(sets.status[player.status])
     end
 end
 
 function status_change(new,old)
-    if T{'Idle','Resting'}:contains(new) then
-        equip(sets.aftercast.Idle)
-    elseif new == 'Engaged' then
-        equip(sets.aftercast.TP)
-    end
-end
-
-function self_command(command)
-    if command == 'toggle TP set' then
-        if sets.aftercast.TP == sets.TP.DD then
-            sets.aftercast.TP = sets.TP.Solo
-            send_command('@input /echo SOLO SET')
-        elseif sets.aftercast.TP == sets.TP.Solo then
-            sets.aftercast.TP = sets.TP.DD
-            send_command('@input /echo DD SET')
-        end
-    elseif command == 'DT' then
-        equip(sets.DT)
+    if sets.status[new] then
+        equip(sets.status[new])
     end
 end
