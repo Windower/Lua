@@ -677,8 +677,9 @@ fields.outgoing[0x05C] = L{
     {ctype='float',             label='Y'},                                     -- 0C
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 10   NPC that you are requesting a warp from
     {ctype='unsigned int',      label='_unknown1'},                             -- 14   01 00 00 00 observed
-    {ctype='unsigned int',      label='_unknown2'},                             -- 18   Likely contains information about the particular warp being requested, like menu ID
-    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 1C
+    {ctype='unsigned short',    label='Zone ID'},                               -- 18
+    {ctype='unsigned short',    label='Menu ID'},                               -- 1A
+	{ctype='unsigned short',    label='Target Index',       fn=index},          -- 1C
     {ctype='unsigned short',    label='_unknown3'},                             -- 1E   Not zone ID
 }
 
