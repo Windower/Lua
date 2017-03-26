@@ -26,7 +26,7 @@
 
 _addon.name    = 'Omen'
 _addon.author  = 'Braden, Sechs'
-_addon.version = '1.4'
+_addon.version = '1.5'
 _addon.command = 'omen'
 
 config = require ('config')
@@ -137,7 +137,7 @@ if windower.ffxi.get_info().zone == 292 then -- 292 is the code for Reisenjima H
 end
 
 windower.register_event('incoming text', function(original, modified, mode)
-	local objective = objectives[tonumber(original:match("^%d"))]
+	local objective = objectives[tonumber(original:match("^%d+"))]
     if mode == 161 then -- Omen messages are 161 color, except total time extension messages which are 121 and irrelevant
         if string.match(original,"^%d") then
             for k,v in pairs (messages) do
