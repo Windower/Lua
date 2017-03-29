@@ -66,6 +66,14 @@ local function div(denom, val)
     return val/denom
 end
 
+local function add(amount, val)
+    return val + amount
+end
+
+local function sub(amount, val)
+    return val - amount
+end
+
 local time
 local utime
 do
@@ -1554,14 +1562,11 @@ fields.incoming[0x026] = L{
     {ctype='data[22]',          label='_unknown2',          const=0},           -- 06
 }
 
-local function mid(val)
-    return val - 0x8000
-end
 -- String Message
 fields.incoming[0x027] = L{
     {ctype='unsigned int',      label='Player',             fn=id},             -- 04   0x0112413A in Omen, 0x010B7083 in Legion, Layer Reserve ID for Ambuscade queue, 0x01046062 for Chocobo circuit
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08   0x013A in Omen, 0x0083 in Legion , Layer Reserve Index for Ambuscade queue, 0x0062 for Chocobo circuit
-    {ctype='unsigned short',    label='Message ID',         fn=mid},            -- 0A   -0x8000
+    {ctype='unsigned short',    label='Message ID',         fn=sub+{0x8000}},            -- 0A   -0x8000
     {ctype='unsigned int',      label='Type'},                                  -- 0C   0x04 for Fishing/Salvage, 0x05 for Omen/Legion/Ambuscade queue/Chocobo Circuit
     {ctype='unsigned int',      label='Param 1'},                               -- 10   Parameter 0 on the display messages dat files
     {ctype='unsigned int',      label='Param 2'},                               -- 14   Parameter 1 on the display messages dat files

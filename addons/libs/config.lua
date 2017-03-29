@@ -142,116 +142,118 @@ function merge(t, t_merge, path)
     for key in pairs(t) do
         keys[tostring(key):lower()] = key
     end
+
+    if not t_merge then
+        return t
+    end
     
-    if t_merge then
-        for lkey, val in pairs(t_merge) do
-            local key = keys[lkey:lower()]
-            if not key then
-                if type(val) == 'table' then
-                    t[lkey] = setmetatable(table.copy(val), getmetatable(val) or _meta.T)
-                else
-                    t[lkey] = val
-                end
-
+    for lkey, val in pairs(t_merge) do
+        local key = keys[lkey:lower()]
+        if not key then
+            if type(val) == 'table' then
+                t[lkey] = setmetatable(table.copy(val), getmetatable(val) or _meta.T)
             else
-                local err = false
-                local oldval = rawget(t, key)
-                local oldtype = type(oldval)
+                t[lkey] = val
+            end
 
-                if oldtype == 'table' and type(val) == 'table' then
-                    t[key] = merge(oldval, val, path and path:copy() + key or nil)
+        else
+            local err = false
+            local oldval = rawget(t, key)
+            local oldtype = type(oldval)
 
-                elseif oldtype ~= type(val) then
-                    if oldtype == 'table' then
-                        if type(val) == 'string' then
-                            -- Single-line CSV parser, can possible refactor this to tables.lua
-                            local res = {}
-                            local current = ''
-                            local quote = false
-                            local last
-                            for c in val:gmatch('.') do
-                                if c == ',' and not quote then
-                                    res[#res + 1] = current
-                                    current = ''
-                                    last = nil
-                                elseif c == '"' then
-                                    if last == '"' then
-                                        current = current .. c
-                                        last = nil
-                                    else
-                                        last = '"'
-                                    end
+            if oldtype == 'table' and type(val) == 'table' then
+                t[key] = merge(oldval, val, path and path:copy() + key or nil)
 
-                                    quote = not quote
-                                else
+            elseif oldtype ~= type(val) then
+                if oldtype == 'table' then
+                    if type(val) == 'string' then
+                        -- Single-line CSV parser, can possible refactor this to tables.lua
+                        local res = {}
+                        local current = ''
+                        local quote = false
+                        local last
+                        for c in val:gmatch('.') do
+                            if c == ',' and not quote then
+                                res[#res + 1] = current
+                                current = ''
+                                last = nil
+                            elseif c == '"' then
+                                if last == '"' then
                                     current = current .. c
-                                    last = c
+                                    last = nil
+                                else
+                                    last = '"'
                                 end
+
+                                quote = not quote
+                            else
+                                current = current .. c
+                                last = c
                             end
-                            res[#res + 1] = current
+                        end
+                        res[#res + 1] = current
 
-                            -- TODO: Remove this after a while, not standard compliant
-                            -- Currently needed to not mess up existing settings
-                            res = table.map(res, string.trim)
+                        -- TODO: Remove this after a while, not standard compliant
+                        -- Currently needed to not mess up existing settings
+                        res = table.map(res, string.trim)
 
-                            if class then
-                                if class(oldval) == 'Set' then
-                                    res = S(res)
-                                elseif class(oldval) == 'List' then
-                                    res = L(res)
-                                elseif class(oldval) == 'Table' then
-                                    res = T(res)
-                                end
+                        if class then
+                            if class(oldval) == 'Set' then
+                                res = S(res)
+                            elseif class(oldval) == 'List' then
+                                res = L(res)
+                            elseif class(oldval) == 'Table' then
+                                res = T(res)
                             end
-                            t[key] = res
-
-                        else
-                            err = true
-
                         end
+                        t[key] = res
 
-                    elseif oldtype == 'number' then
-                        local testdec = tonumber(val)
-                        local testhex = tonumber(val, 16)
-                        if testdec then
-                            t[key] = testdec
-                        elseif testhex then
-                            t[key] = testhex
-                        else
-                            err = true
-                        end
+                    else
+                        err = true
 
-                    elseif oldtype == 'boolean' then
-                        if val == 'true' then
-                            t[key] = true
-                        elseif val == 'false' then
-                            t[key] = false
-                        else
-                            err = true
-                        end
+                    end
 
-                    elseif oldtype == 'string' then
-                        if type(val) == 'table' and not next(val) then
-                            t[key] = ''
-                        else
-                            t[key] = val
-                            err = true
-                        end
-
+                elseif oldtype == 'number' then
+                    local testdec = tonumber(val)
+                    local testhex = tonumber(val, 16)
+                    if testdec then
+                        t[key] = testdec
+                    elseif testhex then
+                        t[key] = testhex
                     else
                         err = true
                     end
 
+                elseif oldtype == 'boolean' then
+                    if val == 'true' then
+                        t[key] = true
+                    elseif val == 'false' then
+                        t[key] = false
+                    else
+                        err = true
+                    end
+
+                elseif oldtype == 'string' then
+                    if type(val) == 'table' and not next(val) then
+                        t[key] = ''
+                    else
+                        t[key] = val
+                        err = true
+                    end
+
                 else
-                    t[key] = val
+                    err = true
                 end
 
-                if err then
-                    if path then
-                        warning('Could not safely merge values for \'%s/%s\', %s expected (default: %s), got %s (%s).':format(path:concat('/'), key, class(oldval), tostring(oldval), class(val), tostring(val)))
-                    end
-                    t[key] = val
+            else
+                t[key] = val
+            end
+
+            if err then
+                if path then
+                    warning('Could not safely merge values for \'%s/%s\', %s expected (default: %s), got %s (%s).':format(path:concat('/'), key, class(oldval), tostring(oldval), class(val), tostring(val)))
                 end
+                t[key] = val
             end
         end
     end
