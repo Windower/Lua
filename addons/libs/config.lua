@@ -143,6 +143,10 @@ function merge(t, t_merge, path)
         keys[tostring(key):lower()] = key
     end
 
+    if not t_merge then
+        return t
+    end
+    
     for lkey, val in pairs(t_merge) do
         local key = keys[lkey:lower()]
         if not key then

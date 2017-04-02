@@ -66,6 +66,14 @@ local function div(denom, val)
     return val/denom
 end
 
+local function add(amount, val)
+    return val + amount
+end
+
+local function sub(amount, val)
+    return val - amount
+end
+
 local time
 local utime
 do
@@ -677,7 +685,8 @@ fields.outgoing[0x05C] = L{
     {ctype='float',             label='Y'},                                     -- 0C
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 10   NPC that you are requesting a warp from
     {ctype='unsigned int',      label='_unknown1'},                             -- 14   01 00 00 00 observed
-    {ctype='unsigned int',      label='_unknown2'},                             -- 18   Likely contains information about the particular warp being requested, like menu ID
+    {ctype='unsigned short',    label='Zone'},                                  -- 18
+    {ctype='unsigned short',    label='Menu ID'},                               -- 1A
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 1C
     {ctype='unsigned short',    label='_unknown3'},                             -- 1E   Not zone ID
 }
@@ -1553,15 +1562,16 @@ fields.incoming[0x026] = L{
     {ctype='data[22]',          label='_unknown2',          const=0},           -- 06
 }
 
--- Encumbrance Release
+-- String Message
 fields.incoming[0x027] = L{
-    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
-    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
-    {ctype='unsigned short',    label='Message ID'},                            -- 0A   
-    {ctype='unsigned int',      label='_unknown1'},                             -- 0C  
-    {ctype='unsigned int',      label='Param 1'},                               -- 10
-    {ctype='unsigned char',     label='_unknown3'},                             -- 14
-    {ctype='data[11]',          label='_unknown4'},                             -- 15
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04   0x0112413A in Omen, 0x010B7083 in Legion, Layer Reserve ID for Ambuscade queue, 0x01046062 for Chocobo circuit
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08   0x013A in Omen, 0x0083 in Legion , Layer Reserve Index for Ambuscade queue, 0x0062 for Chocobo circuit
+    {ctype='unsigned short',    label='Message ID',         fn=sub+{0x8000}},            -- 0A   -0x8000
+    {ctype='unsigned int',      label='Type'},                                  -- 0C   0x04 for Fishing/Salvage, 0x05 for Omen/Legion/Ambuscade queue/Chocobo Circuit
+    {ctype='unsigned int',      label='Param 1'},                               -- 10   Parameter 0 on the display messages dat files
+    {ctype='unsigned int',      label='Param 2'},                               -- 14   Parameter 1 on the display messages dat files
+    {ctype='unsigned int',      label='Param 3'},                               -- 18   Parameter 2 on the display messages dat files
+    {ctype='unsigned int',      label='Param 4'},                               -- 1C   Parameter 3 on the display messages dat files
     {ctype='char[16]',          label='Player Name'},                           -- 20
     {ctype='data[16]',          label='_unknown6'},                             -- 30
     {ctype='char[16]',          label='_dupePlayer Name'},                      -- 40
@@ -3404,14 +3414,14 @@ fields.incoming[0x113] = L{
     {ctype='signed int',        label='Guild Points (Alchemy)'},                -- 3C
     {ctype='signed int',        label='Guild Points (Cooking)'},                -- 40
     {ctype='signed int',        label='Cinders'},                               -- 44
-    {ctype='unsigned char',     label='Syngery Fewell (Fire)'},                 -- 48
-    {ctype='unsigned char',     label='Syngery Fewell (Ice)'},                  -- 49
-    {ctype='unsigned char',     label='Syngery Fewell (Wind)'},                 -- 4A
-    {ctype='unsigned char',     label='Syngery Fewell (Earth)'},                -- 4B
-    {ctype='unsigned char',     label='Syngery Fewell (Lightning)'},            -- 4C
-    {ctype='unsigned char',     label='Syngery Fewell (Water)'},                -- 4D
-    {ctype='unsigned char',     label='Syngery Fewell (Light)'},                -- 4E
-    {ctype='unsigned char',     label='Syngery Fewell (Dark)'},                 -- 4F
+    {ctype='unsigned char',     label='Synergy Fewell (Fire)'},                 -- 48
+    {ctype='unsigned char',     label='Synergy Fewell (Ice)'},                  -- 49
+    {ctype='unsigned char',     label='Synergy Fewell (Wind)'},                 -- 4A
+    {ctype='unsigned char',     label='Synergy Fewell (Earth)'},                -- 4B
+    {ctype='unsigned char',     label='Synergy Fewell (Lightning)'},            -- 4C
+    {ctype='unsigned char',     label='Synergy Fewell (Water)'},                -- 4D
+    {ctype='unsigned char',     label='Synergy Fewell (Light)'},                -- 4E
+    {ctype='unsigned char',     label='Synergy Fewell (Dark)'},                 -- 4F
     {ctype='signed int',        label='Ballista Points'},                       -- 50
     {ctype='signed int',        label='Fellow Points'},                         -- 54
     {ctype='unsigned short',    label='Chocobucks (San d\'Oria)'},              -- 58
