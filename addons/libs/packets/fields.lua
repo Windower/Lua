@@ -3414,14 +3414,14 @@ fields.incoming[0x113] = L{
     {ctype='signed int',        label='Guild Points (Alchemy)'},                -- 3C
     {ctype='signed int',        label='Guild Points (Cooking)'},                -- 40
     {ctype='signed int',        label='Cinders'},                               -- 44
-    {ctype='unsigned char',     label='Syngery Fewell (Fire)'},                 -- 48
-    {ctype='unsigned char',     label='Syngery Fewell (Ice)'},                  -- 49
-    {ctype='unsigned char',     label='Syngery Fewell (Wind)'},                 -- 4A
-    {ctype='unsigned char',     label='Syngery Fewell (Earth)'},                -- 4B
-    {ctype='unsigned char',     label='Syngery Fewell (Lightning)'},            -- 4C
-    {ctype='unsigned char',     label='Syngery Fewell (Water)'},                -- 4D
-    {ctype='unsigned char',     label='Syngery Fewell (Light)'},                -- 4E
-    {ctype='unsigned char',     label='Syngery Fewell (Dark)'},                 -- 4F
+    {ctype='unsigned char',     label='Synergy Fewell (Fire)'},                 -- 48
+    {ctype='unsigned char',     label='Synergy Fewell (Ice)'},                  -- 49
+    {ctype='unsigned char',     label='Synergy Fewell (Wind)'},                 -- 4A
+    {ctype='unsigned char',     label='Synergy Fewell (Earth)'},                -- 4B
+    {ctype='unsigned char',     label='Synergy Fewell (Lightning)'},            -- 4C
+    {ctype='unsigned char',     label='Synergy Fewell (Water)'},                -- 4D
+    {ctype='unsigned char',     label='Synergy Fewell (Light)'},                -- 4E
+    {ctype='unsigned char',     label='Synergy Fewell (Dark)'},                 -- 4F
     {ctype='signed int',        label='Ballista Points'},                       -- 50
     {ctype='signed int',        label='Fellow Points'},                         -- 54
     {ctype='unsigned short',    label='Chocobucks (San d\'Oria)'},              -- 58
