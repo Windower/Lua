@@ -327,6 +327,13 @@
     <support>http://mibbit.com/#windower@irc.ffochat.com</support>
   </addon>
   <addon>
+    <name>Omen</name>
+    <author>Braden, Sechs</author>
+    <description>Tracks primary and secondary objectives within the Omen event in a customizable on-screen window</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Asura/Sechs</support>
+  </addon>
+  <addon>
     <name>OhShi</name>
     <description>Keeps track of various event related things. Such as, VW proc messages, mob casting, mob tp moves, TH procs and cor rolls, as well as others.</description>
     <author>Nitrous (Shiva)</author>
