@@ -163,6 +163,7 @@ do
     end
 end
 
+rendering              = false
 zone_search            = windower.ffxi.get_info().logged_in
 first_pass             = true
 item_names             = T{}
@@ -192,9 +193,22 @@ end)
 storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14', 'slip 15', 'slip 16', 'slip 17', 'slip 18', 'slip 19', 'slip 20', 'slip 21', 'slip 22', 'slip 23'}
 merged_storages_orders = storages_order + storage_slips_order + L{'key items'}
 
-function search(query, export)
-    update()
+windower.register_event('prerender',function()
+    rendering = true
+end)
 
+windower.register_event('postrender',function()
+    rendering = false
+end)
+
+function avoid_stuttering()
+    if rendering then
+        coroutine.sleep(0.002)
+    end
+end
+
+function search(query, export)    
+    update()
     if query:length() == 0 then
         return
     end
@@ -242,6 +256,7 @@ function search(query, export)
                     end
                 end
             end
+            avoid_stuttering()
         end
     end
 
@@ -373,6 +388,7 @@ function search(query, export)
                         log(result)
                     end
                 end
+                avoid_stuttering()
             end
         end
     end
@@ -398,11 +414,6 @@ function search(query, export)
         end
     end
 end
---[[for f in io.popen('dir "'..windower.addon_path..'\\res\\" /b'):lines() do
-    f = f:sub(1,-5) -- Removes extension.
-    local data = require('res.'..f)
-    resources[f] = data
-end]]
 
 function get_storages()
     local items    = windower.ffxi.get_items()
