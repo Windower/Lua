@@ -127,7 +127,7 @@ windower.register_event('incoming chunk',function (id, _, data)
     end
     
     -- Check whether the character is loaded into memory yet.
-    local character = windower.ffxi.get_mob_by_index(packet.Index or player.index) -- Target of 0x00D or yourself for 0x051
+    local character = windower.ffxi.get_mob_by_index(packet.Index or player and player.index or -1) -- Target of 0x00D or yourself for 0x051
     local blink_type, models, name = 'others'
     if character and character.models and table.length(character.models) == 9 and
         (id == 0x051 or (id == 0x00D and character.id == packet.Player) ) then
