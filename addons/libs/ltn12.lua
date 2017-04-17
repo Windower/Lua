@@ -9,6 +9,7 @@
 -----------------------------------------------------------------------------
 local string = require("string")
 local table = require("table")
+local unpack = unpack or table.unpack
 local base = _G
 local _M = {}
 if module then -- heuristic for exporting a global package table
@@ -20,6 +21,9 @@ _M.filter = filter
 _M.source = source
 _M.sink = sink
 _M.pump = pump
+
+local unpack = unpack or table.unpack
+local select = base.select
 
 -- 2048 seems to be better in windows...
 _M.BLOCKSIZE = 2048
@@ -42,7 +46,7 @@ end
 -- (thanks to Wim Couwenberg)
 function filter.chain(...)
     local arg = {...}
-    local n = select('#',...)
+    local n = base.select('#',...)
     local top, index = 1, 1
     local retry = ""
     return function(chunk)
