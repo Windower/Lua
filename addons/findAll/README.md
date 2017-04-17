@@ -128,6 +128,10 @@ Show all the items stored on "omega".
 
 ## Changelog
 
+### v1.20170405
+* **fix**: Adjusted the conditions for updating the shared storages.json to make it more robust.
+* **add**: Added key item tracking.
+
 ### v1.20150521
 * **fix**: Fixed after May 2015 FFXI update
 * **change**: Future proofed the addon to be less prone to breaks
