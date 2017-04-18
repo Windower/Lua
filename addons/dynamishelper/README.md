@@ -1,11 +1,11 @@
 Authors: Krizz, Skyrant
-Version: 2.1
+Version: 2.2
 Date: 18/03/2017
 
 Dynamis Helper
 
 Description:
-Dynamis Helper displays time remaining in the zone. Shows you the proc needed for the targeted monster, creates a stagger timer and displays the total amount of currency and forbidden items looted so far.
+Dynamis Helper displays time remaining in the zone. Tracks obtained time extensions. Shows you the proc needed for the targeted monster. Creates a stagger timer. Displays the total amount of currency and forbidden items looted so far.
 
 Abbreviation: //dh
 

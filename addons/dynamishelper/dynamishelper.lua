@@ -24,6 +24,8 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --Features
+-- Zone Timer
+-- Time extention tracker
 -- Stagger timer
 -- Currency tracker
 -- Proc identifier
@@ -32,7 +34,7 @@
 _addon.name = 'DynamisHelper'
 _addon.author = 'Krizz, Skyrant'
 _addon.commands = {'DynamisHelper','dh'}
-_addon.version = '2.1'
+_addon.version = '2.2'
 
 config = require('config')
 texts = require('texts')
@@ -100,6 +102,19 @@ function init_currency()
 	obj_time = 0
 end
 init_currency()
+
+-------------------------------------------------------------------------------
+-- Initialize the time Granules array. Keeps track of the time extensions -----
+-------------------------------------------------------------------------------
+function init_granules()
+	Granules = {"Crimson granules of time","Azure granules of time","Amber granules of time",
+				"Alabaster granules of time","Obsidian granules of time"}
+	for i=1, #Granules do
+		Granules[Granules[i]] = 0
+	end
+end
+init_granules()
+
 -------------------------------------------------------------------------------
 -- Refresh the on screen messages ---------------------------------------------
 -------------------------------------------------------------------------------
@@ -121,7 +136,13 @@ function refresh()
 			body = body.."\n "..neutral_col..Currency[i]..": "..Currency[Currency[i]].." "
 		end
 	end
-	texts.text(image,header..body)
+	footer = "\\cr\n ------------------------------------"
+	for i=1, #Granules do
+		if Granules[Granules[i]] == 0 then
+			footer = footer.."\n "..Granules[i].." "
+		end
+	end
+	texts.text(image,header..body..footer)
 end
 refresh()
 
@@ -195,6 +216,15 @@ windower.register_event('incoming text',function (original, new, color)
     	end_time = end_time + (tonumber(original:match("%d+")) * 60)
     	refresh()
    	end
+	a,b,item = string.find(original,"Obtained key item: ..(%w+ %w+ %w+ %w+)..\46")
+	if item ~= nil then
+		item = item:lower()
+		for i=1, #Granules do
+			if item == Granules[i]:lower() then
+				Granules[Granules[i]] = 1
+			end
+		end
+	end
    	a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+ %w+)..\46")
    	if item == nil then
    		a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+)..\46")
