@@ -1,15 +1,15 @@
-**Authors:** Krizz, Skyrant
-**Version:** 2.0
-**Date:** 18/03/2017
+Authors: Krizz, Skyrant
+Version: 2.1
+Date: 18/03/2017
 
-**Dynamis Helper**
+Dynamis Helper
 
-**Description:**
-Dynamis Helper displays time remaining in the zone. Shows you the proc needed for the targeted monster and displays the total amount of currency and forbidden items looted so far.
+Description:
+Dynamis Helper displays time remaining in the zone. Shows you the proc needed for the targeted monster, creates a stagger timer and displays the total amount of currency and forbidden items looted so far.
 
 Abbreviation: //dh
 
-**Commands:**
+Commands:
 * help - Shows a menu of commands in game
 * visible - toggle addon display.
 * position pos_x pos_y - position of addon window in pixels from the top left of the screen.

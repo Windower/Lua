@@ -32,7 +32,7 @@
 _addon.name = 'DynamisHelper'
 _addon.author = 'Krizz, Skyrant'
 _addon.commands = {'DynamisHelper','dh'}
-_addon.version = '2.0'
+_addon.version = '2.1'
 
 config = require('config')
 texts = require('texts')
@@ -187,7 +187,8 @@ windower.register_event('incoming text',function (original, new, color)
 	a,b,fiend = string.find(original,"%w+'s attack staggers the (%w+)%!")
    	if fiend == 'fiend' then
 		StaggerCount = StaggerCount + 1
-    	windower.send_command('timers c '..StaggerCount..' 30 down')
+		a,b,mob_timers = string.find(current_mob,"%w+ (%w+)")
+    	windower.send_command('timers c "'..mob_timers..'" 30 down stun')
     	return new, color
     end
    	if string.find(original,"Your stay in Dynamis has been extended by %d+ minutes.") then
