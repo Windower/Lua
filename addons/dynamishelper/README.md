@@ -1,16 +1,17 @@
-Authors: Krizz
+**Authors:** Krizz, Skyrant
+**Version:** 2.0
+**Date:** 18/03/2017
 
-Version: 1
+**Dynamis Helper**
 
-Date: 20130419
-
-Dynamis Helper
+**Description:**
+Dynamis Helper displays time remaining in the zone. Shows you the proc needed for the targeted monster and displays the total amount of currency and forbidden items looted so far.
 
 Abbreviation: //dh
 
-Commands:
+**Commands:**
 * help - Shows a menu of commands in game
-* timer [on/off] - Displays a timer each time a mob is staggered.
-* tracker [on/off/reset/pos x y] - Tracks the amount of currency obtained.
-* proc [on/off/pos x y] - Displays the proc for the targeted mob.
+* visible - toggle addon display.
+* position pos_x pos_y - position of addon window in pixels from the top left of the screen.
+* opacity bg_alpha - opacity (0-255) of the background.
 * ll create - Creates and loads a light luggage profile that will automatically lot currency.

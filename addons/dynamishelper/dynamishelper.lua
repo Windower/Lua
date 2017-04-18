@@ -1,4 +1,4 @@
---Copyright (c) 2013, Krizz
+--Copyright (c) 2013, Krizz, Skyrant
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -27,19 +27,307 @@
 -- Stagger timer
 -- Currency tracker
 -- Proc identifier
--- Lot currency
+-- Light Luggage Profile
 
 _addon.name = 'DynamisHelper'
-_addon.author = 'Krizz, maintainer: Skyrant'
+_addon.author = 'Krizz, Skyrant'
 _addon.commands = {'DynamisHelper','dh'}
-_addon.version = '1.0.2.0'
+_addon.version = '2.0'
 
-require('strings')
-require('sets')
 config = require('config')
+texts = require('texts')
 res = require('resources')
 
--- Variables
+ProcZones = res.zones:english(string.startswith-{'Dynamis'}):keyset()
+
+-------------------------------------------------------------------------------
+-- Define default values ------------------------------------------------------
+-------------------------------------------------------------------------------
+defaults = T{}
+defaults.text_R = 255
+defaults.text_G = 255
+defaults.text_B = 255
+defaults.Wind_R = 0
+defaults.Wind_G = 255
+defaults.Wind_B = 0
+defaults.Bast_R = 0
+defaults.Bast_G = 0
+defaults.Bast_B = 255
+defaults.Sand_R = 255
+defaults.Sand_G = 0
+defaults.Sand_B = 0
+defaults.pos_x = 0
+defaults.pos_y = 0
+defaults.font_size = 11
+defaults.bg_alpha = 255
+
+-------------------------------------------------------------------------------
+-- Load defaults from settings.xml --------------------------------------------
+-------------------------------------------------------------------------------
+settings = config.load(defaults)
+
+windurst_col = "\\cs("..tostring(settings.Wind_R)..","..tostring(settings.Wind_G)..","..tostring(settings.Wind_B)..")"
+bastok_col = "\\cs("..tostring(settings.Bast_R)..","..tostring(settings.Bast_G)..","..tostring(settings.Bast_B)..")"
+sandoria_col = "\\cs("..tostring(settings.Sand_R)..","..tostring(settings.Sand_G)..","..tostring(settings.Sand_B)..")"
+neutral_col = "\\cs(128,128,128)"
+time_col = "\\cs(255,255,0)"
+
+StaggerCount = 0
+current_mob = "unknown"
+current_proc = "unknown"
+currenttime = 0
+obj_time = 0
+end_time = 0
+
+image = texts.new("image")
+
+texts.color(image,settings.text_R,settings.text_G,settings.text_B)
+texts.size(image,settings.font_size)
+texts.pos_x(image,settings.pos_x)
+texts.pos_y(image,settings.pos_y)
+texts.bg_alpha(image,settings.bg_alpha)
+
+-------------------------------------------------------------------------------
+-- Initialize the Currency array. We need this to keep track of the drops -----
+-------------------------------------------------------------------------------
+function init_currency()
+	Currency = {"Ordelle Bronzepiece","Montiont Silverpiece","One Byne Bill",
+				"One Hundred Byne Bill","Tukuku Whiteshell","Lungo-Nango Jadeshell",
+				"Forgotten Thought","Forgotten Hope","Forgotten Touch","Forgotten Journey","Forgotten Step"}
+	for i=1, #Currency do
+    	 Currency[Currency[i]] = 0
+	end
+	obj_time = 0
+end
+init_currency()
+-------------------------------------------------------------------------------
+-- Refresh the on screen messages ---------------------------------------------
+-------------------------------------------------------------------------------
+function refresh()
+	header = time_col.."Time remaining    "..os.date('!%H:%M:%S', obj_time).." \\cr\n------------------------------------"
+	if current_mob ~= "unknown" then
+		body = "\n Current proc for \n "..current_mob.."\n is "..current_proc.."\n------------------------------------"
+	else
+		body = "\n Waiting for target...\n ------------------------------------"
+	end
+	for i=1, #Currency do
+		if Currency[i] == "Ordelle Bronzepiece" or Currency[i] == "Montiont Silverpiece" then
+			body = body.."\n "..sandoria_col..Currency[i]..": "..Currency[Currency[i]].." \\cr"
+		elseif Currency[i] == "One Byne Bill" or Currency[i] == "One Hundred Byne Bill" then
+			body = body.."\n "..bastok_col..Currency[i]..": "..Currency[Currency[i]].." \\cr"
+		elseif Currency[i] == "Tukuku Whiteshell" or Currency[i] == "Lungo-Nango Jadeshell" then
+			body = body.."\n "..windurst_col..Currency[i]..": "..Currency[Currency[i]].." \\cr"
+		else
+			body = body.."\n "..neutral_col..Currency[i]..": "..Currency[Currency[i]].." "
+		end
+	end
+	texts.text(image,header..body)
+end
+refresh()
+
+-------------------------------------------------------------------------------
+-- Register a prerendere event for the display refresh ------------------------
+-------------------------------------------------------------------------------
+windower.register_event('prerender', function()
+    if obj_time < 1 then return end
+    if obj_time ~= (end_time - os.time()) then
+        obj_time = end_time - os.time()
+        refresh()
+    end
+end)
+
+-------------------------------------------------------------------------------
+-- Did we enter a Dynamis Zone? -----------------------------------------------
+-------------------------------------------------------------------------------
+windower.register_event('zone change', function(zone)
+    image:hide()
+    header = "Waiting for currency drops..."
+    init_currency()
+    if ProcZones:contains(windower.ffxi.get_info().zone) then
+    	obj_time = 3600
+    	end_time = os.time() + obj_time
+        image:show()
+    end
+end)
+
+image:hide()
+-------------------------------------------------------------------------------
+-- Check if we are in Dynamis and show the overlay ----------------------------
+-------------------------------------------------------------------------------
+if ProcZones:contains(windower.ffxi.get_info().zone) then
+    image:show()
+end
+-------------------------------------------------------------------------------
+-- 186	Dynamis - Bastok ------------------------------------------------------
+-- 134	Dynamis - Beaucedine --------------------------------------------------
+--  40	Dynamis - Buburimu ----------------------------------------------------
+-- 188	Dynamis - Jeuno -------------------------------------------------------
+--  41	Dynamis - Qufim -------------------------------------------------------
+-- 185	Dynamis - San d'Oria --------------------------------------------------
+--  42	Dynamis - Tavnazia ----------------------------------------------------
+--  39	Dynamis - Valkurm -----------------------------------------------------
+-- 187	Dynamis - Windurst ----------------------------------------------------
+-- 135	Dynamis - Xarcabard ---------------------------------------------------
+-------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------
+-- Get the player name for light luggage profile ------------------------------
+-------------------------------------------------------------------------------
+windower.register_event('load', 'login', function()
+    if windower.ffxi.get_info().logged_in then
+        player = windower.ffxi.get_player().name
+        obtained = nil
+    end
+end)
+
+-------------------------------------------------------------------------------
+-- Parse the chat messages for drops, staggers and time extensions ------------
+-------------------------------------------------------------------------------
+windower.register_event('incoming text',function (original, new, color)
+	a,b,fiend = string.find(original,"%w+'s attack staggers the (%w+)%!")
+   	if fiend == 'fiend' then
+		StaggerCount = StaggerCount + 1
+    	windower.send_command('timers c '..StaggerCount..' 30 down')
+    	return new, color
+    end
+   	if string.find(original,"Your stay in Dynamis has been extended by %d+ minutes.") then
+    	end_time = end_time + (tonumber(original:match("%d+")) * 60)
+    	refresh()
+   	end
+   	a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+ %w+)..\46")
+   	if item == nil then
+   		a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+)..\46")
+   		if item == nil then
+    		a,b,item = string.find(original,"%w+ obtains an? ..(%w+%-%w+ %w+)..\46")
+    		if item == nil then
+    			a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+)..\46")
+    		end
+   		end
+  	end
+ 	if item ~= nil then
+ 		item = item:lower()
+ 		for i=1, #Currency do
+			if item == Currency[i]:lower() then
+   				Currency[Currency[i]] = Currency[Currency[i]] + 1
+   			end
+ 		end
+ 	end
+    refresh()
+ 	return new, color
+end)
+
+-------------------------------------------------------------------------------
+-- Register target change event to get the monster name -----------------------
+-------------------------------------------------------------------------------
+windower.register_event('target change', function(targ_id)
+	if targ_id ~= 0 then
+        mob = windower.ffxi.get_mob_by_index(targ_id)
+        current_mob = mob.name
+        setproc()
+    end
+end)
+
+-------------------------------------------------------------------------------
+-- Find the proc for the monster based on time or job -------------------------
+-------------------------------------------------------------------------------
+function setproc()
+	current_proc = "unknown"
+    local currenttime = windower.ffxi.get_info().time
+ 	if currenttime >= 0*60 and currenttime < 8*60 then
+  		window = 'morning'
+ 	elseif currenttime >= 8*60 and currenttime < 16*60 then
+  		window = 'day'
+	elseif currenttime >= 16*60 and currenttime <= 24*60 then
+  		window = 'night'
+ 	end
+
+ 	for i=1, #proctype do
+  		for j=1, #staggers[window][proctype[i]] do
+ 			if current_mob == staggers[window][proctype[i]][j] then
+				current_proc = proctype[i]
+ 			end
+ 		end
+ 	end
+ 	if current_proc == 'ja' then
+ 		current_proc = 'Job Ability'
+ 	elseif current_proc == 'magic' then
+ 		current_proc = 'Magic'
+ 	elseif current_proc == 'ws' then
+ 		current_proc = 'Weapon Skill'
+ 	end
+	refresh()
+end
+
+-------------------------------------------------------------------------------
+-- Process options and save settings ------------------------------------------
+-------------------------------------------------------------------------------
+windower.register_event('addon command',function (...)
+	local params = {...}
+	if #params < 1 then
+		return
+	end
+	if params[1] == "visible" then
+		if texts.visible(image) then
+			image:hide()
+		else
+			image:show()
+		end
+	elseif params[1]:lower() == "help" then
+		windower.add_to_chat(159,'\nDynamisHelper v2.0')
+		windower.add_to_chat(158,'dh visible: toggle addon display.')
+		windower.add_to_chat(158,'dh font size: change the font size.')
+		windower.add_to_chat(158,'dh position pos_x pos_y: position of addon window in pixels from the top left of the screen.')
+		windower.add_to_chat(158,'dh opacity bg_alpha: opacity (0-255) of the background.')
+		windower.add_to_chat(158,'dh ll create: Creates a light luggage profile to lot all dynamis currency.')
+		windower.add_to_chat(158,'dh save: save your current settings.')
+  	elseif params[1]:lower() == "font" then
+  		if params[2] then
+  			texts.size(image,params[2])
+  			settings.font_size = params[2]
+  		else
+  			windower.add_to_chat(158,'dh font size: change the font size.')
+  		end
+  	elseif params[1]:lower() == "position" then
+  		if params[3] then
+  			texts.pos_x(image,params[2])
+			texts.pos_y(image,params[3])
+			settings.pos_x = params[2]
+			settings.pos_y = params[3]
+  		else
+  			windower.add_to_chat(158,'dh pos [pos_x][pos_y] : position of addon window in pixels from the top left of the screen.')
+  		end
+	elseif params[1]:lower() == "opacity" then
+		if params[2] then
+			texts.bg_alpha(image,params[2])
+			settings.bg_alpha = params[2]
+		else
+			windower.add_to_chat(158,'dh opacity [0-255] : transparency of addon window.')
+		end
+	elseif params[1]:lower() == "ll" then
+   		if params[2]:lower() == "create" then
+    		player = windower.ffxi.get_player()['name']
+    		io.open(windower.addon_path..'../../plugins/ll/dynamis-'..player..'.txt',"w"):write('if item is 1452, 1453, 1455, 1456, 1449, 1450 then lot'):close()
+    		windower.send_command('ll profile dynamis-'..player..'.txt')
+   		else 
+   			windower.add_to_chat(158,'dh ll create: Creates a light luggage profile to lot all dynamis currency.')
+   		end
+   	elseif params[1]:lower() == "save" then
+   		config.save(settings, 'all')
+   	else
+		windower.add_to_chat(159,'\nDynamisHelper v2.0')
+		windower.add_to_chat(158,'dh visible: toggle addon display.')
+		windower.add_to_chat(158,'dh position pos_x pos_y: position of addon window in pixels from the top left of the screen.')
+		windower.add_to_chat(158,'dh opacity bg_alpha: opacity (0-255) of the background.')
+	end
+end)
+
+-------------------------------------------------------------------------------
+-- Data and Arrays ------------------------------------------------------------
+-------------------------------------------------------------------------------
+proctype = {"ja","magic","ws","random","none"}
+-------------------------------------------------------------------------------
+-- Enemy Stagger Array based on time > stagger > name -------------------------
+-------------------------------------------------------------------------------
 staggers = T{}
 staggers['morning'] = T{}
 staggers['morning']['ja'] = {	"Kindred Thief", "Kindred Beastmaster", "Kindred Monk", "Kindred Ninja", "Kindred Ranger",
@@ -195,237 +483,3 @@ staggers['night']['ws'] =  {	"Kindred Paladin", "Kindred Warrior", "Kindred Samu
 								"Barong", "Alklha", "Stihi", "Fairy Ring", "Stcemqestcint", "Stringes", "Suttung" }
 staggers['night']['random'] = {"Nightmare Taurus"}
 staggers['night']['none'] = {"Animated Claymore", "Animated Dagger", "Animated Great Axe", "Animated Gun", "Animated Hammer", "Animated Horn", "Animated Kunai", "Animated Knuckles", "Animated Longbow", "Animated Longsword", "Animated Scythe", "Animated Shield", "Animated Spear", "Animated Staff", "Animated Tabar", "Animated Tachi", "Fire Pukis", "Petro Pukis", "Poison Pukis", "Wind Pukis", "Kindred's Vouivre", "Kindred's Wyvern", "Kindred's Avatar", "Vanguard Eye", "Prototype Eye", "Nebiros's Avatar", "Haagenti's Avatar", "Caim's Vouivre", "Andras's Vouivre", "Adamantking Effigy", "Avatar Icon", "Goblin Replica", "Serjeant Tombstone", "Zagan's Wyvern", "Hydra's Hound", "Hydra's Wyvern", "Hydra's Avatar", "Rearguard Eye", "Adamantking Effigy", "Adamantking Image", "Avatar Icon", "Avatar Idol", "Effigy Prototype", "Goblin Replica", "Goblin Statue", "Icon Prototype", "Manifest Icon", "Manifest Icon", "Prototype Eye", "Serjeant Tombstone", "Statue Prototype", "Tombstone Prototype", "Vanguard Eye", "Vanguard's Avatar", "Vanguard's Avatar", "Vanguard's Avatar", "Vanguard's Avatar", "Vanguard's Crow", "Vanguard's Hecteyes", "Vanguard's Scorpion", "Vanguard's Slime", "Vanguard's Wyvern", "Vanguard's Wyvern", "Vanguard's Wyvern", "Vanguard's Wyvern", "Warchief Tombstone"}
-
-Currency = {"Ordelle Bronzepiece", "Montiont Silverpiece", "One Byne Bill","One Hundred Byne Bill","Tukuku Whiteshell", "Lungo-Nango Jadeshell", "Forgotten Thought", "Forgotten Hope", "Forgotten Touch", "Forgotten Journey", "Forgotten Step"}
-ProcZones = res.zones:english(string.startswith-{'Dynamis'}):keyset()
-proctype = {"ja","magic","ws","random","none"}
-StaggerCount = 0
-current_proc = "lolidk"
-currentime = 0
-goodzone = false
-timer = "off"
-tracker = "off"
-proc = "off"
-trposx = 1000
-trposy = 250
-pposx = 800
-pposy = 250
-
-settings = config.load()
-timer = settings['timer']
-tracker = settings['tracker']
-trposx = settings['trposx']
-trposy = settings['trposy']
-proc = settings['proc']
-pposx = settings['pposx']
-pposy = settings['pposy']
-
-for i=1, #Currency do
-     Currency[Currency[i]] = 0
-end
-
-windower.register_event('load', 'login', function()
-    if windower.ffxi.get_info().logged_in then
-        player = windower.ffxi.get_player().name
-        obtained = nil
-        initializebox()
-    end
-end)
-
-windower.register_event('addon command',function (...)
---	 print('event_addon_command function')
-	local params = {...};
-	if #params < 1 then
-		return	end
-		if params[1] then
-			if params[1]:lower() == "help" then
-   				print('dh help : Shows help message')
-  				print('dh timer [on/off] : Displays a timer each time a mob is staggered.')
-   				print('dh tracker [on/off/reset/pos x y] : Tracks the amount of currency obtained.')
-				print('dh proc [on/off/pos x y] : Displays the current proc for the targeted mob.')
-   				print('dh ll create : Creates and loads a light luggage profile that will automatically lot all currency.')
-   				--print(goodzone)
-   				--print(ProcZones)
-			elseif params[1]:lower() == "timer" then
-   				if params[2]:lower() == "on" or params[2]:lower() == "off" then
-    				timer = params[2]
-					print('Timer feature is '..timer)
-   				else print("Invalid timer option.")
-   			end
-		elseif params[1]:lower() == "tracker" then
-   			if params[2]:lower() == "on" then
-    			tracker = "on"
-				initializebox()
-				windower.text.set_visibility('dynamis_box',true)
-    			print('Tracker enabled')
-   			elseif params[2]:lower() == "off" then
-    			tracker = "off"
-    			windower.text.set_visibility('dynamis_box',false)
-    			print('Tracker disabled')
-   			elseif params[2]:lower() == "reset" then
-				for i=1, #Currency do
-     				Currency[Currency[i]] = 0
-     			end
-      			obtainedf()
-     	 		initializebox()
-      			print('Tracker reset')
-   			elseif params[2]:lower() == "pos" then
-    			if params[3] then
-     				trposx, trposy = tonumber(params[3]), tonumber(params[4])
-     				obtainedf()
-     				initializebox()
-    			else print("Invalid tracker option.")
-    			end
-    		end
-  		elseif params[1]:lower() == "ll" then
-   			if params[2]:lower() == "create" then
-    			player = windower.ffxi.get_player()['name']
-    			io.open(windower.addon_path..'../../plugins/ll/dynamis-'..player..'.txt',"w"):write('if item is 1452, 1453, 1455, 1456, 1449, 1450 then lot'):close()
-    			windower.send_command('ll profile dynamis-'..player..'.txt')
-   			else print("Invalid light luggage option.")
-   			end
-  	 elseif params[1]:lower() == "proc" then
-   			if params[2]:lower() == "on" then
-   				proc = params[2]
-   				print('Proc feature enabled.')
-   			elseif params[2]:lower() == "off" then
-   		 		proc = params[2]
-    			windower.text.set_visibility('proc_box',false)
-    			print('Proc feature disabled.')
-    		elseif params[2]:lower() == "pos" then
-   				pposx, pposy = tonumber(params[3]), tonumber(params[4])
-   				initializeproc()
-   			end
-		end
-	end
-end)
-
-
-windower.register_event('incoming text',function (original, new, color)
---	print('event_incoming_text function')
-	if timer == 'on' then
-  		a,b,fiend = string.find(original,"%w+'s attack staggers the (%w+)%!")
-   		if fiend == 'fiend' then
-			StaggerCount = StaggerCount + 1
-    		windower.send_command('timers c '..StaggerCount..' 30 down')
-    		return new, color
-    	end
-	end
- 	if tracker == 'on' then
-     	a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+ %w+)..\46")
-     		if item == nil then
-      	 		a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+)..\46")
-       				if item == nil then
-         				a,b,item = string.find(original,"%w+ obtains an? ..(%w+%-%w+ %w+)..\46")
-          					if item == nil then
-           						a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+)..\46")
-         					end
-       				end
-     		end
--- 		a,b,item = string.find(original,"%w+ obtains an? ..(.*)..\46")
- 		if item ~= nil then
- 			item = item:lower()
- 			for i=1, #Currency do
-				if item == Currency[i]:lower() then
-   					Currency[Currency[i]] = Currency[Currency[i]] + 1
-   				end
- 			end
- 			obtainedf()
- 		end
-    	initializebox()
- 	end
- 	return new, color
-end)
-
-function obtainedf()
-	obtained = nil
- 	for i=1,#Currency do
- 		if Currency[Currency[i]] ~= 0 then
-  			if obtained == nil then
-  				obtained = " "
-  			end
-   			obtained = (obtained..Currency[i]..': '..Currency[Currency[i]]..' \n ')
- 		end
- 	end
-end
-
-windower.register_event('zone change', function(id)
-	goodzone = ProcZones:contains(id)
-	if not goodzone then
-		windower.text.set_visibility('proc_box', false)
-	end
-end)
-
-function initializebox()
-	if obtained ~= nil and tracker == "on" then
- 		windower.text.create('dynamis_box')
- 		windower.text.set_bg_color('dynamis_box',200,30,30,30)
- 		windower.text.set_color('dynamis_box',255,200,200,200)
-		windower.text.set_location('dynamis_box',trposx,trposy)
- 		windower.text.set_visibility('dynamis_box',true)
- 		windower.text.set_bg_visibility('dynamis_box',true)
- 		windower.text.set_font('dynamis_box','Arial',12)
- 		windower.text.set_text('dynamis_box',obtained);
- 	end
-end
-
-windower.register_event('target change', function(targ_id)
-	--goodzone = ProcZones:contains(windower.ffxi.get_info().zone)
-	if goodzone and proc == 'on' and targ_id ~= 0 then
-        mob = windower.ffxi.get_mob_by_index(targ_id)['name']
-        setproc()
- 	end
-
- 	--print(ProcZones:contains(windower.ffxi.get_info().zone))
-
-end)
-
-function setproc()
-	current_proc = 'lolidk'
-    local currenttime = windower.ffxi.get_info().time
- 	if currenttime >= 0*60 and currenttime < 8*60 then
-  		window = 'morning'
- 	elseif currenttime >= 8*60 and currenttime < 16*60 then
-  		window = 'day'
-	elseif currenttime >= 16*60 and currenttime <= 24*60 then
-  		window = 'night'
- 	end
- 	--figure out the stupid mob's proc
- 	for i=1, #proctype do
-  		for j=1, #staggers[window][proctype[i]] do
- 			if mob == staggers[window][proctype[i]][j] then
- 				current_proc = proctype[i]
- 			end
- 		end
- 	end
- 	if current_proc == 'ja' then
- 		current_proc = 'Job Ability'
- 	elseif current_proc == 'magic' then
- 		current_proc = 'Magic'
- 	elseif current_proc == 'ws' then
- 		current_proc = 'Weapon Skill'
- 	end
-	initializeproc()
-end
-
-function initializeproc()
---		print('initializeproc function')
-		windower.text.create('proc_box')
-	 	windower.text.set_bg_color('proc_box',200,30,30,30)
-	 	windower.text.set_color('proc_box',255,200,200,200)
-	 	windower.text.set_location('proc_box',pposx,pposy)
-	 	if proc == 'on' then
-	 	 	windower.text.set_visibility('proc_box', true)
-	 	end
-	 	windower.text.set_bg_visibility('proc_box',1)
-	 	windower.text.set_font('proc_box','Arial',12)
-	 	windower.text.set_text('proc_box',' Current proc for \n '..mob..'\n is '..current_proc);
-	 	if proc == "off" then
-	 		windower.text.set_visibility('proc_box', false)
-	 	end
-end
-
-windower.register_event('unload',function ()
- 	windower.text.delete('dynamis_box')
- 	windower.text.delete('proc_box')
-end)
