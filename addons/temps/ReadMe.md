@@ -11,7 +11,7 @@
 2. buy [override] - Buys all temporary items in an escha zone.
 - buy - Buys all temporary items.
 - buy radialens - Buys all temporary items and also attempts to buy a radialens, even if it is on your blacklist or if you already have one.
-3. blacklist - [add|a||remove|r] items from your blacklist.
+3. blacklist - [add|a|remove|r] items from your blacklist.
 - blacklist add radialens - Adds radialens to your blacklist.
 - blacklist a radialens - Adds radialens to your blacklist.
 - blacklist remove radialens - Removes radialens from  your blacklist.
