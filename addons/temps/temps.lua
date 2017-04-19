@@ -12,14 +12,14 @@ notice, this list of conditions and the following disclaimer.
 * Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-* Neither the name of timestamp nor the
+* Neither the name of temps nor the
 names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL Giuliano Riccio BE LIABLE FOR ANY
+DISCLAIMED. IN NO EVENT SHALL Mojo BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -323,15 +323,12 @@ local function turbo()
     settings:save()
 end
     
-local function handle_command(...)
-    local cmd  = (...) and (...):lower()
-    local args = {select(2, ...)}
+local function handle_command(cmd, ...)
+    local cmd = cmd and cmd:lower() or 'help'
     if handlers[cmd] then
-        handlers[cmd](unpack(args))
-    elseif cmd then
-        error("Unknown command %s.":format(cmd))
+        handlers[cmd](...)
     else
-        error("No command passed.")
+        error("Unknown command %s.":format(cmd))
     end
 end
 
