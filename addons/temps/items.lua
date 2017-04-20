@@ -1,7 +1,7 @@
 return {
     [2894] = {name="Tribulens", option=4, key_item=true, offset=0},
     [3031] = {name="Radialens", option=2308, key_item=true, offset=9},
-    [3032] = {name="Mollifer", option=2564, key_item=true, offset=10},
+    [3032] = {name="Mollifier", option=2564, key_item=true, offset=10},
     [4182] = {name="Instant Reraise", option=7, key_item=false, offset=4},
     [4202] = {name="Daedalus Wing", option=263, key_item=false, offset=26},
     [4206] = {name="Catholicon", option=519, key_item=false, offset=14},
