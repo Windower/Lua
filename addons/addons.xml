@@ -641,4 +641,11 @@
     <bugtracker>https://github.com/Jayjs20/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
   </addon>
+  <addon>
+    <name>temps</name>
+    <author>Mojo</author>
+    <description>Makes buying temporary items from escha npcs much easier.</description>
+    <bugtracker>https://github.com/Snapsmojo/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Fenrir/Snaps</support>
+  </addon>
 </addons>
