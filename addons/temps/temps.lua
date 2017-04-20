@@ -70,7 +70,7 @@ Notes:
 local defaults = {
     turbo = false,
     blacklist = S{
-        'mollifer',
+        'mollifier',
         'primeval brew',
         'radialens',
     }
