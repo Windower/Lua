@@ -1,3 +1,29 @@
+--[[Copyright © 2014-2017, trv
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of Nostrum nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL trv BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER I N CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
+
 local widgets = {}
 
 _libs = _libs or {}
@@ -22,8 +48,8 @@ local click_types = {
 	'left button down',
     'left button up',
     nil,
-    'right button up',
     'right button down',
+    'right button up',
     'middle button down',
     'middle button up',
     nil,
@@ -61,6 +87,7 @@ local block_mouse_event = {
 	[5] = false,
 	[6] = false, -- 7
 	[7] = false,
+	[10] = false,
 	[11] = false, -- 12
 	[12] = false,
 }
@@ -86,9 +113,7 @@ do
 		depth_determining_factor = depth_determining_factor + 1
 		smallest_dimension = smallest_dimension/2
 	end
-	
-	depth_determining_factor = math.min(depth_determining_factor, 8)
-	
+		
 	mouse_object_tree = quadtree.new(
 		windower_settings.x_res, -- w
 		windower_settings.y_res, -- h
@@ -131,7 +156,6 @@ local object_with_focus
 local function iterate_over_hits(type, qt, x, y, delta, s)
 	local new_focus
 	local possible_hits = qt:get_point_collision(x, y)
-	
 	
 	for object in possible_hits() do
 		if object:visible() and object:hover(x, y) then
@@ -205,9 +229,10 @@ function widget_listener(type, x, y, delta, blocked)
 			
 			if not bail then
 				local contact_point = carried_object._contact_point
-				local obj = carried_object._group or carried_object
+				--local obj = carried_object._group or carried_object
 
-				obj:pos(x - contact_point[1], y + contact_point[2])
+				--obj:pos(x - contact_point[1], y + contact_point[2])
+				carried_object:pos(x - contact_point[1], y + contact_point[2])
 			end
 			
 			block_mouse_event[0] = true
@@ -228,14 +253,14 @@ function widget_listener(type, x, y, delta, blocked)
 		
 	if object_with_focus then
 		if not s[object_with_focus] then
+			local old_focus = object_with_focus
+			
+			object_with_focus = new_focus
 			-- create focus change event
-			call_events(object_with_focus, 'focus change', false)
+			call_events(old_focus, 'focus change', false)
 			
 			if new_focus then
 				call_events(new_focus, 'focus change', true)
-				object_with_focus = new_focus
-			else
-				object_with_focus = nil
 			end
 		end	
 	elseif new_focus then
@@ -254,15 +279,13 @@ function widgets.track(object, x1, x2, y1, y2)
 	mouse_object_tree:track(object, x1, x2, y1, y2)
 end
 
-function widgets.do_not_track(object, x1, x2, y1, y2)
+function widgets.do_not_track(object)
 	mouse_object_tree:do_not_track(object)
 end
 
 function widgets.update_object(object, x1, x2, y1, y2, qt)
 	(qt or mouse_object_tree):update(object, x1, x2, y1, y2)
 end
-
---tree_nicknames[mouse_object_tree] = 'root'
 
 function widgets.pick_up(object, x, y)
 	if carried_object then

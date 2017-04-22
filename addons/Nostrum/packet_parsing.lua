@@ -1,3 +1,29 @@
+--[[Copyright © 2014-2017, trv
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of Nostrum nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL trv BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER I N CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
+
 parse_lookup = {
 	incoming = {},
 	outgoing = {},
@@ -5,58 +31,69 @@ parse_lookup = {
 
 parse_lookup.incoming[0x063] = function(data)
 	if data:byte(5) == 9 then
-		if buff_gain then
-			buff_gain = false
+		if ignore_0x063 then
+			ignore_0x063 = false
+			return
+		end
 			
-			local new = L{}
-			local old = pc.buffs
+		local new = L{}
+		local old = pc.buffs.array
+		local changes = {}
+
+		pc.buffs.array = new
+		buff_lookup[1].array = new
+		
+		for i = 1, 32 do
+			local buff_id = data:unpack('H', 7 + i * 2)
 			
-			for i=1,32 do
-				local buff_id = last_buff_update:unpack('H', i*2+7)
+			if buff_id == 255  then
+				break
+			else
+				new:append(buff_id)
 				
-				if buff_id == 255  then
-					break
-				else
-					new:append(buff_id)
+				if old[i] ~= buff_id then
+					changes[i] = buff_id
 				end
 			end
+		end
+		
+		local old_set = pc.buffs.active
+		local new_set = {}
+		
+		local buff_resources = res.buffs
+		local buff_strings = {}
+		
+		for i = 1, new.n do
+			local buff = new[i]
 			
-			local old_set = S(old)
+			local res_string = buff_resources[buff][_addon.language]:lower()
 			
-			for i = 1, new.n do
-				local buff = new[i]
-				
-				if not old_set:contains(buff) then
-					call_events('buff change', 1, buff, true, i)
-				end
+			buff_strings[buff] = res_string
+			
+			new_set[buff] = true
+			new_set[res_string] = true
+		end
+		
+		buff_lookup[1].active = new_set
+		pc.buffs.active = new_set
+		
+		for i = 1, old.n do
+			local buff = old[i]
+			
+			if not new_set[buff] then
+				call_events('buff loss', 1, i, buff, buff_strings[buff])
 			end
-		elseif buff_loss then
-			buff_loss = false
-			
-			local new = L{}
-			local old = pc.buffs
-			
-			for i=1,32 do
-				local buff_id = last_buff_update:unpack('H', i*2+7)
-				
-				if buff_id == 255  then
-					break
-				else
-					new:append(buff_id)
-				end
-			end
-			
-			local new_set = S(new)
-			
-			for i = 1, old.n do
-				local buff = old[i]
-				
-				if not new_set:contains(buff) then
-					call_events('buff change', 1, buff, false, i)
-				end
-			end		
 		end		
-		--last_buff_update = data
+
+		for i = 1, new.n do
+			local buff = new[i]
+			
+			if not old_set[buff] then
+				call_events('buff gain', 1, i, buff, buff_strings[buff])
+			end
+		end
+		
+		call_events('buff change', 1, old.n, new.n, changes)
 	end
 end
 
@@ -78,18 +115,18 @@ parse_lookup.incoming[0x00D] = function(data)
 	if player and player.id ~= pc.id then
 		if bit.is_set(mask, 1) then					--mask
 			local x, z, y = data:unpack('fff',0x0D) --0b000001 position updated
-			local pos = player.pos					--0b000100 hp updated
-													--0b011111 model appear i.e. update all
-			pos.x = x                      			--0b100000 model disappear
-			pos.y = y                      			
+													--0b000100 hp updated
+			player.x = x							--0b011111 model appear i.e. update all
+			player.y = y                      		--0b100000 model disappear
 			
 			if player.out_of_sight then
 				player.out_of_sight = false
 				call_events('member appear', player.party, player.spot)
 			end
 			
-			call_events('distance change', player.party, player.spot, (pc.pos.x - pos.x)^2 + (pc.pos.y - pos.y)^2)
+			call_events('distance change', player.party, player.spot, (pc.x - player.x)^2 + (pc.y - player.y)^2)
 		elseif bit.is_set(mask, 6) then
+			player.out_of_sight = true
 			call_events('member disappear', player.party, player.spot)
 		end
 	end
@@ -157,7 +194,7 @@ parse_lookup.incoming[0x0DD] = function(data)
 
 		local zone = packet.Zone
 
-		player.name = packet['Name']
+		player.name = packet.Name
 		player.zone = zone
 
 		if zone == 0 then
@@ -172,8 +209,9 @@ parse_lookup.incoming[0x0DD] = function(data)
 			local mob = windower.ffxi.get_mob_by_index(player.index)
 			
 			if mob then
-				player.out_of_sight = mob.distance >= 50
-				-- Catch-all: I'm pretty sure the mob table doesn't exist if distance is > 50.
+				player.out_of_sight = mob.distance >= 50 -- Catch-all: I'm pretty sure the mob table doesn't exist if distance is > 50.
+				player.x = mob.x
+				player.y = mob.y
 			end
 		end
 		
@@ -181,7 +219,7 @@ parse_lookup.incoming[0x0DD] = function(data)
 		local pos = alliance[party]:invite(id)
 		
 		player.spot = pos
-		call_events('member join', party, pos, sandbox.alliance[party][pos])
+		call_events('member join', party, pos, sandbox_lookup[id])
 	elseif packet.Zone ~= player.zone then
 		local old = player.zone
 		local new = packet.Zone
@@ -235,6 +273,7 @@ parse_lookup.incoming[0x0DD] = function(data)
 			end
 		elseif old == 0 then
 			player.out_of_zone = true
+			player.out_of_sight = true
 		end
 		
 		call_events('member zone', player.party, player.spot, new, old)
@@ -248,9 +287,10 @@ parse_lookup.incoming[0x076] = function(data)
 		if id == 0 then
 			break
 		elseif alliance_lookup[id] then
-			local player = alliance_lookup[id]
-			local old_buffs = player.buffs
+			local lookup = buff_lookup[i + 2]
+			local old_buffs = lookup.array
 			local new_buffs = L{}
+			local changes = {}
 			local buff
 			
 			for j = 1,32 do
@@ -260,29 +300,50 @@ parse_lookup.incoming[0x076] = function(data)
 					break
 				else
 					new_buffs:append(buff)
+					
+					if old_buffs[j] ~= buff then
+						changes[j] = buff
+					end
 				end
 			end
 			
-			local old_buffs_set = S(old_buffs)
-			local new_buffs_set = S(new_buffs)
+			local old_buffs_set = lookup.active
+			local new_buffs_set = {}
 
-			player.buffs = new_buffs
+
+			lookup.array = new_buffs
+			lookup.active = new_buffs_set
 			
-			for j = 1, old_buffs.n do
-				local buff_id = old_buffs[j]
+			local buff_strings = {}
+			local buff_resources = res.buffs
+			
+			for j = 1, new_buffs.n do
+				local buff_id = new_buffs[j]
+				local res_string = buff_resources[buff_id][_addon.language]:lower()
 				
-				if not new_buffs_set:contains(buff_id) then
-					call_events('buff change', i+2, buff_id, false, j)
-				end
+				buff_strings[buff_id] = res_string
+				
+				new_buffs_set[buff_id] = true
+				new_buffs_set[res_string] = true
 			end
 			
 			for j = 1, new_buffs.n do
 				local buff_id = new_buffs[j]
 				
-				if not old_buffs_set:contains(buff_id) then
-					call_events('buff change', i+2, buff_id, true, j)
+				if not old_buffs_set[buff_id] then
+					call_events('buff gain', i+2, j, buff_id, buff_strings[buff_id])
 				end
 			end
+
+			for j = 1, old_buffs.n do
+				local buff_id = old_buffs[j]
+				
+				if not new_buffs_set[buff_id] then
+					call_events('buff loss', i+2, j, buff_id, buff_strings[buff_id])
+				end
+			end
+
+			call_events('buff change', i, old_buffs.n, new_buffs.n, changes)
 		end
 	end
 end
@@ -318,7 +379,7 @@ parse_lookup.incoming[0x0C8] = function(data)
 
     local p = {S(alliance[1]), S(alliance[2]), S(alliance[3])}
 
-    for i=1,3 do
+    for i = 1, 3 do
 		local is_party_empty = p[i]:empty()
 		local party = alliance[i]
 		local to_kick = p[i] - packet_pt_struc[i]
@@ -332,13 +393,19 @@ parse_lookup.incoming[0x0C8] = function(data)
 		for id in to_kick:it() do
 			local n_pos = party:kick(id)
 			
+			if i == 1 then
+				table.remove(buff_lookup, n_pos)
+				buff_lookup[6] = {array = L{}, active = {}}
+			end
+			
 			for j = n_pos, party:count() do
 				local player = alliance_lookup[party[j]]
 				
 				player.spot = player.spot - 1
 			end
 			
-			alliance_lookup[id] = nil
+			forget(id)
+			
 			call_events('member leave', i, n_pos)
 		end
 		
@@ -346,8 +413,16 @@ parse_lookup.incoming[0x0C8] = function(data)
             local player = players.new()
 
 			player.party = i
-			player.is_trust = trust_flag
-			alliance_lookup[id] = player
+			player.is_trust = trust_flag;
+			
+			--[[
+				The 0x0DF packet can arrive before finish_trust_invitation runs.
+				If a trust id is added to alliance_lookup, an hp change event will
+				run with spot = 0, causing an error.
+				Stash the player table temporarily, then add it to alliance_lookup
+				in finish_trust_invitation.
+			--]]
+			(trust_flag and trust_lookup or alliance_lookup)[id] = player
         end
 
 		if party:count() == 0 and not is_party_empty then
@@ -380,24 +455,26 @@ parse_lookup.outgoing[0x015] = function(data)
 	end
 	
 	local packet = packets.parse('outgoing', data)
-	local pos = pc.pos
+	local pc = pc
 	
-	if pos.x ~= packet.X or pos.y ~= packet.Y then
-		pos.x, pos.y = packet.X, packet.Y
-
+	if pc.x ~= packet.X or pc.y ~= packet.Y then
+		pc.x, pc.y = packet.X, packet.Y
+		
+		local self = alliance_lookup[pc.id]
+		
+		self.x, self.y = packet.X, packet.Y
+		
 		local party = alliance[1]
 		
 		for i = 2, party:count() do
 			local player = alliance_lookup[party[i]]
 			
-			if not (player.out_of_zone or player.out_of_sight) then
-				local member_pos = player.pos
-				
+			if not (player.out_of_zone or player.out_of_sight) then				
 				call_events(
 					'distance change', 
 					player.party, 
 					player.spot, 
-					(pos.x - member_pos.x)^2 + (pos.y - member_pos.y)^2
+					(pc.x - player.x)^2 + (pc.y - player.y)^2
 				)
 			end
 		end
@@ -415,7 +492,7 @@ parse_lookup.outgoing[0x015] = function(data)
 						'distance change', 
 						player.party, 
 						player.spot, 
-						(pos.x - member_pos.x)^2 + (pos.y - member_pos.y)^2
+						(pc.x - player.x)^2 + (pc.y - player.y)^2
 					)				
 				end
 			end
@@ -424,7 +501,8 @@ parse_lookup.outgoing[0x015] = function(data)
 end
 
 parse_lookup.outgoing[0x00D] = function(data)
-	nostrum.state.hidden = true
+	nostrum.state.running = false
 	low_level_visibility(false)
+	ignore_0x063 = true
 	call_events('zoning')
 end

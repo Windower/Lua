@@ -1,11 +1,39 @@
+--[[Copyright © 2014-2017, trv
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of Nostrum nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL trv BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER I N CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
+
 --[[
-    A library for creating and maintaining quadtrees.
+    A library for creating quadtrees.
     Objects are tracked using a rectangular bounding box.
 --]]
+
 local _print = print
 
 local print = function(...)
     _print('QUADTREE LIB: ', ...)
+	--_print('You are overcome with dread.')
 end
 
 local quadtree = {}
@@ -96,9 +124,9 @@ function quadtree.gather_leaves_in_area(t, x1, x2, y1, y2, container) -- rectang
     else
 		local m = meta[t]
 		for i = 1,4 do
-			local leaf = m[i]
-            if leaf:intersects(x1, x2, y1, y2) then
-                leaf:gather_leaves_in_area(x1, x2, y1, y2, container)
+			local tree = m[i]
+            if tree:intersects(x1, x2, y1, y2) then
+                tree:gather_leaves_in_area(x1, x2, y1, y2, container)
             end
 		end
     end
@@ -121,15 +149,20 @@ function quadtree.remove_object_from_records(t, object)
 	m.contents[object] = nil
 	object._quadtrees[t] = nil
 
-	local masked
+	local masked = false
+	local corners = object_corner_map[object]
 
 	for k, b in pairs(m.contents) do
-		masked = masks(object_corner_map[k], object_corner_map[object], m)
-		if masked then 
+		masked = masks(object_corner_map[k], corners, m)
+		--[[if masked then 
 			m.n = m.n - 1
 			break
-		end
+		end--]]
+		
+		if masked then break end
 	end
+	
+	m.n = masked and m.n or m.n - 1
 end
 
  -- intended to be called on m.branch, should it exist.
@@ -148,8 +181,8 @@ function quadtree.check_for_collapse(t, bin, ignore)
 		local _m = meta[m[i]]
 		
 		--[[
-		Break out if a branch is found. A branched tree implies the 
-		current branch will not fold.
+			Break out if a branch is found. A branched tree implies the 
+			current branch will not fold.
 		--]]
 		if not _m.leaf then
 			return false, bin 
@@ -192,10 +225,10 @@ end
 
 function quadtree.intersects(tree, x1, x2, y1, y2)
     local rect = meta[tree]
-    return  rect.x2 > x1
+    return  rect.x2 >= x1
         and rect.x1 <= x2
         and rect.y2 >= y1
-        and rect.y1 < y2
+        and rect.y1 <= y2
 end
 
 do
@@ -209,7 +242,7 @@ do
 		y = floor(y * resolution/m.height)
 				
 		local potential_hits = meta[t:traverse(x, y)].contents
-		
+	
 		-- don't return m.contents: someone could modify it
 		return function()
 			local object = nil
@@ -232,7 +265,6 @@ function quadtree.sprout(t)
     m.n = 0
     
     local w, h, d = m.width/2, m.height/2, m.depth+1
-	
 	local max, max_depth = m.max, m.max_depth
 	local x1, y1 = m.x1, m.y1
 	
@@ -265,7 +297,7 @@ function quadtree.defoliate(t)
 			object._quadtrees[tree] = nil
 		end
 		
-		meta[m[i]] = nil -- forget this line for a wicked memory leak!
+		meta[tree] = nil -- forget this line for a wicked memory leak!
 		m[i] = nil
 	end
 end
@@ -301,6 +333,11 @@ local function remove(object, trees)
 		
 		m.contents[object] = nil
 		object._quadtrees[tree] = nil
+	end
+	
+	for i = 1, trees.n do
+		local tree = trees[i]
+		local m = meta[tree]
 		
 		local branch = m.branch
 		
@@ -345,8 +382,8 @@ local function remove(object, trees)
 				branch:defoliate()
 				
 				--[[
-				collapse can travel up the tree, cutting off 
-				branches that will error if they aren't removed.
+					collapse can travel up the tree, cutting off 
+					branches that will error if they aren't removed.
 				--]]
 				folding_branches[branch] = nil
 				
@@ -368,8 +405,8 @@ local function remove(object, trees)
 		
 		folding_branches[old_branch] = nil
 		--[[ 
-		Bug? : INVALID KEY TO NEXT if above line appears directly after the
-		first defoliate call. I do not understand why.
+			INVALID KEY TO NEXT if above line appears directly after the
+			first defoliate call. I do not understand why.
 		--]]
 	end
 end
@@ -428,8 +465,6 @@ function quadtree.track(t, object, x1, x2, y1, y2)
 end
 
 function quadtree.do_not_track(t, object)
-    object_corner_map[object] = nil
-    
 	local l = {}
 	local n = 0
 	
@@ -441,7 +476,93 @@ function quadtree.do_not_track(t, object)
 	l.n = n
 	
 	remove(object, l)
+	object_corner_map[object] = nil
 end
+
+--[[function quadtree.visualize(t)
+	local pixel_array = {}
+	
+	local m = meta[t]
+	local black = '\0\0\0'
+	
+	
+		Trying to split pixels, etc. would be a headache. Round the
+		width and height dimensions so that they're powers of two
+		(as a result, all of the trees will land nicely on full pixels).
+	
+	
+	local rounded_w = 2^(math.ceil(math.log(m.w)/math.log(2)))
+	local rounded_h = 2^(math.ceil(math.log(m.h)/math.log(2)))
+	
+	for j = m.y1, m.y2 do
+		local row = {}
+		pixel_array[j] = row
+		
+		for i = m.x1, m.x2 do
+			row[i] = black
+		end			
+	end
+	
+	pixel_array.x_start = m.x1
+	pixel_array.y_start = m.y1
+	pixel_array.x_end = m.y2
+	pixel_array.y_end = m.y2
+
+	quadtree.make_graphic(t, pixel_array, 0)
+	
+	return pixel_array
+end
+	
+function quadtree.make_graphic(t, image, corner)
+	local white = '\255\255\255'
+	local red = '\255\0\0'
+	local m = meta[t]
+	
+	if m.leaf then
+		for	i = m.y1, m.y2 do
+			local row = image[i]
+			
+			for j = m.x1, m.x2 do
+				row[j] = corner % 3 == 1 and red or white
+			end
+		end
+	else
+		for i = 1, 4 do
+			quadtree.make_graphic(m[i], image, i)
+		end
+	end
+end
+
+function quadtree.add_object_to_graphic(t, image, object)
+	local trees = object._quadtrees
+	
+	if not trees then print('That object is not in any of the quadtree\'s leaves') return end
+
+	local blue = '\0\0\255'
+	local purple = '\255\0\255'
+	
+	for k, b in pairs(trees) do
+		local m = meta[k]
+		
+		if not m.leaf then
+			print('The object is in a branch!')
+		end
+		
+		for i = m.y1, m.y1 do
+			local row = image[i]
+			
+			for j = m.x1, m.x2 do
+				row[j] = corner % 3 == 1 and purple or blue
+			end
+		end
+	end
+	
+	return image
+end
+
+function quadtree.draw(t, image)
+	local header = 'P6 width height 255\n'
+end--]]
 
 quadtree.debug = {}
 

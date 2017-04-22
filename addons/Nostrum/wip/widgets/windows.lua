@@ -1,3 +1,29 @@
+--[[Copyright © 2014-2017, trv
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of Nostrum nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL trv BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER I N CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
+
 local windows = {}
 local meta = {}
 
@@ -16,7 +42,7 @@ _meta.windows.__index = function(t, k)
 end
 
 function windows.new(x, y, w, h, visible, alpha, red, green, blue, create_handle)
-	local t = groups.new(x, create_handle and y + 30 or y, w, h)
+	local t = groups.new(x, y, w, create_handle and h + 30 or h)
 	
 	meta[t] = {}
 	
@@ -30,50 +56,35 @@ function windows.new(x, y, w, h, visible, alpha, red, green, blue, create_handle
 		
 		t:add(t.handle)
 		
-		if _libs.widgets then -- ehhhhhhhhhhhhhhhhhhhhhhhhhhh
+		if _libs.widgets then
 			t.handle:register_event('left button down', function(x, y)
 				widgets.pick_up(t, x, y)
 				
 				return true
 			end)
-			--[[t.handle:register_event('drag', function(x, y)
-				local contact = t.handle._contact_point
-
-				groups.pos(t, x + contact[1], y - contact[2])
-				
-				return true
-			end)
-			t.handle:register_event('drop', function()
-				local x, y = t.handle:pos()
-				print('drop')
-				
-				widgets.update_object(t, x, x + w, y, y + h)
-			end)--]]
-			
 		end
 		
-		h = h + 30 -- spoof the height to account for the top bar
+		t.bar = prims.new({
+			color = {alpha, (red+100)%256, (green+100)%256, (blue+100)%256},
+			w = w - 10,
+			h = 20,
+			visible = visible,
+			pos = {x+5, y+5}
+		})
+		
+		t:add(t.bar)
 	end
 	
-	local bg = prims.new({
+	t.bg = prims.new({
 		color = {alpha, red, green, blue},
 		w = w,
-		h = h,
+		h = create_handle and h + 30 or h, -- spoof the height to account for the top bar
 		visible = visible,
 		pos = {x, y}
 	})
-	local bar = prims.new({
-		color = {alpha, (red+100)%256, (green+100)%256, (blue+100)%256},
-		w = w - 10,
-		h = 20,
-		visible = visible,
-		pos = {x+5, y+5}
-	})
 	
-	t:add(bg)
-	t:add(bar)
+	t:add(t.bg)
 
-	--m.events = {} -- ?
 	m.visible = visible
 	
 	return setmetatable(t, _meta.windows)
@@ -81,6 +92,18 @@ end
 
 function windows.destroy(t)
 	meta[t] = nil
+	
+	t.bg:destroy()
+	t.bg = nil
+	
+	if t.handle then
+		t.handle:destroy()
+		t.bar:destroy()
+		t.handle = nil
+		t.bar = nil
+	end
+	
+	groups.destroy(t)
 end
 
 --[[
@@ -141,26 +164,5 @@ function windows.height(t, height)
 	return t._subwidgets[1]:height(height)
 end--]]
 
---[[function windows.events(t, event)
-	local function_list = meta[t].events[event]
-	if not function_list then return nil end
-	
-	local n = 1
-	local m = function_list.n
-	
-	return function()
-		local fn = function_list[n]
-		
-		-- handle holes in the list
-		while not fn and n <= m do
-			n = n + 1
-			fn = function_list[n]
-		end
-		
-		n = n + 1
-		
-		return fn
-	end
-end--]]
 
 return windows

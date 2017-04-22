@@ -1,3 +1,29 @@
+--[[Copyright © 2014-2017, trv
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of Nostrum nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL trv BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER I N CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
+
 function texts.up(t, n)
 	local y = t:pos_y()
 	
@@ -24,6 +50,29 @@ function readonly(t)
 	})
 end
 
+function weak_readonly(t)
+	return setmetatable({}, {
+		__index = t,
+		__newindex = function(u, k, v)
+			if t[k] then
+				print("Error: Attempting to modify a protected value.")
+			else
+				rawset(u, k, v)
+			end
+		end
+	})
+end
+
+function recursive_readonly(t)
+	return setmetatable({}, {
+		__index = function(u, k)
+			local v = t[k]
+			
+			return type(v) == 'table' and recursive_readonly(v) or v
+		end
+	})
+end
+
 function initialize(overlay_name)
 	-- try to load the overlay
 	local fn, err = attempt_to_load_overlay(overlay_name)
@@ -36,7 +85,7 @@ function initialize(overlay_name)
 		return
 	end
 		
-	for event, _ in pairs(events) do
+	for event in pairs(events) do
 		event_registry[event] = {n = 0}
 	end
 	
@@ -71,21 +120,6 @@ function initialize(overlay_name)
 	-- hide the display if Nostrum is hidden
 	if nostrum.state.hidden then
 		low_level_visibility(false)
-	end
-end
-
-function clean_up_user_env()
-	for obj in pairs(bucket.widgets) do
-		obj:destroy()
-		bucket.widgets[obj] = nil
-	end
-	
-	for name in pairs(bucket.prim) do
-		windower.prim.delete(name)
-	end
-	
-	for name in pairs(bucket.text) do
-		windower.prim.delete(name)
 	end
 end
 
@@ -133,8 +167,6 @@ function gather_alliance_from_memory()
 					-- Note: all stats seem to be 0 when this is run on login.
 					-- Not a big deal. After loading, '<stat> change' events will be called.
 					
-					lookup.pos.x = mob.x
-					lookup.pos.y = mob.y
 					lookup.zone = player_table.zone
 					lookup.out_of_sight = false
 					lookup.out_of_zone = false
@@ -151,11 +183,11 @@ end
 
 function low_level_visibility(visible)
 	for name, is_visible in pairs(bucket.prim) do
-		windower.prim.rawset_visibility(name, visible)
+		windower.prim.rawset_visibility(name, visible and is_visible)
 	end
 	
 	for name, is_visible in pairs(bucket.text) do
-		windower.text.rawset_visibility(name, visible)		
+		windower.text.rawset_visibility(name, visible and is_visible)
 	end
 end
 
@@ -168,20 +200,20 @@ function compare_alliance_to_memory()
 		if not party:empty() then
 			local current_party = alliance[i]
 
-			if current_party:count() == 0 and party_from_memory.n > 0 then -- that won't work
+			if current_party:count() == 0 and party.n > 0 then -- that won't work
 				call_events('new party', i, party.n)
 			end
 			
 			local party_record = S(current_party)
 			
-			for j = 1, party_from_memory.n do
-				local id = party_from_memory[j]
+			for j = 1, party.n do
+				local id = party[j]
 				
 				if not party_record:contains(id) then
 					local lookup = alliance_lookup[id]
 					
 					lookup.spot = current_party:invite(id)
-					call_events('member join', i, lookup.spot, sandbox.alliance[party][pos])
+					call_events('member join', i, lookup.spot, sandbox_lookup[id])
 				end
 			end
 		end
@@ -204,9 +236,10 @@ function finish_trust_invitation()
 		local mob = member.mob
 		
 		if mob then
-			local lookup = alliance_lookup[mob.id]
+			local lookup = trust_lookup[mob.id]
 			
 			if lookup and lookup.is_trust and lookup.seeking_information then
+				alliance_lookup[mob.id] = lookup
 				lookup.seeking_information = false
 				lookup.hp = member.hp
 				lookup.mp = member.mp
@@ -222,8 +255,59 @@ function finish_trust_invitation()
 				local pos = party:invite(mob.id)
 				
 				lookup.spot = pos
-				call_events('member join', 1, pos, sandbox.alliance[1][pos])
+				call_events('member join', 1, pos, sandbox_lookup[mob.id])
+				
+				trust_lookup[mob.id] = nil
 			end
 		end
 	end
+end
+
+function get_action_interpreter(cache)
+	return function(act_string)
+		if not act_string then return end
+		
+		act_string = act_string:lower()
+		
+		if cache[act_string] then return recursive_readonly(cache[act_string]) end
+		
+		local action
+		
+		for _, category in ipairs{
+			'spells', 'job_abilities', 'weapon_skills',
+		} do
+			for id, resource_entry in pairs(res[category]) do
+				if resource_entry[_addon.language]:lower() == act_string then
+					action = resource_entry
+					break
+				end
+				
+				if action then break end
+			end
+		end
+		
+		if action then
+			cache[act_string] = action
+			
+			return recursive_readonly(action) 
+		end
+		
+		for _, mabil in ipairs(res.monster_abilities) do
+			if mabil[_addon.language]:lower() == act_string then
+				action = mabil
+				mabil.type = 'MonsterAbility'
+				mabil.targets = S{'self', 'others', 'enemy', 'alliance', 'party'} -- prevent filtering: there are no resources available for this
+				mabil.prefix = '/monsterskill'
+				
+				cache[act_string] = action
+				
+				return recursive_readonly(action)
+			end
+		end
+	end
+end
+
+function forget(id)
+	alliance_lookup[id] = nil
+	sandbox_lookup[id] = nil
 end

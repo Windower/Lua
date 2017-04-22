@@ -1,3 +1,29 @@
+--[[Copyright © 2014-2017, trv
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of Nostrum nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL trv BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER I N CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
+
 local groups = {}
 local meta = {}
 
@@ -9,7 +35,6 @@ _meta.groups = _meta.groups or {}
 _meta.groups.__index = groups
 
 function groups.new(x, y, w, h)
-	
 	local t = {}
 	local m = {}
 	
@@ -19,41 +44,42 @@ function groups.new(x, y, w, h)
 	m.events = {}
 	m.visible = true -- ?
 	m.x1, m.y1, m.w, m.h = x, y, w, h
-	m.x2, m.y2 = x + w, y + h
+	m.x2, m.y2 = m.x1 + m.w - 1, m.y1 + m.h - 1
 	
-	t._subwidgets = {n = 0}
+	t._subwidgets = {}
 	t.n = 0
+	
+	t._ignored = {}
 	
 	if _libs.widgets then
 		groups.register_event(t, 'drop', function()
 			local subwidgets = t._subwidgets
 			local x, y = groups.pos(t)
 			
-			for i = 1, subwidgets.n do
-				local object = subwidgets[i]
+			for object in pairs(subwidgets) do
 				if widgets.tracking(object) then
 					local offsets = m.offsets[object]
 					local _x, _y = x + offsets.x, y + offsets.y
-					widgets.update_object(object, _x, _x + object:width(), _y, _y + object:height())
+					
+					widgets.update_object(object, _x, _x + object:width() - 1, _y, _y + object:height() - 1)
 				end
 			end
 		end)
 	end
-	
-	
-	--[[for i = 1, #args do
-		groups.add(t, t[i])
-	end--]]
 	
 	return setmetatable(t, _meta.groups)
 end
 
 function groups.destroy(t)
 	meta[t] = nil
+	
+	t._subwidgets = nil
+	t._ignored = nil
 end
 
 function groups.hover(t, x, y)
 	local m = meta[t]
+
 	return m.x1 <= x
 		and m.x2 >= x
 		and m.y1 <= y
@@ -65,22 +91,14 @@ function groups.pos(t, x, y)
 	
 	if not y then return m.x1, m.y1 end
 	
-	if t.handle then
-		t.handle:pos(x, y)
-		y = y + 30
-	end
-	
-	local members = t._subwidgets
-	
-	for i = 1,members.n do
-		local object = members[i]
+	for object in pairs(t._subwidgets) do
 		local offsets = m.offsets[object]
-		--probably where the multiple pos calls are coming from
+
 		object:pos(x + offsets.x, y + offsets.y)
 	end
 	
 	m.x1, m.y1 = x, y
-	m.x2, m.y2 = x + m.w, y + m.h
+	m.x2, m.y2 = x + m.w - 1, y + m.h - 1
 end
 
 function groups.pos_x(t, x)
@@ -88,21 +106,14 @@ function groups.pos_x(t, x)
 	
 	local m = meta[t]
 	
-	if t.handle then
-		t.handle:pos_x(x)
-	end
-
-	local members = t._subwidgets
-	
-	for i = 1,members.n do
-		local object = members[i]
+	for object in pairs(t._subwidgets) do
 		local offsets = m.offsets[object]
 		
 		object:pos_x(x + offsets.x)
 	end
 	
 	m.x1 = x
-	m.x2 = x + m.w
+	m.x2 = x + m.w - 1
 end
 
 function groups.pos_y(t, y)
@@ -110,43 +121,45 @@ function groups.pos_y(t, y)
 	
 	local m = meta[t]
 	
-	if t.handle then
-		t.handle:pos_y(y)
-		y = y + 30
-	end
-
-	local members = t._subwidgets
-	
-	for i = 1,members.n do
-		local object = members[i]
+	for object in pairs(t._subwidgets) do
 		local offsets = m.offsets[object]
 		
 		object:pos_y(y + offsets.y)
 	end
 	
 	m.y1 = y
-	m.y2 = y + m.h
+	m.y2 = y + m.h - 1
 end
 
 function groups.add(t, object)
 	local m = meta[t]
-	
 	local x, y = object:pos()
+
 	x, y = x - m.x1, y - m.y1
 	
 	m.offsets[object] = {x=x, y=y}
 	
-	local members = t._subwidgets
-	local n = members.n + 1
-	
-	members[n] = object
-	members.n = n
+	t._subwidgets[object] = true
 	
 	object._group = t
 end
 
+function groups.remove(t, object)
+	if not object then return end
+	
+	t._ignored[object] = nil
+	
+	local m = meta[t]
+	
+	t._subwidgets[object] = nil
+end
+
 function groups.contains(t, object)
-	return meta[t].offsets[object] and true or false
+	return t._subwidgets[object]
+end
+
+function groups.ignore_visibility(t, object, bool)
+	t._ignored[object] = bool or nil
 end
 
 function groups.visible(t, bool)
@@ -158,40 +171,37 @@ function groups.visible(t, bool)
 	
 	m.visible = bool
 	
-	local members = t._subwidgets
-	for i = 1, members.n do
-		members[i]:visible(bool)
+	for obj in pairs(t._subwidgets) do
+		if not t._ignored[obj] then
+			obj:visible(bool)
+		end
 	end
 end
 
 function groups.width(t, w)
 	if not w then return meta[t].w end
 	
-	meta[t].w = w
+	local m = meta[t]
+	
+	m.w = w
+	m.x2 = m.x1 + w - 1
 end
 
 function groups.height(t, h)
 	if not h then return meta[t].h end
 	
-	meta[t].h = h
+	local m = meta[t]
+	
+	m.h = h
+	m.y2 = m.y1 + h - 1
 end
 
 function groups.hide(t)
-	meta[t].visible = false
-	local members = t._subwidgets
-	
-	for i = 1, members.n do
-		members[i]:visible(false)
-	end
+	groups.visible(t, false)
 end
 
 function groups.show(t)
-	meta[t].visible = false
-	local members = t._subwidgets
-	
-	for i = 1, members.n do
-		members[i]:visible(true)
-	end
+	groups.visible(t, true)
 end
 
 function groups.detach(t, object)
