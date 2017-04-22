@@ -62,11 +62,28 @@ defaults.pos_x = 0
 defaults.pos_y = 0
 defaults.font_size = 11
 defaults.bg_alpha = 255
+defaults.timer = true
+defaults.tracker = true
+defaults.trposx = 0
+defaults.trposy = 0
+defaults.proc = true
+defaults.pposx = 0
+defaults.pposy = 0
 
 -------------------------------------------------------------------------------
 -- Load defaults from settings.xml --------------------------------------------
 -------------------------------------------------------------------------------
 settings = config.load(defaults)
+
+-- upgrade to new settings file if old settings still exist -------------------
+if settings.trposx and settings.trposy then
+	-- copy position from old config to new one
+   	settings.pos_x = settings.trposx
+   	settings.pos_y = settings.trposy
+	-- delete old settings here ---------------------------------------------------
+	config.save(settings, 'all')
+end
+
 
 windurst_col = "\\cs("..tostring(settings.Wind_R)..","..tostring(settings.Wind_G)..","..tostring(settings.Wind_B)..")"
 bastok_col = "\\cs("..tostring(settings.Bast_R)..","..tostring(settings.Bast_G)..","..tostring(settings.Bast_B)..")"
@@ -88,6 +105,8 @@ texts.size(image,settings.font_size)
 texts.pos_x(image,settings.pos_x)
 texts.pos_y(image,settings.pos_y)
 texts.bg_alpha(image,settings.bg_alpha)
+
+
 
 -------------------------------------------------------------------------------
 -- Initialize the Currency array. We need this to keep track of the drops -----
@@ -119,30 +138,41 @@ init_granules()
 -- Refresh the on screen messages ---------------------------------------------
 -------------------------------------------------------------------------------
 function refresh()
-	header = time_col.."Time remaining    "..os.date('!%H:%M:%S', obj_time).." \\cr\n------------------------------------"
-	if current_mob ~= "unknown" then
-		body = "\n Current proc for \n "..current_mob.."\n is "..current_proc.."\n------------------------------------"
-	else
-		body = "\n Waiting for target...\n ------------------------------------"
-	end
-	for i=1, #Currency do
-		if Currency[i] == "Ordelle Bronzepiece" or Currency[i] == "Montiont Silverpiece" then
-			body = body.."\n "..sandoria_col..Currency[i]..": "..Currency[Currency[i]].." \\cr"
-		elseif Currency[i] == "One Byne Bill" or Currency[i] == "One Hundred Byne Bill" then
-			body = body.."\n "..bastok_col..Currency[i]..": "..Currency[Currency[i]].." \\cr"
-		elseif Currency[i] == "Tukuku Whiteshell" or Currency[i] == "Lungo-Nango Jadeshell" then
-			body = body.."\n "..windurst_col..Currency[i]..": "..Currency[Currency[i]].." \\cr"
+	body = time_col.."Time remaining    "..os.date('!%H:%M:%S', obj_time).."\\cr\n------------------------------------"
+	if settings.proc then
+		if current_mob ~= "unknown" then
+			body = body.."\n Current proc for \n "..current_mob.."\n is "..current_proc.." "
 		else
-			body = body.."\n "..neutral_col..Currency[i]..": "..Currency[Currency[i]].." "
+			body = body.."\n Waiting for target... "
 		end
 	end
-	footer = "\\cr\n ------------------------------------"
+	if settings.tracker then
+		if settings.proc then
+			body = body.."\n------------------------------------"
+		end
+		for i=1, #Currency do
+			if Currency[i] == "Ordelle Bronzepiece" or Currency[i] == "Montiont Silverpiece" then
+				body = body.."\n "..sandoria_col..Currency[i]..": "..Currency[Currency[i]].." \\cr"
+			elseif Currency[i] == "One Byne Bill" or Currency[i] == "One Hundred Byne Bill" then
+				body = body.."\n "..bastok_col..Currency[i]..": "..Currency[Currency[i]].." \\cr"
+			elseif Currency[i] == "Tukuku Whiteshell" or Currency[i] == "Lungo-Nango Jadeshell" then
+				body = body.."\n "..windurst_col..Currency[i]..": "..Currency[Currency[i]].." \\cr"
+			else
+				body = body.."\n "..neutral_col..Currency[i]..": "..Currency[Currency[i]].." "
+			end
+		end
+	end
+	if settings.tracker or settings.proc then
+		footer = "\\cr\n------------------------------------"
+	else 
+		footer = "\\cr"
+	end
 	for i=1, #Granules do
 		if Granules[Granules[i]] == 0 then
 			footer = footer.."\n "..Granules[i].." "
 		end
 	end
-	texts.text(image,header..body..footer)
+	texts.text(image,body..footer)
 end
 refresh()
 
@@ -206,11 +236,13 @@ end)
 -------------------------------------------------------------------------------
 windower.register_event('incoming text',function (original, new, color)
 	a,b,fiend = string.find(original,"%w+'s attack staggers the (%w+)%!")
-   	if fiend == 'fiend' then
-		StaggerCount = StaggerCount + 1
-		a,b,mob_timers = string.find(current_mob,"%w+ (%w+)")
-    	windower.send_command('timers c "'..mob_timers..'" 30 down stun')
-    	return new, color
+   	if settings.timer then
+   		if fiend == 'fiend' then
+			StaggerCount = StaggerCount + 1
+			a,b,mob_timers = string.find(current_mob,"%w+ (%w+)")
+    		windower.send_command('timers c "'..mob_timers..'" 30 down stun')
+    		return new, color
+    	end
     end
    	if string.find(original,"Your stay in Dynamis has been extended by %d+ minutes.") then
     	end_time = end_time + (tonumber(original:match("%d+")) * 60)
@@ -306,10 +338,15 @@ windower.register_event('addon command',function (...)
 	elseif params[1]:lower() == "help" then
 		windower.add_to_chat(159,'\nDynamisHelper v2.0')
 		windower.add_to_chat(158,'dh visible: toggle addon display.')
-		windower.add_to_chat(158,'dh font size: change the font size.')
-		windower.add_to_chat(158,'dh position pos_x pos_y: position of addon window in pixels from the top left of the screen.')
-		windower.add_to_chat(158,'dh opacity bg_alpha: opacity (0-255) of the background.')
+		windower.add_to_chat(158,'dh font size: change the font size. ['..tostring(settings.font_size)..']')
+		windower.add_to_chat(158,'dh position pos_x pos_y: position of addon window in pixels. [X='..tostring(settings.pos_x)..' Y='..tostring(settings.pos_y)..']')
+		windower.add_to_chat(158,'dh opacity bg_alpha: opacity (0-255) of the background. ['..tostring(settings.bg_alpha)..']')
+		-- compatibility commands ---------------------------------------------
+		windower.add_to_chat(158,'dh timer [on/off] : Displays a timer each time a mob is staggered. ['..tostring(settings.timer)..']')
+		windower.add_to_chat(158,'dh tracker [on/off/reset] : Tracks the amount of currency obtained. ['..tostring(settings.tracker)..']')
+		windower.add_to_chat(158,'dh proc [on/off] : Displays the current proc for the targeted mob. ['..tostring(settings.proc)..']')
 		windower.add_to_chat(158,'dh ll create: Creates a light luggage profile to lot all dynamis currency.')
+		-----------------------------------------------------------------------
 		windower.add_to_chat(158,'dh save: save your current settings.')
   	elseif params[1]:lower() == "font" then
   		if params[2] then
@@ -334,6 +371,48 @@ windower.register_event('addon command',function (...)
 		else
 			windower.add_to_chat(158,'dh opacity [0-255] : transparency of addon window.')
 		end
+	-- compatibility commands ---------------------------------------------
+	elseif params[1]:lower() == "timer" then
+		if params[2]:lower() == "on" then 
+			settings.timer = true 
+		elseif params[2]:lower() == "off" then 
+			settings.timer = false
+		else
+			windower.add_to_chat(158,'dh timer [on/off] : Displays a timer each time a mob is staggered.')
+		end
+	elseif params[1]:lower() == "tracker" then
+		if params[2]:lower() == "on" then
+			settings.tracker = true
+			refresh()
+			image:show()
+		elseif params[2]:lower() == "off" then
+			settings.tracker = false
+			refresh()
+		elseif params[2]:lower() == "reset" then
+			init_currency()
+			refresh()
+--		elseif  params[2]:lower() == "pos" then
+--			if params[4] then
+--				settings.trposx, settings.trposy = tonumber(params[3]), tonumber(params[4])
+--			end
+		else
+			windower.add_to_chat(158,'dh proc [on/off] : Displays the current proc for the targeted mob.')
+		end
+	elseif params[1]:lower() == "proc" then
+		if params[2]:lower() == "on" then
+			settings.proc = true
+			refresh()
+			image:show()
+		elseif params[2]:lower() == "off" then
+			settings.proc = false
+			refresh()
+--		elseif  params[2]:lower() == "pos" then
+--			if params[4] then
+--				settings.pposx, settings.pposy = tonumber(params[3]), tonumber(params[4])
+--			end
+--		else
+			windower.add_to_chat(158,'dh tracker [on/off/reset] : Tracks the amount of currency obtained.')
+		end
 	elseif params[1]:lower() == "ll" then
    		if params[2]:lower() == "create" then
     		player = windower.ffxi.get_player()['name']
@@ -342,13 +421,20 @@ windower.register_event('addon command',function (...)
    		else 
    			windower.add_to_chat(158,'dh ll create: Creates a light luggage profile to lot all dynamis currency.')
    		end
+   	-- End of compatibility commands---------------------------------------
    	elseif params[1]:lower() == "save" then
    		config.save(settings, 'all')
    	else
 		windower.add_to_chat(159,'\nDynamisHelper v2.0')
+		windower.add_to_chat(159,"Timer:"..tostring(settings.timer).." Tracker:"..tostring(settings.tracker).." Proc:"..tostring(settings.proc).." Position: X="..tostring(settings.pos_x).." Y="..tostring(settings.pos_y).." Font Size:"..tostring(settings.font_size))
 		windower.add_to_chat(158,'dh visible: toggle addon display.')
+		windower.add_to_chat(158,'dh font size: change the font size.')
 		windower.add_to_chat(158,'dh position pos_x pos_y: position of addon window in pixels from the top left of the screen.')
 		windower.add_to_chat(158,'dh opacity bg_alpha: opacity (0-255) of the background.')
+		windower.add_to_chat(158,'dh timer [on/off] : Displays a timer each time a mob is staggered.')
+		windower.add_to_chat(158,'dh tracker [on/off/reset/pos x y] : Tracks the amount of currency obtained.')
+		windower.add_to_chat(158,'dh proc [on/off/pos x y] : Displays the current proc for the targeted mob.')
+		windower.add_to_chat(158,'dh ll create: Creates a light luggage profile to lot all dynamis currency.')
 	end
 end)
 
