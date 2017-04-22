@@ -1,5 +1,5 @@
 --[[
-Copyright © 2013-2014, Ricky Gall
+Copyright Â© 2013-2014, Ricky Gall
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -58,6 +58,7 @@ defaults.autosets = T{}
 defaults.autosets.default = T{ }
 defaults.AutoActivate = true
 defaults.AutoDeusExAutomata = false
+defaults.maneuvertimers = true
     
 settings = config.load(defaults)
 
@@ -261,6 +262,8 @@ windower.register_event('addon command', function(comm, ...)
         end
     elseif comm == 'list' then
         get_current_autoset():vprint()
+    elseif comm == "maneuvertimers" or comm == "mt" then
+        maneuvertimers = not maneuvertimers
     elseif S{'fonttype','fontsize','pos','bgcolor','txtcolor'}:contains(comm) then
             if comm == 'fonttype' then Burden_tb:font(args[1])
         elseif comm == 'fontsize' then Burden_tb:size(args[1])
@@ -284,6 +287,7 @@ windower.register_event('addon command', function(comm, ...)
         log('  4. equipset <setname> - equips <setname> to your automaton.')
         log('  5. attlist <setname> - gets the attachment list for <setname>')
         log('  6. list - gets the list of currently equipped attachments.')
+        log('  7. maneuvertimers - Toggles showing maneuver timers on/off.')
         log('The following all correspond to the burden tracker:')
         log('  fonttype <name> | fontsize <size> | pos <x> <y>')
         log('  bgcolor <r> <g> <b> | txtcolor <r> <g> <b>')

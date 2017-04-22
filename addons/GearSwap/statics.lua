@@ -1,4 +1,4 @@
---Copyright (c) 2013-2014, Byrthnoth
+--Copyright (c) 2013~2016, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -28,11 +28,33 @@
  
 unify_prefix = {['/ma'] = '/ma', ['/magic']='/ma',['/jobability'] = '/ja',['/ja']='/ja',['/item']='/item',['/song']='/ma',
     ['/so']='/ma',['/ninjutsu']='/ma',['/weaponskill']='/ws',['/ws']='/ws',['/ra']='/ra',['/rangedattack']='/ra',['/nin']='/ma',
-    ['/throw']='/ra',['/range']='/ra',['/shoot']='/ra',['/monsterskill']='/ms',['/ms']='/ms',['/pet']='/ja',['Monster']='Monster'}
+    ['/throw']='/ra',['/range']='/ra',['/shoot']='/ra',['/monsterskill']='/ms',['/ms']='/ms',['/pet']='/ja',['Monster']='Monster',['/bstpet']='/ja'}
 
 action_type_map = {['/ja']='Ability',['/jobability']='Ability',['/so']='Magic',['/song']='Magic',['/ma']='Magic',['/magic']='Magic',['/nin']='Magic',['/ninjutsu']='Magic',
     ['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/ms']='Ability',['/monsterskill']='Ability',
-    ['/ws']='Ability',['/weaponskill']='Ability',['/item']='Item',['/pet']='Ability',['Monster']='Monster Move'}
+    ['/ws']='Ability',['/weaponskill']='Ability',['/item']='Item',['/pet']='Ability',['/bstpet']='Ability',['Monster']='Monster Move'}
+
+usable_item_bags = {
+    res.bags[3],  -- Temporary Items
+    res.bags[0],  -- Inventory
+    res.bags[8],  -- Wardrobe 1
+    res.bags[10], -- Wardrobe 2
+    res.bags[11], -- Wardrobe 3
+    res.bags[12]} -- Wardrobe 4
+
+equippable_item_bags = {
+    res.bags[0],  -- Inventory
+    res.bags[8],  -- Wardrobe 1
+    res.bags[10], -- Wardrobe 2
+    res.bags[11], -- Wardrobe 3
+    res.bags[12]} -- Wardrobe 4
+    
+bag_string_lookup = {}
+for i,v in pairs(res.bags) do
+    bag_string_lookup[to_windower_bag_api(v.en)]=i
+end
+    
+bstpet_range = {min=672,max=782} -- Range of the JA resource devoted to BST jugpet abilities
     
 delay_map_to_action_type = {['Ability']=3,['Magic']=20,['Ranged Attack']=10,['Item']=10,['Monster Move']=10,['Interruption']=3}
     
@@ -85,8 +107,8 @@ default_slot_map = T{'sub','range','ammo','head','body','hands','legs','feet','n
     'left_ear', 'right_ear', 'left_ring', 'right_ring','back'}
 default_slot_map[0]= 'main'
 
-jas = {false,false,false,false,false,true,false,false,false,false,false,false,false,true,true,false}--6,14,15}
-readies = {false,false,false,false,false,false,true,true,true,false,false,true,false,false,false,false}--{7,8,9,12}
+jas = {false,false,false,false,false,true,false,false,false,false,false,false,false,true,true,false}-- {6,14,15}
+readies = {false,false,false,false,false,false,true,true,true,false,false,true,false,false,false,false} -- {7,8,9,12}
 uses = {false,true,true,true,true,false,false,false,false,false,true,false,true,false,false,false}--{2,3,4,5,11,13}
 unable_to_use = T{17,18,55,56,87,88,89,90,104,191,308,313,325,410,428,561,574,579,580,581,661,665,
     12,16,34,35,40,47,48,49,71,72,76,78,84,91,92,95,96,106,111,128,154,155,190,192,193,198,
@@ -174,15 +196,18 @@ slot_map.back = 15
 
 
 
-gearswap_disabled = false
+gearswap_disabled = true
+seen_0x063_type9 = false
+delay_0x063_v9 = false
 not_sent_out_equip = {}
 command_registry = Command_Registry.new()
 equip_list = {}
+equip_list_history = {}
 world = make_user_table()
 buffactive = make_user_table()
 alliance = make_user_table()
 st_targs = {['<st>']=true,['<stpc>']=true,['<stal>']=true,['<stnpc>']=true,['<stpt>']=true}
-current_job_file = nil
+current_file = nil
 disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
 disable_table[0] = false
 outgoing_action_category_table = {['/ma']=3,['/ws']=7,['/ja']=9,['/ra']=16,['/ms']=25}
@@ -193,6 +218,11 @@ empty = {name="empty"}
 --outgoing_packet_table = {}
 last_refresh = 0
 
+injected_equipment_registry = {}
+for i=0,15 do
+    injected_equipment_registry[i] = L{}
+end
+
 
 _global = make_user_table()
 _global.pretarget_cast_delay = 0
@@ -202,12 +232,12 @@ _global.current_event = 'None'
 
 _settings = {debug_mode = false, demo_mode = false, show_swaps = false}
 
+-- _ExtraData is persistent information that isn't included in the windower API.
+-- Because player, pet, and so forth are regularly regenerated from the windower API,
+-- this table is necessary to maintain information that goes beyond the windower API.
 _ExtraData = {
-        player = {},
-        spell = {},
-        alliance = {},
+        player = {buff_details = {}},
         pet = {},
-        fellow = {},
         world = {in_mog_house = false,conquest=false},
     }
 
@@ -333,7 +363,7 @@ region_to_zone_map = {
     [22] = S{11,12,13},
     [24] = S{24,25,26,27,28,29,30,31,32},
     }
-
+    
 
 function initialize_globals()
     local pl = windower.ffxi.get_player()
@@ -360,7 +390,14 @@ function initialize_globals()
     fellow = make_user_table()
     fellow.isvalid = false
     partybuffs = {}
-
+    
+    -- GearSwap effectively needs to maintain two inventory structures:
+    --  one is the proposed current inventory based on equip packets sent to the server,
+    --  the other is the currently reported inventory based on packets sent from the server.
+    -- The problem with proposed_inv is that it doesn't know when actions force items to unequip or prevent them from equipping.
+    -- The problem with reported_inv is that packets can be dropped, so it doesn't always report everything accurately.
+    -- In an ideal world, gearswap would maintain a registry of expected changes for each slot,
+    --  and would advance along the registry as changes are reported by the server.
     items = windower.ffxi.get_items()
     if not items then
         items = {

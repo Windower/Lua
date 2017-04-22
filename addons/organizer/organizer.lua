@@ -37,7 +37,7 @@ config = require 'config'
 
 _addon.name = 'Organizer'
 _addon.author = 'Byrth, maintainer: Rooks'
-_addon.version = 0.20150531
+_addon.version = 0.20150923
 _addon.commands = {'organizer','org'}
 
 _static = {
@@ -73,7 +73,8 @@ default_settings = {
     retain = {
         ["moogle_slip_gear"]=false,
         ["seals"]=false,
-        ["items"]=false
+        ["items"]=false,
+        ["slips"]=false
     },
     auto_heal = false,
     default_file='default.lua',
@@ -197,7 +198,15 @@ function options_load( )
         if(settings.retain.items == true) then
             org_verbose("Non-equipment items set to retain")
         end
-
+		
+        if(settings.retain.slips == true) then
+            org_verbose("Slips set to retain")
+            slips = {29312,29313,29314,29315,29316,29317,29318,29319,29320,29321,29322,29323,29324,29325,29326,29327,29328,29329,29330,29331,29332}
+            for _,slips_id in pairs(slips) do
+                _retain[slips_id] = "slips"
+                org_debug("settings", "Adding ("..res.items[slips_id].english..') to slip retain list')
+            end
+        end
     end
 
     -- Always allow inventory and wardrobe, obviously

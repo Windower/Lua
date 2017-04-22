@@ -39,22 +39,22 @@
 -----------------------------------------------------------------------------------
 function valid_target(targ,flag)
     local spell_targ
-    local san_targ = find_san(targ)
+    local san_targ = find_san(strip(targ))
     -- If the target is whitelisted, pass it through.
-    if pass_through_targs:contains(targ) or st_targs:contains(targ) or (tonumber(targ) and windower.ffxi.get_mob_by_id(tonumber(targ))) then
-        return targ
+    if pass_through_targs:contains(targ:lower()) or st_targs:contains(targ:lower()) or (tonumber(targ:lower()) and windower.ffxi.get_mob_by_id(tonumber(targ:lower()))) then
+        return targ:lower()
     elseif targ and windower.ffxi.get_player() then
     -- If the target exists, scan the mob array for it
         local current_target = windower.ffxi.get_mob_by_target('t')
         local targar = {}
         for i,v in pairs(windower.ffxi.get_mob_array()) do
-            if string.find(v.name:lower(),san_targ:lower()) and (v.valid_target or v.id == windower.ffxi.get_player().id) then -- Malformed pattern somehow
+            if string.find(strip(v.name),san_targ) and (v.valid_target or v.id == windower.ffxi.get_player().id) then -- Malformed pattern somehow
                 -- Handling for whether it's a monster or not
                 if v.is_npc and v.spawn_type ~= 14 and current_target then
                     if v.id == current_target.id then
                         targar['<t>'] = math.sqrt(v.distance)
                     end
-                elseif not v.is_npc or v.spawn_type == 14 then
+                elseif not v.is_npc or (v.spawn_type == 14 and v.in_party) then
                     targar[v.name] = math.sqrt(v.distance)
                 end
             end
@@ -88,7 +88,7 @@ end
 -----------------------------------------------------------------------------------
 --Name: target_make(targarr)
 --Args:
----- targarr (table of booleans): Keyed to potential targets
+---- targets (table of booleans): Keyed to potential targets
 -----------------------------------------------------------------------------------
 --Returns:
 ---- Created valid target, defaulting to '<me>'
@@ -101,7 +101,7 @@ function target_make(targets)
         -- rest of the processing and just return <me>.
     elseif target.hpp == 0 then
         target_type = 'Corpse'
-    elseif target.is_npc then
+    elseif target.is_npc and target.spawn_type ~= 14 then
         target_type = 'Enemy'
         -- Need to add handling that differentiates 'Enemy' and 'NPC' here.
     else
@@ -116,17 +116,21 @@ function target_make(targets)
                         target_type = 'Party'
                     end
                 end
-                if target.charmed then
+                if target.charmed and not target.is_npc then
                     target_type = 'Enemy'
                 end
                 break
             end
         end
     end
-    
+        
     if targets[target_type] and target_type ~= 'Self' then
         return '<t>'
+    elseif targets.Self then
+        return '<me>'
+    elseif targets.Self or targets.Party or targets.Enemy or targets.NPC or targets.Ally or targets.Corpse then
+        return '<t>'
+    else
+        return ''
     end
---    windower.add_to_chat(8,"got to the end "..tostring(target_type))
-    return '<me>'
 end

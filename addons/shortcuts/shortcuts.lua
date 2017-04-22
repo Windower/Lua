@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.711'
+_addon.version = '2.902'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -243,8 +243,8 @@ function command_logic(original,modified)
     elseif command2_list[command] and not valid_target(potential_targ,true) then
         -- If the command is legitimate and requires target completion but not ability interpretation
         
-        if command2_list[command]==true then -- If there are not any excluded secondary commands
-            local temptarg = valid_target(potential_targ) or target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true}) -- Complete the target or make one.
+        if not command2_list[command].args then -- If there are not any secondary commands
+            local temptarg = valid_target(potential_targ) or target_make(command2_list[command]) -- Complete the target or make one.
             if temptarg ~= '<me>' then -- These commands, like emotes, check, etc., don't need to default to <me>
                 lastsent = '/'..command..' '..temptarg -- Push the command and target together and send it out.
             else
@@ -258,31 +258,28 @@ function command_logic(original,modified)
             end
             windower.send_command('@input '..lastsent)
             return '',false
-        else -- If there are excluded secondary commands (like /pcmd add <name>)
+        else -- If there are secondary commands (like /pcmd add <name>)
             local tempcmd = command
             local passback
+            local targs = command2_list[command]
             for _,v in ipairs(splitline) do -- Iterate over the potential secondary arguments.
-            -- I'm not sure when there could be more than one secondary argument, but it's ready if it happens.
-                if command2_list[command]:contains(v) then
+                if command2_list[command]['args'] and command2_list[command]['args'][v] then
                     tempcmd = tempcmd..' '..v
                     passback = v
+                    targs = command2_list[command]['args'][v]
+                    break
                 end
             end
-            
-            local temptarg = valid_target(potential_targ)
-            if passback then
-                if temptarg == potential_targ or pass_through_targs:contains(temptarg) then
-                    -- If the final entry is a valid target, pass it through.
-                    temptarg = potential_targ
-                elseif passback == potential_targ then
-                    -- If the final entry is the passed through secondary command, just send it out without a target
-                    temptarg = ''
-                elseif not temptarg then
-                    -- Default to using the raw entry
-                    temptarg = potential_targ
+            local temptarg = ''
+            if targs ~= true then
+                -- Target is required
+                if command == potential_targ or passback and passback == potential_targ or potential_targ == '/nope//' then
+                    -- No target is provided
+                    temptarg = target_make(targs)
+                else
+                    -- A target is provided, which is either corrected or (if not possible) used raw
+                    temptarg = valid_target(potential_targ) or potential_targ
                 end
-            elseif not temptarg then -- Make a target if the temptarget isn't valid
-                temptarg = target_make({['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true})
             end
             lastsent = '/'..tempcmd..' '..temptarg
             debug_chat('292: input '..lastsent)
@@ -293,7 +290,7 @@ function command_logic(original,modified)
             windower.send_command('@input '..lastsent)
             return '',false
         end
-    elseif command2_list[command] and valid_target(potential_targ,true) then
+    elseif command2_list[command] then
         -- If the submitted command does not require ability interpretation and is fine already, send it out.
         lastsent = ''
         if logging then
@@ -370,9 +367,9 @@ function interp_text(splitline,offset,modified)
         if num_opts > 0 then
             -- If there are usable options then prioritize:
             -- Prefix, if given -> Spells -> Job Abilities -> Weapon Skills -> Monster Skills
-            r_line = res[(offset == 1 and options[command_list[splitline[1]]] and command_list[splitline[1]]) or (options.spells and 'spells') or (options.job_abilities and 'job_abilities') or (options.weapon_skills and 'weapon_skills') or (options.monster_abilities and 'monster_abilities')][options[command_list[splitline[1]]] or options.spells or options.job_abilities or options.weapon_skills or options.monster_abilities]
+            r_line = res[(offset == 1 and options[command_list[splitline[1]]] and command_list[splitline[1]]) or (options.spells and 'spells') or (options.job_abilities and 'job_abilities') or (options.weapon_skills and 'weapon_skills') or (options.monster_abilities and 'monster_abilities') or (options.mounts and 'mounts')][options[command_list[splitline[1]]] or options.spells or options.job_abilities or options.weapon_skills or options.monster_abilities or options.mounts]
         elseif num_opts == 0 then
-            r_line = res[(offset == 1 and nonoptions[command_list[splitline[1]]] and command_list[splitline[1]]) or (nonoptions.spells and 'spells') or (nonoptions.weapon_skills and 'weapon_skills') or (nonoptions.job_abilities and 'job_abilities') or (nonoptions.monster_abilities and 'monster_abilities')][nonoptions[command_list[splitline[1]]] or nonoptions.spells or nonoptions.weapon_skills or nonoptions.job_abilities or nonoptions.monster_abilities]
+            r_line = res[(offset == 1 and nonoptions[command_list[splitline[1]]] and command_list[splitline[1]]) or (nonoptions.spells and 'spells') or (nonoptions.weapon_skills and 'weapon_skills') or (nonoptions.job_abilities and 'job_abilities') or (nonoptions.monster_abilities and 'monster_abilities') or (nonoptions.mounts and 'mounts')][nonoptions[command_list[splitline[1]]] or nonoptions.spells or nonoptions.weapon_skills or nonoptions.job_abilities or nonoptions.monster_abilities or nonoptions.mounts]
         end
         
         local targets = table.reassign({},r_line.targets)
@@ -380,8 +377,8 @@ function interp_text(splitline,offset,modified)
         -- Handling for abilities that change potential targets.
         if r_line.skill == 40 and r_line.cast_time == 8 and L(player.buffs):contains(409) then
             targets.Party = true -- Pianissimo changes the target list of 
-        elseif r_line.skill == 44 and r_line.en:find('Indi-') and not L(player.buffs):contains(584) then
-            targets.Party = false -- Indi- spells default to castable on party for some reason
+        elseif r_line.skill == 44 and r_line.en:find('Indi-') and L(player.buffs):contains(584) then
+            targets.Party = true -- Indi- spells can be cast on others when Entrust is up
         end
         
         local abil_name = r_line.english -- Remove spaces at the end of the ability name.

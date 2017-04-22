@@ -90,7 +90,7 @@ function queue.remove(q, i)
 end
 
 function queue.it(q)
-    local key = q.front
+    local key = q.front - 1
     return function()
         key = key + 1
         return rawget(q.data, key), key

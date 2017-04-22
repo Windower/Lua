@@ -179,6 +179,7 @@ function texts.new(str, settings, root_settings)
     local m = {}
     meta[t] = m
     m.name = (_addon and _addon.name or 'text') .. '_gensym_' .. tostring(t):sub(8) .. '_%.8X':format(16^8 * math.random()):sub(3)
+    t._name = m.name
     m.settings = settings or {}
     m.status = m.status or {visible = false, text = {}}
     m.root_settings = root_settings

@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -- addon information
 
 _addon.name = 'digger'
-_addon.version = '2.0.1'
+_addon.version = '2.2.0'
 _addon.command = 'digger'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
@@ -51,9 +51,11 @@ defaults.delay.lag = 3
 defaults.delay.dig = 15
 defaults.fatigue = {}
 defaults.fatigue.date = os.date('!%Y-%m-%d', os.time() + 32400)
-defaults.fatigue.remaining = 100
+defaults.fatigue.items = 0
+defaults.fatigue.diff = 0
+defaults.fatigue.free = 0
 defaults.accuracy = {}
-defaults.accuracy.successful = 0
+defaults.accuracy.failed = 0
 defaults.accuracy.total = 0
 
 settings = config.load(defaults)
@@ -77,8 +79,8 @@ end
 
 function get_gysahl_count()
     local count = 0
-    for _,item in pairs(windower.ffxi.get_items().inventory) do
-        if item.id == 4545 and item.status == 0 then
+    for _,item in pairs(windower.ffxi.get_items(0)) do
+        if type(item) == 'table' and item.id == 4545 and item.status == 0 then
             count = count + item.count
         end
     end
@@ -91,31 +93,35 @@ function update_day()
     local today = os.date('!%Y-%m-%d', os.time() + 32400)
     if settings.fatigue.date ~= today then
         settings.fatigue.date = today
-        settings.fatigue.remaining = 100
+        settings.fatigue.items = 0
+        settings.fatigue.free = 0
+        settings.fatigue.diff = settings.accuracy.failed - settings.accuracy.total
     end
 end
 
 function display_stats()
     local accuracy = 0
+    local successful = settings.accuracy.total - settings.accuracy.failed
     if settings.accuracy.total > 0 then
-        accuracy = (settings.accuracy.successful / settings.accuracy.total) * 100
+        accuracy = (successful / settings.accuracy.total) * 100
     end
-    windower.add_to_chat(207, 'dig accuracy: %d%% (%d/%d), items until fatigued: %d, gysahl greens remaining: %d':format(accuracy, settings.accuracy.successful, settings.accuracy.total, settings.fatigue.remaining, get_gysahl_count()))
+    windower.add_to_chat(207, 'dig accuracy: %d%% (%d/%d), fatigue today: %d, items today: %d gysahl greens remaining: %d':format(accuracy, successful, settings.accuracy.total, successful - settings.fatigue.free + settings.fatigue.diff, settings.fatigue.items, get_gysahl_count()))
 end
 
-function update_stats(count)
+function update_stats(mode)
     update_day()
-    if count < 1 then
+    if mode == 3 then
+        settings.fatigue.free = settings.fatigue.free + 1
+    elseif mode == 2 then
+        settings.fatigue.items = settings.fatigue.items + 1
+        display_stats()
+    elseif mode == 1 then
         settings.accuracy.total = settings.accuracy.total + 1
-    end
-    if count < 0 then
-        settings.accuracy.successful = settings.accuracy.successful + 1
-    end
-    settings.fatigue.remaining = settings.fatigue.remaining + count
-    settings:save()
-    if count ~= 1 then
+    else
+        settings.accuracy.failed = settings.accuracy.failed + 1
         display_stats()
     end
+    settings:save()
 end
 
 -- event callback functions
@@ -134,13 +140,16 @@ function check_incoming_chunk(id, original, modified, injected, blocked)
     if messages[zone_id] then
         if id == 0x2A then
             local message_id = original:unpack('H', 27) % 0x8000
-            if messages[zone_id].full == message_id or messages[zone_id].success == message_id and get_chocobo_buff() then
-                update_stats(-1)
+            if (messages[zone_id].full == message_id or messages[zone_id].success == message_id or messages[zone_id].points == message_id or messages[zone_id].standing == message_id or messages[zone_id].notes == message_id or messages[zone_id].bayld == message_id) and get_chocobo_buff() then
+                update_stats(2)
             elseif messages[zone_id].ease == message_id then
-                update_stats(1)
+                update_stats(3)
             end
-        elseif id == 0x2F and settings.delay.dig > 0 and windower.ffxi.get_player().id == original:unpack('I', 5) then
-            windower.send_command('timers c "Chocobo Dig Delay" %d down':format(settings.delay.dig))
+        elseif id == 0x2F and windower.ffxi.get_player().id == original:unpack('I', 5) then
+            if settings.delay.dig > 0 then
+                windower.send_command('timers c "Chocobo Dig Delay" %d down':format(settings.delay.dig))
+            end
+            update_stats(1)
         elseif id == 0x36 then
             local message_id = original:unpack('H', 11) % 0x8000
             if messages[zone_id].fail == message_id then
@@ -156,43 +165,45 @@ function digger_command(...)
         update_day()
         display_stats()
     elseif #arg == 2 and arg[1]:lower() == 'stats' and arg[2]:lower() == 'clear' then
-        settings.accuracy.successful = 0
+        update_day()
+        settings.fatigue.diff = settings.accuracy.total - settings.accuracy.failed + settings.fatigue.diff
+        settings.accuracy.failed = 0
         settings.accuracy.total = 0
         settings:save()
         windower.add_to_chat(204, 'reset dig accuracy statistics')
     elseif #arg == 2 and arg[1]:lower() == 'rank' then
         local rank = arg[2]:lower()
-        if rank == 'amateur' then
+        if rank == 'amateur' or rank == 'a60' then
             settings.delay.area = 60
             settings.delay.dig = 15
-        elseif rank == 'recruit' then
+        elseif rank == 'recruit' or rank == 'a55' then
             settings.delay.area = 55
             settings.delay.dig = 10
-        elseif rank == 'initiate' then
+        elseif rank == 'initiate' or rank == 'a50' then
             settings.delay.area = 50
             settings.delay.dig = 5
-        elseif rank == 'novice' then
+        elseif rank == 'novice' or rank == 'a45' then
             settings.delay.area = 45
             settings.delay.dig = 0
-        elseif rank == 'apprentice' then
+        elseif rank == 'apprentice' or rank == 'a40' then
             settings.delay.area = 40
             settings.delay.dig = 0
-        elseif rank == 'journeyman' then
+        elseif rank == 'journeyman' or rank == 'a35' then
             settings.delay.area = 35
             settings.delay.dig = 0
-        elseif rank == 'craftsman' then
+        elseif rank == 'craftsman' or rank == 'a30' then
             settings.delay.area = 30
             settings.delay.dig = 0
-        elseif rank == 'artisan' then
+        elseif rank == 'artisan' or rank == 'a25' then
             settings.delay.area = 25
             settings.delay.dig = 0
-        elseif rank == 'adept' then
+        elseif rank == 'adept' or rank == 'a20' then
             settings.delay.area = 20
             settings.delay.dig = 0
-        elseif rank == 'veteran' then
+        elseif rank == 'veteran' or rank == 'a15' then
             settings.delay.area = 15
             settings.delay.dig = 0
-        elseif rank == 'expert' then
+        elseif rank == 'expert' or rank == 'a10' then
             settings.delay.area = 10
             settings.delay.dig = 0
         else

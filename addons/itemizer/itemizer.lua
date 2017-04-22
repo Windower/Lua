@@ -139,7 +139,7 @@ windower.register_event('unhandled command', function(command, ...)
         local specified_bag = rawget(bag_ids, bag)
         if specified_bag then
             if not windower.ffxi.get_bag_info(specified_bag).enabled then
-                error('%s currently not enabled':format(res.bags[source_bag].name))
+                error('%s currently not enabled':format(res.bags[specified_bag].name))
                 return
             end
 
