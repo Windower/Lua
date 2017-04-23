@@ -94,6 +94,7 @@ time_col = "\\cs(255,255,0)"
 StaggerCount = 0
 current_mob = "unknown"
 current_proc = "unknown"
+mob_timers = "unknown"
 currenttime = 0
 obj_time = 0
 end_time = 0
