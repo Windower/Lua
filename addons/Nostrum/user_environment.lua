@@ -154,6 +154,14 @@ function build_a_sandbox(overlay_name)
 			t[s] = fn
 		end
 	end
+	
+	sandbox.coroutine.sleep = function(n)
+		coroutine.yield('sleep', n)
+	end
+	
+	sandbox.coroutine.yield = function(...)
+		coroutine.yield('yield', ...)
+	end
 
 	-- this is a bigger pain than expected
 	sandbox.files.new = function(path, create)
