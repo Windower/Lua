@@ -123,6 +123,10 @@ windower.register_event('incoming text', function(original, modified, mode, newm
                 end
             end
 
+            if lines:last() == '' then
+                lines:remove(lines.n)
+            end
+
             -- Insert spaces in NPC text
             if mode == 190 then
                 for i = 2, lines.n do
