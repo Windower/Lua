@@ -37,3 +37,4 @@ command(shortcut)
   - Trims the display down to size, removing blank spaces.
 2. profile(p) &lt;name&gt;:
   - Loads a new palette profile from the settings file.
+  

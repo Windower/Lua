@@ -20,14 +20,14 @@ DISCLAIMED. IN NO EVENT SHALL trv BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER I N CONTRACT, STRICT LIABILITY, OR TORT
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 --[[
-	Old "fit" functions removed. Text extents are needed to recalculate
-	dimensions of box, but the text object is not redrawn until the next
-	frame render.
+    Old "fit" functions removed. Text extents are needed to recalculate
+    dimensions of box, but the text object is not redrawn until the next
+    frame render.
 --]]
 
 local scrolling_text = {}
@@ -73,13 +73,13 @@ local default_settings = {
     text = {
         font = 'Consolas',
         size = 10,
-		red = 224,
-		blue = 226,
-		green = 228,
-		lines = {},
+        red = 224,
+        blue = 226,
+        green = 228,
+        lines = {},
         color_formatting = {},
         lines_to_display = 12,
-		line_height = 16,
+        line_height = 16,
     },
     pos = {0, 0},
     w = 150,
@@ -91,7 +91,7 @@ function scrolling_text.new(settings)
 
     local t = {}
     meta[t] = m
-	
+    
     m.events = {}
     
     amend(m, default_settings)
@@ -109,14 +109,14 @@ function scrolling_text.new(settings)
             m.text.display[i] = m.text.lines[i]
         end
     end
-	
-	m.line_height = m.text.line_height
-	m.h = m.line_height * m.lines_to_display --
+    
+    m.line_height = m.text.line_height
+    m.h = m.line_height * m.lines_to_display --
 
     t.bg = prims.new({
         pos = m.pos,
         w = m.w,
-		h = m.h,
+        h = m.h,
         color = m.color.bg,
         visible = m.visible,
         })
@@ -126,7 +126,7 @@ function scrolling_text.new(settings)
             m.pos[2],
         },
         w = 10,
-		h = m.line_height,
+        h = m.line_height,
         color = m.color.bar,
         visible = m.visible,
         })
@@ -146,82 +146,82 @@ function scrolling_text.new(settings)
         scrolling_text.initialize(t)
     end--]]
     
-	if _libs.widgets then
-		--widgets.handle_mouse_event(t.bar, m.pos[1] + m.w, m.pos[1] + m.w + 10, m.pos[2], m.pos[2] + 1) -- ?
-		scrolling_text.register_event(t, 'scroll', function(x, y, delta)
-			local m = meta[t]
-			scrolling_text.scroll(t, delta)
+    if _libs.widgets then
+        --widgets.handle_mouse_event(t.bar, m.pos[1] + m.w, m.pos[1] + m.w + 10, m.pos[2], m.pos[2] + 1) -- ?
+        scrolling_text.register_event(t, 'scroll', function(x, y, delta)
+            local m = meta[t]
+            scrolling_text.scroll(t, delta)
 
-			return m.events.scroll.n == 1
-		end)
-		
-		scrolling_text.register_event(t, 'left button down', function(x, y)
-			local m = meta[t]
-			if x > m.pos[1] + m.w 
-				and m.text.lines.n > m.lines_to_display 
-				and t.bar:hover(x, y) 
-				and widgets.get_carried_object() ~= t.bar then
+            return m.events.scroll.n == 1
+        end)
+        
+        scrolling_text.register_event(t, 'left button down', function(x, y)
+            local m = meta[t]
+            if x > m.pos[1] + m.w 
+                and m.text.lines.n > m.lines_to_display 
+                and t.bar:hover(x, y) 
+                and widgets.get_carried_object() ~= t.bar then
 
-					widgets.pick_up(t.bar, x, y)
-					return true
-			end
-		end)
-		
-		prims.register_event(t.bar, 'drag', function(x, y)
-			local scroll_increment_height = (m.h - t.bar:height())/(m.text.lines.n - m.lines_to_display)
-			local bar_y = scroll_increment_height * (m.from - 1) + m.pos[2]--t.bar:pos_y()
-			local bar_y2 = y - t.bar._contact_point[2]
-			local dy = bar_y2 - bar_y
-			
-			if dy > 0 then
-				local max_bar_pos = m.h + m.pos[2] - t.bar:height()
-				
-				if bar_y2 <= max_bar_pos then
-					t.bar:pos_y(bar_y2)
-				else
-					t.bar:pos_y(max_bar_pos)
-				end				
-				scrolling_text.text_scroll(t, -math.floor(dy/scroll_increment_height))
-			else
-				local max_bar_pos = m.pos[2]
-				
-				if bar_y2 >= max_bar_pos then
-					t.bar:pos_y(bar_y2)
-				else
-					t.bar:pos_y(max_bar_pos)
-				end
-				scrolling_text.text_scroll(t, -math.ceil(dy/scroll_increment_height))
-			end
+                    widgets.pick_up(t.bar, x, y)
+                    return true
+            end
+        end)
+        
+        prims.register_event(t.bar, 'drag', function(x, y)
+            local scroll_increment_height = (m.h - t.bar:height())/(m.text.lines.n - m.lines_to_display)
+            local bar_y = scroll_increment_height * (m.from - 1) + m.pos[2]--t.bar:pos_y()
+            local bar_y2 = y - t.bar._contact_point[2]
+            local dy = bar_y2 - bar_y
+            
+            if dy > 0 then
+                local max_bar_pos = m.h + m.pos[2] - t.bar:height()
+                
+                if bar_y2 <= max_bar_pos then
+                    t.bar:pos_y(bar_y2)
+                else
+                    t.bar:pos_y(max_bar_pos)
+                end                
+                scrolling_text.text_scroll(t, -math.floor(dy/scroll_increment_height))
+            else
+                local max_bar_pos = m.pos[2]
+                
+                if bar_y2 >= max_bar_pos then
+                    t.bar:pos_y(bar_y2)
+                else
+                    t.bar:pos_y(max_bar_pos)
+                end
+                scrolling_text.text_scroll(t, -math.ceil(dy/scroll_increment_height))
+            end
 
-			return true
-		end)
-		
-		--[[scrolling_text.register_event(t, 'left button up', function(x, y)
-			if widgets.get_carried_object() == t.bar then
-				widgets.put_down(t.bar)
-				return true
-			end
-		end)
-		t.bar:register_event('left button down', handle_pickup)
-		t.bar.height = function(t, h)
-			if h then
-				local x, y = t.bar:pos()
-				widgets.update(t.bar, x, x + 10, y, y + h)
-			end
+            return true
+        end)
+        
+        --[[scrolling_text.register_event(t, 'left button up', function(x, y)
+            if widgets.get_carried_object() == t.bar then
+                widgets.put_down(t.bar)
+                return true
+            end
+        end)
+        t.bar:register_event('left button down', handle_pickup)
+        t.bar.height = function(t, h)
+            if h then
+                local x, y = t.bar:pos()
+                widgets.update(t.bar, x, x + 10, y, y + h)
+            end
 
-			return prims.height(t, h)
-		end
-		t.bar.pos_y = function(t, y)
-			if y then
-				local x = t.bar:pos_x()
-				widgets.update(t.bar, x, x + 10, y, y + t.bar:height())
-			end
-			
-			return prims.pos_y(t, y)
-		end
-		t.bar:register_event('drag', handle_drag)--]]
-	end
-	
+            return prims.height(t, h)
+        end
+        t.bar.pos_y = function(t, y)
+            if y then
+                local x = t.bar:pos_x()
+                widgets.update(t.bar, x, x + 10, y, y + t.bar:height())
+            end
+            
+            return prims.pos_y(t, y)
+        end
+        t.bar:register_event('drag', handle_drag)--]]
+    end
+    
     return setmetatable(t, _meta.scrolling_text)
 end
 
@@ -246,14 +246,14 @@ end
     t.content:hide()
 end--]]
 function scrolling_text.destroy(t)
-	meta[t] = nil
-	t.content:destroy()
-	t.bar:destroy()
-	t.bg:destroy()
+    meta[t] = nil
+    t.content:destroy()
+    t.bar:destroy()
+    t.bg:destroy()
 end
 
 function scrolling_text.line(t, n)
-	return meta[t].text.lines[n]
+    return meta[t].text.lines[n]
 end
 
 --[[
@@ -339,18 +339,18 @@ function scrolling_text.open(t, n)
     --t:fit(m.fit.x, m.fit.y)
     
     if m.text.lines.n > m.lines_to_display then
-		local bar_height = m.h * m.lines_to_display / m.text.lines.n
+        local bar_height = m.h * m.lines_to_display / m.text.lines.n
 --        t.bar:pos_y(m.pos[2] + (m.lines_to_display * m.line_height * (1 - m.lines_to_display / m.text.lines.n)) / (m.text.lines.n - m.lines_to_display) * (m.from - 1))        
         t.bar:pos_y(
-			m.pos[2] 
-			--+ (m.lines_to_display * m.line_height * (1 - m.lines_to_display / m.text.lines.n)) 
-			+ (m.h - bar_height)
-			/ (m.text.lines.n - m.lines_to_display) 
-			* (m.from - 1)
-		)        
+            m.pos[2] 
+            --+ (m.lines_to_display * m.line_height * (1 - m.lines_to_display / m.text.lines.n)) 
+            + (m.h - bar_height)
+            / (m.text.lines.n - m.lines_to_display) 
+            * (m.from - 1)
+        )        
         t.bar:height(bar_height)
-		
-		if not t.bar:visible() then 
+        
+        if not t.bar:visible() then 
             t.bar:show()
         end
     elseif t.bar:visible() then
@@ -385,12 +385,12 @@ function scrolling_text.visible(t, visible)
 end
 
 function scrolling_text.scroll(t, delta)
-	t:text_scroll(delta)
-	t:bar_scroll(delta)
+    t:text_scroll(delta)
+    t:bar_scroll(delta)
 end
 
 function scrolling_text.text_scroll(t, delta)
-	if delta == 0 or delta == -0 then return end
+    if delta == 0 or delta == -0 then return end
 
     local m = meta[t]
     if m.text.lines.n > m.lines_to_display then
@@ -407,23 +407,23 @@ end
 
 function scrolling_text.bar_scroll(t, delta)
     local m = meta[t]
-	t.bar:pos_y(
-		m.pos[2] 
-		+ (m.lines_to_display * m.line_height * (1 - m.lines_to_display / m.text.lines.n))
-		/ (m.text.lines.n - m.lines_to_display)
-		* (m.from - 1)
-	)
+    t.bar:pos_y(
+        m.pos[2] 
+        + (m.lines_to_display * m.line_height * (1 - m.lines_to_display / m.text.lines.n))
+        / (m.text.lines.n - m.lines_to_display)
+        * (m.from - 1)
+    )
 end
 
 function scrolling_text.force_scroll(t, delta)
-	local events = m.events.scroll
-	if not events then return end
-	
-	for i = 1, events.n do
-		if events[i] then
-			events[i](delta)
-		end
-	end
+    local events = m.events.scroll
+    if not events then return end
+    
+    for i = 1, events.n do
+        if events[i] then
+            events[i](delta)
+        end
+    end
 end
 
 function scrolling_text.line_height(t)
@@ -440,13 +440,13 @@ end
 
 function scrolling_text.hover(t, x, y)
     local m = meta[t]
-	local _x, _y = m.pos[1], m.pos[2]
-	
-	return x >= _x
-		and x < _x + m.w + (t.bar:visible() and 10 or 0)
-		and y >= _y
-		and y < _y + m.h
-	--t.bg:hover(x, y)
+    local _x, _y = m.pos[1], m.pos[2]
+    
+    return x >= _x
+        and x < _x + m.w + (t.bar:visible() and 10 or 0)
+        and y >= _y
+        and y < _y + m.h
+    --t.bg:hover(x, y)
 end
 
 function scrolling_text.text(t, array, color_formatting)
@@ -639,24 +639,24 @@ function scrolling_text.concat(t, sep, from, to)
 end
 
 function scrolling_text.events(t, event)
-	local function_list = meta[t].events[event]
-	if not function_list then return nil end
+    local function_list = meta[t].events[event]
+    if not function_list then return nil end
 
-	local n = 0
-	local m = function_list.n
-	
-	return function()
-		n = n + 1
-		local fn = function_list[n]
-		
-		-- handle holes in the list
-		while not fn and n <= m do
-			n = n + 1
-			fn = function_list[n]
-		end
+    local n = 0
+    local m = function_list.n
+    
+    return function()
+        n = n + 1
+        local fn = function_list[n]
+        
+        -- handle holes in the list
+        while not fn and n <= m do
+            n = n + 1
+            fn = function_list[n]
+        end
 
-		return fn
-	end
+        return fn
+    end
 end
 
 function scrolling_text.register_event(t, event, fn)
@@ -675,7 +675,7 @@ function scrolling_text.register_event(t, event, fn)
         m[event].n = n
     end
     m[event][n] = fn
-	
+    
     return n
 end
  

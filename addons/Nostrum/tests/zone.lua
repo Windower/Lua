@@ -20,35 +20,35 @@ DISCLAIMED. IN NO EVENT SHALL trv BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER I N CONTRACT, STRICT LIABILITY, OR TORT
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 return function(party, spot, zone_id)
-	party = tonumber(party)
-	spot = tonumber(spot)
-	zone_id = tonumber(zone_id)
-	
-	if not (party and spot and zone_id) then
-		print('Missing arguments.')
-		return
-	end
-	
-	local id = alliance[party][spot]
-	
-	if not id then
-		print('No player in that position.')
-		return
-	end
-	
-	local player = alliance_lookup[id]
-	local old = player.zone
-	
-	player.zone = zone_id
-	player.out_of_zone = zone_id ~= 0
-	
-	if old ~= zone_id then
-		dbg['member zone'](party, spot, zone_id, old)
-	end
+    party = tonumber(party)
+    spot = tonumber(spot)
+    zone_id = tonumber(zone_id)
+    
+    if not (party and spot and zone_id) then
+        print('Missing arguments.')
+        return
+    end
+    
+    local id = alliance[party][spot]
+    
+    if not id then
+        print('No player in that position.')
+        return
+    end
+    
+    local player = alliance_lookup[id]
+    local old = player.zone
+    
+    player.zone = zone_id
+    player.out_of_zone = zone_id ~= 0
+    
+    if old ~= zone_id then
+        dbg['member zone'](party, spot, zone_id, old)
+    end
 end, [[This test simulates the zone change event.
 Parameter <party> <spot> <zone id>.]]

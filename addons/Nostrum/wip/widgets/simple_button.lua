@@ -20,7 +20,7 @@ DISCLAIMED. IN NO EVENT SHALL trv BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER I N CONTRACT, STRICT LIABILITY, OR TORT
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
@@ -80,48 +80,48 @@ amend = function(settings, defaults)
 end
 
 function simple_buttons.new(settings)
-	settings = amend(settings or {}, default_settings)
+    settings = amend(settings or {}, default_settings)
     local t = prims.new(settings)
 
-	local m = {
+    local m = {
         state = false,
         events = {},
-		labels = {},
+        labels = {},
     }
-	
-	local labels = settings.labels
-	m.labels.n = #labels
-	
-	for i = 1, m.labels.n do
-		local text_settings = labels[i]
-		if type(text_settings) == 'table' then
-			text_settings.flags = text_settings.flags or {}
-			text_settings.flags.draggable = false
-			settings.bg = settings.bg or {visible = false}
-		else
-			text_settings = {text_settings, {flags = {draggable = false}}}
-		end
-		
-		m.labels[i] = texts.new(unpack(text_settings))
-		
-		if settings.visible then
-			m.labels[i]:show()
-		end
-	end
-	
-	meta[t] = m
+    
+    local labels = settings.labels
+    m.labels.n = #labels
+    
+    for i = 1, m.labels.n do
+        local text_settings = labels[i]
+        if type(text_settings) == 'table' then
+            text_settings.flags = text_settings.flags or {}
+            text_settings.flags.draggable = false
+            settings.bg = settings.bg or {visible = false}
+        else
+            text_settings = {text_settings, {flags = {draggable = false}}}
+        end
+        
+        m.labels[i] = texts.new(unpack(text_settings))
+        
+        if settings.visible then
+            m.labels[i]:show()
+        end
+    end
+    
+    meta[t] = m
     
     return setmetatable(t, _meta.SimpleButtons)
 end
 
 function simple_buttons.destroy(t)
-	meta[t] = nil
+    meta[t] = nil
 end
 
 function simple_buttons.visible(t, visible)
     if visible == nil then return prims.visible(t) end
 
-	local m = meta[t]
+    local m = meta[t]
     for i = 1, m.labels.n do
         m.labels[i]:visible(visible)
     end
@@ -134,19 +134,19 @@ function simple_buttons.show(t)
 end
 
 function simple_buttons.hide(t)
-	t:visible(false)
+    t:visible(false)
 end
 
 function simple_buttons.pos(t, x, y)
     if not y then return prims.pos(t) end
     
-	local m = meta[t]
-	local _x, _y = prims.pos(t)
+    local m = meta[t]
+    local _x, _y = prims.pos(t)
 
     for i = 1, m.labels.n do
         local label = m.labels[i]
-		local lx, ly = label:pos()
-		
+        local lx, ly = label:pos()
+        
         label:pos(x + lx - _x, y + ly - _y)
     end
     
@@ -156,9 +156,9 @@ end
 function simple_buttons.pos_x(t, x)
     if not x then return prims.pos_x(t) end
 
-	local m = meta[t]
-	local _x = prims.pos_x(t)
-	
+    local m = meta[t]
+    local _x = prims.pos_x(t)
+    
     for i = 1, m.labels.n do
         local label = m.labels[i]
         label:pos_x(x + label:pos_x() - _x)
@@ -170,9 +170,9 @@ end
 function simple_buttons.pos_y(t, y)
     if not y then return prims.pos_y(t) end
 
-	local m = meta[t]
-	local _y = prims.pos_y(t)
-	
+    local m = meta[t]
+    local _y = prims.pos_y(t)
+    
     for i = 1, m.labels.n do
         local label = m.labels[i]
         label:pos_y(y + label:pos_y() - _y)
@@ -182,43 +182,43 @@ function simple_buttons.pos_y(t, y)
 end
 
 function simple_buttons.append_label(t, text, x_offset, y_offset)
-	x_offset, y_offset = x_offset or 0, y_offset or 0
-	local m = meta[t]
+    x_offset, y_offset = x_offset or 0, y_offset or 0
+    local m = meta[t]
 
     local n = m.labels.n + 1
-	
-	if class(text) == 'Text' then
-		m.labels[n] = text
-		
-		local x, y = prims.pos(t)
-		text:pos(x + x_offset, y + y_offset)
-		
-	elseif type(text) == 'table' then
-		text.flags = text.flags or {}
-		text.flags.draggable = false
-		text.pos = text.pos or {x = x_offset + prims.pos_x(t), y = y_offset + prims.pos_y(t)}
-		text.bg = text.bg or {visible = false}
-		m.labels[n] = texts.new(unpack(text))
-		
-	elseif type(text) == 'string' then
-		m.labels[n] = texts.new(text, {
+    
+    if class(text) == 'Text' then
+        m.labels[n] = text
+        
+        local x, y = prims.pos(t)
+        text:pos(x + x_offset, y + y_offset)
+        
+    elseif type(text) == 'table' then
+        text.flags = text.flags or {}
+        text.flags.draggable = false
+        text.pos = text.pos or {x = x_offset + prims.pos_x(t), y = y_offset + prims.pos_y(t)}
+        text.bg = text.bg or {visible = false}
+        m.labels[n] = texts.new(unpack(text))
+        
+    elseif type(text) == 'string' then
+        m.labels[n] = texts.new(text, {
             flags = {draggable = false},
             bg = {visible = false},
-            pos = {x = x_offset + prims.pos_x(t), y = y_offset + prims.pos_y(t)},		
-		})
-	end
-	
-	m.labels.n = n
+            pos = {x = x_offset + prims.pos_x(t), y = y_offset + prims.pos_y(t)},        
+        })
+    end
+    
+    m.labels.n = n
 
-	if prims.visible(t) then
-		m.labels[n]:show()
-	end
+    if prims.visible(t) then
+        m.labels[n]:show()
+    end
 end
 
 function simple_buttons.remove_label(t, n)
     local m = meta[t]
-	
-	m.labels.n = m.labels.n - 1
+    
+    m.labels.n = m.labels.n - 1
     m.labels[n]:destroy()
     table.remove(m.labels, n)
 end
@@ -228,24 +228,24 @@ function simple_buttons.label(t, n)
 end
 
 function simple_buttons.events(t, event)
-	local function_list = meta[t].events[event]
-	if not function_list then return nil end
-	
-	local n = 0
-	local m = function_list.n
-	
-	return function()
-		n = n + 1
-		local fn = function_list[n]
-		
-		-- handle holes in the list
-		while not fn and n <= m do
-			n = n + 1
-			fn = function_list[n]
-		end
+    local function_list = meta[t].events[event]
+    if not function_list then return nil end
+    
+    local n = 0
+    local m = function_list.n
+    
+    return function()
+        n = n + 1
+        local fn = function_list[n]
+        
+        -- handle holes in the list
+        while not fn and n <= m do
+            n = n + 1
+            fn = function_list[n]
+        end
 
-		return fn
-	end
+        return fn
+    end
 end
 
 function simple_buttons.register_event(t, event, fn)

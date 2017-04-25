@@ -20,7 +20,7 @@ DISCLAIMED. IN NO EVENT SHALL trv BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER I N CONTRACT, STRICT LIABILITY, OR TORT
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
@@ -34,12 +34,12 @@ _meta = _meta or {}
 _meta.parties = {__index = parties}
 
 function parties.new()
-	local t = {nil, nil, nil, nil, nil, nil}
-	local m = {}
-	meta[t] = m
+    local t = {nil, nil, nil, nil, nil, nil}
+    local m = {}
+    meta[t] = m
 
-	m.n = 0
-	
+    m.n = 0
+    
     return setmetatable(t, _meta.parties)
 end
 
@@ -58,70 +58,70 @@ function parties.form_alliance(...)
 end
 
 function parties.kick(t, id)
-	local i = 1
-	local position
-	local m = meta[t]
-	local n = m.n
-	
-	repeat
-		position = t[i] == id and i or nil
-		i = i + 1
-	until position or i > n
-	
-	if position then
-		table.remove(t, position)
-		t[6] = nil
-		m.n = n - 1
-		
-		return position
-	else
-		return false
-	end
+    local i = 1
+    local position
+    local m = meta[t]
+    local n = m.n
+    
+    repeat
+        position = t[i] == id and i or nil
+        i = i + 1
+    until position or i > n
+    
+    if position then
+        table.remove(t, position)
+        t[6] = nil
+        m.n = n - 1
+        
+        return position
+    else
+        return false
+    end
 end
 
 function parties.kick_pos(t, n)
-	local m = meta[t]
-	
-	local id = table.remove(t, n)
-	m.n = #t
-	
-	return id or false
+    local m = meta[t]
+    
+    local id = table.remove(t, n)
+    m.n = #t
+    
+    return id or false
 end
 
 function parties.invite(t, id)
     local m = meta[t]
-	local n = m.n + 1
-	
-	m.n = n
+    local n = m.n + 1
+    
+    m.n = n
     t[n] = id
-	
-	return n
+    
+    return n
 end
 
 function parties.carbon_copy(t)
-	local m = meta[t]
-	local cc = {}
-	
-	for i = 1, m.n do
-		cc[i] = t[i]
-	end
-	
-	cc.n = m.n
-	
-	return cc
+    local m = meta[t]
+    local cc = {}
+    
+    for i = 1, m.n do
+        cc[i] = t[i]
+    end
+    
+    cc.n = m.n
+    
+    return cc
 end
 
 function parties.count(t)
-	return meta[t].n
+    return meta[t].n
 end
 
 function parties.dissolve(t)
-	--meta[t] = nil
-	for i = 1, meta[t].n do
-		t[i] = nil
-	end
-	
-	meta[t].n = 0
+    --meta[t] = nil
+    for i = 1, meta[t].n do
+        t[i] = nil
+    end
+    
+    meta[t].n = 0
 end
 
 return parties

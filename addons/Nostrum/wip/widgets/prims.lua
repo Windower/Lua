@@ -20,7 +20,7 @@ DISCLAIMED. IN NO EVENT SHALL trv BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER I N CONTRACT, STRICT LIABILITY, OR TORT
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
@@ -54,7 +54,7 @@ function prims.new(settings)
     local t = {}
     local color = settings.color
 
-	settings = settings or {}
+    settings = settings or {}
     settings.pos = settings.pos and {settings.pos[1], settings.pos[2]} or {0, 0}
 
     local m = {
@@ -69,7 +69,7 @@ function prims.new(settings)
         events = {}
     }
 
-	-- these are almost definitely swapped.
+    -- these are almost definitely swapped.
     m.x1, m.x2 = m.width >= 0 and settings.pos[1], m.width + settings.pos[1] - 1 or m.width + settings.pos[1], settings.pos[1] - 1
     m.y1, m.y2 = m.height >= 0 and settings.pos[2], m.height + settings.pos[2] - 1 or m.height + settings.pos[2], settings.pos[2] - 1
 
@@ -124,9 +124,9 @@ function prims.pos(t, x, y)
     if not y then
         return m.width >= 0 and m.x1 or m.x2 + 1, m.height >= 0 and m.y1 or m.y2 + 1
     end
-	
-	local is_width_positive = m.width >= 0
-	local is_height_positive = m.height >= 0
+    
+    local is_width_positive = m.width >= 0
+    local is_height_positive = m.height >= 0
 
     m.x1, m.x2 = is_width_positive and x, m.width + x - 1 or m.width + x, x - 1
     m.y1, m.y2 = is_height_positive and y, m.height + y - 1 or m.height + y, y - 1
@@ -140,25 +140,25 @@ function prims.pos_x(t, x)
     if not x then
         return m.width >= 0 and m.x1 or m.x2 + 1
     end
-	
-	m.x1, m.x2 = m.width >= 0 and x, m.width + x - 1 or m.width + x, x - 1
+    
+    m.x1, m.x2 = m.width >= 0 and x, m.width + x - 1 or m.width + x, x - 1
 
-	-- if x1 is the left corner, then x1 <= x < x1 + h
-	-- if width is negative, then x2 + h <= x < x2
-	
-	--[[
-		w = 10
-		pos = 0
-		x1 -> 0
-		x2 -> 9
-		
-		w = -10
-		pos = 0
-		x1 -> -10
-		x2 -> -1
-		
-		returning x2 - 1
-	--]]
+    -- if x1 is the left corner, then x1 <= x < x1 + h
+    -- if width is negative, then x2 + h <= x < x2
+    
+    --[[
+        w = 10
+        pos = 0
+        x1 -> 0
+        x2 -> 9
+        
+        w = -10
+        pos = 0
+        x1 -> -10
+        x2 -> -1
+        
+        returning x2 - 1
+    --]]
     windower.prim.set_position(m.name, x, m.height >= 0 and m.y1 or m.y2 + 1)
 end
 
@@ -168,8 +168,8 @@ function prims.pos_y(t, y)
     if not y then
         return m.height >= 0 and m.y1 or m.y2 + 1
     end
-	
-	local is_height_positive = m.height >= 0
+    
+    local is_height_positive = m.height >= 0
 
     m.y1, m.y2 = is_height_positive and y, m.height + y - 1 or m.height + y, y - 1
 
@@ -205,9 +205,9 @@ function prims.width(t, width)
     local w = m.width
     
     windower.prim.set_size(m.name, width, m.height)
-	
+    
     m.width = width
-	
+    
     if w * width >= 0 then
         if w >= 0 then
             m.x2 = m.x1 + width - 1
@@ -261,9 +261,9 @@ function prims.height(t, height)
     local h = m.height
     
     windower.prim.set_size(m.name, m.width, height)
-	
+    
     m.height = height
-	
+    
     if h * height >= 0 then
         if h >= 0 then
             m.y2 = m.y1 + height - 1
@@ -416,7 +416,7 @@ end
 
 function prims.hover(t, x, y)
     local m = meta[t]
-	
+    
     return (m.x2 >= x
         and m.x1 <= x
         and m.y2 >= y
@@ -430,33 +430,33 @@ end
 
 
 function prims.events(t, event)
-	local function_list = meta[t].events[event]
-	if not function_list then return nil end
-	
-	local n = 0
-	local m = function_list.n
-	
-	return function()
-		n = n + 1
-		local fn = function_list[n]
-		
-		-- handle holes in the list
-		while not fn and n <= m do
-			n = n + 1
-			fn = function_list[n]
-		end
+    local function_list = meta[t].events[event]
+    if not function_list then return nil end
+    
+    local n = 0
+    local m = function_list.n
+    
+    return function()
+        n = n + 1
+        local fn = function_list[n]
+        
+        -- handle holes in the list
+        while not fn and n <= m do
+            n = n + 1
+            fn = function_list[n]
+        end
 
-		return fn
-	end
+        return fn
+    end
 end
 
 function prims.register_event(t, event, fn)    
     local m = meta[t].events
 
     m[event] = m[event] or {n = 0}
-	
+    
     local n = #m[event] + 1
-	
+    
     m[event][n] = fn
     m[event].n = m[event].n > n and m[event].n or n
 

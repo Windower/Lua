@@ -20,7 +20,7 @@ DISCLAIMED. IN NO EVENT SHALL trv BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER I N CONTRACT, STRICT LIABILITY, OR TORT
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
@@ -85,13 +85,13 @@ function slider.new(settings)
     settings = amend(settings or {}, default_settings)
     
     settings.handle.pos = {
-		settings.pos[1] - settings.handle.w / 2, 
-		settings.pos[2] -- - (settings.handle.h - settings.track.h) / 2
-	}
+        settings.pos[1] - settings.handle.w / 2, 
+        settings.pos[2] -- - (settings.handle.h - settings.track.h) / 2
+    }
     settings.track.pos = {
-		settings.pos[1],
-		settings.pos[2] + settings.handle.h/2 - settings.track.h/2
-	}--settings.pos
+        settings.pos[1],
+        settings.pos[2] + settings.handle.h/2 - settings.track.h/2
+    }--settings.pos
     
     t.track = prims.new(settings.track)
     t.handle = prims.new(settings.handle)
@@ -100,33 +100,33 @@ function slider.new(settings)
     meta[t] = m
     
     m.slider_pos = 0
-	m.decimal = 0
+    m.decimal = 0
     m.events = {}
-	m.pos = settings.pos
-	
-	if _libs.widgets then
-		slider.register_event(t, 'left button down', function(x, y)
-			slider.slide(t, x)
-			widgets.pick_up(t.handle, x, y)
-			
-			return true
-		end)
-		
-		t.handle:register_event('drag', function(x, y)
-			slider.slide(t, x)
+    m.pos = settings.pos
+    
+    if _libs.widgets then
+        slider.register_event(t, 'left button down', function(x, y)
+            slider.slide(t, x)
+            widgets.pick_up(t.handle, x, y)
+            
+            return true
+        end)
+        
+        t.handle:register_event('drag', function(x, y)
+            slider.slide(t, x)
 
-			return true
-		end)
-	end
-	
-	return setmetatable(t, _meta.slider)
+            return true
+        end)
+    end
+    
+    return setmetatable(t, _meta.slider)
 end
 
 function slider.destroy(t)
-	t.handle:destroy()
-	t.track:destroy()
-	
-	meta[t] = nil
+    t.handle:destroy()
+    t.track:destroy()
+    
+    meta[t] = nil
 end
 
 function slider.hover(t, x, y)
@@ -134,51 +134,51 @@ function slider.hover(t, x, y)
 end
 
 function slider.decimal(t)
-	return meta[t].decimal
+    return meta[t].decimal
 end
 
 function slider.percentage(t, percent)
-	if not percent then	return meta[t].decimal * 100 end
+    if not percent then    return meta[t].decimal * 100 end
 
     local m = meta[t]
-	
-	percent = percent/100
-	m.decimal = percent
-	
-	percent = percent * t.track:width() - t.handle:width() / 2
-	t.handle:pos_x(t:pos_x() + percent)
-    m.slider_pos = percent	
+    
+    percent = percent/100
+    m.decimal = percent
+    
+    percent = percent * t.track:width() - t.handle:width() / 2
+    t.handle:pos_x(t:pos_x() + percent)
+    m.slider_pos = percent    
 end
 
 function slider.slide(t, x)    
-	local m = meta[t]
-	
+    local m = meta[t]
+    
     local _x = m.pos[1]
     local _w = t.track:width()
     
     x = (x < _x and _x or x > _x + _w and _x + _w or x)
-	m.decimal = (x-_x)/_w
+    m.decimal = (x-_x)/_w
 
-	x = x - t.handle:width() / 2
+    x = x - t.handle:width() / 2
     t.handle:pos_x(x)
     m.slider_pos = x - _x
-	local events = meta[t].events.slide
-	
-	if events then
-		for i = 1, events.n do
-			if events[i] then
-				events[i](m.decimal)
-			end
-		end
-	end
+    local events = meta[t].events.slide
+    
+    if events then
+        for i = 1, events.n do
+            if events[i] then
+                events[i](m.decimal)
+            end
+        end
+    end
 end
 
 function slider.width(t)
-	return t.track:width()
+    return t.track:width()
 end
 
 function slider.height(t)
-	return t.handle:height()
+    return t.handle:height()
 end
 
 function slider.show(t)
@@ -199,56 +199,56 @@ function slider.visible(t, visible)
 end
 
 function slider.pos(t, x, y)
-	local m = meta[t]
+    local m = meta[t]
     if not y then return m.pos[1], m.pos[2] end
     
     t.handle:pos(
-		x + m.slider_pos,
-		y
-	)
+        x + m.slider_pos,
+        y
+    )
     t.track:pos(x, y + (t.handle:height() - t.track:height()) / 2)
-	
-	m.pos[1], m.pos[2] = x, y
+    
+    m.pos[1], m.pos[2] = x, y
 end
 
 function slider.pos_x(t, x)
     if not x then return meta[t].pos[1] end
-	local m = meta[t]
-	
+    local m = meta[t]
+    
     t.handle:pos_x(x + m.slider_pos)
     t.track:pos_x(x)
-	m.pos[1] = x
+    m.pos[1] = x
 end
 
 function slider.pos_y(t, y)
     if not y then return meta[t].pos[2] end
 
-	local m = meta[t]
-	
+    local m = meta[t]
+    
     t.handle:pos_y(y)
     t.track:pos_y(y + (t.handle:height() - t.track:height()) / 2)
-	m.pos[2] = y
+    m.pos[2] = y
 end
 
 function slider.events(t, event)
-	local function_list = meta[t].events[event]
-	if not function_list then return nil end
-	
-	local n = 0
-	local m = function_list.n
-	
-	return function()
-		n = n + 1
-		local fn = function_list[n]
-		
-		-- handle holes in the list
-		while not fn and n <= m do
-			n = n + 1
-			fn = function_list[n]
-		end
+    local function_list = meta[t].events[event]
+    if not function_list then return nil end
+    
+    local n = 0
+    local m = function_list.n
+    
+    return function()
+        n = n + 1
+        local fn = function_list[n]
+        
+        -- handle holes in the list
+        while not fn and n <= m do
+            n = n + 1
+            fn = function_list[n]
+        end
 
-		return fn
-	end
+        return fn
+    end
 end
 
 function slider.register_event(t, event, fn)

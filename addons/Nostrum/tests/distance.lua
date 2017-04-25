@@ -20,30 +20,30 @@ DISCLAIMED. IN NO EVENT SHALL trv BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER I N CONTRACT, STRICT LIABILITY, OR TORT
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 return function(party, spot, distance)
-	party = tonumber(party)
-	spot = tonumber(spot)
-	distance = tonumber(distance)
-	
-	if not (party and spot and distance) then
-		print('Missing arguments.')
-		return
-	end
-	
-	local id = alliance[party][spot]
-	
-	if not id then
-		print('No player in that position.')
-		return
-	end
+    party = tonumber(party)
+    spot = tonumber(spot)
+    distance = tonumber(distance)
+    
+    if not (party and spot and distance) then
+        print('Missing arguments.')
+        return
+    end
+    
+    local id = alliance[party][spot]
+    
+    if not id then
+        print('No player in that position.')
+        return
+    end
 
-	local player = alliance_lookup[id]	
-	distance = distance ^ 2
-	
-	dbg['distance change'](party, spot, distance)
+    local player = alliance_lookup[id]    
+    distance = distance ^ 2
+    
+    dbg['distance change'](party, spot, distance)
 end, [[This test simulates the distance change event.
 Parameters <party> <spot> <distance>.]]

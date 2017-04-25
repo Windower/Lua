@@ -20,26 +20,26 @@ DISCLAIMED. IN NO EVENT SHALL trv BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER I N CONTRACT, STRICT LIABILITY, OR TORT
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 return function()
-	local party = alliance[1]
+    local party = alliance[1]
 
-	for i = 1, party:count() do
-		local t = {}
-		local l = L{}
-		local lookup = buff_lookup[i].array
-		
-		for j = 1, math.random(1, 32) do
-			local rand = math.random(1, 254)
-			t[j] = rand
-			l:append(rand)
-		end
+    for i = 1, party:count() do
+        local t = {}
+        local l = L{}
+        local lookup = buff_lookup[i].array
+        
+        for j = 1, math.random(1, 32) do
+            local rand = math.random(1, 254)
+            t[j] = rand
+            l:append(rand)
+        end
 
-		buff_lookup[i].array = l
-		
-		dbg['buff change'](i, lookup.n, l.n, t)
-	end
+        buff_lookup[i].array = l
+        
+        dbg['buff change'](i, lookup.n, l.n, t)
+    end
 end, [[This test assigns random buffs for party 1.]]

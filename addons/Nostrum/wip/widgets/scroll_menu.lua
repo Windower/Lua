@@ -20,7 +20,7 @@ DISCLAIMED. IN NO EVENT SHALL trv BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER I N CONTRACT, STRICT LIABILITY, OR TORT
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
@@ -63,7 +63,7 @@ local default_settings = {
         lines = {},
         color_formatting = {},
         lines_to_display = 12,
-		line_height = 16,
+        line_height = 16,
     },
     pos = {0, 0},
     w = 150,
@@ -91,39 +91,39 @@ function scrolling_text_menu.new(settings)
     m.color = nil
 
     meta[t] = m
-	
-	if _libs.widgets then
-		scroll_text.register_event(t, 'left click', function(x, y)
-			local m = meta[t]
-			local n = math.floor((y - m.pos[2])/t:line_height()) + t:list_position()
+    
+    if _libs.widgets then
+        scroll_text.register_event(t, 'left click', function(x, y)
+            local m = meta[t]
+            local n = math.floor((y - m.pos[2])/t:line_height()) + t:list_position()
 
-			local text = t:line(n)
+            local text = t:line(n)
 
-			local events = m.events['menu selection']
-			
-			if not events then return end
-			
-			for i = 1,events.n do
-				events[i](n, text)
-			end		
-		end)
-		
-		scroll_text.register_event(t, 'move', function(x, y)
-			local m = meta[t]
-			local n = math.floor((y - scroll_text.pos_y(t))/t:line_height()) + 1
-			
-			scrolling_text_menu.selected(t, n)
-		end)
-	end
-	
+            local events = m.events['menu selection']
+            
+            if not events then return end
+            
+            for i = 1,events.n do
+                events[i](n, text)
+            end        
+        end)
+        
+        scroll_text.register_event(t, 'move', function(x, y)
+            local m = meta[t]
+            local n = math.floor((y - scroll_text.pos_y(t))/t:line_height()) + 1
+            
+            scrolling_text_menu.selected(t, n)
+        end)
+    end
+    
     return setmetatable(t, _meta.scrolling_text_menu)
 end
 
 function scrolling_text_menu.destroy(t)
-	t.highlight:destroy()
-	scrolling_text.destroy(t)
-	
-	meta[t] = nil
+    t.highlight:destroy()
+    scrolling_text.destroy(t)
+    
+    meta[t] = nil
 end
 
 function scrolling_text_menu.show(t)
@@ -173,9 +173,9 @@ end
 
 function scrolling_text_menu.width(t, width)
     if width then
-		t.highlight:width(width)
-	end
-	
+        t.highlight:width(width)
+    end
+    
     return scroll_text.width(t, width)
 end
 
@@ -194,26 +194,26 @@ end
 
 function scrolling_text_menu.pos(t, x, y)
     if y then
-		t.highlight:pos(x, y + meta[t].selected * t.highlight:height())
-	end
-	
-	return scroll_text.pos(t, x, y)
+        t.highlight:pos(x, y + meta[t].selected * t.highlight:height())
+    end
+    
+    return scroll_text.pos(t, x, y)
 end
 
 function scrolling_text_menu.pos_x(t, x)
-	if x then
-		t.highlight:pos_x(x)
-	end
+    if x then
+        t.highlight:pos_x(x)
+    end
 
-	return scroll_text.pos_x(t, x)
+    return scroll_text.pos_x(t, x)
 end
 
 function scrolling_text_menu.pos_y(t, y)
-	if y then
-		t:pos(t:pos_x(), y)
-	else
-		return scroll_text.pos_y(t)
-	end
+    if y then
+        t:pos(t:pos_x(), y)
+    else
+        return scroll_text.pos_y(t)
+    end
 end
 
 return scrolling_text_menu

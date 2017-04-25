@@ -20,7 +20,7 @@ DISCLAIMED. IN NO EVENT SHALL trv BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER I N CONTRACT, STRICT LIABILITY, OR TORT
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
@@ -34,26 +34,26 @@ _meta.players = _meta.players or {__index = players}
 
 function players.new()
     local t = {
-		hp = 0,
-		mp = 0,
-		tp = 0,
-		id = 0,
-		hpp = 0,
-		mpp = 0,
-		x = 0,
-		y = 0,
-		spot = 0,
-		name = '???',
-		zone = 0,
-		index = 0,
-		party = 0,
-		is_trust = false,
-		out_of_zone = true,
-		out_of_sight = true,
-		seeking_information = true,
+        hp = 0,
+        mp = 0,
+        tp = 0,
+        id = 0,
+        hpp = 0,
+        mpp = 0,
+        x = 0,
+        y = 0,
+        spot = 0,
+        name = '???',
+        zone = 0,
+        index = 0,
+        party = 0,
+        is_trust = false,
+        out_of_zone = true,
+        out_of_sight = true,
+        seeking_information = true,
     }
-	
-	return setmetatable(t, _meta.players)
+    
+    return setmetatable(t, _meta.players)
 end
 
 return players
