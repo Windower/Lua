@@ -1,4 +1,4 @@
---Copyright (c) 2013, Krizz, Skyrant
+--Copyright © 2013, Krizz, Skyrant
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -78,8 +78,8 @@ settings = config.load(defaults)
 -- upgrade to new settings file if old settings still exist -------------------
 if settings.trposx and settings.trposy then
 	-- copy position from old config to new one
-   	settings.pos_x = settings.trposx
-   	settings.pos_y = settings.trposy
+	settings.pos_x = settings.trposx
+	settings.pos_y = settings.trposy
 	-- delete old settings here ---------------------------------------------------
 	config.save(settings, 'all')
 end
@@ -117,7 +117,7 @@ function init_currency()
 				"One Hundred Byne Bill","Tukuku Whiteshell","Lungo-Nango Jadeshell",
 				"Forgotten Thought","Forgotten Hope","Forgotten Touch","Forgotten Journey","Forgotten Step"}
 	for i=1, #Currency do
-    	 Currency[Currency[i]] = 0
+		Currency[Currency[i]] = 0
 	end
 	obj_time = 0
 end
@@ -181,25 +181,25 @@ refresh()
 -- Register a prerendere event for the display refresh ------------------------
 -------------------------------------------------------------------------------
 windower.register_event('prerender', function()
-    if obj_time < 1 then return end
-    if obj_time ~= (end_time - os.time()) then
-        obj_time = end_time - os.time()
-        refresh()
-    end
+	if obj_time < 1 then return end
+	if obj_time ~= (end_time - os.time()) then
+		obj_time = end_time - os.time()
+		refresh()
+	end
 end)
 
 -------------------------------------------------------------------------------
 -- Did we enter a Dynamis Zone? -----------------------------------------------
 -------------------------------------------------------------------------------
 windower.register_event('zone change', function(zone)
-    image:hide()
-    header = "Waiting for currency drops..."
-    init_currency()
-    if ProcZones:contains(windower.ffxi.get_info().zone) then
-    	obj_time = 3600
-    	end_time = os.time() + obj_time
-        image:show()
-    end
+	image:hide()
+	header = "Waiting for currency drops..."
+	init_currency()
+	if ProcZones:contains(windower.ffxi.get_info().zone) then
+		obj_time = 3600
+		end_time = os.time() + obj_time
+		image:show()
+	end
 end)
 
 image:hide()
@@ -226,30 +226,33 @@ end
 -- Get the player name for light luggage profile ------------------------------
 -------------------------------------------------------------------------------
 windower.register_event('load', 'login', function()
-    if windower.ffxi.get_info().logged_in then
-        player = windower.ffxi.get_player().name
-        obtained = nil
-    end
+	if windower.ffxi.get_info().logged_in then
+		player = windower.ffxi.get_player().name
+		obtained = nil
+	end
 end)
 
 -------------------------------------------------------------------------------
 -- Parse the chat messages for drops, staggers and time extensions ------------
 -------------------------------------------------------------------------------
 windower.register_event('incoming text',function (original, new, color)
-	a,b,fiend = string.find(original,"%w+'s attack staggers the (%w+)%!")
-   	if settings.timer then
-   		if fiend == 'fiend' then
+	local fiend = original:match("%w+'s attack staggers the (%w+)%!")
+	--a,b,fiend = string.find(original,"%w+'s attack staggers the (%w+)%!")
+	if settings.timer then
+		if fiend == 'fiend' then
 			StaggerCount = StaggerCount + 1
-			a,b,mob_timers = string.find(current_mob,"%w+ (%w+)")
-    		windower.send_command('timers c "'..mob_timers..'" 30 down stun')
-    		return new, color
-    	end
-    end
-   	if string.find(original,"Your stay in Dynamis has been extended by %d+ minutes.") then
-    	end_time = end_time + (tonumber(original:match("%d+")) * 60)
-    	refresh()
-   	end
-	a,b,item = string.find(original,"Obtained key item: ..(%w+ %w+ %w+ %w+)..\46")
+			local mob_timers = original:match("%w+ (%w+)")
+			--a,b,mob_timers = string.find(current_mob,"%w+ (%w+)")
+			windower.send_command('timers c "'..mob_timers..'" 30 down stun')
+			return new, color
+		end
+	end
+	if string.find(original,"Your stay in Dynamis has been extended by %d+ minutes.") then
+		end_time = end_time + (tonumber(original:match("%d+")) * 60)
+		refresh()
+	end
+	local item = original:match("Obtained key item: ..(%w+ %w+ %w+ %w+)..\46")
+	--a,b,item = string.find(original,"Obtained key item: ..(%w+ %w+ %w+ %w+)..\46")
 	if item ~= nil then
 		item = item:lower()
 		for i=1, #Granules do
@@ -258,26 +261,30 @@ windower.register_event('incoming text',function (original, new, color)
 			end
 		end
 	end
-   	a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+ %w+)..\46")
-   	if item == nil then
-   		a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+)..\46")
-   		if item == nil then
-    		a,b,item = string.find(original,"%w+ obtains an? ..(%w+%-%w+ %w+)..\46")
-    		if item == nil then
-    			a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+)..\46")
-    		end
-   		end
-  	end
- 	if item ~= nil then
- 		item = item:lower()
- 		for i=1, #Currency do
+	local item = original:match("%w+ obtains an? ..(%w+ %w+ %w+ %w+)..\46")
+	--a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+ %w+)..\46")
+	if item == nil then
+		local item = original:match("%w+ obtains an? ..(%w+ %w+ %w+)..\46")
+		--a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+)..\46")
+		if item == nil then
+			local item = original:match("%w+ obtains an? ..(%w+%-%w+ %w+)..\46")
+			--a,b,item = string.find(original,"%w+ obtains an? ..(%w+%-%w+ %w+)..\46")
+			if item == nil then
+				local item = original:match("%w+ obtains an? ..(%w+ %w+)..\46")
+				--a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+)..\46")
+			end
+		end
+	end
+	if item ~= nil then
+		item = item:lower()
+		for i=1, #Currency do
 			if item == Currency[i]:lower() then
-   				Currency[Currency[i]] = Currency[Currency[i]] + 1
-   			end
- 		end
- 	end
-    refresh()
- 	return new, color
+			Currency[Currency[i]] = Currency[Currency[i]] + 1
+			end
+		end
+	end
+	refresh()
+	return new, color
 end)
 
 -------------------------------------------------------------------------------
@@ -285,10 +292,10 @@ end)
 -------------------------------------------------------------------------------
 windower.register_event('target change', function(targ_id)
 	if targ_id ~= 0 then
-        mob = windower.ffxi.get_mob_by_index(targ_id)
-        current_mob = mob.name
-        setproc()
-    end
+		mob = windower.ffxi.get_mob_by_index(targ_id)
+		current_mob = mob.name
+		setproc()
+	end
 end)
 
 -------------------------------------------------------------------------------
@@ -296,29 +303,29 @@ end)
 -------------------------------------------------------------------------------
 function setproc()
 	current_proc = "unknown"
-    local currenttime = windower.ffxi.get_info().time
- 	if currenttime >= 0*60 and currenttime < 8*60 then
-  		window = 'morning'
- 	elseif currenttime >= 8*60 and currenttime < 16*60 then
-  		window = 'day'
+	local currenttime = windower.ffxi.get_info().time
+	if currenttime >= 0*60 and currenttime < 8*60 then
+		window = 'morning'
+	elseif currenttime >= 8*60 and currenttime < 16*60 then
+		window = 'day'
 	elseif currenttime >= 16*60 and currenttime <= 24*60 then
-  		window = 'night'
- 	end
+		window = 'night'
+	end
 
- 	for i=1, #proctype do
-  		for j=1, #staggers[window][proctype[i]] do
- 			if current_mob == staggers[window][proctype[i]][j] then
+	for i=1, #proctype do
+		for j=1, #staggers[window][proctype[i]] do
+			if current_mob == staggers[window][proctype[i]][j] then
 				current_proc = proctype[i]
- 			end
- 		end
- 	end
- 	if current_proc == 'ja' then
- 		current_proc = 'Job Ability'
- 	elseif current_proc == 'magic' then
- 		current_proc = 'Magic'
- 	elseif current_proc == 'ws' then
- 		current_proc = 'Weapon Skill'
- 	end
+			end
+		end
+	end
+	if current_proc == 'ja' then
+		current_proc = 'Job Ability'
+	elseif current_proc == 'magic' then
+		current_proc = 'Magic'
+	elseif current_proc == 'ws' then
+		current_proc = 'Weapon Skill'
+	end
 	refresh()
 end
 
@@ -349,22 +356,22 @@ windower.register_event('addon command',function (...)
 		windower.add_to_chat(158,'dh ll create: Creates a light luggage profile to lot all dynamis currency.')
 		-----------------------------------------------------------------------
 		windower.add_to_chat(158,'dh save: save your current settings.')
-  	elseif params[1]:lower() == "font" then
-  		if params[2] then
-  			texts.size(image,params[2])
-  			settings.font_size = params[2]
-  		else
-  			windower.add_to_chat(158,'dh font size: change the font size.')
-  		end
-  	elseif params[1]:lower() == "position" then
-  		if params[3] then
-  			texts.pos_x(image,params[2])
+	elseif params[1]:lower() == "font" then
+		if params[2] then
+			texts.size(image,params[2])
+			settings.font_size = params[2]
+		else
+			windower.add_to_chat(158,'dh font size: change the font size.')
+		end
+	elseif params[1]:lower() == "position" then
+		if params[3] then
+			texts.pos_x(image,params[2])
 			texts.pos_y(image,params[3])
 			settings.pos_x = params[2]
 			settings.pos_y = params[3]
-  		else
-  			windower.add_to_chat(158,'dh pos [pos_x][pos_y] : position of addon window in pixels from the top left of the screen.')
-  		end
+		else
+			windower.add_to_chat(158,'dh pos [pos_x][pos_y] : position of addon window in pixels from the top left of the screen.')
+		end
 	elseif params[1]:lower() == "opacity" then
 		if params[2] then
 			texts.bg_alpha(image,params[2])
@@ -415,17 +422,17 @@ windower.register_event('addon command',function (...)
 			windower.add_to_chat(158,'dh tracker [on/off/reset] : Tracks the amount of currency obtained.')
 		end
 	elseif params[1]:lower() == "ll" then
-   		if params[2]:lower() == "create" then
-    		player = windower.ffxi.get_player()['name']
-    		io.open(windower.addon_path..'../../plugins/ll/dynamis-'..player..'.txt',"w"):write('if item is 1452, 1453, 1455, 1456, 1449, 1450 then lot'):close()
-    		windower.send_command('ll profile dynamis-'..player..'.txt')
-   		else 
-   			windower.add_to_chat(158,'dh ll create: Creates a light luggage profile to lot all dynamis currency.')
-   		end
-   	-- End of compatibility commands---------------------------------------
-   	elseif params[1]:lower() == "save" then
-   		config.save(settings, 'all')
-   	else
+		if params[2]:lower() == "create" then
+			player = windower.ffxi.get_player()['name']
+			io.open(windower.addon_path..'../../plugins/ll/dynamis-'..player..'.txt',"w"):write('if item is 1452, 1453, 1455, 1456, 1449, 1450 then lot'):close()
+			windower.send_command('ll profile dynamis-'..player..'.txt')
+		else 
+			windower.add_to_chat(158,'dh ll create: Creates a light luggage profile to lot all dynamis currency.')
+		end
+	-- End of compatibility commands---------------------------------------
+	elseif params[1]:lower() == "save" then
+		config.save(settings, 'all')
+	else
 		windower.add_to_chat(159,'\nDynamisHelper v2.0')
 		windower.add_to_chat(159,"Timer:"..tostring(settings.timer).." Tracker:"..tostring(settings.tracker).." Proc:"..tostring(settings.proc).." Position: X="..tostring(settings.pos_x).." Y="..tostring(settings.pos_y).." Font Size:"..tostring(settings.font_size))
 		windower.add_to_chat(158,'dh visible: toggle addon display.')
@@ -449,51 +456,51 @@ proctype = {"ja","magic","ws","random","none"}
 staggers = T{}
 staggers['morning'] = T{}
 staggers['morning']['ja'] = {	"Kindred Thief", "Kindred Beastmaster", "Kindred Monk", "Kindred Ninja", "Kindred Ranger",
-								"Duke Gomory", "Marquis Andras", "Marquis Gamygyn", "Count Raum", "Marquis Cimeries", "Marquis Caim", "Baron Avnas", 
-							 	"Hydra Thief", "Hydra Beastmaster", "Hydra Monk", "Hydra Ninja", "Hydra Ranger", 
-							 	"Vanguard Backstabber", "Vanguard Grappler", "Vanguard Hawker", "Vanguard Pillager", "Vanguard Predator", "Voidstreaker Butchnotch", "Steelshank Kratzvatz", 
-							 	"Vanguard Beasttender", "Vanguard Kusa", "Vanguard Mason", "Vanguard Militant", "Vanguard Purloiner",  "Ko'Dho Cannonball", 
-							 	"Vanguard Assassin", "Vanguard Liberator", "Vanguard Ogresoother", "Vanguard Salvager", "Vanguard Sentinel", "Wuu Qoho the Razorclaw", "Tee Zaksa the Ceaseless", 
-							 	"Vanguard Ambusher", "Vanguard Hitman", "Vanguard Pathfinder", "Vanguard Pit", "Vanguard Welldigger",
-							 	"Bandrix Rockjaw", "Lurklox Dhalmelneck", "Trailblix Goatmug", "Kikklix Longlegs", "Snypestix Eaglebeak", "Jabkix Pigeonpecs", "Blazox Boneybod", "Bootrix Jaggedelbow", "Mobpix Mucousmouth", "Prowlox Barrelbelly", "Slystix Megapeepers", "Feralox Honeylips", 
-							 	"Bordox Kittyback", "Droprix Granitepalms", "Routsix Rubbertendon", "Slinkix Trufflesniff", "Swypestix Tigershins",
-							 	"Nightmare Crawler", "Nightmare Raven", "Nightmare Uragnite", 
-							 	"Nightmare Fly", "Nightmare Flytrap", "Nightmare Funguar", 
-							 	"Nightmare Gaylas", "Nightmare Kraken", "Nightmare Roc", 
-							 	"Nightmare Hornet", "Nightmare Bugard", 
-							 	"Woodnix Shrillwhistle", "Hamfist Gukhbuk", "Lyncean Juwgneg", "Va'Rhu Bodysnatcher", "Doo Peku the Fleetfoot",
-							 	"Nant'ina", "Antaeus"}
+								"Duke Gomory", "Marquis Andras", "Marquis Gamygyn", "Count Raum", "Marquis Cimeries", "Marquis Caim", "Baron Avnas",
+								"Hydra Thief", "Hydra Beastmaster", "Hydra Monk", "Hydra Ninja", "Hydra Ranger",
+								"Vanguard Backstabber", "Vanguard Grappler", "Vanguard Hawker", "Vanguard Pillager", "Vanguard Predator", "Voidstreaker Butchnotch", "Steelshank Kratzvatz",
+								"Vanguard Beasttender", "Vanguard Kusa", "Vanguard Mason", "Vanguard Militant", "Vanguard Purloiner",  "Ko'Dho Cannonball",
+								"Vanguard Assassin", "Vanguard Liberator", "Vanguard Ogresoother", "Vanguard Salvager", "Vanguard Sentinel", "Wuu Qoho the Razorclaw", "Tee Zaksa the Ceaseless",
+								"Vanguard Ambusher", "Vanguard Hitman", "Vanguard Pathfinder", "Vanguard Pit", "Vanguard Welldigger",
+								"Bandrix Rockjaw", "Lurklox Dhalmelneck", "Trailblix Goatmug", "Kikklix Longlegs", "Snypestix Eaglebeak", "Jabkix Pigeonpecs", "Blazox Boneybod", "Bootrix Jaggedelbow", "Mobpix Mucousmouth", "Prowlox Barrelbelly", "Slystix Megapeepers", "Feralox Honeylips",
+								"Bordox Kittyback", "Droprix Granitepalms", "Routsix Rubbertendon", "Slinkix Trufflesniff", "Swypestix Tigershins",
+								"Nightmare Crawler", "Nightmare Raven", "Nightmare Uragnite",
+								"Nightmare Fly", "Nightmare Flytrap", "Nightmare Funguar",
+								"Nightmare Gaylas", "Nightmare Kraken", "Nightmare Roc",
+								"Nightmare Hornet", "Nightmare Bugard",
+								"Woodnix Shrillwhistle", "Hamfist Gukhbuk", "Lyncean Juwgneg", "Va'Rhu Bodysnatcher", "Doo Peku the Fleetfoot",
+								"Nant'ina", "Antaeus"}
 
-staggers['morning']['magic'] = {"Kindred White Mage", "Kindred Bard", "Kindred Summoner", "Kindred Black Mage", "Kindred Red Mage", 
+staggers['morning']['magic'] = {"Kindred White Mage", "Kindred Bard", "Kindred Summoner", "Kindred Black Mage", "Kindred Red Mage",
 								"Duke Berith", "Marquis Decarabia", "Prince Seere", "Marquis Orias", "Marquis Nebiros", "Duke Haures",
-								"Hydra White Mage", "Hydra Bard", "Hydra Summoner", "Hydra Black Mage", "Hydra Red Mage", 
-								"Vanguard Amputator", "Vanguard Bugler", "Vanguard Dollmaster", "Vanguard Mesmerizer", "Vanguard Vexer", "Soulsender Fugbrag", "Reapertongue Gadgquok", "Battlechoir Gitchfotch", 
-								"Vanguard Constable", "Vanguard Minstrel", "Vanguard Protector", "Vanguard Thaumaturge", "Vanguard Undertaker", "Gi'Pha Manameister", "Gu'Nhi Noondozer", "Ra'Gho Darkfount", "Va'Zhe Pummelsong",  
-								"Vanguard Chanter", "Vanguard Oracle", "Vanguard Prelate", "Vanguard Priest", "Vanguard Visionary", "Loo Hepe the Eyepiercer", "Xoo Kaza the Solemn", "Haa Pevi the Stentorian", "Xuu Bhoqa the Enigma", "Fuu Tzapo the Blessed", "Naa Yixo the Stillrage", 
-								"Vanguard Alchemist", "Vanguard Enchanter", "Vanguard Maestro", "Vanguard Necromancer", "Vanguard Shaman", 
+								"Hydra White Mage", "Hydra Bard", "Hydra Summoner", "Hydra Black Mage", "Hydra Red Mage",
+								"Vanguard Amputator", "Vanguard Bugler", "Vanguard Dollmaster", "Vanguard Mesmerizer", "Vanguard Vexer", "Soulsender Fugbrag", "Reapertongue Gadgquok", "Battlechoir Gitchfotch",
+								"Vanguard Constable", "Vanguard Minstrel", "Vanguard Protector", "Vanguard Thaumaturge", "Vanguard Undertaker", "Gi'Pha Manameister", "Gu'Nhi Noondozer", "Ra'Gho Darkfount", "Va'Zhe Pummelsong",
+								"Vanguard Chanter", "Vanguard Oracle", "Vanguard Prelate", "Vanguard Priest", "Vanguard Visionary", "Loo Hepe the Eyepiercer", "Xoo Kaza the Solemn", "Haa Pevi the Stentorian", "Xuu Bhoqa the Enigma", "Fuu Tzapo the Blessed", "Naa Yixo the Stillrage",
+								"Vanguard Alchemist", "Vanguard Enchanter", "Vanguard Maestro", "Vanguard Necromancer", "Vanguard Shaman",
 								"Elixmix Hooknose", "Gabblox Magpietongue", "Hermitrix Toothrot", "Humnox Drumbelly", "Morgmox Moldnoggin", "Mortilox Wartpaws", "Distilix Stickytoes", "Jabbrox Grannyguise", "Quicktrix Hexhands", "Wilywox Tenderpalm",
-								"Ascetox Ratgums", "Brewnix Bittypupils", "Gibberox Pimplebeak", "Morblox Stubthumbs", "Whistrix Toadthroat", 
-								"Nightmare Bunny", "Nightmare Eft", "Nightmare Mandragora", 
-								"Nightmare Hippogryph", "Nightmare Sabotender", "Nightmare Sheep", 
+								"Ascetox Ratgums", "Brewnix Bittypupils", "Gibberox Pimplebeak", "Morblox Stubthumbs", "Whistrix Toadthroat",
+								"Nightmare Bunny", "Nightmare Eft", "Nightmare Mandragora",
+								"Nightmare Hippogryph", "Nightmare Sabotender", "Nightmare Sheep",
 								"Nightmare Snoll", "Nightmare Stirge", "Nightmare Weapon",
-								"Nightmare Makara", "Nightmare Cluster", 
-								"Gosspix Blabblerlips", "Flamecaller Zoeqdoq", "Gi'Bhe Fleshfeaster", "Ree Nata the Melomanic", "Baa Dava the Bibliophage", 
+								"Nightmare Makara", "Nightmare Cluster",
+								"Gosspix Blabblerlips", "Flamecaller Zoeqdoq", "Gi'Bhe Fleshfeaster", "Ree Nata the Melomanic", "Baa Dava the Bibliophage",
 								"Aitvaras" }
 
-staggers['morning']['ws'] = {	"Kindred Paladin", "Kindred Warrior", "Kindred Samurai", "Kindred Dragoon", "Kindred Dark Knight", 
-								"Count Zaebos", "Duke Scox", "Marquis Sabnak", "King Zagan", "Count Haagenti", 
-								"Hydra Paladin", "Hydra Warrior", "Hydra Samurai", "Hydra Dragoon", "Hydra Dark Knight", 
-								"Vanguard Footsoldier", "Vanguard Gutslasher", "Vanguard Impaler", "Vanguard Neckchopper", "Vanguard Trooper", "Wyrmgnasher Bjakdek", "Bladerunner Rokgevok", "Bloodfist Voshgrosh", "Spellspear Djokvukk", 
-								"Vanguard Defender", "Vanguard Drakekeeper", "Vanguard Hatamoto", "Vanguard Vigilante", "Vanguard Vindicator", "Ze'Vho Fallsplitter", "Zo'Pha Forgesoul", "Bu'Bho Truesteel", 
-								"Vanguard Exemplar", "Vanguard Inciter", "Vanguard Partisan", "Vanguard Persecutor", "Vanguard Skirmisher", "Maa Febi the Steadfast", "Muu Febi the Steadfast", 
+staggers['morning']['ws'] = {	"Kindred Paladin", "Kindred Warrior", "Kindred Samurai", "Kindred Dragoon", "Kindred Dark Knight",
+								"Count Zaebos", "Duke Scox", "Marquis Sabnak", "King Zagan", "Count Haagenti",
+								"Hydra Paladin", "Hydra Warrior", "Hydra Samurai", "Hydra Dragoon", "Hydra Dark Knight",
+								"Vanguard Footsoldier", "Vanguard Gutslasher", "Vanguard Impaler", "Vanguard Neckchopper", "Vanguard Trooper", "Wyrmgnasher Bjakdek", "Bladerunner Rokgevok", "Bloodfist Voshgrosh", "Spellspear Djokvukk",
+								"Vanguard Defender", "Vanguard Drakekeeper", "Vanguard Hatamoto", "Vanguard Vigilante", "Vanguard Vindicator", "Ze'Vho Fallsplitter", "Zo'Pha Forgesoul", "Bu'Bho Truesteel",
+								"Vanguard Exemplar", "Vanguard Inciter", "Vanguard Partisan", "Vanguard Persecutor", "Vanguard Skirmisher", "Maa Febi the Steadfast", "Muu Febi the Steadfast",
 								"Vanguard Armorer", "Vanguard Dragontamer", "Vanguard Ronin", "Vanguard Smithy",
 								"Buffrix Eargone", "Cloktix Longnail", "Sparkspox Sweatbrow", "Ticktox Beadyeyes", "Tufflix Loglimbs", "Wyrmwix Snakespecs", "Karashix Swollenskull", "Smeltix Thickhide", "Wasabix Callusdigit", "Anvilix Sootwrists", "Scruffix Shaggychest", "Tymexox Ninefingers", "Scourquix Scaleskin",
 								"Draklix Scalecrust", "Moltenox Stubthumbs", "Ruffbix Jumbolobes", "Shisox Widebrow", "Tocktix Thinlids",
-								"Nightmare Crab", "Nightmare Dhalmel", "Nightmare Scorpion", 
-								"Nightmare Goobbue", "Nightmare Manticore", "Nightmare Treant", 
-								"Nightmare Diremite", "Nightmare Tiger", "Nightmare Raptor", 
-								"Nightmare Leech", "Nightmare Worm", 
-								"Shamblix Rottenheart", "Elvaansticker Bxafraff", "Qu'Pho Bloodspiller", "Te'Zha Ironclad", "Koo Rahi the Levinblade", 
+								"Nightmare Crab", "Nightmare Dhalmel", "Nightmare Scorpion",
+								"Nightmare Goobbue", "Nightmare Manticore", "Nightmare Treant",
+								"Nightmare Diremite", "Nightmare Tiger", "Nightmare Raptor",
+								"Nightmare Leech", "Nightmare Worm",
+								"Shamblix Rottenheart", "Elvaansticker Bxafraff", "Qu'Pho Bloodspiller", "Te'Zha Ironclad", "Koo Rahi the Levinblade",
 								"Barong", "Alklha", "Stihi", "Fairy Ring", "Stcemqestcint", "Stringes", "Suttung" }
 
 staggers['morning']['random'] = {"Nightmare Taurus"}
@@ -501,51 +508,51 @@ staggers['morning']['none'] = {"Animated Claymore", "Animated Dagger", "Animated
 
 staggers['day'] = T{}
 staggers['day']['ja'] = {		"Kindred Thief", "Kindred Beastmaster", "Kindred Monk", "Kindred Ninja", "Kindred Ranger",
-								"Duke Gomory", "Marquis Andras", "Marquis Gamygyn", "Count Raum", "Marquis Cimeries", "Marquis Caim", "Baron Avnas", 
-							 	"Hydra Thief", "Hydra Beastmaster", "Hydra Monk", "Hydra Ninja", "Hydra Ranger", 
-							 	"Vanguard Backstabber", "Vanguard Grappler", "Vanguard Hawker", "Vanguard Pillager", "Vanguard Predator", "Voidstreaker Butchnotch", "Steelshank Kratzvatz", 
-							 	"Vanguard Beasttender", "Vanguard Kusa", "Vanguard Mason", "Vanguard Militant", "Vanguard Purloiner",  "Ko'Dho Cannonball", 
-							 	"Vanguard Assassin", "Vanguard Liberator", "Vanguard Ogresoother", "Vanguard Salvager", "Vanguard Sentinel", "Wuu Qoho the Razorclaw", "Tee Zaksa the Ceaseless", 
-							 	"Vanguard Ambusher", "Vanguard Hitman", "Vanguard Pathfinder", "Vanguard Pit", "Vanguard Welldigger",
-							 	"Bandrix Rockjaw", "Lurklox Dhalmelneck", "Trailblix Goatmug", "Kikklix Longlegs", "Snypestix Eaglebeak", "Jabkix Pigeonpecs", "Blazox Boneybod", "Bootrix Jaggedelbow", "Mobpix Mucousmouth", "Prowlox Barrelbelly", "Slystix Megapeepers", "Feralox Honeylips", 
-							 	"Bordox Kittyback", "Droprix Granitepalms", "Routsix Rubbertendon", "Slinkix Trufflesniff", "Swypestix Tigershins",
-								"Nightmare Bunny", "Nightmare Eft", "Nightmare Mandragora", 
-								"Nightmare Hippogryph", "Nightmare Sabotender", "Nightmare Sheep", 
+								"Duke Gomory", "Marquis Andras", "Marquis Gamygyn", "Count Raum", "Marquis Cimeries", "Marquis Caim", "Baron Avnas",
+								"Hydra Thief", "Hydra Beastmaster", "Hydra Monk", "Hydra Ninja", "Hydra Ranger",
+								"Vanguard Backstabber", "Vanguard Grappler", "Vanguard Hawker", "Vanguard Pillager", "Vanguard Predator", "Voidstreaker Butchnotch", "Steelshank Kratzvatz",
+								"Vanguard Beasttender", "Vanguard Kusa", "Vanguard Mason", "Vanguard Militant", "Vanguard Purloiner",  "Ko'Dho Cannonball",
+								"Vanguard Assassin", "Vanguard Liberator", "Vanguard Ogresoother", "Vanguard Salvager", "Vanguard Sentinel", "Wuu Qoho the Razorclaw", "Tee Zaksa the Ceaseless",
+								"Vanguard Ambusher", "Vanguard Hitman", "Vanguard Pathfinder", "Vanguard Pit", "Vanguard Welldigger",
+								"Bandrix Rockjaw", "Lurklox Dhalmelneck", "Trailblix Goatmug", "Kikklix Longlegs", "Snypestix Eaglebeak", "Jabkix Pigeonpecs", "Blazox Boneybod", "Bootrix Jaggedelbow", "Mobpix Mucousmouth", "Prowlox Barrelbelly", "Slystix Megapeepers", "Feralox Honeylips",
+								"Bordox Kittyback", "Droprix Granitepalms", "Routsix Rubbertendon", "Slinkix Trufflesniff", "Swypestix Tigershins",
+								"Nightmare Bunny", "Nightmare Eft", "Nightmare Mandragora",
+								"Nightmare Hippogryph", "Nightmare Sabotender", "Nightmare Sheep",
 								"Nightmare Snoll", "Nightmare Stirge", "Nightmare Weapon",
-								"Nightmare Makara", "Nightmare Cluster", 
-							 	"Woodnix Shrillwhistle", "Hamfist Gukhbuk", "Lyncean Juwgneg", "Va'Rhu Bodysnatcher", "Doo Peku the Fleetfoot",
-							 	"Nant'ina", "Antaeus"}
+								"Nightmare Makara", "Nightmare Cluster",
+								"Woodnix Shrillwhistle", "Hamfist Gukhbuk", "Lyncean Juwgneg", "Va'Rhu Bodysnatcher", "Doo Peku the Fleetfoot",
+								"Nant'ina", "Antaeus"}
 
-staggers['day']['magic'] = {	"Kindred White Mage", "Kindred Bard", "Kindred Summoner", "Kindred Black Mage", "Kindred Red Mage", 
+staggers['day']['magic'] = {	"Kindred White Mage", "Kindred Bard", "Kindred Summoner", "Kindred Black Mage", "Kindred Red Mage",
 								"Duke Berith", "Marquis Decarabia", "Prince Seere", "Marquis Orias", "Marquis Nebiros", "Duke Haures",
-								"Hydra White Mage", "Hydra Bard", "Hydra Summoner", "Hydra Black Mage", "Hydra Red Mage", 
-								"Vanguard Amputator", "Vanguard Bugler", "Vanguard Dollmaster", "Vanguard Mesmerizer", "Vanguard Vexer", "Soulsender Fugbrag", "Reapertongue Gadgquok", "Battlechoir Gitchfotch", 
-								"Vanguard Constable", "Vanguard Minstrel", "Vanguard Protector", "Vanguard Thaumaturge", "Vanguard Undertaker", "Gi'Pha Manameister", "Gu'Nhi Noondozer", "Ra'Gho Darkfount", "Va'Zhe Pummelsong",  
-								"Vanguard Chanter", "Vanguard Oracle", "Vanguard Prelate", "Vanguard Priest", "Vanguard Visionary", "Loo Hepe the Eyepiercer", "Xoo Kaza the Solemn", "Haa Pevi the Stentorian", "Xuu Bhoqa the Enigma", "Fuu Tzapo the Blessed", "Naa Yixo the Stillrage", 
-								"Vanguard Alchemist", "Vanguard Enchanter", "Vanguard Maestro", "Vanguard Necromancer", "Vanguard Shaman", 
+								"Hydra White Mage", "Hydra Bard", "Hydra Summoner", "Hydra Black Mage", "Hydra Red Mage",
+								"Vanguard Amputator", "Vanguard Bugler", "Vanguard Dollmaster", "Vanguard Mesmerizer", "Vanguard Vexer", "Soulsender Fugbrag", "Reapertongue Gadgquok", "Battlechoir Gitchfotch",
+								"Vanguard Constable", "Vanguard Minstrel", "Vanguard Protector", "Vanguard Thaumaturge", "Vanguard Undertaker", "Gi'Pha Manameister", "Gu'Nhi Noondozer", "Ra'Gho Darkfount", "Va'Zhe Pummelsong",
+								"Vanguard Chanter", "Vanguard Oracle", "Vanguard Prelate", "Vanguard Priest", "Vanguard Visionary", "Loo Hepe the Eyepiercer", "Xoo Kaza the Solemn", "Haa Pevi the Stentorian", "Xuu Bhoqa the Enigma", "Fuu Tzapo the Blessed", "Naa Yixo the Stillrage",
+								"Vanguard Alchemist", "Vanguard Enchanter", "Vanguard Maestro", "Vanguard Necromancer", "Vanguard Shaman",
 								"Elixmix Hooknose", "Gabblox Magpietongue", "Hermitrix Toothrot", "Humnox Drumbelly", "Morgmox Moldnoggin", "Mortilox Wartpaws", "Distilix Stickytoes", "Jabbrox Grannyguise", "Quicktrix Hexhands", "Wilywox Tenderpalm",
-								"Ascetox Ratgums", "Brewnix Bittypupils", "Gibberox Pimplebeak", "Morblox Stubthumbs", "Whistrix Toadthroat", 
-								"Nightmare Crab", "Nightmare Dhalmel", "Nightmare Scorpion", 
-								"Nightmare Goobbue", "Nightmare Manticore", "Nightmare Treant", 
-								"Nightmare Diremite", "Nightmare Tiger", "Nightmare Raptor", 
-								"Nightmare Leech", "Nightmare Worm" ,
-								"Gosspix Blabblerlips", "Flamecaller Zoeqdoq", "Gi'Bhe Fleshfeaster", "Ree Nata the Melomanic", "Baa Dava the Bibliophage", 
+								"Ascetox Ratgums", "Brewnix Bittypupils", "Gibberox Pimplebeak", "Morblox Stubthumbs", "Whistrix Toadthroat",
+								"Nightmare Crab", "Nightmare Dhalmel", "Nightmare Scorpion",
+								"Nightmare Goobbue", "Nightmare Manticore", "Nightmare Treant",
+								"Nightmare Diremite", "Nightmare Tiger", "Nightmare Raptor",
+								"Nightmare Leech", "Nightmare Worm",
+								"Gosspix Blabblerlips", "Flamecaller Zoeqdoq", "Gi'Bhe Fleshfeaster", "Ree Nata the Melomanic", "Baa Dava the Bibliophage",
 								"Aitvaras" }
 
-staggers['day']['ws'] =  {		"Kindred Paladin", "Kindred Warrior", "Kindred Samurai", "Kindred Dragoon", "Kindred Dark Knight", 
-								"Count Zaebos", "Duke Scox", "Marquis Sabnak", "King Zagan", "Count Haagenti", 
-								"Hydra Paladin", "Hydra Warrior", "Hydra Samurai", "Hydra Dragoon", "Hydra Dark Knight", 
-								"Vanguard Footsoldier", "Vanguard Gutslasher", "Vanguard Impaler", "Vanguard Neckchopper", "Vanguard Trooper", "Wyrmgnasher Bjakdek", "Bladerunner Rokgevok", "Bloodfist Voshgrosh", "Spellspear Djokvukk", 
-								"Vanguard Defender", "Vanguard Drakekeeper", "Vanguard Hatamoto", "Vanguard Vigilante", "Vanguard Vindicator", "Ze'Vho Fallsplitter", "Zo'Pha Forgesoul", "Bu'Bho Truesteel", 
-								"Vanguard Exemplar", "Vanguard Inciter", "Vanguard Partisan", "Vanguard Persecutor", "Vanguard Skirmisher", "Maa Febi the Steadfast", "Muu Febi the Steadfast", 
+staggers['day']['ws'] =  {		"Kindred Paladin", "Kindred Warrior", "Kindred Samurai", "Kindred Dragoon", "Kindred Dark Knight",
+								"Count Zaebos", "Duke Scox", "Marquis Sabnak", "King Zagan", "Count Haagenti",
+								"Hydra Paladin", "Hydra Warrior", "Hydra Samurai", "Hydra Dragoon", "Hydra Dark Knight",
+								"Vanguard Footsoldier", "Vanguard Gutslasher", "Vanguard Impaler", "Vanguard Neckchopper", "Vanguard Trooper", "Wyrmgnasher Bjakdek", "Bladerunner Rokgevok", "Bloodfist Voshgrosh", "Spellspear Djokvukk",
+								"Vanguard Defender", "Vanguard Drakekeeper", "Vanguard Hatamoto", "Vanguard Vigilante", "Vanguard Vindicator", "Ze'Vho Fallsplitter", "Zo'Pha Forgesoul", "Bu'Bho Truesteel",
+								"Vanguard Exemplar", "Vanguard Inciter", "Vanguard Partisan", "Vanguard Persecutor", "Vanguard Skirmisher", "Maa Febi the Steadfast", "Muu Febi the Steadfast",
 								"Vanguard Armorer", "Vanguard Dragontamer", "Vanguard Ronin", "Vanguard Smithy",
 								"Buffrix Eargone", "Cloktix Longnail", "Sparkspox Sweatbrow", "Ticktox Beadyeyes", "Tufflix Loglimbs", "Wyrmwix Snakespecs", "Karashix Swollenskull", "Smeltix Thickhide", "Wasabix Callusdigit", "Anvilix Sootwrists", "Scruffix Shaggychest", "Tymexox Ninefingers", "Scourquix Scaleskin",
 								"Draklix Scalecrust", "Moltenox Stubthumbs", "Ruffbix Jumbolobes", "Shisox Widebrow", "Tocktix Thinlids",
-							 	"Nightmare Crawler", "Nightmare Raven", "Nightmare Uragnite", 
-							 	"Nightmare Fly", "Nightmare Flytrap", "Nightmare Funguar", 
-							 	"Nightmare Gaylas", "Nightmare Kraken", "Nightmare Roc", 
-							 	"Nightmare Hornet", "Nightmare Bugard", 
-								"Shamblix Rottenheart", "Elvaansticker Bxafraff", "Qu'Pho Bloodspiller", "Te'Zha Ironclad", "Koo Rahi the Levinblade", 
+								"Nightmare Crawler", "Nightmare Raven", "Nightmare Uragnite",
+								"Nightmare Fly", "Nightmare Flytrap", "Nightmare Funguar",
+								"Nightmare Gaylas", "Nightmare Kraken", "Nightmare Roc",
+								"Nightmare Hornet", "Nightmare Bugard",
+								"Shamblix Rottenheart", "Elvaansticker Bxafraff", "Qu'Pho Bloodspiller", "Te'Zha Ironclad", "Koo Rahi the Levinblade",
 								"Barong", "Alklha", "Stihi", "Fairy Ring", "Stcemqestcint", "Stringes", "Suttung" }
 
 staggers['day']['random'] = {"Nightmare Taurus"}
@@ -553,51 +560,51 @@ staggers['day']['none'] = {"Animated Claymore", "Animated Dagger", "Animated Gre
 
 staggers['night'] = T{}
 staggers['night']['ja'] = {		"Kindred Thief", "Kindred Beastmaster", "Kindred Monk", "Kindred Ninja", "Kindred Ranger",
-								"Duke Gomory", "Marquis Andras", "Marquis Gamygyn", "Count Raum", "Marquis Cimeries", "Marquis Caim", "Baron Avnas", 
-							 	"Hydra Thief", "Hydra Beastmaster", "Hydra Monk", "Hydra Ninja", "Hydra Ranger", 
-							 	"Vanguard Backstabber", "Vanguard Grappler", "Vanguard Hawker", "Vanguard Pillager", "Vanguard Predator", "Voidstreaker Butchnotch", "Steelshank Kratzvatz", 
-							 	"Vanguard Beasttender", "Vanguard Kusa", "Vanguard Mason", "Vanguard Militant", "Vanguard Purloiner",  "Ko'Dho Cannonball", 
-							 	"Vanguard Assassin", "Vanguard Liberator", "Vanguard Ogresoother", "Vanguard Salvager", "Vanguard Sentinel", "Wuu Qoho the Razorclaw", "Tee Zaksa the Ceaseless", 
-							 	"Vanguard Ambusher", "Vanguard Hitman", "Vanguard Pathfinder", "Vanguard Pit", "Vanguard Welldigger",
-							 	"Bandrix Rockjaw", "Lurklox Dhalmelneck", "Trailblix Goatmug", "Kikklix Longlegs", "Snypestix Eaglebeak", "Jabkix Pigeonpecs", "Blazox Boneybod", "Bootrix Jaggedelbow", "Mobpix Mucousmouth", "Prowlox Barrelbelly", "Slystix Megapeepers", "Feralox Honeylips", 
-							 	"Bordox Kittyback", "Droprix Granitepalms", "Routsix Rubbertendon", "Slinkix Trufflesniff", "Swypestix Tigershins",
-								"Nightmare Crab", "Nightmare Dhalmel", "Nightmare Scorpion", 
-								"Nightmare Goobbue", "Nightmare Manticore", "Nightmare Treant", 
-								"Nightmare Diremite", "Nightmare Tiger", "Nightmare Raptor", 
-								"Nightmare Leech", "Nightmare Worm", 
-							 	"Woodnix Shrillwhistle", "Hamfist Gukhbuk", "Lyncean Juwgneg", "Va'Rhu Bodysnatcher", "Doo Peku the Fleetfoot",
-							 	"Nant'ina", "Antaeus"}
+								"Duke Gomory", "Marquis Andras", "Marquis Gamygyn", "Count Raum", "Marquis Cimeries", "Marquis Caim", "Baron Avnas",
+								"Hydra Thief", "Hydra Beastmaster", "Hydra Monk", "Hydra Ninja", "Hydra Ranger",
+								"Vanguard Backstabber", "Vanguard Grappler", "Vanguard Hawker", "Vanguard Pillager", "Vanguard Predator", "Voidstreaker Butchnotch", "Steelshank Kratzvatz",
+								"Vanguard Beasttender", "Vanguard Kusa", "Vanguard Mason", "Vanguard Militant", "Vanguard Purloiner",  "Ko'Dho Cannonball",
+								"Vanguard Assassin", "Vanguard Liberator", "Vanguard Ogresoother", "Vanguard Salvager", "Vanguard Sentinel", "Wuu Qoho the Razorclaw", "Tee Zaksa the Ceaseless",
+								"Vanguard Ambusher", "Vanguard Hitman", "Vanguard Pathfinder", "Vanguard Pit", "Vanguard Welldigger",
+								"Bandrix Rockjaw", "Lurklox Dhalmelneck", "Trailblix Goatmug", "Kikklix Longlegs", "Snypestix Eaglebeak", "Jabkix Pigeonpecs", "Blazox Boneybod", "Bootrix Jaggedelbow", "Mobpix Mucousmouth", "Prowlox Barrelbelly", "Slystix Megapeepers", "Feralox Honeylips",
+								"Bordox Kittyback", "Droprix Granitepalms", "Routsix Rubbertendon", "Slinkix Trufflesniff", "Swypestix Tigershins",
+								"Nightmare Crab", "Nightmare Dhalmel", "Nightmare Scorpion",
+								"Nightmare Goobbue", "Nightmare Manticore", "Nightmare Treant",
+								"Nightmare Diremite", "Nightmare Tiger", "Nightmare Raptor",
+								"Nightmare Leech", "Nightmare Worm",
+								"Woodnix Shrillwhistle", "Hamfist Gukhbuk", "Lyncean Juwgneg", "Va'Rhu Bodysnatcher", "Doo Peku the Fleetfoot",
+								"Nant'ina", "Antaeus"}
 
-staggers['night']['magic'] = {	"Kindred White Mage", "Kindred Bard", "Kindred Summoner", "Kindred Black Mage", "Kindred Red Mage", 
+staggers['night']['magic'] = {	"Kindred White Mage", "Kindred Bard", "Kindred Summoner", "Kindred Black Mage", "Kindred Red Mage",
 								"Duke Berith", "Marquis Decarabia", "Prince Seere", "Marquis Orias", "Marquis Nebiros", "Duke Haures",
-								"Hydra White Mage", "Hydra Bard", "Hydra Summoner", "Hydra Black Mage", "Hydra Red Mage", 
-								"Vanguard Amputator", "Vanguard Bugler", "Vanguard Dollmaster", "Vanguard Mesmerizer", "Vanguard Vexer", "Soulsender Fugbrag", "Reapertongue Gadgquok", "Battlechoir Gitchfotch", 
-								"Vanguard Constable", "Vanguard Minstrel", "Vanguard Protector", "Vanguard Thaumaturge", "Vanguard Undertaker", "Gi'Pha Manameister", "Gu'Nhi Noondozer", "Ra'Gho Darkfount", "Va'Zhe Pummelsong",  
-								"Vanguard Chanter", "Vanguard Oracle", "Vanguard Prelate", "Vanguard Priest", "Vanguard Visionary", "Loo Hepe the Eyepiercer", "Xoo Kaza the Solemn", "Haa Pevi the Stentorian", "Xuu Bhoqa the Enigma", "Fuu Tzapo the Blessed", "Naa Yixo the Stillrage", 
-								"Vanguard Alchemist", "Vanguard Enchanter", "Vanguard Maestro", "Vanguard Necromancer", "Vanguard Shaman", 
+								"Hydra White Mage", "Hydra Bard", "Hydra Summoner", "Hydra Black Mage", "Hydra Red Mage",
+								"Vanguard Amputator", "Vanguard Bugler", "Vanguard Dollmaster", "Vanguard Mesmerizer", "Vanguard Vexer", "Soulsender Fugbrag", "Reapertongue Gadgquok", "Battlechoir Gitchfotch",
+								"Vanguard Constable", "Vanguard Minstrel", "Vanguard Protector", "Vanguard Thaumaturge", "Vanguard Undertaker", "Gi'Pha Manameister", "Gu'Nhi Noondozer", "Ra'Gho Darkfount", "Va'Zhe Pummelsong",
+								"Vanguard Chanter", "Vanguard Oracle", "Vanguard Prelate", "Vanguard Priest", "Vanguard Visionary", "Loo Hepe the Eyepiercer", "Xoo Kaza the Solemn", "Haa Pevi the Stentorian", "Xuu Bhoqa the Enigma", "Fuu Tzapo the Blessed", "Naa Yixo the Stillrage",
+								"Vanguard Alchemist", "Vanguard Enchanter", "Vanguard Maestro", "Vanguard Necromancer", "Vanguard Shaman",
 								"Elixmix Hooknose", "Gabblox Magpietongue", "Hermitrix Toothrot", "Humnox Drumbelly", "Morgmox Moldnoggin", "Mortilox Wartpaws", "Distilix Stickytoes", "Jabbrox Grannyguise", "Quicktrix Hexhands", "Wilywox Tenderpalm",
-								"Ascetox Ratgums", "Brewnix Bittypupils", "Gibberox Pimplebeak", "Morblox Stubthumbs", "Whistrix Toadthroat", 
-							 	"Nightmare Crawler", "Nightmare Raven", "Nightmare Uragnite", 
-							 	"Nightmare Fly", "Nightmare Flytrap", "Nightmare Funguar", 
-							 	"Nightmare Gaylas", "Nightmare Kraken", "Nightmare Roc", 
-							 	"Nightmare Hornet", "Nightmare Bugard", 
-								"Gosspix Blabblerlips", "Flamecaller Zoeqdoq", "Gi'Bhe Fleshfeaster", "Ree Nata the Melomanic", "Baa Dava the Bibliophage", 
+								"Ascetox Ratgums", "Brewnix Bittypupils", "Gibberox Pimplebeak", "Morblox Stubthumbs", "Whistrix Toadthroat",
+								"Nightmare Crawler", "Nightmare Raven", "Nightmare Uragnite",
+								"Nightmare Fly", "Nightmare Flytrap", "Nightmare Funguar",
+								"Nightmare Gaylas", "Nightmare Kraken", "Nightmare Roc",
+								"Nightmare Hornet", "Nightmare Bugard",
+								"Gosspix Blabblerlips", "Flamecaller Zoeqdoq", "Gi'Bhe Fleshfeaster", "Ree Nata the Melomanic", "Baa Dava the Bibliophage",
 								"Aitvaras" }
 
-staggers['night']['ws'] =  {	"Kindred Paladin", "Kindred Warrior", "Kindred Samurai", "Kindred Dragoon", "Kindred Dark Knight", 
-								"Count Zaebos", "Duke Scox", "Marquis Sabnak", "King Zagan", "Count Haagenti", 
-								"Hydra Paladin", "Hydra Warrior", "Hydra Samurai", "Hydra Dragoon", "Hydra Dark Knight", 
-								"Vanguard Footsoldier", "Vanguard Gutslasher", "Vanguard Impaler", "Vanguard Neckchopper", "Vanguard Trooper", "Wyrmgnasher Bjakdek", "Bladerunner Rokgevok", "Bloodfist Voshgrosh", "Spellspear Djokvukk", 
-								"Vanguard Defender", "Vanguard Drakekeeper", "Vanguard Hatamoto", "Vanguard Vigilante", "Vanguard Vindicator", "Ze'Vho Fallsplitter", "Zo'Pha Forgesoul", "Bu'Bho Truesteel", 
-								"Vanguard Exemplar", "Vanguard Inciter", "Vanguard Partisan", "Vanguard Persecutor", "Vanguard Skirmisher", "Maa Febi the Steadfast", "Muu Febi the Steadfast", 
+staggers['night']['ws'] =  {	"Kindred Paladin", "Kindred Warrior", "Kindred Samurai", "Kindred Dragoon", "Kindred Dark Knight",
+								"Count Zaebos", "Duke Scox", "Marquis Sabnak", "King Zagan", "Count Haagenti",
+								"Hydra Paladin", "Hydra Warrior", "Hydra Samurai", "Hydra Dragoon", "Hydra Dark Knight",
+								"Vanguard Footsoldier", "Vanguard Gutslasher", "Vanguard Impaler", "Vanguard Neckchopper", "Vanguard Trooper", "Wyrmgnasher Bjakdek", "Bladerunner Rokgevok", "Bloodfist Voshgrosh", "Spellspear Djokvukk",
+								"Vanguard Defender", "Vanguard Drakekeeper", "Vanguard Hatamoto", "Vanguard Vigilante", "Vanguard Vindicator", "Ze'Vho Fallsplitter", "Zo'Pha Forgesoul", "Bu'Bho Truesteel",
+								"Vanguard Exemplar", "Vanguard Inciter", "Vanguard Partisan", "Vanguard Persecutor", "Vanguard Skirmisher", "Maa Febi the Steadfast", "Muu Febi the Steadfast",
 								"Vanguard Armorer", "Vanguard Dragontamer", "Vanguard Ronin", "Vanguard Smithy",
 								"Buffrix Eargone", "Cloktix Longnail", "Sparkspox Sweatbrow", "Ticktox Beadyeyes", "Tufflix Loglimbs", "Wyrmwix Snakespecs", "Karashix Swollenskull", "Smeltix Thickhide", "Wasabix Callusdigit", "Anvilix Sootwrists", "Scruffix Shaggychest", "Tymexox Ninefingers", "Scourquix Scaleskin",
 								"Draklix Scalecrust", "Moltenox Stubthumbs", "Ruffbix Jumbolobes", "Shisox Widebrow", "Tocktix Thinlids",
-								"Nightmare Bunny", "Nightmare Eft", "Nightmare Mandragora", 
-								"Nightmare Hippogryph", "Nightmare Sabotender", "Nightmare Sheep", 
+								"Nightmare Bunny", "Nightmare Eft", "Nightmare Mandragora",
+								"Nightmare Hippogryph", "Nightmare Sabotender", "Nightmare Sheep",
 								"Nightmare Snoll", "Nightmare Stirge", "Nightmare Weapon",
-								"Nightmare Makara", "Nightmare Cluster", 
-								"Shamblix Rottenheart", "Elvaansticker Bxafraff", "Qu'Pho Bloodspiller", "Te'Zha Ironclad", "Koo Rahi the Levinblade", 
+								"Nightmare Makara", "Nightmare Cluster",
+								"Shamblix Rottenheart", "Elvaansticker Bxafraff", "Qu'Pho Bloodspiller", "Te'Zha Ironclad", "Koo Rahi the Levinblade",
 								"Barong", "Alklha", "Stihi", "Fairy Ring", "Stcemqestcint", "Stringes", "Suttung" }
 staggers['night']['random'] = {"Nightmare Taurus"}
 staggers['night']['none'] = {"Animated Claymore", "Animated Dagger", "Animated Great Axe", "Animated Gun", "Animated Hammer", "Animated Horn", "Animated Kunai", "Animated Knuckles", "Animated Longbow", "Animated Longsword", "Animated Scythe", "Animated Shield", "Animated Spear", "Animated Staff", "Animated Tabar", "Animated Tachi", "Fire Pukis", "Petro Pukis", "Poison Pukis", "Wind Pukis", "Kindred's Vouivre", "Kindred's Wyvern", "Kindred's Avatar", "Vanguard Eye", "Prototype Eye", "Nebiros's Avatar", "Haagenti's Avatar", "Caim's Vouivre", "Andras's Vouivre", "Adamantking Effigy", "Avatar Icon", "Goblin Replica", "Serjeant Tombstone", "Zagan's Wyvern", "Hydra's Hound", "Hydra's Wyvern", "Hydra's Avatar", "Rearguard Eye", "Adamantking Effigy", "Adamantking Image", "Avatar Icon", "Avatar Idol", "Effigy Prototype", "Goblin Replica", "Goblin Statue", "Icon Prototype", "Manifest Icon", "Manifest Icon", "Prototype Eye", "Serjeant Tombstone", "Statue Prototype", "Tombstone Prototype", "Vanguard Eye", "Vanguard's Avatar", "Vanguard's Avatar", "Vanguard's Avatar", "Vanguard's Avatar", "Vanguard's Crow", "Vanguard's Hecteyes", "Vanguard's Scorpion", "Vanguard's Slime", "Vanguard's Wyvern", "Vanguard's Wyvern", "Vanguard's Wyvern", "Vanguard's Wyvern", "Warchief Tombstone"}

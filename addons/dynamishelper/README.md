@@ -1,5 +1,5 @@
 Authors: Krizz, Skyrant
-Version: 2.2
+Version: 2.3
 Date: 18/03/2017
 
 Dynamis Helper
