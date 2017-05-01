@@ -48,7 +48,7 @@ res = require('resources')
 defaults = {}
 defaults.Track = ''
 defaults.Tracker = {}
-defaults.Tracker.Key_Item_Display = true
+defaults.KeyItemDisplay = true
 
 settings = config.load(defaults)
 
@@ -282,11 +282,13 @@ function search(query, export)
         end
     end
     
-    for id, names in pairs(key_item_names) do
-        if terms_pattern == '' or key_item_names[id].name:find(terms_pattern) and settings.Tracker.Key_Item_Display == true then
-            results_key_items:add(id)
-        end
-    end
+    if settings.KeyItemDisplay then
+          for id in pairs(key_item_names) do
+               if terms_pattern == '' or key_item_names[id].name:match(terms_pattern) then
+                    results_key_items:add(id)
+               end
+          end
+     end
 
     log('Searching: '..query:concat(' '))
 
