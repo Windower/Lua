@@ -128,6 +128,9 @@ Show all the items stored on "omega".
 
 ## Changelog
 
+### v1.20170501
+* **add**: Added a setting to stop the display of keyitems. Maybe someone will add a command toggle for it later?
+
 ### v1.20170405
 * **fix**: Adjusted the conditions for updating the shared storages.json to make it more robust.
 * **add**: Added key item tracking.
