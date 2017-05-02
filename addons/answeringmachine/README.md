@@ -1,5 +1,5 @@
 Author: Byrth
-Version: 1.2
+Version: 1.4
 Answering Machine with basic functionality
 
 Abbreviation: //am, //answeringmachine
@@ -15,6 +15,7 @@ Purpose:
 To record conversations and play them back at your leisure.
 
 Version History:
+1.4 - Added a black/red box that appears if you have messages that you probably haven't read.
 1.3 - Adjusted trim function to prevent error when dealing with 15 character names.
 1.2 - Timestamps added. Massive refactoring. Outgoing tells now included.
 1.1 - Version History started, fundamental recording and answering features created.
