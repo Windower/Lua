@@ -450,14 +450,12 @@ function texts.alpha(t, alpha)
 end
 
 -- Sets/returns text transparency. Based on percentage values, with 1 being fully transparent, while 0 is fully opaque.
-function texts.transparency(t, alpha)
-    if not alpha then
+function texts.transparency(t, transparency)
+    if not transparency then
         return 1 - meta[t].settings.text.alpha/255
     end
-
-    alpha = math.floor(255*(1-alpha))
-    windower.text.set_color(meta[t].name, alpha, meta[t].settings.text.red, meta[t].settings.text.green, meta[t].settings.text.blue)
-    meta[t].settings.text.alpha = alpha
+    
+    texts.alpha(t,math.floor(255*(1-transparency)))
 end
 
 function texts.right_justified(t, right)
@@ -556,9 +554,10 @@ function texts.stroke_color(t, red, green, blue)
 end
 
 function texts.stroke_transparency(t, transparency)
-    if not alpha then
+    if not transparency then
         return 1 - meta[t].settings.text.stroke.alpha/255
     end
+    
     texts.stroke_alpha(t,math.floor(255 * (1 - transparency)))
 end
 
