@@ -527,14 +527,12 @@ function texts.bg_alpha(t, alpha)
 end
 
 -- Sets/returns background transparency. Based on percentage values, with 1 being fully transparent, while 0 is fully opaque.
-function texts.bg_transparency(t, alpha)
-    if not alpha then
+function texts.bg_transparency(t, transparency)
+    if not transparency then
         return 1 - meta[t].settings.bg.alpha/255
     end
-
-    alpha = math.floor(255*(1-alpha))
-    windower.text.set_bg_color(meta[t].name, alpha, meta[t].settings.bg.red, meta[t].settings.bg.green, meta[t].settings.bg.blue)
-    meta[t].settings.bg.alpha = alpha
+    
+    texts.bg_alpha(t, math.floor(255*(1-transparency)))
 end
 
 function texts.stroke_width(t, width)
