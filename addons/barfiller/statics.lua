@@ -174,7 +174,7 @@ function load_text_box()
     exp_text:font(settings.Texts.Exp.Text.Font, unpack(settings.Texts.Exp.Text.Fonts))
     exp_text:size(settings.Texts.Exp.Text.Size)
     exp_text:color(settings.Texts.Exp.Text.Red, settings.Texts.Exp.Text.Green, settings.Texts.Exp.Text.Blue)
-    exp_text:stroke_transparency(settings.Texts.Exp.Text.Stroke.Alpha)
+    exp_text:stroke_alpha(settings.Texts.Exp.Text.Stroke.Alpha)
     exp_text:stroke_color(settings.Texts.Exp.Text.Stroke.Red, settings.Texts.Exp.Text.Stroke.Green,
         settings.Texts.Exp.Text.Stroke.Blue)
     exp_text:stroke_width(settings.Texts.Exp.Text.Stroke.Width)
