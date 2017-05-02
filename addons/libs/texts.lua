@@ -121,7 +121,7 @@ local apply_settings = function(_, t, settings)
     texts.visible(t, meta[t].status.visible)
     texts.stroke_width(t, settings.text.stroke.width)
     texts.stroke_color(t, settings.text.stroke.red, settings.text.stroke.green, settings.text.stroke.blue)
-    texts.stroke_transparency(t, settings.text.stroke.alpha)
+    texts.stroke_alpha(t, settings.text.stroke.alpha)
 
     call_events(t, 'reload')
 end
@@ -557,12 +557,18 @@ function texts.stroke_color(t, red, green, blue)
     meta[t].settings.text.stroke.blue = blue
 end
 
-function texts.stroke_transparency(t, alpha)
+function texts.stroke_transparency(t, transparency)
     if not alpha then
-        return 1 - meta[t].settings.stroke.alpha/255
+        return 1 - meta[t].settings.text.stroke.alpha/255
+    end
+    texts.stroke_alpha(t,math.floor(255 * (1 - transparency)))
+end
+
+function texts.stroke_alpha(t, alpha)
+    if not alpha then
+        return meta[t].settings.text.stroke.alpha
     end
 
-    alpha = math.floor(255 * (1 - alpha))
     windower.text.set_stroke_color(meta[t].name, alpha, meta[t].settings.text.stroke.red, meta[t].settings.text.stroke.green, meta[t].settings.text.stroke.blue)
     meta[t].settings.text.stroke.alpha = alpha
 end
