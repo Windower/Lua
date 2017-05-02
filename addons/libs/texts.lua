@@ -539,7 +539,7 @@ end
 
 function texts.stroke_width(t, width)
     if not width then
-        return meta[t].settings.text.stroke.width
+        return meta[t].settings.stroke.width
     end
 
     windower.text.set_stroke_width(meta[t].name, width)
@@ -559,7 +559,7 @@ end
 
 function texts.stroke_transparency(t, alpha)
     if not alpha then
-        return 1 - meta[t].settings.text.stroke.alpha/255
+        return 1 - meta[t].settings.stroke.alpha/255
     end
 
     alpha = math.floor(255 * (1 - alpha))
