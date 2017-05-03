@@ -138,8 +138,7 @@ windower.register_event('job change',function ()
 			windower.add_to_chat(17, '                             Auto Macro Switching Disabled for ' .. job ..'.')
 		else
 			windower.add_to_chat(17, '                             Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '.  Job Changed to ' .. job)
-			windower.send_command('input /macro book ' .. book)
-			windower.send_command('input /macro set ' .. page)
+			windower.send_command('input /macro book '..book..';wait 0.2;input /macro set '..page..';')
 		end
 	elseif globaldisable == 1 then
 
