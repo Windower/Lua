@@ -535,7 +535,7 @@ end
 
 function texts.stroke_width(t, width)
     if not width then
-        return meta[t].settings.stroke.width
+        return meta[t].settings.text.stroke.width
     end
 
     windower.text.set_stroke_width(meta[t].name, width)
