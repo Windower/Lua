@@ -26,16 +26,26 @@
         SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+local text_setup = {
+    flags = {
+        draggable = false
+    }
+}
+
+local images_setup = {
+    draggable = false
+}
+
 -- setup variables
-background = images.new()
+background = images.new(images_setup)
 
-hp_foreground = images.new()
-mp_foreground = images.new()
-tp_foreground = images.new()
+hp_foreground = images.new(images_setup)
+mp_foreground = images.new(images_setup)
+tp_foreground = images.new(images_setup)
 
-hp_text = texts.new(settings.Texts.Text)
-mp_text = texts.new(settings.Texts.Text)
-tp_text = texts.new(settings.Texts.Text)
+hp_text = texts.new(text_setup)
+mp_text = texts.new(text_setup)
+tp_text = texts.new(text_setup)
 
 -- style variables
 total_height = 8
@@ -63,7 +73,7 @@ if settings.Bars.Compact then
     bar_background = settings.Images.FFXIV.BackgroundCompact
     total_width = 422
     bar_width = 127
-    bar_spacing = 4
+    bar_spacing = 5
 end
 
 if settings.Bars.Style == 'ffxi' then
@@ -95,3 +105,14 @@ ready = false
 hp_update = false
 mp_update = false
 tp_update = false
+hp_bar_width = 0
+mp_bar_width = 0
+tp_bar_width = 0
+
+-- stats variables
+hpp = 0
+mpp = 0
+tpp = 0
+current_hp = 0
+current_mp = 0
+current_tp = 0

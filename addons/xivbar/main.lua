@@ -26,6 +26,7 @@
         SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
+-- setup images with a common setup
 function setup_image(image, path)
     image:path(path)
     image:repeat_xy(1, 1)
@@ -34,6 +35,7 @@ function setup_image(image, path)
     image:show()
 end
 
+-- setup text with a common setup
 function setup_text(text)
     text:bg_alpha(0)
     text:bg_visible(false)
@@ -47,7 +49,8 @@ function setup_text(text)
     text:show()
 end
 
-function position_images()
+-- position the images and text
+function position_ui()
     local x = windower.get_windower_settings().x_res / 2 - (total_width / 2) + settings.Bars.OffsetX
     local y = windower.get_windower_settings().y_res - 60 + settings.Bars.OffsetY
 
@@ -59,146 +62,77 @@ function position_images()
     hp_foreground:width(0)
     mp_foreground:width(0)
     tp_foreground:width(0)
-end
-
-function position_text()
-    local x = windower.get_windower_settings().x_res / 2 - (total_width / 2) + settings.Bars.OffsetX
 
     hp_text:pos(x + 50, background:pos_y() + 4)
     mp_text:pos(x + 65 + bar_width + bar_spacing, background:pos_y() + 4)
     tp_text:pos(x + 75 + (bar_width*2) + (bar_spacing*2), background:pos_y() + 4)
 end
 
-function load_images()
+-- load the images and text
+function load_ui()
     setup_image(background, bar_background)
-
     setup_image(hp_foreground, bar_hp)
     setup_image(mp_foreground, bar_mp)
     setup_image(tp_foreground, bar_tp)
-
-    position_images()
-end
-
-function load_text()
     setup_text(hp_text)
     setup_text(mp_text)
     setup_text(tp_text)
 
-    position_text()
+    position_ui()
 end
 
-function update_hp()
-    local info         = windower.ffxi.get_player()
-    local old_hp_width = hp_foreground:width()
-    local new_hp_width = math.floor((info.vitals.hpp / 100) * bar_width)
+-- update a bar
+function update_bar(bar, width, text, current, pp, flag)
+    local old_width = width
+    local new_width = math.floor((pp / 100) * bar_width)
 
-    if new_hp_width ~= nil and new_hp_width >= 0 then
-        if old_hp_width < new_hp_width then
-            local x = old_hp_width + math.ceil(((new_hp_width - old_hp_width) * 0.1))
-
-            if x > bar_width then
-                x = bar_width
+    if new_width ~= nil and new_width >= 0 then
+        if old_width == new_width then
+            if new_width == 0 then
+                bar:hide()
             end
 
-            hp_foreground:show()
-            hp_foreground:size(x, total_height)
-        elseif old_hp_width > new_hp_width then
-            local x = old_hp_width - math.ceil(((old_hp_width - new_hp_width) * 0.1))
+            if flag == 1 then
+                hp_update = false
+            elseif flag == 2 then
+                mp_update = false
+            elseif flag == 3 then
+                tp_update = false
+            end
+        else
+            local x = old_width
 
-            if x < 0 then
-                x = 0
+            if old_width < new_width then
+                x = old_width + math.ceil(((new_width - old_width) * 0.1))
+
+                if x > bar_width then
+                    x = bar_width
+                end
+            elseif old_width > new_width then
+                x = old_width - math.ceil(((old_width - new_width) * 0.1))
+
+                if x < 0 then
+                    x = 0
+                end
             end
 
-            hp_foreground:show()
-            hp_foreground:size(x, total_height)
-        elseif old_hp_width == new_hp_width then
-            if new_hp_width == 0 then
-                hp_foreground:hide()
+            if flag == 1 then
+                hp_bar_width = x
+            elseif flag == 2 then
+                mp_bar_width = x
+            elseif flag == 3 then
+                tp_bar_width = x
             end
-            hp_update = false
+
+            bar:size(x, total_height)
+            bar:show()
         end
     end
 
-    hp_text:clear()
-    hp_text:append('' .. info.vitals.hp)
+    text:text(tostring(current))
 end
 
-function update_mp()
-    local info         = windower.ffxi.get_player()
-    local old_mp_width = mp_foreground:width()
-    local new_mp_width = math.floor((info.vitals.mpp / 100) * bar_width)
-
-    if new_mp_width ~= nil and new_mp_width >= 0 then
-        if old_mp_width < new_mp_width then
-            local x = old_mp_width + math.ceil(((new_mp_width - old_mp_width) * 0.1))
-
-            if x > bar_width then
-                x = bar_width
-            end
-
-            mp_foreground:show()
-            mp_foreground:size(x, total_height)
-        elseif old_mp_width > new_mp_width then
-            local x = old_mp_width - math.ceil(((old_mp_width - new_mp_width) * 0.1))
-
-            if x < 0 then
-                x = 0
-            end
-
-            mp_foreground:show()
-            mp_foreground:size(x, total_height)
-        elseif old_mp_width == new_mp_width then
-            if new_mp_width == 0 then
-                mp_foreground:hide()
-            end
-            mp_update = false
-        end
-    end
-
-    mp_text:clear()
-    mp_text:append('' .. info.vitals.mp)
-end
-
-function update_tp()
-    local info         = windower.ffxi.get_player()
-    local old_tp_width = tp_foreground:width()
-    local new_tp_width = bar_width
-
-    if info.vitals.tp < 1000 then
-        new_tp_width = math.floor((info.vitals.tp / 1000) * bar_width)
-    end
-
-    if new_tp_width ~= nil and new_tp_width >= 0 then
-        if old_tp_width < new_tp_width then
-            local x = old_tp_width + math.ceil(((new_tp_width - old_tp_width) * 0.1))
-
-            if x > bar_width then
-                x = bar_width
-            end
-
-            tp_foreground:show()
-            tp_foreground:size(x, total_height)
-        elseif old_tp_width > new_tp_width then
-            local x = old_tp_width - math.ceil(((old_tp_width - new_tp_width) * 0.1))
-
-            if x < 0 then
-                x = 0
-            end
-
-            tp_foreground:show()
-            tp_foreground:size(x, total_height)
-        elseif old_tp_width == new_tp_width then
-            if new_tp_width == 0 then
-                tp_foreground:hide()
-            end
-            tp_update = false
-        end
-    end
-
-    tp_text:clear()
-    tp_text:append('' .. info.vitals.tp)
-end
-
+-- hide the addon
 function hide()
     background:hide()
     hp_foreground:hide()
@@ -210,6 +144,7 @@ function hide()
     ready = false
 end
 
+-- show the addon
 function show()
     background:show()
     hp_foreground:show()
@@ -219,13 +154,30 @@ function show()
     tp_foreground:show()
     tp_text:show()
     ready = true
-end
-
-function initialize()
-    load_images()
-    load_text()
-    ready = true
     hp_update = true
     mp_update = true
     tp_update = true
+end
+
+-- initialize addon
+function initialize()
+    load_ui()
+
+    local player = windower.ffxi.get_player()
+
+    if player ~= nil then
+        hpp = player.vitals.hpp
+        mpp = player.vitals.mpp
+        current_hp = player.vitals.hp
+        current_mp = player.vitals.mp
+        current_tp = player.vitals.tp
+
+        tpp = current_tp
+
+        if current_tp ~= 0 then
+            tpp = current_tp / 10
+
+            if tpp > 100 then tpp = 100 end
+        end
+    end
 end

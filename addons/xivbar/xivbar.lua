@@ -30,13 +30,12 @@
 _addon.name = 'XIV Bar'
 _addon.author = 'Edeon'
 _addon.version = '1.0'
-_addon.commands = {'xivbar'}
 _addon.language = 'english'
 
 -- Windower Libs
 config = require('config')
-texts  = require('libs/non-draggable-texts')
-images = require('libs/images')
+texts  = require('texts')
+images = require('images')
 
 -- load settings
 require('defaults')
