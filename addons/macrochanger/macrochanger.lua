@@ -111,7 +111,7 @@ function options_load()
 	else
 		f:close()
 		for curline in io.lines(windower.addon_path..'data/settings.txt') do
-			local splat = curline:split(' ')
+			local splat = curline:gsub(':',''):split(' ')
 			local cmd = ''
 			if splat[1] and macros[splat[1]:upper()] and splat[2] ~=nil and (splat[2]:lower() == 'book' or splat[2]:lower() == 'page') and splat[3] then
 				macros[splat[1]:upper()][splat[2]:ucfirst()] = splat[3] -- Instead of a number, this can also be 'disabled'
