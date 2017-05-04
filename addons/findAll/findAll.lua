@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name    = 'findAll'
 _addon.author  = 'Zohno'
-_addon.version = '1.201704052'
+_addon.version = '1.20170501'
 _addon.commands = {'findall'}
 
 require('chat')
@@ -48,6 +48,7 @@ res = require('resources')
 defaults = {}
 defaults.Track = ''
 defaults.Tracker = {}
+defaults.KeyItemDisplay = true
 
 settings = config.load(defaults)
 
@@ -281,11 +282,13 @@ function search(query, export)
         end
     end
     
-    for id, names in pairs(key_item_names) do
-        if terms_pattern == '' or key_item_names[id].name:find(terms_pattern) then
-            results_key_items:add(id)
-        end
-    end
+    if settings.KeyItemDisplay then
+          for id in pairs(key_item_names) do
+               if terms_pattern == '' or key_item_names[id].name:match(terms_pattern) then
+                    results_key_items:add(id)
+               end
+          end
+     end
 
     log('Searching: '..query:concat(' '))
 
