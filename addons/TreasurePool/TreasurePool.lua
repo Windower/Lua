@@ -1,4 +1,4 @@
---[[Copyright © 2016, Kenshi
+--[[Copyright © 2017, Kenshi
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -125,12 +125,12 @@ windower.register_event('prerender', function()
         return
     end
     for i = 0, 9 do
-        if treasure[i] then
+        if treasure[i] and treasure[i].item_id then
             if goals[i] then
                 local diff = os.difftime(goals[i], os.time())
                 local timer = {}    
                 timer[i] = os.date('!%M:%S', diff)
-                if treasure[i].item_id and timer[i] then
+                if timer[i] then
                     if diff < 0 then -- stop the timer when 00:00 so it don't show 59:59 for a brief moment
                         remove:add('index' .. i)
                         remove:add('lotting' .. i)
