@@ -152,6 +152,7 @@ end)
 windower.register_event('zone change', function(zone)
     if ProcZones:contains(windower.ffxi.get_info().zone) then
         init_currency()
+        init_granules()
         window:show()
     else
         window:hide()
