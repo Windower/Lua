@@ -26,52 +26,38 @@
         SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-defaults = {}
+local defaults = {}
 
 defaults.Bars = {}
-defaults.Bars.Style = 'ffxiv'
-defaults.Bars.Compact = false
 defaults.Bars.OffsetX = 0
 defaults.Bars.OffsetY = 0
 
-defaults.Images = {}
-defaults.Images.FFXIV = {}
-defaults.Images.FFXIV.Background = windower.addon_path..'resources/ffxiv_bar_bg.png'
-defaults.Images.FFXIV.BackgroundCompact = windower.addon_path..'resources/ffxiv_bar_compact.png'
-defaults.Images.FFXIV.Hp = windower.addon_path..'resources/ffxiv_hp_fg.png'
-defaults.Images.FFXIV.Mp = windower.addon_path..'resources/ffxiv_mp_fg.png'
-defaults.Images.FFXIV.Tp = windower.addon_path..'resources/ffxiv_tp_fg.png'
-defaults.Images.FFXI = {}
-defaults.Images.FFXI.Background = windower.addon_path..'resources/ffxi_bar_bg.png'
-defaults.Images.FFXI.BackgroundCompact = windower.addon_path..'resources/ffxi_bar_compact.png'
-defaults.Images.FFXI.Hp = windower.addon_path..'resources/ffxi_hp_fg.png'
-defaults.Images.FFXI.Mp = windower.addon_path..'resources/ffxi_mp_fg.png'
-defaults.Images.FFXI.Tp = windower.addon_path..'resources/ffxi_tp_fg.png'
+defaults.Theme = {}
+defaults.Theme.Name = 'ffxiv'
+defaults.Theme.Compact = false
+defaults.Theme.Bar = {}
+defaults.Theme.Bar.Width = 132
+defaults.Theme.Bar.Spacing = 18
+defaults.Theme.Bar.Offset = 0
+defaults.Theme.Bar.Compact = {}
+defaults.Theme.Bar.Compact.Width = 116
+defaults.Theme.Bar.Compact.Spacing = 16
+defaults.Theme.Bar.Compact.Offset = 0
 
 defaults.Texts = {}
-defaults.Texts.FFXIV = {}
-defaults.Texts.FFXIV.Size = 16
-defaults.Texts.FFXIV.Font = 'sans-serif'
-defaults.Texts.FFXIV.Alpha = 255
-defaults.Texts.FFXIV.Red = 253
-defaults.Texts.FFXIV.Green = 252
-defaults.Texts.FFXIV.Blue = 250
-defaults.Texts.FFXIV.Stroke = {}
-defaults.Texts.FFXIV.Stroke.Width = 2
-defaults.Texts.FFXIV.Stroke.Alpha = 150
-defaults.Texts.FFXIV.Stroke.Red = 83
-defaults.Texts.FFXIV.Stroke.Green = 78
-defaults.Texts.FFXIV.Stroke.Blue = 36
-defaults.Texts.FFXI = {}
-defaults.Texts.FFXI.Size = 14
-defaults.Texts.FFXI.Font = 'sans-serif'
-defaults.Texts.FFXI.Alpha = 255
-defaults.Texts.FFXI.Red = 253
-defaults.Texts.FFXI.Green = 252
-defaults.Texts.FFXI.Blue = 250
-defaults.Texts.FFXI.Stroke = {}
-defaults.Texts.FFXI.Stroke.Width = 2
-defaults.Texts.FFXI.Stroke.Alpha = 200
-defaults.Texts.FFXI.Stroke.Red = 50
-defaults.Texts.FFXI.Stroke.Green = 50
-defaults.Texts.FFXI.Stroke.Blue = 50
+defaults.Texts.Font = 'sans-serif'
+defaults.Texts.Size = 14
+defaults.Texts.Offset = 0
+defaults.Texts.Color = {}
+defaults.Texts.Color.Alpha = 255
+defaults.Texts.Color.Red = 253
+defaults.Texts.Color.Green = 252
+defaults.Texts.Color.Blue = 250
+defaults.Texts.Stroke = {}
+defaults.Texts.Stroke.Width = 2
+defaults.Texts.Stroke.Alpha = 200
+defaults.Texts.Stroke.Red = 50
+defaults.Texts.Stroke.Green = 50
+defaults.Texts.Stroke.Blue = 50
+
+return defaults

@@ -26,84 +26,25 @@
         SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
--- Bind Events
--- ON LOAD
-windower.register_event('load', function()
-    if windower.ffxi.get_info().logged_in then
-        initialize()
-        show()
+local player = {}
+
+player.hpp = 0
+player.mpp = 0
+player.tpp = 0
+player.current_hp = 0
+player.current_mp = 0
+player.current_tp = 0
+
+function player:calculate_tpp()
+    self.tpp = self.current_tp
+
+    if self.current_tp ~= 0 then
+        self.tpp = self.current_tp / 10
+
+        if self.tpp > 100 then
+            self.tpp = 100
+        end
     end
-end)
+end
 
--- ON LOGIN
-windower.register_event('login', function()
-    show()
-end)
-
--- ON LOGOUT
-windower.register_event('logout', function()
-    hide()
-end)
-
--- BIND EVENTS
-windower.register_event('hp change', function(new, old)
-    current_hp = new
-    hp_update = true
-end)
-
-windower.register_event('hpp change', function(new, old)
-    hpp = new
-    hp_update = true
-end)
-
-windower.register_event('mp change', function(new, old)
-    current_mp = new
-    mp_update = true
-end)
-
-windower.register_event('mpp change', function(new, old)
-    mpp = new
-    mp_update = true
-end)
-
-windower.register_event('tp change', function(new, old)
-    current_tp = new
-
-    tpp = current_tp
-
-    if current_tp ~= 0 then
-        tpp = current_tp / 10
-
-        if tpp > 100 then tpp = 100 end
-    end
-
-    tp_update = true
-end)
-
-windower.register_event('prerender', function()
-    if ready == false then
-        return
-    end
-
-    if hp_update then
-        update_bar(hp_foreground, hp_bar_width, hp_text, current_hp, hpp, 1)
-    end
-
-    if mp_update then
-        update_bar(mp_foreground, mp_bar_width, mp_text, current_mp, mpp, 2)
-    end
-
-    if tp_update then
-        update_bar(tp_foreground, tp_bar_width, tp_text, current_tp, tpp, 3)
-    end
-end)
-
-windower.register_event('status change', function(new_status_id)
-    if hide_bars == false and (new_status_id == 4) then
-        hide_bars = true
-        hide()
-    elseif hide_bars and new_status_id ~= 4 then
-        hide_bars = false
-        show()
-    end
-end)
+return player
