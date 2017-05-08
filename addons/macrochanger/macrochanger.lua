@@ -26,57 +26,37 @@
 
 _addon.name = 'MacroChanger'
 _addon.author = 'Banggugyangu'
-_addon.version = '1.0.0.0'
+_addon.version = '1.0.0.1'
 _addon.commands = {'mc','macrochanger'}
 
 require('strings')
 
 windower.register_event('load', function()
 	globaldisable = 0
-	WAR_Book = ''
-	WAR_Page = ''
-	MNK_BOOK = ''
-	MNK_Page = ''
-	WHM_Book = ''
-	WHM_Page = ''
-	BLM_Book = ''
-	BLM_Page = ''
-	RDM_Book = ''
-	RDM_Page = ''
-	THF_Book = ''
-	THF_Page = ''
-	PLD_Book = ''
-	PLD_Page = ''
-	DRK_Book = ''
-	DRK_Page = ''
-	BST_Book = ''
-	BST_Page = ''
-	BRD_Book = ''
-	BRD_Page = ''
-	RNG_Book = ''
-	RNG_Page = ''
-	SAM_Book = ''
-	SAM_Page = ''
-	NIN_Book = ''
-	NIN_Page = ''
-	DRG_Book = ''
-	DRG_Page = ''
-	SMN_Book = ''
-	SMN_Page = ''
-	BLU_Book = ''
-	BLU_Page = ''
-	COR_Book = ''
-	COR_Page = ''
-	PUP_Book = ''
-	PUP_Page = ''
-	DNC_Book = ''
-	DNC_Page = ''
-	SCH_Book = ''
-	SCH_Page = ''
-	GEO_Book = ''
-	GEO_Page = ''
-	RUN_Book = ''
-	RUN_Page = ''
+    macros = {
+        WAR = {Book = '', Page = ''},
+        MNK = {Book = '', Page = ''},
+        WHM = {Book = '', Page = ''},
+        BLM = {Book = '', Page = ''},
+        RDM = {Book = '', Page = ''},
+        THF = {Book = '', Page = ''},
+        PLD = {Book = '', Page = ''},
+        DRK = {Book = '', Page = ''},
+        BST = {Book = '', Page = ''},
+        BRD = {Book = '', Page = ''},
+        RNG = {Book = '', Page = ''},
+        SAM = {Book = '', Page = ''},
+        NIN = {Book = '', Page = ''},
+        DRG = {Book = '', Page = ''},
+        SMN = {Book = '', Page = ''},
+        BLU = {Book = '', Page = ''},
+        COR = {Book = '', Page = ''},
+        PUP = {Book = '', Page = ''},
+        DNC = {Book = '', Page = ''},
+        SCH = {Book = '', Page = ''},
+        GEO = {Book = '', Page = ''},
+        RUN = {Book = '', Page = ''},
+        }
 	options_load()
 end)
 
@@ -102,149 +82,40 @@ function options_load()
 		g:write('DNC Book: 19\nDNC Page: 1\nSCH Book: 20\nSCH Page: 1\nGEO Book: 20\nGEO Page: 1\nRUN Book: 20\nRUN Page: 1\n')
 		g:close()
 		DisableAll = 0
-		WAR_Book = '1'
-		WAR_Page = '1'
-		MNK_BOOK = '2'
-		MNK_Page = '1'
-		WHM_Book = '3'
-		WHM_Page = '1'
-		BLM_Book = '4'
-		BLM_Page = '1'
-		RDM_Book = '5'
-		RDM_Page = '1'
-		THF_Book = '6'
-		THF_Page = '1'
-		PLD_Book = '7'
-		PLD_Page = '1'
-		DRK_Book = '8'
-		DRK_Page = '1'
-		BST_Book = '9'
-		BST_Page = '1'
-		BRD_Book = '10'
-		BRD_Page = '1'
-		RNG_Book = '11'
-		RNG_Page = '1'
-		SAM_Book = '12'
-		SAM_Page = '1'
-		NIN_Book = '13'
-		NIN_Page = '1'
-		DRG_Book = '14'
-		DRG_Page = '1'
-		SMN_Book = '15'
-		SMN_Page = '1'
-		BLU_Book = '16'
-		BLU_Page = '1'
-		COR_Book = '17'
-		COR_Page = '1'
-		PUP_Book = '18'
-		PUP_Page = '1'
-		DNC_Book = '19'
-		DNC_Page = '1'
-		SCH_Book = '20'
-		SCH_Page = '1'
-		GEO_Book = '20'
-		GEO_Page = '1'
-		RUN_Book = '20'
-		RUN_Page = '1'
+        macros = {
+            WAR = {Book = '1', Page = '1'},
+            MNK = {Book = '2', Page = '1'},
+            WHM = {Book = '3', Page = '1'},
+            BLM = {Book = '4', Page = '1'},
+            RDM = {Book = '5', Page = '1'},
+            THF = {Book = '6', Page = '1'},
+            PLD = {Book = '7', Page = '1'},
+            DRK = {Book = '8', Page = '1'},
+            BST = {Book = '9', Page = '1'},
+            BRD = {Book = '10', Page = '1'},
+            RNG = {Book = '11', Page = '1'},
+            SAM = {Book = '12', Page = '1'},
+            NIN = {Book = '13', Page = '1'},
+            DRG = {Book = '14', Page = '1'},
+            SMN = {Book = '15', Page = '1'},
+            BLU = {Book = '16', Page = '1'},
+            COR = {Book = '17', Page = '1'},
+            PUP = {Book = '18', Page = '1'},
+            DNC = {Book = '19', Page = '1'},
+            SCH = {Book = '20', Page = '1'},
+            GEO = {Book = '20', Page = '1'},
+            RUN = {Book = '20', Page = '1'},
+            }
 		print('Default settings file created')
 		windower.add_to_chat(12,'MacroChanger created a settings file and loaded!')
 	else
 		f:close()
 		for curline in io.lines(windower.addon_path..'data/settings.txt') do
-			local splat = curline:split(' ')
+			local splat = curline:gsub(':',''):split(' ')
 			local cmd = ''
-			if splat[2] ~=nil then
-				cmd = (splat[1]..' '..splat[2]):gsub(':',''):lower()
-			end
-			if cmd == 'war book' then
-				WAR_Book = splat[3]
-			elseif cmd == 'war page' then
-				WAR_Page = splat[3]
-			elseif cmd == 'mnk book' then
-				MNK_Book = splat[3]
-			elseif cmd == 'mnk page' then
-				MNK_Page = splat[3]
-			elseif cmd == 'whm book' then
-				WHM_Book = splat[3]
-			elseif cmd == 'whm page' then
-				WHM_Page = splat[3]
-			elseif cmd == 'blm book' then
-				BLM_Book = splat[3]
-			elseif cmd == 'blm page' then
-				BLM_Page = splat[3]
-			elseif cmd == 'rdm book' then
-				RDM_Book = splat[3]
-			elseif cmd == 'rdm page' then
-				RDM_Page = splat[3]
-			elseif cmd == 'thf book' then
-				THF_Book = splat[3]
-			elseif cmd == 'thf page' then
-				THF_Page = splat[3]
-			elseif cmd == 'pld book' then
-				PLD_Book = splat[3]
-			elseif cmd == 'pld page' then
-				PLD_Page = splat[3]
-			elseif cmd == 'drk book' then
-				DRK_Book = splat[3]
-			elseif cmd == 'drk page' then
-				DRK_Page = splat[3]
-			elseif cmd == 'bst book' then
-				BST_Book = splat[3]
-			elseif cmd == 'bst page' then
-				BST_Page = splat[3]
-			elseif cmd == 'brd book' then
-				BRD_Book = splat[3]
-			elseif cmd == 'brd page' then
-				BRD_Page = splat[3]
-			elseif cmd == 'rng book' then
-				RNG_Book = splat[3]
-			elseif cmd == 'rng page' then
-				RNG_Page = splat[3]
-			elseif cmd == 'sam book' then
-				SAM_Book = splat[3]
-			elseif cmd == 'sam page' then
-				SAM_Page = splat[3]
-			elseif cmd == 'nin book' then
-				NIN_Book = splat[3]
-			elseif cmd == 'nin page' then
-				NIN_Page = splat[3]
-			elseif cmd == 'drg book' then
-				DRG_Book = splat[3]
-			elseif cmd == 'drg page' then
-				DRG_Page = splat[3]
-			elseif cmd == 'smn book' then
-				SMN_Book = splat[3]
-			elseif cmd == 'smn page' then
-				SMN_Page = splat[3]
-			elseif cmd == 'blu book' then
-				BLU_Book = splat[3]
-			elseif cmd == 'blu page' then
-				BLU_Page = splat[3]
-			elseif cmd == 'cor book' then
-				COR_Book = splat[3]
-			elseif cmd == 'cor page' then
-				COR_Page = splat[3]
-			elseif cmd == 'pup book' then
-				PUP_Book = splat[3]
-			elseif cmd == 'pup page' then
-				PUP_Page = splat[3]
-			elseif cmd == 'dnc book' then
-				DNC_Book = splat[3]
-			elseif cmd == 'dnc page' then
-				DNC_Page = splat[3]
-			elseif cmd == 'sch book' then
-				SCH_Book = splat[3]
-			elseif cmd == 'sch page' then
-				SCH_Page = splat[3]
-			elseif cmd == 'geo book' then
-				GEO_Book = splat[3]
-			elseif cmd == 'geo page' then
-				GEO_Page = splat[3]
-			elseif cmd == 'run book' then
-				RUN_Book = splat[3]
-			elseif cmd == 'run page' then
-				RUN_Page = splat[3]
-			elseif cmd == 'disable all' then
+			if splat[1] and macros[splat[1]:upper()] and splat[2] ~=nil and (splat[2]:lower() == 'book' or splat[2]:lower() == 'page') and splat[3] then
+				macros[splat[1]:upper()][splat[2]:ucfirst()] = splat[3] -- Instead of a number, this can also be 'disabled'
+			elseif splat[1] and splat[2] and (splat[1]..' '..splat[2]) == 'disable all' and tonumber(splat[3]) then
 				globaldisable = tonumber(splat[3])
 			end
 		end
@@ -252,86 +123,22 @@ function options_load()
 	end
 end
 
-windower.register_event('job change',function (job_id)
-	local player = windower.ffxi.get_player()
-	local job = player.main_job
+windower.register_event('job change',function ()
+-- Could use the job ID passed into this function, but the addon would have to include the resources library
+	local job = windower.ffxi.get_player().main_job
 	local book = ''
 	local page = ''
 	if globaldisable == 0 then
-		if job == 'WAR' then
-			book = WAR_Book
-			page = WAR_Page
-		elseif job == 'MNK' then
-			book = MNK_Book
-			page = MNK_Page
-		elseif job == 'WHM' then
-			book = WHM_Book
-			page = WHM_Page
-		elseif job == 'BLM' then
-			book = BLM_Book
-			page = BLM_Page
-		elseif job == 'RDM' then
-			book = RDM_Book
-			page = RDM_Page
-		elseif job == 'THF' then
-			book = THF_Book
-			page = THF_Page
-		elseif job == 'PLD' then
-			book = PLD_Book
-			page = PLD_Page
-		elseif job == 'DRK' then
-			book = DRK_Book
-			page = DRK_Page
-		elseif job == 'BST' then
-			book = BST_Book
-			page = BST_Page
-		elseif job == 'BRD' then
-			book = BRD_Book
-			page = BRD_Page
-		elseif job == 'RNG' then
-			book = RNG_Book
-			page = RNG_Page
-		elseif job == 'SAM' then
-			book = SAM_Book
-			page = SAM_Page
-		elseif job == 'NIN' then
-			book = NIN_Book
-			page = NIN_Page
-		elseif job == 'DRG' then
-			book = DRG_Book
-			page = DRG_Page
-		elseif job == 'SMN' then
-			book = SMN_Book
-			page = SMN_Page
-		elseif job == 'BLU' then
-			book = BLU_Book
-			page = BLU_Page
-		elseif job == 'COR' then
-			book = COR_Book
-			page = COR_Page
-		elseif job == 'PUP' then
-			book = PUP_Book
-			page = PUP_Page
-		elseif job == 'DNC' then
-			book = DNC_Book
-			page = DNC_Page
-		elseif job == 'SCH' then
-			book = SCH_Book
-			page = SCH_Page
-		elseif job == 'GEO' then
-			book = GEO_Book
-			page = GEO_Page
-		elseif job == 'RUN' then
-			book = RUN_Book
-			page = RUN_Page
+        if job and macros[job] then
+			book = macros[job].Book
+			page = macros[job].Page
 		end
 
 		if ((book == 'disabled') or (page == 'disabled')) then
 			windower.add_to_chat(17, '                             Auto Macro Switching Disabled for ' .. job ..'.')
 		else
 			windower.add_to_chat(17, '                             Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '.  Job Changed to ' .. job)
-			windower.send_command('input /macro book ' .. book)
-			windower.send_command('input /macro set ' .. page)
+			windower.send_command('input /macro book '..book..';wait 0.2;input /macro set '..page..';')
 		end
 	elseif globaldisable == 1 then
 

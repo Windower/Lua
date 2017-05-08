@@ -54,13 +54,6 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
-    <name>AutoLockstyle</name>
-    <author>Bangerang</author>
-    <description>Automatically uses lockstyle command upon zoning, excluding cities. Optionally, use a gear set defined in a gearswap lua.</description>
-    <bugtracker>https://github.com/z16/Lua/issues</bugtracker>
-    <support>http://www.ffxiah.com/player/Asura/Bangerang</support>
-  </addon>
-  <addon>
     <name>AutoRA</name>
     <author>Banggugyangu</author>
     <description>Causes Ranged Attacks to behave the same as melee Auto-Attack.</description>
@@ -640,5 +633,12 @@
     <description>Displays the amount of time one has been in zone.  Original by Krellion.</description>
     <bugtracker>https://github.com/Jayjs20/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
+  </addon>
+  <addon>
+    <name>temps</name>
+    <author>Mojo</author>
+    <description>Makes buying temporary items from escha npcs much easier.</description>
+    <bugtracker>https://github.com/Snapsmojo/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Fenrir/Snaps</support>
   </addon>
 </addons>
