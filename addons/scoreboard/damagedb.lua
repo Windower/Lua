@@ -8,14 +8,17 @@ local DamageDB = {
 
 --[[
 DamageDB.player_stat_fields = T{
-    'acc', 'racc', 'crit', 'rcrit',
     'mmin', 'mmax', 'mavg',
     'rmin', 'rmax', 'ravg',
     'wsmin', 'wsmax', 'wsavg'
 }
 ]]
+
 DamageDB.player_stat_fields = T{
-    'acc', 'racc', 'crit', 'rcrit'
+    'mavg', 'mrange', 'critavg', 'critrange',
+    'ravg', 'rrange', 'rcritavg', 'rcritrange',
+    'acc', 'racc', 'crit', 'rcrit',
+    'wsavg', 'wsacc'
 }
 
 function DamageDB:new (o)
@@ -48,7 +51,7 @@ end
 
 
 function DamageDB:_filter_contains_mob(mob_name)
-    if self.filter:isempty() then
+    if self.filter:empty() then
         return true
     end
     
@@ -90,6 +93,10 @@ end
 function DamageDB:query_stat(stat, player_name)
     local players = T{}
     
+    if player_name and player_name:match('^[a-zA-Z]+$') then
+        player_name = player_name:lower():ucfirst()
+    end
+
     -- Gather a table mapping player names to all of the corresponding Player instances
     for mob, mob_players in self:iter() do
         for name, player in pairs(mob_players) do
@@ -114,8 +121,8 @@ function DamageDB:query_stat(stat, player_name)
 end
 
 
-function DamageDB:isempty()
-    return self.db:isempty()
+function DamageDB:empty()
+    return self.db:empty()
 end
 
 
@@ -135,6 +142,7 @@ function DamageDB:add_r_hit(m, p, d)         self:_get_player(m, p):add_r_hit(d)
 function DamageDB:add_r_crit(m, p, d)        self:_get_player(m, p):add_r_crit(d)        end
 function DamageDB:incr_misses(m, p)          self:_get_player(m, p):incr_m_misses()      end
 function DamageDB:incr_r_misses(m, p)        self:_get_player(m, p):incr_r_misses()      end
+function DamageDB:incr_ws_misses(m, p)       self:_get_player(m, p):incr_ws_misses()     end
 function DamageDB:add_damage(m, p, d)        self:_get_player(m, p):add_damage(d)        end
 function DamageDB:add_ws_damage(m, p, d, id) self:_get_player(m, p):add_ws_damage(id, d) end
 

@@ -1,0 +1,10 @@
+<?xml version="1.1" ?>
+<settings>
+	<global>
+		<chatColor>207</chatColor>
+		<chatTab>say</chatTab>
+	</global>
+	<nitroustaru>
+		<chatTab>shout</chatTab>
+	</nitroustaru>
+</settings>

@@ -1,5 +1,5 @@
-**Author:** Giuliano Riccio  
-**Version:** v 1.20130529
+**Author:** Giuliano Riccio
+**Version:** v 1.20131021
 
 # Plasmon #
 This addon tracks plasm, killed mobs and dropped airlixirs during a delve.
@@ -55,12 +55,20 @@ plasmon toggle
 ```
 
 ### light ###
-Enables or disabled light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the _enabled_ parameter is not specified, the help text will be shown.
+Enables or disables light mode. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the _enabled_ parameter is not specified, the help text will be shown.
 
 ```
 plasmon light <enabled>
 ```
 * **enabled:** specifies the status of the light mode. **default**, **false** or **0** mean disabled. **true** or **1** mean enabled.
+
+### timer ###
+Enables or disables the timer. When enabled, the addon will never show the window and just print a summary in the chat box at the end of the run. If the _enabled_ parameter is not specified, the help text will be shown.
+
+```
+plasmon timer <enabled>
+```
+* **enabled:** specifies the status of the timer. **false** or **0** mean disabled. **default**, **true** or **1** mean enabled.
 
 ### position ###
 Sets the horizontal and vertical position of the window relative to the upper-left corner. If no parameter is specified, the help text will be shown.
@@ -102,6 +110,18 @@ plasmon color [[-h]|[-o <objects>] [-d] [-r <red>] [-g <green>] [-b <blue>] [-a 
 ----
 
 ## Changelog ##
+
+### v1.20130613 ###
+* **add**: Stop tracking on zone change.
+
+### v1.20130610 ###
+* **add**: Added a function to enable/disable the fracture timer.
+
+### v1.20130609 ###
+* **fix**: Fix for ally leaders and mobs counting.
+
+### v1.20130604 ###
+* **add**: Added a 45 minutes timer. Requires Timers plugin's custom timers function.
 
 ### v1.20130529 ###
 * **change**: Aligned to Windower's addon development guidelines.

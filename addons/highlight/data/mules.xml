@@ -1,0 +1,9 @@
+<?xml version="1.1" ?>
+<settings>
+	<global>
+	
+	<!-- Add your mule name or other names in here to colour them when they are not in party. The correct syntax for this is as below 
+		<mulename>color</mulename>
+		This uses the same colours as battlemod. -->
+	</global>
+</settings>

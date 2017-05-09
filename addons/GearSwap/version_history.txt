@@ -1,0 +1,224 @@
+-------------------------------------------------
+GearSwap 0.929 - Adjusted the print_set function to give preference and order to slot name keys.
+-------------------------------------------------
+GearSwap 0.928 - Changed how the outgoing equipment chunks were parsed due to a changing understanding of how the windower packet events work.
+-------------------------------------------------
+GearSwap 0.927 - Sped up equipment handling and made Rare items ignore augments.
+-------------------------------------------------
+GearSwap 0.926 - Simplified the equipment handling and used 0x117 incoming.
+-------------------------------------------------
+GearSwap 0.925 - Fixed minor problem that arose with the previous version's implementation of the equip history.
+-------------------------------------------------
+GearSwap 0.924 - Fixed problems that arose when attempting to equip two of the same item in two different slots. Changed how player equipment is handled.
+-------------------------------------------------
+GearSwap 0.923 - Added augments to //gs validate sets.
+-------------------------------------------------
+GearSwap 0.922 - Changed how the reload event works so it no longer causes stack problems.
+-------------------------------------------------
+GearSwap 0.921 - Split a buff overwriting itself off into a separate event, buff_refresh, and adjusted documentation.
+-------------------------------------------------
+GearSwap 0.920 - Made file_unload fire on load commands and changed its argument to be the previous file name.
+-------------------------------------------------
+GearSwap 0.919 - Switched handling of buff_change to rely on 0x063 incoming v9, which includes the durations.
+-------------------------------------------------
+GearSwap 0.918 - Added player.buff_details and made it so buff_change triggers when buffs are overwritten.
+-------------------------------------------------
+GearSwap 0.917 - Added code to ignore already-equipped items when searching for items to equip.
+-------------------------------------------------
+GearSwap 0.916 - Added wardrobes 3 and 4.
+-------------------------------------------------
+GearSwap 0.915 - Added wardrobe2.
+-------------------------------------------------
+GearSwap 0.914 - Added /bstpet handling.
+-------------------------------------------------
+GearSwap 0.913 - Fixed japanese job point filter in filter_pretarget
+- Fixed command handling so filtered_action will be called for spells you haven't learned
+- Fixed pet_status_change so it will always be called (including in cases where the pet is dead)
+- Re-implemented pet.tp
+- Added player.base_str, player.add_str, and player.str, which is your total strength stat. Did this for all base stats as well as resistances and attack/defense. May not be reliable, but was requested.
+- Added spell.value, but there is no filter determining when it's meaningful or not. Mostly useful for COR rolls, which people should be able to filter out on their own.
+-------------------------------------------------
+GearSwap 0.912 - Added Geo- spell positioning.
+-------------------------------------------------
+GearSwap 0.911 - Removed dependence of Unbridled Wisdom spells on the respective buff.
+-------------------------------------------------
+GearSwap 0.910 - Fixed set_combine so it does not respect the disable_table and updated copyright statements.
+-------------------------------------------------
+GearSwap 0.908 - Fixed party.count failing to update in user_env. Added README.md file.
+-------------------------------------------------
+GearSwap 0.907 - Fixed a spell completion issue in aftercast caused by action packets that had no message.
+-------------------------------------------------
+GearSwap 0.906 - Added BLU magic spells and handled one aftercast that uses the 0x053 incoming packet.
+-------------------------------------------------
+GearSwap 0.904 - Adjusted party buff information to run off indices instead of names.
+-------------------------------------------------
+GearSwap 0.903 - Added buff information to the alliance/party structure.
+-------------------------------------------------
+GearSwap 0.902 - Changed action packet length.
+-------------------------------------------------
+GearSwap 0.901 - Modified add_to_chat handling throughout GearSwap so it would show up in a consistent log (the same one as mode 1)
+-------------------------------------------------
+GearSwap 0.900 - Adjusted GearSwap to be compatible with the new library behavior.
+-------------------------------------------------
+GearSwap 0.899 - Adjusted GearSwap to be compatible with the new library behavior.
+-------------------------------------------------
+GearSwap 0.898 - Fixed a bug with using cast_delay in the pretarget function.
+-------------------------------------------------
+GearSwap 0.897 - Superior system support and filtering.
+-------------------------------------------------
+GearSwap 0.896 - Command_registry class addition.
+-------------------------------------------------
+GearSwap 0.894 - Various bugfixes (including Monstrosity loading).
+-------------------------------------------------
+GearSwap 0.892 - Proxied primitive and text commands.
+-------------------------------------------------
+GearSwap 0.891 - Fixed a few bugs with /item commands. Exposed the _addon table.
+-------------------------------------------------
+GearSwap 0.890 - Added support for enchanted items in Wardrobe. Added a filter for enchanted items/armors. Made resources tables static.
+-------------------------------------------------
+GearSwap 0.880 - Accommodated booleans and numbers in equip commands. Fixed world.conquest.strengths.
+-------------------------------------------------
+GearSwap 0.875 - Changed command_registry handling slightly
+-------------------------------------------------
+GearSwap 0.874 - Added indi_change event
+-------------------------------------------------
+GearSwap 0.873 - Adjusted midaction and pet_midaction.
+-------------------------------------------------
+GearSwap 0.872 - Fixed Encumbrance, Job Change issues, and a nil error on login.
+-------------------------------------------------
+GearSwap 0.871 - Debugging and Logging changes.
+-------------------------------------------------
+GearSwap 0.870 - Rewrite of "order" as "priority" for advanced tables.
+-------------------------------------------------
+GearSwap 0.868 - Ironed out some bugs. Added .in_mog_house. Made pet_change work for gaining charmed pets.
+-------------------------------------------------
+GearSwap 0.865 - Replicated part of the LuaCore API in GearSwap and set limits on global variable refresh rates.
+-------------------------------------------------
+GearSwap 0.860 - Reworked the augment system to use the extdata library. Consequently enabled evolith support.
+-------------------------------------------------
+GearSwap 0.851 - Added Load command and file path support for a libs folder.
+-------------------------------------------------
+GearSwap 0.850 - Japanese support.
+-------------------------------------------------
+GearSwap 0.840 - Overhaul for Wardrobe. Preparations for new augment library.
+-------------------------------------------------
+GearSwap 0.837 - Created infrastructure for GearSwap served information and added Indi spell aura information to player.
+-------------------------------------------------
+GearSwap 0.836 - Added augments to the export feature for currently equipped sets and inventory.
+-------------------------------------------------
+GearSwap 0.835 - Adaptation for new resources.
+-------------------------------------------------
+GearSwap 0.834 - Filter now handles Scholar spells and Blue Magic.
+-------------------------------------------------
+GearSwap 0.833 - Added the first version of a more authentic filter.
+-------------------------------------------------
+GearSwap 0.832 - Adapted GearSwap for the .lua version of resources lib.
+-------------------------------------------------
+GearSwap 0.830 - Fixed various bugs. Differentiated pretarget and precast delays. Augments work again.
+-------------------------------------------------
+GearSwap 0.823 - Changed GearSwap to run off the resources library. Fixed Double-Up's aftercast.
+-------------------------------------------------
+GearSwap 0.822 - Added demomode and filters to prevent impossible actions. 
+-------------------------------------------------
+GearSwap 0.821 - Finalized register_event(). Protected user files to prevent error propagation.
+-------------------------------------------------
+GearSwap 0.820 - Added 0x02, 0x35 extdata augment handling. Added sub_job_change(new,old) event.
+-------------------------------------------------
+GearSwap 0.819 - API adjustments. Massive refactoring of the scheduler, which improved midaction() and pet_midaction(). Fixed " <wait X>" macros and the buff_change() event.
+-------------------------------------------------
+GearSwap 0.818 - Added pet_change() user event. Refined event registration.
+-------------------------------------------------
+GearSwap 0.817 - Added filtering to //gs validate. Added pet_midcast() user function.
+-------------------------------------------------
+GearSwap 0.816 - Automaton midcast fixed. //gs fixed. //gs export no longer requires a user file (except for the sets option).
+-------------------------------------------------
+GearSwap 0.815 - Automaton information added. 
+-------------------------------------------------
+GearSwap 0.814 - Fixed the equipment table, which was being unreliable.
+-------------------------------------------------
+GearSwap 0.813 - Fixed issues with /pet. Meddled with triggering interruption again. Potentially re-created the Paralysis issue in the process.
+-------------------------------------------------
+GearSwap 0.812 - Fixed Interruption handling for action messages that show the player as the target regardless the real target.
+-------------------------------------------------
+GearSwap 0.811 - Added a check for whether or not a given spell/ability can be used. Made player.equipment update between pretarget/precast/midcast. Deleted the second argument to pretarget, precast, midcast, aftercast, pet_midcast, and pet_aftercast.
+-------------------------------------------------
+GearSwap 0.810 - Changed how precast and midcast are defined for players. Removed verify_equip and force_send. Refactored a great deal.
+-------------------------------------------------
+GearSwap 0.802 - Introduced the debugging "clocking" setting. Changed how actions are injected.
+-------------------------------------------------
+GearSwap 0.801 - Combated double precasts, fixed a variety of nil errors, and made Paralysis work (hopefully).
+-------------------------------------------------
+GearSwap 0.800 - Added pretarget and moved precast to outgoing_chunk. Changed "buff_change()" to pass a boolean instead of a string indicating whether the buff was gained or lost.
+-------------------------------------------------
+GearSwap 0.723 - Removed a debug message, updated documentation, and refactored equip_processing.lua extensively.
+-------------------------------------------------
+GearSwap 0.722 - Changed the ranged attack spell table to reflect the resources. Added spell.interrupted boolean. Added a persistent spell for ambiguous interruption message cases. Changed interrupted action.type to "Interruption"... Many things.
+-------------------------------------------------
+GearSwap 0.721 - Adjusted for API changes and related documentation.
+-------------------------------------------------
+GearSwap 0.720 - Fixed Pet TP magnitude, exposed OS library, updated documentation, improved file name handling (a bit), and minor changes to the validation algorithm.
+-------------------------------------------------
+GearSwap 0.719 - Removed dependence on sets library. Fixed error that occured when there was no subjob.
+-------------------------------------------------
+GearSwap 0.718 - Fixed player.status. Added the validate command. Improved export sets' efficiency. Updated documentation.
+-------------------------------------------------
+GearSwap 0.717 - Fixed equipment removal. Added sets.naked. Handled category 11 outgoing actions (homepointing). Updated documentation.
+-------------------------------------------------
+GearSwap 0.716 - Export now looks up the proper equipment slot. Changed syntax for equipping an empty slot to be less ambiguous. Fixed unequipping on zone (I think).
+-------------------------------------------------
+GearSwap 0.715 - Converted resource strings to numbers if appropriate. Added Pianissimo cast_time handling.
+-------------------------------------------------
+GearSwap 0.714 - Minor changes to make export more user friendly.
+-------------------------------------------------
+GearSwap 0.713 - Added equipment order support. Made export sets more safe. Added equip "empty" support.
+-------------------------------------------------
+GearSwap 0.712 - Added adventuring fellow handling.
+-------------------------------------------------
+GearSwap 0.711 - Refined category exclusions for the outgoing action packet.
+-------------------------------------------------
+GearSwap 0.710 - Added windower.debug statements.
+-------------------------------------------------
+GearSwap 0.709 - Looped midact back through console with a 1.5 second delay. Tested for 2 days without extra DC issues.
+-------------------------------------------------
+GearSwap 0.708 - Added Encumbrance support. Added a message for Exporting files. Added another _global.midaction fix. Altered how Disable works, slightly.
+-------------------------------------------------
+GearSwap 0.707 - Forced the "sets" export to convert all equipment to inventory names. Started to add encumbrance code. Added a check for debuffs that prevent ability/spell usage in outgoing_chunk to reset midact.
+-------------------------------------------------
+GearSwap 0.706 - Added a "sets" option to the export command.
+-------------------------------------------------
+GearSwap 0.705 - Likely eliminated the Line 71 and 324 errors. Changed the "disable" console command so that it can be used for individual slots or all of gearSwap.
+-------------------------------------------------
+GearSwap 0.704 - Changed require() to include() and reworked its back end. Confirmed that register_event() works for users now and are successfully deleted.
+-------------------------------------------------
+GearSwap 0.703 - Added an export command and the appropriate documentation.
+-------------------------------------------------
+GearSwap 0.702 - Made keys to player data tables all case insensitive. Fixed the user windower structure. Set it so it should reset _global.midaction if the spelltarget dies while casting.
+-------------------------------------------------
+GearSwap 0.701 - Made silent interrupts reset _global.midaction. Fixed aftercast triggering on event_action_messages other than your own/your pets.
+-------------------------------------------------
+GearSwap 0.700 - Added preliminary augmented equipment support. Improved register_event. Finished conversion of GearSwap to new API.
+-------------------------------------------------
+GearSwap 0.605 - Fixed pet_mid/aftercast. Added/documented disable/enable. Verified that register_event will work in user documents.
+-------------------------------------------------
+GearSwap 0.604 - Added more handling to deal with monstrosity. Dramatical reduced memory requirements.
+-------------------------------------------------
+GearSwap 0.603 - Added handling to deal with monstrosity. About a week worth of misc. changes that I can't remember.
+-------------------------------------------------
+GearSwap 0.602 - Minor refactoring, moved things around, added a little more protection to windower.send_command()
+-------------------------------------------------
+GearSwap 0.601 - Improved the equip command to handle multiple set layers
+-------------------------------------------------
+GearSwap 0.600 - Added item handling and add/documented require
+-------------------------------------------------
+GearSwap 0.505 - Added and documented set_combine()
+-------------------------------------------------
+GearSwap 0.504 - "Fixed" reraise crash error. Likely indicates an underlying problem in LuaCore that should be addressed
+-------------------------------------------------
+GearSwap 0.503 - Event_status_change() handling changed so people don't swap gear when disengaging from NPCs or crafting.
+-------------------------------------------------
+GearSwap 0.502 - Require unmasked and documented.
+-------------------------------------------------
+GearSwap 0.501 - File_unload user function added.
+-------------------------------------------------
+GearSwap 0.500 - Initial beta release
+-------------------------------------------------

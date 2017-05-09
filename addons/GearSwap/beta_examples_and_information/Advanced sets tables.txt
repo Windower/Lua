@@ -1,0 +1,47 @@
+============== Advanced "sets" tables ==============
+
+-- Augments --
+There are a lot of different augments, many/all of which have been mapped in the extdata library.
+This system will use the first item it finds in your inventory that matches the name/augment
+combination that you provide. If you provide an ambiguous set of conditions, the resulting equipped
+item will be ambiguous (could vary based on the pairs iterator).
+
+In order to specify an item by augment, you must write the augment exactly as it appears on your equipment:
+    sets.aftercast_Idle = {ring1={name="Dark Ring",augments={"Phys. Damage Taken -6%"}},
+	    ring2={name="Dark Ring",augments={"Breath Damage Taken -6%","{Phys. Damage Taken -5%"}}}
+
+		
+If it pleases you, you can store your augmented items in variables:
+    lefty = {name="Dark Ring",augments={"Phys. Damage Taken -6%"}}
+	righty = {name="Dark Ring",augments={"Breath Damage Taken -6%","Phys. Damage Taken -5%"}}
+	sets.aftercast_Idle = {ring1=lefty,ring2=righty}
+
+This will save you a little work when you are dealing with using the same augmented item in multiple sets.
+
+
+If you are having trouble getting GearSwap to recognize your augment, equip the gear and use //gs export.
+This will create a Lua file in ../windower/addons/gearswap/data/export that includes a properly formatted table.
+
+
+
+
+-- Prioritizing gear changes --
+Currently equip swaps can be ordered by using advanced "sets" tables similar to the above:
+    sets.nohead = {head={name="empty",priority=1},lring={name="Angha ring",priority=2}}
+
+Gear is changed in descending order from highest to lowest, so the above set would equip Angha ring and then
+unequip the head slot. All gear that is not defined is given a default priority of zero, and all positive and
+negative rational numbers are acceptable priorities. If two pieces of gear have the same priority value, they
+will be swapped in the default order (from 0 to 15 in ../windower/res/slots.lua).
+
+I do not recommend moving Sub in front of Main, Ammo in front of Range, etc. as these will cause silent equip
+failures.
+
+
+
+-- Specifying a bag --
+With the introduction of Mog Wardrobe, it is now possible to equip items from either Inventory or Wardrobe:
+    sets.wardrobe_feet = {feet={name="Bokwus Boots",bag="wardrobe"}}
+
+There is really no reason to do this 99% of the time, but it has been included as a failsafe to let people
+still specify at least two augments in case the augment system stops working in the future.

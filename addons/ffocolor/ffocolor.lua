@@ -26,276 +26,101 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-_addon = {}
+
 _addon.name = 'FFOColor'
-_addon.version = '1.1'
-function event_load()
-    startAddon()
-end
+_addon.version = '2.02'
+_addon.author = 'Nitrous (Shiva)'
+_addon.command = 'ffocolor'
 
-function event_login()
-    startAddon()
-end
+require('tables')
+require('strings')
+require('logger')
+require('lists')
+config = require('config')
+files = require('files')
+chat = require('chat')
+defaults = {}
 
-function event_logout()
-    dosettings('save')
-end
+defaults.chatTab = 'say'
+defaults.chatColor = 207
 
-function event_unload()
-    dosettings('save')
-    add_to_chat(55, "FFOColor unloading and saving settings.")
-    send_command('unalias ffocolor')
-end
+settings = config.load(defaults)
 
-function event_addon_command(...)
+chatColors = T{say=1,shout=2,tell=4,party=5,linkshell=6,none=74}
+
+windower.register_event('addon command', function(...)
     local args = {...}
+    if args[1] == nil then args[1] = 'help' end
     if args[1] ~= nil then
-        comm = args[1]
-        if comm:lower() == 'help' then
-            add_to_chat(55,'FFOcolor loaded! You have access to the following commands:')
-            add_to_chat(55,' 1. ffocolor hlcolor <color#> --Changes the highlight color')
-            add_to_chat(55,' 2. ffocolor chattab <say/shout/linkshell/party/tell> --Changes the chattab')
-            add_to_chat(55,' 3. ffocolor highlight <line/name> --Changes the line or your name color when you are talked about in ffochat')
-            add_to_chat(55,' 4. ffocolor talkedc <color#> --Sets the color of the highlight for when you are talked about')
-            add_to_chat(55,' 5. ffocolor watchname <name> -- Track another name')
-            add_to_chat(55,' 6. ffocolor getcolors -- Show a list of color codes. Be aware this is 255 lines of text')
-            add_to_chat(55,' 7. ffocolor unload --Save settings and close ffocolor.')
-            add_to_chat(55,' 8. ffocolor help --Shows this menu.')
-        elseif comm:lower() == 'talkedc' then
-            settings['talkedc'] = args[2]
-        elseif comm:lower() == 'chattab' then
-            settings['chatTab'] = args[2]
-        elseif comm:lower() == 'hlcolor' then
-            settings['hlcolor'] = args[2]
-        elseif comm:lower() == 'highlight' then
-            settings['highlight'] = args[2]
-        elseif comm:lower() == 'watchname' then
-            names[#names+1] = args[2]
-            settings['namestowatch'] = settings['namestowatch']..','..args[2]
-        elseif comm:lower() == 'getcolors' then
-            getcolors()
-        elseif comm:lower() == 'unload' then
-            send_command('lua u ffocolor')
-        else
-            return
-        end
-    end
-end
-
-function event_incoming_text(old,new,color)
-    if old ~= former then
-        local a,b,txt = string.find(old,'^[^%w]*%[%d+:#[%w_]+%](.-):')
-        local c = string.find(old,'^[^%w]*%[%d+:#%w+%]') or string.find(old,'^[^%w]*%[FFOChat%]')
-        if b ~= nil then
-            tcol = string.char(31,settings['talkedc'])
-            hcol = string.char(31,settings['hlcolor'])
-            ccol = string.char(31,color)
-            cres = string.char(0x1E,0x01)
-            for i = 1, #chatTabs do
-                if settings['chatTab']:lower() == chatTabs[i]:lower() then
-                    color = tabColor[i]
-                end
-            end
-            fulltext = split(old,' ')
-            new = ''
-            for z = 1, #names do
-                nametest = string.find(old:lower(),'('..names[z]:lower()..')')
-                if nametest ~= nil then break end
-            end
-            for y = 1, #names do
-                playertest = string.find(txt:lower(),'('..names[y]:lower()..')')
-                if playertest ~= nil then break end
-            end
-            if nametest ~= nil then
-                if playertest ~= nil then
-                    for u = 1, #fulltext do
-                        if u > 1 then
-                            new = new..' '
-                        end
-                        new = new..hcol..fulltext[u]
-                    end
+        comm = args[1]:lower()
+        if S{'chattab','chatcolor'}:contains(comm) then
+            if comm == 'chatcolor' then
+                if args[2] == nil then
+                    print('Current Chat Color:', settings.chatColor)
+                elseif args[2] >= 1 and args[2] <= 509 then
+                    settings.chatColor = tonumber(args[2])
+                    print('New Chat Color:', tonumber(args[2]))
                 else
-                    if settings['highlight'] == 'name' then
-                        for u = 1, #fulltext do
-                            for x = 1, #names do
-                                wordtest = string.find(fulltext[u]:lower(),'('..names[x]:lower()..')')
-                                if wordtest ~= nil then break end
-                            end
-                            if u > 1 then
-                                new = new..' '
-                            end
-                            if wordtest == nil then
-                                new = new..hcol..fulltext[u]
-                            else
-                                new = new..tcol..fulltext[u]
-                            end
-                        end
+                    error('Chat color must be between 1 and 509.')
+                end
+            elseif comm == 'chattab' then
+                if args[2] == nil then
+                    print('Current Chat Tab:', settings.chatTab)
+                elseif S{'say','shout','linkshell','party','tell','none'}:contains(args[2]:lower()) then
+                    settings.chatTab = args[2]:lower()
+                    print('New Chat Tab:', args[2]:lower())
+                else
+                    error('Improper tab selection defaulting to say')
+                    settings.chatTab = 'say'
+                end
+            end
+            settings:save()
+        elseif comm == 'getcolors' then
+            local color_redundant = S{26,33,41,71,72,89,94,109,114,164,173,181,184,186,70,84,104,127,128,129,130,131,132,133,134,135,136,137,138,139,140,64,86,91,106,111,175,178,183,81,101,16,65,87,92,107,112,174,176,182,82,102,67,68,69,170,189,15,208,18,25,32,40,163,185,23,24,27,34,35,42,43,162,165,187,188,30,31,14,205,144,145,146,147,148,149,150,151,152,153,190,13,9,253,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,284,285,286,287,292,293,294,295,300,301,301,303,308,309,310,311,316,317,318,319,324,325,326,327,332,333,334,335,340,341,342,343,344,345,346,347,348,349,350,351,355,357,358,360,361,363,366,369,372,374,375,378,381,384,395,406,409,412,415,416,418,421,424,437,450,453,456,458,459,462,479,490,493,496,499,500,502,505,507,508,10,51,52,55,58,62,66,80,83,85,88,90,93,100,103,105,108,110,113,122,168,169,171,172,177,179,180,12,11,37,291} -- 37 and 291 might be unique colors, but they are not gsubbable.
+            local black_colors = S{352,354,356,388,390,400,402,430,432,442,444,472,474,484,486}
+            local counter = 0
+            local line = ''
+            for n = 1, 509 do
+                if not color_redundant:contains(n) and not black_colors:contains(n) then
+                    if n <= 255 then
+                        loc_col = string.char(0x1F, n)
                     else
-                        for u = 1, #fulltext do
-                            if u > 1 then
-                                new = new..' '
-                            end
-                            new = new..tcol..fulltext[u]
-                        end
+                        loc_col = string.char(0x1E, n - 254)
                     end
+                    line = line..loc_col..string.format('%03d ', n)
+                    counter = counter + 1
                 end
-            else
-                for u = 1, #fulltext do
-                    if u > 1 then
-                        new = new..' '
-                    end
-                    new = new..hcol..fulltext[u]
+                if counter == 16 or n == 509 then
+                    log(line)
+                    counter = 0
+                    line = ''
                 end
-            end
-        elseif c ~= nil or old:sub(2,8) == 'PrivMsg' then
-            tcol = string.char(31,settings['talkedc'])
-            hcol = string.char(31,settings['hlcolor'])
-            ccol = string.char(31,color)
-            for i = 1, #chatTabs do
-                if settings['chatTab']:lower() == chatTabs[i]:lower() then
-                    color = tabColor[i]
-                end
-            end
-            fulltext = split(old,' ')
-            new = ''
-            for u = 1, #fulltext do
-                if u > 1 then
-                    new = new..' '
-                end
-                new = new..hcol..fulltext[u]
-            end
-        end
-    end
-    return new,color
-end
-
-function dosettings(arg1)
-    if arg1 == 'get' then
-        for line in io.lines(settingsFile) do
-            local g,h,key,value = string.find(line,'<(%w+)>([%w%d%p]+)</%1>')
-            if value ~= nil then
-                settings[key] = value
-            end
-        end
-        names = split(settings['namestowatch'],',')
-    else
-        local f = io.open(settingsPath..'tmp.txt',"w")
-        f:write("<?xml version=\"1.0\"?>\n")
-        f:write("<!--File Created by FFOColor.lua v1.0-->\n\n")
-        f:write("\t<settings>\n")
-        f:write("\t\t<chatTab>"..settings['chatTab'].."</chatTab> --Chat tab for ffochat to show up in\n")
-        f:write("\t\t<hlcolor>"..settings['hlcolor'].."</hlcolor> --Color to recolor ffochat text\n")
-        f:write("\t\t<talkedc>"..settings['talkedc'].."</talkedc> --Color to highlight when you are talked about\n")
-        f:write("\t\t<highlight>"..settings['highlight'].."</highlight> --Which to highlight when you are talked about\n")
-        f:write("\t\t<namestowatch>"..settings['namestowatch'].."</namestowatch> -- Which names would you light using above method\n")
-        f:write("\t</settings>")
-        io.close(f)
-        local r,es = os.rename(settingsFile,settingsPath..'tmp2.txt')
-        if not r then write(es) end
-        local e,rs = os.rename(settingsPath..'tmp.txt',settingsFile)
-        if not e then write(rs) end
-        local r,es = os.remove(settingsPath..'tmp2.txt')
-        if not r then write(es) end
-    end
-end
-
-function startAddon()
-    player = get_player()
-    settingsPath = lua_base_path..'data/'
-    settingsFile = settingsPath..'settings-'..player['name']..'.xml'
-    chatTabs = {'Say','Tell','Party','Linkshell','Shout'}
-    tabColor = {'1','4','5','6','2'}
-    settings = {}
-    last = ''
-    firstrun = 0
-    former = ''
-    if not file_exists(settingsFile) then
-        firstrun = 1
-        local f = io.open(settingsFile,"w")
-        f:write("<?xml version=\"1.0\"?>\n")
-        f:write("<!--File Created by FFOColor.lua v1.0-->\n\n")
-        f:write("\t<settings>\n")
-        f:write("\t\t<chatTab>Say</chatTab> --Chat tab for ffochat to show up in\n")
-        f:write("\t\t<hlcolor>04</hlcolor> --Color to recolor ffochat text\n")
-        f:write("\t\t<talkedc>167</talkedc> --Color to highlight when you are talked about\n")
-        f:write("\t\t<highlight>line</highlight> --Which to highlight when you are talked about\n")
-        f:write("\t\t<namestowatch>"..player['name'].."</namestowatch> -- Which names would you light using above method\n")
-        f:write("\t</settings>")
-        io.close(f)
-    end
-    send_command('alias ffocolor lua c ffocolor')
-    dosettings('get')
-    if firstrun == 1 then
-        send_command('ffocolor help')
-        add_to_chat(55,'FFOColor settings file created')
-    end	
-end
-
-function file_exists(name)
-   local f=io.open(name,"r")
-   if f~=nil then 
-        local q,r = io.close(f)
-        if not q then write(r) end
-        return true 
-    else
-        return false 
-    end
-end
-
-function getcolors()
-    colors = {}
-    colors[1] = 'Menu > Font Colors > Chat > Immediate vicinity ("Say")'
-    colors[2] = 'Menu > Font Colors > Chat > Wide area ("Shout")'
-    colors[4] = 'Menu > Font Colors > Chat > Tell target only ("Tell")'
-    colors[5] = 'Menu > Font Colors > Chat > All party members ("Party")'
-    colors[6] = 'Menu > Font Colors > Chat > Linkshell group ("Linkshell")'
-    colors[7] = 'Menu > Font Colors > Chat > Emotes'
-    colors[17] = 'Menu > Font Colors > Chat > Messages ("Message")'
-    colors[142] = 'Menu > Font Colors > Chat > NPC Conversations'
-    colors[20] = 'Menu > Font Colors > For Others > HP/MP others loose'
-    colors[21] = 'Menu > Font Colors > For Others > Actions others evade'
-    colors[22] = 'Menu > Font Colors > For Others > HP/MP others recover'
-    colors[60] = 'Menu > Font Colors > For Others > Beneficial effects others are granted'
-    colors[61] = 'Menu > Font Colors > For Others > Detrimental effects others receive'
-    colors[63] = 'Menu > Font Colors > For Others > Effects others resist'
-    colors[28] = 'Menu > Font Colors > For Self > HP/MP you loose'
-    colors[29] = 'Menu > Font Colors > For Self > Actions you evade'
-    colors[30] = 'Menu > Font Colors > For Self > HP/MP you recover'
-    colors[56] = 'Menu > Font Colors > For Self > Beneficial effects you are granted'
-    colors[57] = 'Menu > Font Colors > For Self > Detrimental effects you receive'
-    colors[59] = 'Menu > Font Colors > For Self > Effects you resist'
-    colors[8] = 'Menu > Font Colors > System > Calls for help'
-    colors[50] = 'Menu > Font Colors > System > Standard battle messages'
-    colors[121] = 'Menu > Font Colors > System > Basic system messages'
-
-    for v = 0, 255, 1 do
-        if(colors[v] ~= nil) then
-            add_to_chat(v, "Color "..v.." - "..colors[v])
-        else
-            add_to_chat(v, "Color "..v.." - This is some random text to display the color.")
-        end
-    end
-end
-
-function split(msg, match)
-    if msg == nil then return '' end
-    local length = msg:len()
-    local splitarr = {}
-    local u = 1
-    while u < length do
-        local nextanch = msg:find(match,u)
-        if nextanch ~= nil then
-            splitarr[#splitarr+1] = msg:sub(u,nextanch-1)
-            if nextanch~=length then
-                u = nextanch+1
-            else
-                u = length
             end
         else
-            splitarr[#splitarr+1] = msg:sub(u,length)
-            u = length
+            local helptext = [[FFOColor - Command List:
+ 1. ffocolor chattab <say/shout/linkshell/party/tell> --Changes the chattab. Default: say.
+ 2. ffocolor chatcolor <color#> --Changes the highlight color.
+ 3. ffocolor getcolors -- Show a list of color codes.
+ 4. ffocolor help --Shows this menu.]]
+            for _, line in ipairs(helptext:split('\n')) do
+                windower.add_to_chat(207, line..chat.controls.reset)
+            end
         end
     end
-    return splitarr
-end
+end)
 
+windower.register_event('incoming text', function(old,new,color,newcolor)
+    local stb = string.find(new,'[^%w]*%[%d+:#.-%]') or string.find(new,'^[^%w]*%[FFOChat%]')
+    if stb ~= nil or old:sub(2,8) == 'PrivMsg' then
+        if settings.chatTab ~= nil then
+            newcolor = chatColors[settings.chatTab]
+        end
+        new = new:gsub('\r',''):gsub('\n','')
+        local newsplit = new:split(' ')
+        for it = 1, #newsplit do
+            newsplit[it] = newsplit[it]:color(settings.chatColor)
+        end
+        new = newsplit:concat(' ')
+        return new, newcolor
+    end
+end)

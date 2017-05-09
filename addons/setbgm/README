@@ -1,0 +1,17 @@
+This script is an addon to be used with Windower for Final Fantasy XI 
+that allows you to set various types of music in the game.
+
+You can report issues, get the latest version, and view the source at:
+    https://github.com/svanheulen/setbgm-windower-addon
+
+The available commands are:
+    setbgm list [music]
+        Lists all of the available songs in the game.
+    setbgm list type
+        Lists the different types of music you can set.
+    setbgm <song id>
+        Sets the background music given by the ID.
+    setbgm <song id> <music type id>
+        Sets only a given type of music.
+    setbgm <song id> <song id> <song id> <song id> <song id> <song id> <song id> <song id>
+        Sets all types of music at once.

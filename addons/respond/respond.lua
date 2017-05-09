@@ -24,29 +24,35 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-function event_addon_command(...)
-end
 
-function event_load()
-	current_r = ''
-end
+_addon.name = 'Respond'
+_addon.version = '1.2'
+_addon.commands = {'r','respond'}
 
-function event_chat_message(isGM, mode, player, message)
-	if mode==3 and r~=player then
-		r=player
-		send_command('alias r input /tell '..player)
+current_mode = '/tell'
+
+windower.register_event('addon command',function(...)
+    if current_r then
+        windower.send_command('input '..current_mode..' '..current_r..' '..table.concat({...},' '))
+    end
+end)
+
+windower.register_event('chat message',function (message, player, mode, isGM)
+	if mode==3 and (player~=current_r or current_mode ~= '/tell') then
+		current_r=player
+        current_mode = '/tell'
 	end
-end
+end)
 
-function event_incoming_text(original, modified, color)
-	if original:sub(2,8) == 'PrivMsg' then
+windower.register_event('incoming text',function (original, modified, color)
+	if original:sub(1,4) == '[PM]' then
 		a,b = string.find(original,'>>')
-		if a~=10 then
-			local name = original:sub(10,a-1)
-			if current_r ~= name then
+		if a~=6 then
+			local name = original:sub(6,a-1)
+			if name~=current_r or current_mode ~= '/pm' then
 				current_r = name
-				send_command('alias r input /pm '..current_r)
+                current_mode = '/pm'
 			end
 		end
-	end
-end
+    end
+end)

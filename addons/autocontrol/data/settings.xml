@@ -1,0 +1,58 @@
+<?xml version="1.1" ?>
+<settings>
+	<global>
+		<autosets>
+			<default />
+			<healer>
+				<frame>Stormwaker Frame</frame>
+				<head>Soulsoother Head</head>
+				<slot01>Disruptor</slot01>
+				<slot02>Economizer</slot02>
+				<slot03>Mana Conserver</slot03>
+				<slot04>Vivi-Valve</slot04>
+				<slot05>Percolator</slot05>
+				<slot06>Damage Gauge</slot06>
+				<slot07>Eraser</slot07>
+				<slot08>Optic Fiber</slot08>
+				<slot09>Steam Jacket</slot09>
+				<slot10>Condenser</slot10>
+				<slot11>Mana Channeler</slot11>
+				<slot12>Stealth Screen</slot12>
+			</healer>
+			<melrng>
+				<frame>Sharpshot Frame</frame>
+				<head>Valoredge Head</head>
+				<slot01>Tension Spring</slot01>
+				<slot02>Turbo Charger</slot02>
+				<slot03>Equalizer</slot03>
+				<slot04>Dynamo</slot04>
+				<slot05>Tension Spring II</slot05>
+				<slot06>Scope</slot06>
+				<slot07>Auto-Repair Kit II</slot07>
+				<slot08>Coiler</slot08>
+				<slot09>Tactical Processor</slot09>
+				<slot10>Armor Plate II</slot10>
+				<slot11>Optic Fiber</slot11>
+				<slot12>Volt Gun</slot12>
+			</melrng>
+		</autosets>
+		<bg>
+			<blue>0</blue>
+			<green>0</green>
+			<red>0</red>
+		</bg>
+		<padding>0</padding>
+		<pos>
+			<x>1600</x>
+			<y>920</y>
+		</pos>
+		<text>
+			<blue>255</blue>
+			<font>Consolas</font>
+			<green>255</green>
+			<red>255</red>
+			<size>10</size>
+		</text>
+		<visible>false</visible>
+	</global>
+</settings>

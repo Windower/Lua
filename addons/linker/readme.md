@@ -1,3 +1,5 @@
+# Linker
+
 Opens certain links via simple console commands, with an optional search string. If the search string is omitted, the home page of that site will open.
 
 ## Commands
@@ -24,4 +26,3 @@ Opens certain links via simple console commands, with an optional search string.
 //web g [query] # Google
 //web wa [query] # Wolfram|Alpha
 ```
-

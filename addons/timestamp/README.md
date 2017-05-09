@@ -1,9 +1,9 @@
-**Author:** Giuliano Riccio/Aureus  
-**Version:** v 1.20130529
+**Author:** Giuliano Riccio  
+**Version:** v 1.20131102
 
 # Timestamp #
 This addon prefixes any chat message with a timestamp.
-Based on Timestamp plugin developed by Aureus.
+Based on Timestamp plugin.
 
 ## Commands ##
 ### help ###
@@ -35,6 +35,12 @@ timestamp color [help|<color>]
 ----
 
 ## Changelog ##
+
+### v1.20130616 ###
+* **fix:** Fixed some indentation issues.
+
+### v1.20130607 ###
+* **fix:** Fixed custom timestamp formatting.
 
 ### v1.20130529 ###
 * first release.

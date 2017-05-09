@@ -1,277 +1,448 @@
 --[[
-A list of deciphered packets and their meaning, with a short description.
-When size is 0x00 it means the size is either unknown or varies.
+A library to facilitate packet usage 
 ]]
-
-_libs = _libs or {}
-_libs.packets = true
-_libs.lists = _libs.lists or require 'lists'
-_libs.mathhelper = _libs.mathhelper or require 'mathhelper'
-_libs.stringhelper = _libs.stringhelper or require 'stringhelper'
-_libs.functools = _libs.functools or require 'functools'
-
-require 'pack'
 
 local packets = {}
-packets.incoming = {}
-packets.outgoing = {}
+
+_libs = _libs or {}
+_libs.packets = packets
+_libs.lists = _libs.lists or require('lists')
+_libs.maths = _libs.maths or require('maths')
+_libs.strings = _libs.strings or require('strings')
+_libs.functions = _libs.functions or require('functions')
+
+require('pack')
+
+if not warning then
+    warning = print+{_addon.name and '%s warning:':format(_addon.name) or 'Warning:'}
+end
+
+__meta = __meta or {}
+__meta.Packet = {__tostring = function(packet)
+    local res = '%s packet 0x%.3X (%s):':format(packet._dir:capitalize(), packet._id, packet._name or 'Unrecognized packet')
+
+    local raw = packets.build(packet)
+    for field in packets.fields(packet._dir, packet._id, raw):it() do
+        res = '%s\n%s: %s':format(res, field.label, tostring(packet[field.label]))
+        if field.fn then
+            res = '%s (%s)':format(res, tostring(field.fn(packet[field.label], raw)))
+        end
+    end
+
+    return res
+end}
 
 --[[
-	Packet database. Feel free to correct/amend it wherever it's lacking.
+    Packet database. Feel free to correct/amend it wherever it's lacking.
 ]]
 
-local dummy = {name='Unknown', size=0x00, description='No data available.'}
+packets.data = require('packets/data')
+packets.raw_fields = require('packets/fields')
 
-for key = 1, 0x1FF do
-	packets.outgoing[key] = dummy
-	packets.incoming[key] = dummy
+--[[
+    Lengths for C data types.
+]]
+
+local sizes = {
+    ['unsigned char']   =  8,
+    ['unsigned short']  = 16,
+    ['unsigned int']    = 32,
+    ['unsigned long']   = 64,
+    ['signed char']     =  8,
+    ['signed short']    = 16,
+    ['signed int']      = 32,
+    ['signed long']     = 64,
+    ['char']            =  8,
+    ['short']           = 16,
+    ['int']             = 32,
+    ['long']            = 64,
+    ['bool']            =  8,
+    ['float']           = 32,
+    ['double']          = 64,
+    ['data']            =  8,
+    ['bit']             =  1,
+    ['boolbit']         =  1,
+}
+
+-- This defines whether to treat a type with brackets at the end as an array or something special
+local non_array_types = S{'bit', 'data', 'char'} 
+
+-- Pattern to match variable size array
+local pointer_pattern = '(.+)%*'
+-- Pattern to match fixed size array
+local array_pattern = '(.+)%[(.+)%]'
+
+-- Function returns number of bytes, bits, items and type name
+local parse_type = function(field)
+    local ctype = field.ctype
+
+    if ctype:endswith('*') then
+        return nil, 1, ctype:match(pointer_pattern):trim()
+    end
+
+    local type, count_str = ctype:match(array_pattern)
+    type = (type or ctype):trim()
+
+    local array = not non_array_types:contains(type)
+    local count_num =  count_str and count_str:number() or 1
+    local type_count = count_str and array and count_num or 1
+
+    local bits = (array and type_count or count_num) * sizes[type];
+
+    return bits, type_count, type
 end
 
--- Client packets (outgoing)
-packets.outgoing[0x00A] = {name='Client Connect',      size=0x2E, description='(unencrypted/uncompressed) First packet sent when connecting to new zone.'}
-packets.outgoing[0x00D] = {name='Client Leave',        size=0x04, description='Last packet sent from client before it leaves the zone.'}
-packets.outgoing[0x015] = {name='Standard Client',     size=0x10, description='Packet contains data that is sent almost every time (i.e your character\'s position).'}
-packets.outgoing[0x01A] = {name='Action',              size=0x08, description='An action being done on a target (i.e. an attack or spell).'}
-packets.outgoing[0x028] = {name='Drop Item',           size=0x06, description='Drops an item.'}
-packets.outgoing[0x029] = {name='Move Item',           size=0x06, description='Move item from one inventory to another.'}
-packets.outgoing[0x032] = {name='Offer Trade',         size=0x06, description='This is sent when you offer to trade somebody.'}
-packets.outgoing[0x033] = {name='Trade Tell',          size=0x06, description='This packet allows you to accept or cancel a trade request.'}
-packets.outgoing[0x034] = {name='Trade Item',          size=0x06, description='Sends the item you want to trade to the server.'}
-packets.outgoing[0x037] = {name='Use Item',            size=0x0A, description='Use an item.'}
-packets.outgoing[0x03A] = {name='Sort Item',           size=0x04, description='Packet sent when you choose to auto-sort your inventory.'}
-packets.outgoing[0x04B] = {name='Servmes',             size=0x0C, description='Requests the server message (/servmes).'}
-packets.outgoing[0x04E] = {name='Auction',             size=0x1E, description='Used to bid on an Auction House item.'}
-packets.outgoing[0x050] = {name='Equip',               size=0x04, description='This command is used to equip your character.'}
-packets.outgoing[0x05A] = {name='Conquest',            size=0x02, description='This command asks the server for data pertaining to conquest/besieged status.'}
-packets.outgoing[0x05B] = {name='Set Home Point',      size=0x0A, description='Set your home point.'}
-packets.outgoing[0x05D] = {name='Emote',               size=0x08, description='This command is used in emotes.'}
-packets.outgoing[0x05E] = {name='Reqest Zone',         size=0x0C, description='Request from the client to zone.'}
-packets.outgoing[0x061] = {name='Equipment Screen',    size=0x02, description='This command is used when you open your equipment screen.'}
-packets.outgoing[0x06E] = {name='Invite Player',       size=0x06, description='Used for Inviting.'}
-packets.outgoing[0x083] = {name='Buy Item',            size=0x08, description='Buy an item.'}
-packets.outgoing[0x084] = {name='Appraise',            size=0x06, description='Ask server for selling price.'}
-packets.outgoing[0x085] = {name='Sell Item',           size=0x04, description='Sell an item from your inventory.'}
-packets.outgoing[0x096] = {name='Synth',               size=0x12, description='Packet sent containing all data of an attempted synth.'}
-packets.outgoing[0x0B5] = {name='Speech',              size=0x00, description='Packet contains normal speech.'}
-packets.outgoing[0x0B6] = {name='Tell',                size=0x00, description='/tell\'s sent from client.'}
-packets.outgoing[0x0DC] = {name='Type Bitmask',        size=0x0A, description='This command is sent when change your party-seek or /anon status.'}
-packets.outgoing[0x0DD] = {name='Check',               size=0x06, description='Used to check other players.'}
-packets.outgoing[0x0DE] = {name='Set Bazaar Message',  size=0x40, description='Sets your bazaar message.'}
-packets.outgoing[0x0E7] = {name='Logout',              size=0x04, description='A request to logout of the server.'}
-packets.outgoing[0x0E8] = {name='Toggle Heal',         size=0x04, description='This command is used to both heal and cancel healing.'}
-packets.outgoing[0x0F4] = {name='Widescan',            size=0x04, description='This command asks the server for a widescan.'}
-packets.outgoing[0x100] = {name='Job Change',          size=0x04, description='Sent when initiating a job change.'}
-packets.outgoing[0x104] = {name='Leave Bazaar',        size=0x02, description='Sent when client leaves a bazaar.'}
-packets.outgoing[0x105] = {name='View Bazaar',         size=0x06, description='Sent when viewing somebody\'s bazaar.'}
-packets.outgoing[0x106] = {name='Buy Bazaar Item',     size=0x06, description='Buy an item from somebody\'s bazaar.'}
-packets.outgoing[0x10A] = {name='Set Price',           size=0x06, description='Set the price on a bazaar item.'}
+local size
+size = function(fields, count)
+    -- A single field
+    if fields.ctype then
+        local bits, type_count, type = parse_type(fields)
+        return bits or count * sizes[type]
+    end
 
--- Server packets (incoming)
-packets.incoming[0x009] = {name='Standard Message',    size=0x08, description='A standardized message send from FFXI.'}
-packets.incoming[0x00A] = {name='Data Download 1',     size=0x82, description='Info about character and zone around it.'}
-packets.incoming[0x00B] = {name='Zone Response',       size=0x0E, description='Response from the server confirming client can zone.'}
-packets.incoming[0x00D] = {name='PC Update',           size=0x2E, description='Packet contains info about another PC (i.e. coordinates).'}
-packets.incoming[0x00E] = {name='NPC Update',          size=0x00, description='Packet contains data about nearby targets (i.e. target\'s position, name).'}
-packets.incoming[0x017] = {name='Incoming Chat',       size=0x00, description='Packet contains data about incoming chat messages.'}
-packets.incoming[0x01B] = {name='Job Info',            size=0x32, description='Job Levels and levels unlocked.'}
-packets.incoming[0x01C] = {name='Inventory Count',     size=0x0A, description='Describes number of slots in inventory.'}
-packets.incoming[0x01D] = {name='Finish Inventory',    size=0x04, description='Finish listing the items in inventory.'}
-packets.incoming[0x01E] = {name='Modify Inventory',    size=0x08, description='Modifies items in your inventor.'}
-packets.incoming[0x01F] = {name='Item Assign',         size=0x08, description='Assigns an ID to equipped items in your inventory.'}
-packets.incoming[0x020] = {name='Item Update',         size=0x16, description='Info about item in your inventory.'}
-packets.incoming[0x021] = {name='Trade Requested',     size=0x06, description='Sent when somebody offers to trade with you.'}
-packets.incoming[0x022] = {name='Trade Action',        size=0x08, description='Sent whenever something happens with the trade window.'}
-packets.incoming[0x025] = {name='Item Accepted',       size=0x06, description='Sent when the server will allow you to trade an item.'}
-packets.incoming[0x028] = {name='Action',              size=0x12, description='Packet sent when an NPC is attacking.'}
-packets.incoming[0x029] = {name='EXP Gain',            size=0x0E, description='Packet sent after you defeat a mob and do not gain XP.'}
-packets.incoming[0x02D] = {name='EXP Gain (kill)',     size=0x0E, description='Packet sent after you defeat a mob and gain XP.'}
-packets.incoming[0x036] = {name='NPC Chat',            size=0x08, description='Dialog from NPC\'s.'}
-packets.incoming[0x037] = {name='Update Char',         size=0x28, description='Updates a characters stats and animation.'}
-packets.incoming[0x03C] = {name='Shop',                size=0x00, description='Displays items in a vendors shop.'}
-packets.incoming[0x03D] = {name='Value',               size=0x08, description='Returns the value of an item.'}
-packets.incoming[0x041] = {name='Stupid Evil Packet',  size=0x7C, description='This packet is stupid and evil. Required for emotes.'}
-packets.incoming[0x04B] = {name='Logout Acknowledge',  size=0x0A, description='Acknoledges a logout attempt.'}
-packets.incoming[0x04B] = {name='Delivery Item',       size=0x2C, description='Item in delivery box.'}
-packets.incoming[0x04D] = {name='Servmes Resp',        size=0x0E, description='Server response when someone requests it.'}
-packets.incoming[0x04F] = {name='Data Download 2',     size=0x04, description='The data that is sent to the client when it is "Downloading data...".'}
-packets.incoming[0x050] = {name='Equip',               size=0x04, description='Updates the characters equipment slots.'}
-packets.incoming[0x051] = {name='Data Download 3',     size=0x0C, description='Info about equipment and appearance.'}
-packets.incoming[0x052] = {name='NPC Release',         size=0x04, description='Allows your PC to move after interacting with an NPC.'}
-packets.incoming[0x053] = {name='Logout Time',         size=0x08, description='The annoying message that tells how much time till you logout.'}
-packets.incoming[0x058] = {name='Lock Target',         size=0x08, description='Locks your target.'}
-packets.incoming[0x05A] = {name='Server Emote',        size=0x0C, description='This packet is the server\'s response to a client /emote p.'}
-packets.incoming[0x05B] = {name='Spawn',               size=0x0E, description='Server packet sent when a new mob spawns in area.'}
-packets.incoming[0x05E] = {name='Stop Download',       size=0x5A, description='Final packet in a DataDld transmission. May be the only packet in a DataDld sequence.'}
-packets.incoming[0x061] = {name='Char Stats',          size=0x2A, description='Packet contains a lot of data about your character\'s stats.'}
-packets.incoming[0x062] = {name='Skills Update',       size=0x80, description='Packet that shows your weapon and magic skill stats.'}
-packets.incoming[0x0B4] = {name='Seek AnonResp',       size=0x0C, description='Server response sent after you put up party or anon flag.'}
-packets.incoming[0x0C9] = {name='Show Equip',          size=0x4C, description='Shows another player your equipment after using the Check command.'}
-packets.incoming[0x0CC] = {name='Linkshell Message',   size=0x58, description='/lsmes text and headers.'}
-packets.incoming[0x0CA] = {name='Show Bazaar Message', size=0x4A, description='Shows another players bazaar message after using the Check command.'}
-packets.incoming[0x0D2] = {name='Found Item',          size=0x1E, description='This command shows an item found on defeated mob.'}
-packets.incoming[0x0DD] = {name='Alliance Update',     size=0x16, description='Alliance/party member info - zone, HP%, HP% etc.'}
-packets.incoming[0x0DF] = {name='Char Update',         size=0x0E, description='A packet sent from server which updates character HP, MP and TP.'}
-packets.incoming[0x0E2] = {name='Char Info',           size=0x18, description='Sends name, HP, HP%, etc.'}
-packets.incoming[0x0F4] = {name='Widescan Mob',        size=0x0E, description='Displays one monster.'}
-packets.incoming[0x0F6] = {name='Widescan Mark',       size=0x04, description='Marks the start and ending of a widescan list.'}
-packets.incoming[0x105] = {name='Data Download 4',     size=0x16, description='The data that is sent to the client when it is "Downloading data...".'}
-packets.incoming[0x108] = {name='Data Download 5',     size=0x00, description='The data that is sent to the client when it is "Downloading data...".'}
+    -- A reference field
+    if fields.ref then
+        return size(fields.ref, count) * (fields.count == '*' and count or fields.count)
+    end
 
--- C type information
-local function make_val(ctype, ...)
-	if ctype == 'unsigned int' or ctype == 'unsigned short' or ctype == 'unsigned char' or ctype == 'unsigned long' then
-		return tonumber(L{...}:reverse():map(string.zfill-{2}..math.tohex):concat(), 16)
-	else
-		return data
-	end
+    return fields:reduce(function(acc, field)
+        return acc + size(field, count)
+    end, 0)
 end
 
-packets.lengths = {}
-packets.lengths['bool'] = 1
-packets.lengths['unsigned char'] = 1
-packets.lengths['unsigned short'] = 2
-packets.lengths['unsigned int'] = 4
-packets.lengths['unsigned long'] = 8
-packets.lengths['signed char'] = 1
-packets.lengths['signed short'] = 2
-packets.lengths['signed int'] = 4
-packets.lengths['signed long'] = 8
-packets.lengths['char'] = 1
-packets.lengths['short'] = 2
-packets.lengths['int'] = 4
-packets.lengths['long'] = 8
-packets.lengths['float'] = 4
-packets.lengths['double'] = 8
-packets.lengths = setmetatable(packets.lengths, {__index = function(t, k)
-	local type, number = k:match('(.-) *%[(%d+)%]')
-	if type then
-		local length = rawget(t, type)
-		if length then
-			return length*tonumber(number)
-		end
-	end
-end})
+local parse
+parse = function(fields, data, index, max, lookup, depth)
+    depth = depth or 0
+    max = max == '*' and 0 or max or 1
+    index = index or 32
 
--- Type identifiers as declared in Lua
+    local res = L{}
+    local count = 0
+    local length = 8 * #data
+    while index < length do
+        count = count + 1
+
+        local parsed = L{}
+        local parsed_index = index
+        for field in fields:it() do
+            if field.ctype then
+                -- A regular type field
+                field = table.copy(field)
+                local bits, type_count, type = parse_type(field)
+
+                if not non_array_types:contains(type) and (not bits or type_count > 1) then
+                    -- An array field with more than one entry, reparse recursively
+                    field.ctype = type
+                    local ext, new_index = parse(L{field}, data, parsed_index, not bits and '*' or type_count, nil, depth + 1)
+                    parsed = parsed + ext
+                    parsed_index = new_index
+                else
+                    -- A non-array field or an array field with one entry
+                    if max ~= 1 then
+                        -- Append indices to labels
+                        if lookup then
+                            -- Look up index name in provided table
+                            local resource = lookup[1][count + lookup[2] - 1]
+                            field.label = '%s %s':format(resource and resource.name or 'Unknown %d':format(count + lookup[2] - 1), field.label)
+                        else
+                            -- Just increment numerically
+                            field.label = '%s %d':format(field.label, count)
+                        end
+                    end
+
+                    if parsed_index % 8 ~= 0 and type ~= 'bit' and type ~= 'boolbit' then
+                        -- Adjust to byte boundary, if non-bit type
+                        parsed_index = 8 * (parsed_index / 8):ceil()
+                    end
+
+                    if not bits then
+                        -- Determine length for pointer types (*)
+                        type_count = ((length - parsed_index) / sizes[type]):floor()
+                        bits = sizes[type] * type_count
+
+                        field.ctype = '%s[%u]':format(type, type_count)
+
+                        count = max
+                    end
+
+                    field.type = type
+                    field.index = parsed_index
+                    field.length = bits
+                    field.count = type_count
+
+                    parsed:append(field)
+                    parsed_index = parsed_index + bits
+                end
+            else
+                -- A reference field, call the parser recursively
+                local type_count = field.count
+                if not type_count then
+                    -- If reference count not explicitly given it must be contained in the packet data
+                    type_count = data:byte(field.count_ref + 1)
+                end
+
+                local ext, new_index = parse(field.ref, data, parsed_index, type_count, field.lookup, depth + 1)
+                parsed = parsed + ext
+                parsed_index = new_index
+            end
+        end
+
+        if parsed_index <= length then
+            -- Only add parsed chunk, if within length boundary
+            res = res + parsed
+            index = parsed_index
+        else
+            count = max
+        end
+
+        if count == max then
+            break
+        end
+    end
+
+    return res, index
+end
+
+-- Arguments are:
+--  dir     'incoming' or 'outgoing'
+--  id      Packet ID
+--  data    Binary packet data, nil if creating a blank packet
+--  ...     Any parameters taken by a packet constructor function
+--          If a packet has a variable length field (e.g. char* or ref with count='*') the last value in here must be the count of that field
+function packets.fields(dir, id, data, ...)
+    local fields = packets.raw_fields[dir][id]
+
+    if type(fields) == 'function' then
+        fields = fields(data, ...)
+    end
+
+    if not fields then
+        return nil
+    end
+
+    if not data then
+        local argcount = select('#', ...)
+        local bits = size(fields, argcount > 0 and select(argcount, ...) or nil)
+        data = 0:char():rep(4 + 4 * ((bits or 0) / 32):ceil())
+    end
+
+    return parse(fields, data)
+end
+
+local dummy = {name='Unknown', description='No data available.'}
+
+-- Type identifiers as declared in lpack.c
+-- Windower uses an adjusted set of identifiers
+-- This is marked where applicable
 local pack_ids = {}
-pack_ids['bool'] = 'b'
-pack_ids['unsigned char'] = 'b'
-pack_ids['unsigned short'] = 'H'
-pack_ids['unsigned int'] = 'I'
-pack_ids['unsigned long'] = 'L'
-pack_ids['signed char'] = 'c'
-pack_ids['signed short'] = 'h'
-pack_ids['signed int'] = 'i'
-pack_ids['signed long'] = 'L'
-pack_ids['char'] = 'c'
-pack_ids['short'] = 'h'
-pack_ids['int'] = 'i'
-pack_ids['long'] = 'l'
-pack_ids['float'] = 'f'
-pack_ids['double'] = 'd'
-pack_ids = setmetatable(pack_ids, {__index = function(t, k)
-	local type, number = k:match('(.-)%s*%[(%d+)%]')
-	if type then
-		local pack_id = rawget(t, type)
-		if pack_id then
-			if type == 'char' then
-				return 'A'..number
-			else
-				return pack_id..number
-			end
-		end
-	end
-end})
+pack_ids['bit']             = 'b'   -- Windower exclusive
+pack_ids['boolbit']         = 'q'   -- Windower exclusive
+pack_ids['bool']            = 'B'   -- Windower exclusive
+pack_ids['unsigned char']   = 'C'   -- Originally 'b', replaced by 'bit' for Windower
+pack_ids['unsigned short']  = 'H'
+pack_ids['unsigned int']    = 'I'
+pack_ids['unsigned long']   = 'L'
+pack_ids['signed char']     = 'c'
+pack_ids['signed short']    = 'h'
+pack_ids['signed int']      = 'i'
+pack_ids['signed long']     = 'L'
+pack_ids['char']            = 'c'
+pack_ids['short']           = 'h'
+pack_ids['int']             = 'i'
+pack_ids['long']            = 'l'
+pack_ids['float']           = 'f'
+pack_ids['double']          = 'd'
+pack_ids['data']            = 'A'
 
--- Specific field data for p.
-packets.fields = {}
-packets.fields.incoming = {}
-packets.fields.outgoing = {}
+local make_pack_string = function(field)
+    local ctype = field.ctype
 
-for key = 0x000, 0x1FF do
-	packets.fields.incoming[key] = L{}
-	packets.fields.outgoing[key] = L{}
+    if pack_ids[ctype] then
+        return pack_ids[ctype]
+    end
+
+    local type_name, number = ctype:match(array_pattern)
+    if type_name then
+        number = tonumber(number)
+        local pack_id = pack_ids[type_name]
+        if pack_id then
+            if type_name == 'char' then
+                return 'S' .. number  -- Windower exclusive
+            else
+                return pack_id .. number
+            end
+        end
+    end
+
+    type_name = ctype:match(pointer_pattern)
+    if type_name then
+        local pack_id = pack_ids[type_name]
+        if pack_id then
+            if type_name == 'char' then
+                return 'z'
+            else
+                return pack_id .. '*'
+            end
+        end
+    end
+
+    return nil
 end
 
-packets.fields.incoming[0x00E] = L{
-	{ctype='unsigned int',   label='ID'},                --   4-  7
-	{ctype='unsigned short', label='Index'},             --   8-  9
-	{ctype='unsigned char',  label='Mask'},              --  10- 10
-	{ctype='unsigned char',  label='Rotation'},          --  11- 11
-	{ctype='float',          label='X Position'},        --  12- 15
-	{ctype='float',          label='Z Position'},        --  16- 19
-	{ctype='float',          label='Y Position'},        --  20- 23
-	{ctype='unsigned short', label='_unknown1'},         --  24- 25
-	{ctype='unsigned short', label='_unknown2'},         --  26- 27
-	{ctype='unsigned short', label='_unknown3'},         --  28- 29
-	{ctype='unsigned char',  label='HP %'},              --  30- 28
-	{ctype='unsigned char',  label='Animation'},         --  31- 31
-	{ctype='unsigned short', label='Status'},            --  32- 33
-	{ctype='unsigned short', label='_unknown4'},         --  34- 35
-	{ctype='unsigned int',   label='_unknown5'},         --  36- 39
-	{ctype='unsigned int',   label='_unknown6'},         --  40- 43
-	{ctype='unsigned int',   label='Claimer ID'},        --  44- 47
-	{ctype='unsigned short', label='_unknown7'},         --  48- 49
-	{ctype='unsigned short', label='Model'},             --  50- 51
--- This value can't be displayed properly yet, since the array length varies.
--- Will need to implement a workaround for that.
-	{ctype='char[16]',       label='Name'},              --  52- 75
-}
+-- Constructor for packets (both injected and parsed).
+-- If data is a string it parses an existing packet, otherwise it will create
+-- a new packet table for injection. In that case, data can ba an optional
+-- table containing values to initialize the packet to.
+-- 
+-- Example usage
+--  Injection:
+--      local packet = packets.new('outgoing', 0x050, {
+--          ['Inventory Index'] = 27,   -- 27th item in the inventory
+--          ['Equipment Slot'] = 15     -- 15th slot, left ring
+--      })
+--      packets.inject(packet)
+--
+--  Injection (Alternative):
+--      local packet = packets.new('outgoing', 0x050)
+--      packet['Inventory Index'] = 27  -- 27th item in the inventory
+--      packet['Equipment Slot'] = 15   -- 15th slot, left ring
+--      packets.inject(packet)
+-- 
+--  Parsing:
+--      windower.register_event('outgoing chunk', function(id, data)
+--          if id == 0x0B6 then -- outgoing /tell
+--              local packet = packets.parse('outgoing', data)
+--              print(packet['Target Name'], packet['Message'])
+--          end
+--      end)
+function packets.parse(dir, data)
+    local rem = #data % 4
+    if rem ~= 0 then
+        data = data .. 0:char():rep(4 - rem)
+    end
 
-packets.fields.incoming[0x0DF] = L{
-	{ctype='unsigned int',   label='ID'},                --   4-  7
-	{ctype='unsigned int',   label='HP'},                --   8- 11
-	{ctype='unsigned int',   label='MP'},                --  12- 15
-	{ctype='unsigned int',   label='TP'},                --  16- 19
-	{ctype='unsigned short', label='_unknown1'},         --  20- 21
-	{ctype='unsigned short', label='_unknown2'},         --  22- 23
-	{ctype='unsigned short', label='_unknown3'},         --  24- 25
-	{ctype='unsigned short', label='_unknown4'},         --  26- 27
-}
+    local res = setmetatable({}, __meta.Packet)
+    res._id, res._size, res._sequence = data:unpack('b9b7H')
+    res._size = res._size * 4
+    res._raw = data
+    res._dir = dir
+    res._name = packets.data[dir][res._id].name
+    res._description = packets.data[dir][res._id].description
+    res._data = data:sub(5)
 
-packets.fields.incoming[0x0CC] = L{
-	{ctype='int',            label='_unknown1'},         --   4-  7
-	{ctype='char[128]',      label='Message'},           --   8-135
-	{ctype='int',            label='_unknown2'},         -- 136-139
-	{ctype='char[16]',       label='Player Name'},       -- 140-155
-	{ctype='int',            label='Permissions'},       -- 156-159
-	{ctype='char[16]',       label='Linkshell Name'},    -- 160-175, 6-bit packed
-}
+    local fields = packets.fields(dir, res._id, data)
+    if not fields or #fields == 0 then
+        return res
+    end
 
-function Pin(id, data)
-	return P(id, data, 'incoming')
+    local pack_str = fields:map(make_pack_string):concat()
+
+    for key, val in ipairs({res._data:unpack(pack_str)}) do
+        local field = fields[key]
+        if field then
+            res[field.label] = field.enc and val:decode(field.enc) or val
+        end
+    end
+
+    return res
 end
 
-function Pout(id, data)
-	return P(id, data, 'outgoing')
+function packets.new(dir, id, values, ...)
+    values = values or {}
+
+    local packet = setmetatable({}, __meta.Packet)
+    packet._id = id
+    packet._dir = dir
+    packet._sequence = 0
+    packet._args = {...}
+
+    local fields = packets.fields(packet._dir, packet._id, nil, ...)
+    if not fields then
+        warning('Packet 0x%.3X not recognized.':format(id))
+        return packet
+    end
+
+    for field in fields:it() do
+        packet[field.label] = values[field.label]
+
+        -- Data not set
+        if not packet[field.label] then
+            if field.const then
+                packet[field.label] = field.const
+
+            elseif field.ctype == 'bool' or field.ctype == 'boolbit' then
+                packet[field.label] = false
+
+            elseif sizes[field.ctype] or field.ctype:startswith('bit') then
+                packet[field.label] = 0
+
+            elseif field.ctype:startswith('char') or field.ctype:startswith('data') then
+                packet[field.label] = ''
+
+            else
+                warning('Bad packet! Unknown packet C type:', field.ctype)
+                packet._error = true
+
+            end
+        end
+    end
+
+    return packet
 end
 
-function P(id, data, mode)
-	local res = {}
-	res._raw = data
-	res._name = packets[mode][id].name
-	res._description = packets[mode][id].description
-	res._id = id
-	res._size = 4*math.floor(data:byte(2)/2)
-	res._sequence = data:byte(3,3) + data:byte(4, 4)*2^8
-	res._data = data:sub(5)
-	res._hex = data:map(string.zfill-{2}..math.tohex..string.byte)
+-- Returns binary data from a packet
+function packets.build(packet)
+    local fields = packets.fields(packet._dir, packet._id, packet._raw, unpack(packet._args or {}))
+    if not fields then
+        error('Packet 0x%.3X not recognized, unable to build.':format(packet._id))
+        return nil
+    end
 
-	local fields = packets.fields[mode][id]
-	if #fields == 0 then
-		return res
-	end
+    local pack_string = fields:map(make_pack_string):concat()
+    local data = pack_string:pack(fields:map(table.lookup-{packet, 'label'}):unpack())
+    local rem = #data % 4
+    if rem ~= 0 then
+        data = data .. 0:char():rep(4 - rem)
+    end
 
-	local keys = fields:map(table.get-{'label'})
-	local pack_str = '<'..fields:map(function (ct) return pack_ids[ct] end..table.get-{'ctype'}):concat()
+    return 'b9b7H':pack(packet._id, 1 + #data / 4, packet._sequence) .. data
+end
 
-	for key, val in ipairs({res._data:unpack(pack_str)}) do
-		if key > 1 and keys[key - 1] then
-			res[keys[key - 1]] = val
-		end
-	end
+-- Injects a packet built with packets.new
+function packets.inject(packet)
+    if packet._error then
+        error('Bad packet, cannot inject')
+        return nil
+    end
 
-	return res
+    local fields = packets.fields(packet._dir, packet._id, packet._raw)
+    if not fields then
+        error('Packet 0x%.3X not recognized, unable to send.':format(packet._id))
+        return nil
+    end
+
+    packet._raw = packets.build(packet)
+
+    if packet._dir == 'incoming' then
+        windower.packets.inject_incoming(packet._id, packet._raw)
+    elseif packet._dir == 'outgoing' then
+        windower.packets.inject_outgoing(packet._id, packet._raw)
+    else
+        error('Error sending packet, no direction specified. Please specify \'incoming\' or \'outgoing\'.')
+    end
 end
 
 return packets
+
+--[[
+Copyright © 2013-2015, Windower
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+    * Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+    * Neither the name of Windower nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Windower BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+]]
