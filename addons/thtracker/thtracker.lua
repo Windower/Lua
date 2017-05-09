@@ -51,7 +51,7 @@ defaults.bg.blue = 30
 
 settings = config.load(defaults)
 
-th = texts.new(settings)
+th = texts.new('No current mob', settings)
 
 windower.register_event('addon command', function(command, ...)
     command = command and command:lower()
@@ -76,31 +76,37 @@ end)
 
 windower.register_event('incoming text', function(original, new, color)
 	original = original:strip_format()
-	if string.find(original, "Treasure Hunter") and not string.find(original, "TH Tracker:") then
-		name, count = original:match('Additional effect: Treasure Hunter effectiveness against the (.*) increases to (%d+)')
+	if string.find(original, "Treasure Hunter") then
+		name, count = original:match('Additional effect: Treasure Hunter effectiveness against the (.*) increases to (%d+).')
 		if not name and not count then
-			name, count = original:match('Additional effect: Treasure Hunter effectiveness against (.*) increases to (%d+)')
-		end		
+			name, count = original:match('Additional effect: Treasure Hunter effectiveness against (.*) increases to (%d+).')
+		end
+		
+		if name and count then
+			mob = name
+			th:text(' '..name..'\n TH: '..count);
+			th:show()
+		end
+		return
 	end
 	
-    if name and count then
-        mob = name
-        th:text(' '..name..'\n TH: '..count);
-        th:show()
-		mob = nil
-		deadmob = nil
-		count = nil
-    end
+	if string.find(original, "defeats") then
 
-    deadmob = original:match('%w+ defeats the (.*).')
-	if not deadmob then
-		deadmob = original:match('%w+ defeats (.*).')
+		deadmob = original:match('%w+ defeats the (.*).')
+		if not deadmob then
+			deadmob = original:match('%w+ defeats (.*).')
+		end
+		
+		if deadmob == mob then
+			th:text('No current mob')
+			th:hide()
+			mob = nil
+		end
+		return
 	end
-	
-    if deadmob then
-        th:text('No current mob')
-        th:hide()
-		mob = nil
-		deadmob = nil
-    end
+end)
+
+windower.register_event('zone change', function()
+	th:text('No current mob')
+	th:hide()
 end)
