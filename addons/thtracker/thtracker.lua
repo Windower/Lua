@@ -1,4 +1,4 @@
---Copyright (c) 2013, Krizz
+--Copyright © 2017, Krizz
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -76,34 +76,28 @@ end)
 
 windower.register_event('incoming text', function(original, new, color)
 	original = original:strip_format()
-	if string.find(original, "Treasure Hunter") then
-		name, count = original:match('Additional effect: Treasure Hunter effectiveness against the (.*) increases to (%d+).')
-		if not name and not count then
-			name, count = original:match('Additional effect: Treasure Hunter effectiveness against (.*) increases to (%d+).')
-		end
-		
-		if name and count then
-			mob = name
-			th:text(' '..name..'\n TH: '..count);
-			th:show()
-		end
-		return
+	local name, count = original:match('Additional effect: Treasure Hunter effectiveness against[%s%a%a%a]- (.*) increases to (%d+).')
+	
+	if name and count then
+		name = name.gsub(name, "the ", "")
+		mob = name
+		th:text(' '..name..'\n TH: '..count);
+		th:show()
+	end
+
+	local deadmob = original:match('%w+ defeats[%s%a%a%a]- (.*).')
+	
+	if deadmob then
+		deadmob = deadmob.gsub(deadmob, "the ", "")
 	end
 	
-	if string.find(original, "defeats") then
-
-		deadmob = original:match('%w+ defeats the (.*).')
-		if not deadmob then
-			deadmob = original:match('%w+ defeats (.*).')
-		end
+	if deadmob == mob then
 		
-		if deadmob == mob then
-			th:text('No current mob')
-			th:hide()
-			mob = nil
-		end
-		return
+		th:text('No current mob')
+		th:hide()
+		mob = nil
 	end
+
 end)
 
 windower.register_event('zone change', function()
