@@ -27,7 +27,7 @@
 
 _addon.name = 'THTracker'
 _addon.author = 'Krizz'
-_addon.version = 1.0
+_addon.version = 1.1
 _addon.commands = {'thtracker', 'th'}
 
 config = require 'config'
