@@ -8,21 +8,21 @@ Load the addon by using the following command:
 
     //lua load capetrader
 
-There are some conditions that you need to meet in order to use the important go and prep commands. Point 5 is particularly important to consider:
+There are some conditions that you need to meet in order to use the important go and prep commands:
 
 1. You must be in Mhaura and be within a distance of 6 to the Gorpa-Masorpa npc.
 
-2. If you have recently zoned into Mhaura you will have to wait to use the go command until your inventory loads.
+2. If you have recently zoned into Mhaura you will have to wait to use the go command until your inventory loads, or if you have only recently logged in.
 
 3. Make sure there is only one of the given cape you want to augment in your inventory. For example if you are intending to augment an ogma's cape, there should only be one ogma's cape in your inventory.
 
 4. The go command takes a number as an input that represents the number of times you wish to augment your cape. It is possible you will lose your thread,dust,sap and dye if you enter a number that would take your augment past its possible maximum. For example suppose you have an ogma's cape already augmented with Dex+5 from a thread item. After using the **//ct prep run thread dex** command you enter **//ct go 20** command. There is a safeguard that will stop the augmentation process after augmenting your cape 15 times. However it is highly recommended that you enter the exact number of times you need to max a particular augment path just in case.
 
-5. It is also possible to lose augment items if you try to augment a cape with a different path than is already present. Suppose again you have an ogma's cape augmented with DEX+5 via threads. If you enter the **//ct prep run thread str** and then the **//ct go 15** command intending to augment your cape with str, **you will lose all 15 threads**. There is currently no safeguard for this but it is being thought about.
+5. It is also possible to lose augment items if you try to augment a cape with a different path than is already present. Suppose again you have an ogma's cape augmented with DEX+5 via threads. If you enter the **//ct prep run thread str** and then the **//ct go 15** command intending to augment your cape with str, **you might lose these 15 threads**. There is now a safeguard to avoid this, but it has not been tested for every single augment path. It is highly recommended you make sure your intended augment path already matches what is on the cape.
 
 6. If you have the inventory menu open, be sure to close it before using the go commmand and make sure you do not open menus or move items around in your inventories while the augmentation process is ongoing. You will get a start message after you use the go command and an ending message once the augmentation process completes. You can mess around with your inventory after you get the ending message, otherwise you might interrupt the augmentation process and need to reload the addon.
 
-7. There is currently a bug involving dye (maybe other paths as well) where the augmentation process will stop after augmenting a cape with dye for the first time. Try using //ct go 1 to avoid the augmentation process getting caught in limbo if you are using a dye for the first time on a cape. If the augmentation process ever seems to stop for any augment path/item combo, I recommend using the **//ct reload** command and starting the process over again.
+7. The augmentation process can occasionally stall. If this ever happens you can use the **//ct r** command to reload the addon and start the process over again.
 
 
 Suppose you want to augment an ogma's cape from scratch with dex, accuracy and attack, and double attack. You can use the following steps:
@@ -152,7 +152,7 @@ There are four parts to the process of augmenting your ambuscade cape:
 
 4. Part 4: Waiting and receiving your newly augmented cape. This takes anywhere from 1 to 3 seconds and can't be controlled by the player. (Involves the incoming 0x01D packet)
 
-The cape trader addon uses packets in order to substantially speed up parts one and three from above at a speed that would not normally be possible. Therefore if you use this addon you could potentially look suspicious. Part 1 of the process takes only 1 second using this addon. If this makes you uncomfortable you can change the value of the TRADE_DELAY variable in the capeTrader.lua file to a more reasonable amount if you wish. This addon does part 3 pretty much instantaneously once the incoming 0x034 packet is received from part 2. So once again you can look suspicious again during this stage. The time it takes for part 2 and 4 should not be that different from you augmenting capes manually.
+The cape trader addon uses packets in order to substantially speed up parts one and three from above at a speed that would not normally be possible. Therefore if you use this addon you could potentially look suspicious. Part 1 of the process takes only 1 second using this addon. If this makes you uncomfortable you can change the value of the TRADE_DELAY and TRADE_DELAY_DYE variables in the capeTrader.lua file to a more reasonable amount if you wish. Please note that the augmenting with dyes needs a bit longer of a delay to work. This addon does part 3 pretty much instantaneously once the incoming 0x034 packet is received from part 2. So once again you can look suspicious again during this stage. The time it takes for part 2 and 4 should not be that different from you augmenting capes manually.
 
 The possibility of the loss of augment items comes from part 3. When augmenting manually you will get denied by the npc if you try to trade an already maxed cape. Injecting the 0x036 packet and later the 0x05B packets bypasses this check but you lose your augment items but receive your cape back unchanged if you have already maxed an augment path. There are some safeguards to prevent this happening in this addon but it has not been tested on every single augment path. So please use the go command with caution.
 
