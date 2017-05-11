@@ -641,4 +641,11 @@
     <bugtracker>https://github.com/Snapsmojo/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Fenrir/Snaps</support>
   </addon>
+  <addon>
+    <name>CapeTrader</name>
+    <author>Lygre, Burntwaffle</author>
+    <description>Automates trading ambuscade capes.</description>
+    <bugtracker>https://github.com/OdinBurntwaffle/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Odin/Burntwaffle</support>
+  </addon>
 </addons>
