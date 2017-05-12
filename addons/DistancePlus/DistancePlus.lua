@@ -396,7 +396,7 @@ windower.register_event('load', function()
 	    self = windower.ffxi.get_player()
         check_job()
         coroutine.sleep(2) -- sleeping because jobchange too fast doesn't show new abilities
-		abilitylist = windower.ffxi.get_abilities().job_abilities
+        abilitylist = windower.ffxi.get_abilities().job_abilities
         displayabilities()
     end
 end)
@@ -406,6 +406,6 @@ windower.register_event('login', function()
     self = windower.ffxi.get_player()
     check_job()
     coroutine.sleep(2) -- sleeping because jobchange too fast doesn't show new abilities
-	abilitylist = windower.ffxi.get_abilities().job_abilities
+    abilitylist = windower.ffxi.get_abilities().job_abilities
     displayabilities()
 end)
