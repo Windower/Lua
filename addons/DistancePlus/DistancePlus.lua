@@ -28,13 +28,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'DistancePlus'
 _addon.author = 'Sammeh'
-_addon.version = '1.3.0.5'
+_addon.version = '1.3.0.6'
 _addon.command = 'dp'
 
 -- 1.3.0.2 Fixed up nil's per recommendation on submission to Windower 
 -- 1.3.0.3 Replaced all tabs for 4 spaces to normalize indentations.
 -- 1.3.0.4 Moving some expensive functions to on-load vs per-render.
 -- 1.3.0.5 Implement config plugin.
+-- 1.3.0.6 Fix ability list on job change.
 
 
 require('tables')
@@ -384,6 +385,7 @@ end)
 windower.register_event('job change', function()
     check_job()
     coroutine.sleep(2) -- sleeping because jobchange too fast doesn't show new abilities
+    abilitylist = windower.ffxi.get_abilities().job_abilities
     abilities:visible(false)
     abilities.value = ""
     displayabilities()
