@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'DistancePlus'
 _addon.author = 'Sammeh'
-_addon.version = '1.3.0.6'
+_addon.version = '1.3.0.7'
 _addon.command = 'dp'
 
 -- 1.3.0.2 Fixed up nil's per recommendation on submission to Windower 
@@ -36,12 +36,11 @@ _addon.command = 'dp'
 -- 1.3.0.4 Moving some expensive functions to on-load vs per-render.
 -- 1.3.0.5 Implement config plugin.
 -- 1.3.0.6 Fix ability list on job change.
-
+-- 1.3.0.7 Implement ranged fix w/o ja_distance
 
 require('tables')
 
 res = require 'resources'
-jadistance = require('ja_distance')
 config = require('config')
 texts = require('texts')
 
@@ -103,20 +102,30 @@ showabilities = false
 showheight = false
 
 function displayabilities(distance,master_pet_distance)
+    local range_mult = {
+        [2] = 1.55,
+        [3] = 1.490909,
+        [4] = 1.44,
+        [5] = 1.377778,
+        [6] = 1.30,
+        [7] = 1.15,
+        [8] = 1.25,
+        [9] = 1.377778,
+        [10] = 1.45,
+        [11] = 1.454545454545455,
+        [12] = 1.666666666666667,
+    }
+
     list = 'Abilities:\n'
     if abilitylist then 
       for key,ability in pairs(abilitylist) do
         ability_en = res.job_abilities[ability].en
         ability_type = res.job_abilities[ability].type
         ability_targets = res.job_abilities[ability].targets
-        if jadistance[ability] then
-            ability_distance = jadistance[ability].distance
-        else
-            ability_distance = nil
-        end
+        ability_distance = res.job_abilities[ability].range
         if distance and ability_en and (ability_type == 'JobAbility' or ability_type == 'PetCommand' or ability_type == 'BloodPactRage' or ability_type == 'BloodPactWard' or ability_type == 'Monster' or ability_type == 'Step') and ability_en ~= "Flourishes II" then 
             if ability_targets.Self ~= true then
-                if distance < (ability_distance + s.model_size + t.model_size) and distance ~= 0 then 
+                if distance < (t.model_size + ability_distance * range_mult[ability_distance] + s.model_size) and distance ~= 0 then 
                     list = list..'\\cs(0,255,0)'..ability_en..'\\cs(255,255,255)'..'\n'
                 else
                     list = list..'\\cs(255,255,255)'..ability_en..'\n'
@@ -385,7 +394,7 @@ end)
 windower.register_event('job change', function()
     check_job()
     coroutine.sleep(2) -- sleeping because jobchange too fast doesn't show new abilities
-    abilitylist = windower.ffxi.get_abilities().job_abilities
+	abilitylist = windower.ffxi.get_abilities().job_abilities
     abilities:visible(false)
     abilities.value = ""
     displayabilities()
@@ -396,7 +405,7 @@ windower.register_event('load', function()
 	    self = windower.ffxi.get_player()
         check_job()
         coroutine.sleep(2) -- sleeping because jobchange too fast doesn't show new abilities
-        abilitylist = windower.ffxi.get_abilities().job_abilities
+		abilitylist = windower.ffxi.get_abilities().job_abilities
         displayabilities()
     end
 end)
@@ -406,6 +415,6 @@ windower.register_event('login', function()
     self = windower.ffxi.get_player()
     check_job()
     coroutine.sleep(2) -- sleeping because jobchange too fast doesn't show new abilities
-    abilitylist = windower.ffxi.get_abilities().job_abilities
+	abilitylist = windower.ffxi.get_abilities().job_abilities
     displayabilities()
 end)
