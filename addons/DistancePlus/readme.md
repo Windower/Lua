@@ -1,20 +1,37 @@
-# DistancePlus
+--[[
+Copyright © 2017, Sammeh of Quetzalcoatl
+All rights reserved.
 
-Enhances the functionality of the Distance AddOn.  You will want to unload Distance before loading DistancePlus.
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
 
-Note:  Most of this is based on my play style and what matters to me for distances.  Not all jobs are well accomodated, but many are.
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of DistancePlus nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
 
-Features:
-* Views distance to the nearest 100th' vs 10th yalm.
-* Adds distance between Master and Pet.  For BST if you are within the yalm requirement it will turn Green to do a Ready Move or Reward.
-* Can type //dp ja   - to show a list of Job Abilities and they will turn green/white depending on range to use.  (Not all JA's represented, would be nice to have community submit.)
-* Can type //dp height   - This will show a height differential between you and target mob.   Red if you are in danger of AOE abilities, and Green if you are safe.   This is very helpful for Geas Fete fights where a height advantage is mandatory for survival.
-* Mage jobs:
-//dp Magic   will set green/white depending on casting range.
-* Ranged Jobs:
-//dp Gun | Bow | Xbow  will automatically color coordinate distance addon for optimal shooting range.
-     White: Can not shoot
-	 Yellow: Can shoot target but no attack gain
-	 Green:  Shoots squarely (Good)
-	 Blue: True Shot  (optimal range)
-	 
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL Sammeh BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+]]
+
+
+Enhances the functionality of the Distance AddOn.  
+
+Distance Plus adds the following features:
+* Distance measured to hundredth vs 10th.
+* Distance offset to Model size correlation
+* Color coordination for JA's, Ranged Attacks, Magic, etc
+* Pet distance for distance-from-Pet
+

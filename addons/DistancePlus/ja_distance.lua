@@ -1,5 +1,3 @@
--- Automatically generated file: Job Abilities
-
 return {
 [26] = {id=26,en="Eagle Eye Shot",distance=20},
 [28] = {id=28,en="Mijin Gakure",distance=16},
@@ -34,7 +32,7 @@ return {
 [131] = {id=131,en="Light Shot",distance=0},
 [132] = {id=132,en="Dark Shot",distance=0},
 [138] = {id=138,en="Deploy",distance=16},
-[150] = {id=150,en="Tomahawk",distance=0},
+[150] = {id=150,en="Tomahawk",distance=10},
 [153] = {id=153,en="Martyr",distance=0},
 [154] = {id=154,en="Devotion",distance=0},
 [161] = {id=161,en="Feral Howl",distance=16},
