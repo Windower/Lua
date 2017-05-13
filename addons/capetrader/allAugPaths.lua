@@ -25,7 +25,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.]]--
 
 return T{
-	['thread'] = {
+	['abdhaljs thread'] = {
 		[0] = 'HP',
 		[1] = 'MP',
 		[2] = 'STR',
@@ -37,12 +37,12 @@ return T{
 		[8] = 'CHR',
 		[9] = 'PetMelee',
 		[10] = 'PetMagic'},
-	['dust'] = {
+	['abdhaljs dust'] = {
 		[0] = 'Acc/Atk',
 		[1] = 'RAcc/RAtk',
 		[2] = 'MAcc/MDmg',
 		[3] = 'Eva/MEva'},
-	['sap'] = {
+	['abdhaljs sap'] = {
 		[0] = 'WSD',
 		[1] = 'CritRate',
 		[2] = 'STP',
@@ -58,7 +58,7 @@ return T{
 		[12] = 'WaltzPotency',
 		[13] = 'PetRegen',
 		[14] = 'PetHaste',},
-	['dye'] = {
+	['abdhaljs dye'] = {
 		[0] = 'HP',
 		[1] = 'MP',
 		[2] = 'STR',

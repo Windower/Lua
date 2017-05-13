@@ -34,33 +34,32 @@ require('pack')
 require('sets')
 require('functions')
 require('strings')
+res = require('resources')
 packets = require('packets')
-ambuscadeCapeTable = require('allAmbuscadeCapes')
-abdhaljs = require('allAugPaths')
-augItems = require('allAugItems')
+augPaths = require('allAugPaths')
 maxAugMap = require('maxAugMap')
 extData = require('extdata')
 jobToCapeMap = require('jobToCapeMap')
 
 local playerIndex = nil
-local npc = 17797273
-local target_index = 153
-local menu = 387
-local zone = 249
-local cape_name = ""
+local gorpaID = 17797273
+local gorpaTargetIndex = 153
+local gorpaMenuID = 387
+local mhauraID = 249
+local currentCape
 local pathName = nil
-local opt_ind
-local path_item = ''
+local pathIndex
+local pathItem = nil
 local inventoryBagNumber = 0
 local maxAmountDustAndThread = 20
 local maxAmountSapAndDye = 10
-local cape_ind
-local aug_ind
-local safeToAugment = false
-local busy = false
-local timesAugmentedCount = nil
-local numberOfTimesToAugment = nil
-local firstPass = false
+local capeIndex
+local augmentItemIndex
+local capeHasBeenPrepared = false
+local currentlyAugmenting = false
+local firstTimeAug = false
+local timesAugmentedCount = 0
+local numberOfTimesToAugment = 0
 local dustSapThreadTradeDelay = 1
 local dyeTradeDelay = 2
 local tradeReady = false
@@ -81,8 +80,7 @@ windower.register_event('addon command', function(input, ...)
 			windower.add_to_chat(123, "You are missing at least one input to the prep command.")
 		end
 	elseif cmd == 'go' then
-		if zoneHasLoaded then
-			inventory = windower.ffxi.get_items(inventoryBagNumber)
+		if zoneHasLoaded and not currentlyAugmenting then
 			if arg[1] then
 				if tonumber(arg[1]) then
 					startAugmentingCape(arg[1], true)
@@ -92,8 +90,10 @@ windower.register_event('addon command', function(input, ...)
 			else
 				startAugmentingCape(1, true)
 			end
-		else
+		elseif not zoneHasLoaded then
 			windower.add_to_chat(123, 'Your inventory has not yet loaded, please try the go command again when your inventory loads.')
+		elseif currentlyAugmenting then
+			windower.add_to_chat(123, 'You are currently still augmenting a cape, please wait until the process finishes.')
 		end
 	elseif cmd == 'list' or cmd == 'l' then
 		printAugList()
@@ -108,67 +108,63 @@ windower.register_event('addon command', function(input, ...)
 	end
 end)
 
-function getCapeIndex(capeID)
-	local capeToAug = ambuscadeCapeTable[capeID]
-
+function getCapeIndex()
 	for itemIndex, item in pairs(inventory) do
-		if item.id == capeToAug.id then
+		if item.id == currentCape.id then
 			return itemIndex
 		end
 	end
 end
 
-function getAugItemIndex(augItemName)
-	local augItem = augItems[augItemName]
-
+function getAugItemIndex()
 	for itemIndex, item in pairs(inventory) do
-		if item.id == augItem.id then
+		if item.id == pathItem.id then
 			return itemIndex
+		end
+	end
+end
+
+function getItem(itemName)
+	for k, item in pairs(res.items) do
+		if string.lower(item.en) == string.lower(itemName) then
+			return item
 		end
 	end
 end
 
 function build_trade()
-	if npc and target_index then
-		local packet = packets.new('outgoing', 0x036, {
-			["Target"] = npc,
-			["Target Index"] = target_index,
-			["Item Count 1"] = 1,
-			["Item Count 2"] = 1,
-			["Item Index 1"] = cape_ind,
-			["Item Index 2"] = aug_ind,
-			["Number of Items"] = 2
-		})
-		packets.inject(packet)
-	end
+	local packet = packets.new('outgoing', 0x036, {
+		["Target"] = gorpaID,
+		["Target Index"] = gorpaTargetIndex,
+		["Item Count 1"] = 1,
+		["Item Count 2"] = 1,
+		["Item Index 1"] = capeIndex,
+		["Item Index 2"] = augmentItemIndex,
+		["Number of Items"] = 2
+	})
+	packets.inject(packet)
 end
 
 windower.register_event('incoming chunk', function(id, data, modified, injected, blocked)
-
 	if id == 0x00B or id == 0x00A then
 		zoneHasLoaded = false --NOTE: This idea was taken from Zohno's findall addon.
 	end
 
 	if id == 0x034 or id == 0x032 then
-		if busy and playerIndex then
+		if currentlyAugmenting and playerIndex then
 
-			if not firstTimeAug then
-				injectAugPackets()
-			else
-				firstTimeAug = false
-				injectFirstAugPackets()
-			end
+			injectAugmentConfirmationPackets()
 
 			timesAugmentedCount = timesAugmentedCount + 1
 			if timesAugmentedCount <= tonumber(numberOfTimesToAugment) then
 				windower.add_to_chat(158, timesAugmentedCount - 1 .. '/' .. numberOfTimesToAugment .. ' augments completed.')
-				busy = false
 				tradeReady = true
 			else
-				safeToAugment = false
-				busy = false
+				capeHasBeenPrepared = false
+				currentlyAugmenting = false
 				playerIndex = nil
-				maxAugKey = nil
+				currentCape = nil
+				pathItem = nil
 				tradeReady = false
 				functions.schedule(sendCompletedMessage, 2)
 			end
@@ -184,7 +180,7 @@ windower.register_event('incoming chunk', function(id, data, modified, injected,
 		if tradeReady then
 			tradeReady = false
 
-			if path_item ~= 'dye' then
+			if not string.contains(string.lower(pathItem.en), 'dye') then
 				functions.schedule(startAugmentingCape, dustSapThreadTradeDelay, numberOfTimesToAugment - timesAugmentedCount + 1, false)
 			else
 				functions.schedule(startAugmentingCape, dyeTradeDelay, numberOfTimesToAugment - timesAugmentedCount + 1, false)
@@ -195,8 +191,8 @@ end)
 
 function checkDistanceToNPC()
 	local zoneID = tonumber(windower.ffxi.get_info().zone)
-	if zoneID == zone then
-		local target = windower.ffxi.get_mob_by_id(npc)
+	if zoneID == mhauraID then
+		local target = windower.ffxi.get_mob_by_id(gorpaID)
 		if target and math.sqrt(target.distance) < 6 then
 			return true
 		else
@@ -205,21 +201,19 @@ function checkDistanceToNPC()
 		end
 	else
 		windower.add_to_chat(123, "You are not in Mhaura!")
+		currentlyAugmenting = false
 		return false
 	end
 end
 
-function checkThreadDustDyeSapCount(augmentType, numberOfAugmentAttempts)
-	if augItems[augmentType] then
-		local augItem = augItems[augmentType]
-		local augID = augItem.id
-		local augItemCount = 0
+function checkThreadDustDyeSapCount(numberOfAugmentAttempts)
+	if pathItem then
+		local pathItemCount = 0
 
 		for key, itemTable in pairs(inventory) do
 			if key ~= 'max' and key ~= 'count' and key ~= 'enabled' then
-				local itemID = itemTable.id
-				if itemID == augID then
-					augItemCount = augItemCount + itemTable.count
+				if itemTable.id == pathItem.id then
+					pathItemCount = pathItemCount + itemTable.count
 				end
 			end
 		end
@@ -227,63 +221,53 @@ function checkThreadDustDyeSapCount(augmentType, numberOfAugmentAttempts)
 		if tonumber(numberOfAugmentAttempts) < 1 then
 			windower.add_to_chat(123, 'Please enter a number of 1 or greater.')
 			return false
-		elseif tonumber(numberOfAugmentAttempts) > maxAmountSapAndDye and (path_item == 'dye' or path_item == 'sap') then
+		elseif tonumber(numberOfAugmentAttempts) > maxAmountSapAndDye and (string.contains(string.lower(pathItem.en), 'dye') or (string.contains(string.lower(pathItem.en), 'sap'))) then
 			windower.add_to_chat(123, 'For sap or dye, the max number of times you can augment a cape is ' .. maxAmountSapAndDye .. ' times. You entered: ' .. numberOfAugmentAttempts)
 			return false
-		elseif tonumber(numberOfAugmentAttempts) > maxAmountDustAndThread and (path_item == 'dust' or path_item == 'thread') then
+		elseif tonumber(numberOfAugmentAttempts) > maxAmountDustAndThread and (string.contains(string.lower(pathItem.en), 'dust') or (string.contains(string.lower(pathItem.en), 'thread'))) then
 			windower.add_to_chat(123, 'For dust or thread, the max number of times you can augment a cape is ' .. maxAmountDustAndThread .. ' times. You entered: ' .. numberOfAugmentAttempts)
 			return false
-		elseif tonumber(numberOfAugmentAttempts) > augItemCount then
+		elseif tonumber(numberOfAugmentAttempts) > pathItemCount then
 			local temp
 			if tonumber(numberOfAugmentAttempts) > 1 then
 				temp = ' times.'
 			elseif tonumber(numberOfAugmentAttempts) == 1 then
 				temp = ' time.'
 			end
-			windower.add_to_chat(123, 'You do not have enough ' .. augItem.en .. ' to augment that cape ' .. numberOfAugmentAttempts .. temp ..' You only have ' .. augItemCount .. ' in your inventory.')
+
+			if pathItemCount ~= 0 then
+				windower.add_to_chat(123, 'You do not have enough ' .. pathItem.en .. ' to augment that cape ' .. numberOfAugmentAttempts .. temp ..' You only have ' .. pathItemCount .. ' in your inventory.')
+			else
+				windower.add_to_chat(123, 'You do not have enough ' .. pathItem.en .. ' to augment that cape ' .. numberOfAugmentAttempts .. temp ..' You have none in your inventory.')
+			end
 			return false
 		else
-			aug_ind = getAugItemIndex(augmentType)
+			augmentItemIndex = getAugItemIndex()
 			return true
 		end
-	else
-		windower.add_to_chat(158, 'Error with input augmentType in checkThreadDustDyeSapCount function.')
 	end
-
 end
 
 function checkCapeCount()
 	local capeCount = 0
-	local capeID
 
-	if cape_name ~= "" and cape_name then
-
-		for index, cape in pairs(ambuscadeCapeTable) do
-			if string.lower(cape.en) == string.lower(cape_name) then
-				capeID = cape.id
-				break
-			end
-		end
-
+	if currentCape then
 		for key, itemTable in pairs(inventory) do
 			if key ~= 'max' and key ~= 'count' and key ~= 'enabled' then
-				local itemID = itemTable.id
-				if itemID ~= 0 then
-					if itemID == capeID then
-						capeCount = capeCount + 1
-					end
+				if itemTable.id == currentCape.id then
+					capeCount = capeCount + 1
 				end
 			end
 		end
 
 		if capeCount > 1 then
-			windower.add_to_chat(123, 'You have multiple ' .. cape_name .. 's in your inventory! Please keep only the one you intend to augment in your inventory.')
+			windower.add_to_chat(123, 'You have multiple ' .. currentCape.en .. 's in your inventory! Please keep only the one you intend to augment in your inventory.')
 			return false
 		elseif capeCount == 0 then
-			windower.add_to_chat(123, 'You have zero ' .. cape_name .. 's in your inventory. Please find the one you intend to augment and move it to your inventory.')
+			windower.add_to_chat(123, 'You have zero ' .. currentCape.en .. 's in your inventory. Please find the one you intend to augment and move it to your inventory.')
 			return false
 		elseif capeCount == 1 then
-			cape_ind = getCapeIndex(capeID)
+			capeIndex = getCapeIndex()
 			return true
 		end
 	else
@@ -292,7 +276,7 @@ function checkCapeCount()
 end
 
 function prepareCapeForAugments(augItemType, jobName, augPath)
-	if not busy then
+	if not currentlyAugmenting then
 		local validArguments = true
 		local augItemTypeIsValid = false
 
@@ -300,32 +284,22 @@ function prepareCapeForAugments(augItemType, jobName, augPath)
 			windower.add_to_chat(123, 'Error with the type of augment item you entered. The second input should be sap or dye or thread or dust. You entered: ' .. string.lower(augItemType))
 			validArguments = false
 		else
-			path_item = string.lower(augItemType)
+			pathItem = getItem('abdhaljs ' .. augItemType)
 			augItemTypeIsValid = true
 		end
 
-		local isCapeTypeValid = false
 		if jobToCapeMap[jobName] then
-			for index, cape in pairs(ambuscadeCapeTable) do
-				if string.lower(cape.en) == string.lower(jobToCapeMap[jobName]) then
-					isCapeTypeValid = true
-					break
-				end
-			end
-		end
-
-		if not isCapeTypeValid then
+			currentCape = getItem(jobToCapeMap[jobName])
+		else
 			windower.add_to_chat(123, 'The job name you entered is not valid. You entered: ' .. jobName)
 			validArguments = false
-		else
-			cape_name = '' .. jobToCapeMap[jobName] .. ''
 		end
 
-		if augPath and augItemTypeIsValid then
+		if augPath and augItemTypeIsValid and validArguments then
 			local isValidPath = false
-			for i, v in pairs(abdhaljs[path_item]) do
+			for i, v in pairs(augPaths[string.lower(pathItem.en)]) do
 				if augPath:lower() == v:lower() then
-					opt_ind = i
+					pathIndex = i
 					pathName = augPath
 					isValidPath = true
 					break
@@ -340,17 +314,13 @@ function prepareCapeForAugments(augItemType, jobName, augPath)
 
 		if validArguments then
 			maxAugKey = string.lower(augItemType .. augPath)
-			safeToAugment = true
-			firstPass = true
+			capeHasBeenPrepared = true
 			timesAugmentedCount = 1
 			windower.add_to_chat(158, 'You can now augment your ' .. jobToCapeMap[jobName] .. ' with ' .. string.lower(augPath) .. ' using abdhaljs ' .. string.lower(augItemType) .. '.')
 		else
-			maxAugKey = nil
-			safeToAugment = false
-			opt_ind = nil
-			path_item = nil
-			path_name = nil
-			cape_name = nil
+			capeHasBeenPrepared = false
+			currentCape = nil
+			pathItem = nil
 		end
 	else
 		windower.add_to_chat(123, 'You can\'t setup another cape while you are currently augmenting one.')
@@ -358,76 +328,68 @@ function prepareCapeForAugments(augItemType, jobName, augPath)
 end
 
 function startAugmentingCape(numberOfRepeats, firstAttempt)
-	local augStatus
+	inventory = windower.ffxi.get_items(inventoryBagNumber)
+	currentlyAugmenting = true
+	local augStatus = nil
 	local capeCountsafe = checkCapeCount()
-	if safeToAugment and capeCountsafe then
-		augStatus = checkAugLimits()
+	if capeHasBeenPrepared and capeCountsafe then
+		augStatus = string.lower(checkAugLimits())
 	end
-	if safeToAugment and not busy and firstAttempt and augStatus then
-		if capeCountsafe and checkThreadDustDyeSapCount(path_item, numberOfRepeats) and checkDistanceToNPC() and string.lower(augStatus) ~= 'maxed' and string.lower(augStatus) ~= 'notmatching' then
-			if firstPass then
-				if string.lower(augStatus) ~= 'empty' then
-					firstTimeAug = false
-				else
-					firstTimeAug = true
-				end
 
-				firstPass = false
-				local temp
-				if tonumber(numberOfRepeats) == 1 then
-					temp = 'time.'
-				else
-					temp = 'times.'
-				end
-
-				numberOfTimesToAugment = numberOfRepeats
-				windower.add_to_chat(466, 'Starting to augment your ' .. cape_name .. ' ' .. numberOfRepeats .. ' ' .. temp)
+	if firstAttempt and augStatus then
+		if checkThreadDustDyeSapCount(numberOfRepeats) and checkDistanceToNPC() and augStatus ~= 'maxed' and augStatus ~= 'notmatching' then
+			if string.lower(augStatus) ~= 'empty' then
+				firstTimeAug = false
+			else
+				firstTimeAug = true
 			end
 
+			local temp
+			if tonumber(numberOfRepeats) == 1 then
+				temp = 'time.'
+			else
+				temp = 'times.'
+			end
+
+			numberOfTimesToAugment = numberOfRepeats
+			windower.add_to_chat(466, 'Starting to augment your ' .. currentCape.en .. ' ' .. numberOfRepeats .. ' ' .. temp)
+
 			playerIndex = windower.ffxi.get_mob_by_target('me').index
-			busy = true
 			tradeReady = false
 			build_trade()
 		else
-			busy = false
+			currentlyAugmenting = false
 			tradeReady = false
 			playerIndex = nil
 		end
-	elseif safeToAugment and not busy and not firstPass and not firstAttempt then
-		if augStatus ~= 'maxed' then
-			busy = true
-			playerIndex = windower.ffxi.get_mob_by_target('me').index
+	elseif not firstAttempt and augStatus then
+		if augStatus and augStatus ~= 'maxed' then
 			tradeReady = false
 			build_trade()
 		else
-			safeToAugment = false
-			busy = false
+			capeHasBeenPrepared = false
+			currentlyAugmenting = false
 			tradeReady = false
 			playerIndex = nil
-			maxAugKey = nil
+			pathItem = nil
+			currentCape = nil
 			windower.add_to_chat(466, 'Your cape is currently maxed in that augment path, ending the augment process now.')
 		end
-	elseif busy then
-		windower.add_to_chat(123, 'You are currently still augmenting a cape, please wait until the process finishes.')
-	elseif not safeToAugment then
+	elseif not capeHasBeenPrepared then
+		currentlyAugmenting = false
 		windower.add_to_chat(123, 'You have not yet setup your cape and augment information with the //ct prep command!')
+	else
+		currentlyAugmenting = false
 	end
 end
 
 function checkAugLimits()
-	local capeID
-	for id, capeInfo in pairs(ambuscadeCapeTable) do
-		if string.lower(capeInfo.en) == string.lower(cape_name) then
-			capeID = id
-			break
-		end
-	end
-
 	local capeItem
 	for index, item in pairs(inventory) do
 		if index ~= 'max' and index ~= 'count' and index ~= 'enabled' then
-			if item.id == capeID then
+			if item.id == currentCape.id then
 				capeItem = item
+				break
 			end
 		end
 	end
@@ -439,13 +401,13 @@ function checkAugLimits()
 
 	local augValue
 	if augmentTable then
-		if path_item == 'thread' then
+		if string.contains(string.lower(pathItem.en), 'thread') then
 			augValue = augmentTable[threadIndex]
-		elseif path_item == 'dust' then
+		elseif string.contains(string.lower(pathItem.en),'dust') then
 			augValue = augmentTable[dustIndex]
-		elseif path_item == 'dye' then
+		elseif string.contains(string.lower(pathItem.en), 'dye') then
 			augValue = augmentTable[dyeIndex]
-		elseif path_item == 'sap' then
+		elseif string.contains(string.lower(pathItem.en), 'sap') then
 			augValue = augmentTable[sapIndex]
 		end
 	else
@@ -458,14 +420,14 @@ function checkAugLimits()
 
 	local max = maxAugMap[maxAugKey].max
 	if string.contains(augValue, max) then
-		windower.add_to_chat(123, 'You have augmented your ' .. cape_name .. ' to the max already with abdhaljs ' .. path_item .. '.')
+		windower.add_to_chat(123, 'You have augmented your ' .. currentCape.en .. ' to the max already with ' .. pathItem.en .. '.')
 		return 'maxed'
 	end
 
 	local mustContainTable = maxAugMap[maxAugKey].mustcontain
 	for k, augmentString in pairs(mustContainTable) do
 		if not string.contains(string.lower(augValue), string.lower(augmentString)) then
-			windower.add_to_chat(123,'You can\'t augment your ' .. cape_name .. ' with ' .. pathName .. ' because it has already been augmented with: ' .. augValue .. ' using ' .. path_item .. '.')
+			windower.add_to_chat(123,'You can\'t augment your ' .. currentCape.en .. ' with ' .. pathName .. ' because it has already been augmented with: ' .. augValue .. ' using ' .. pathItem.en .. '.')
 			return 'notmatching'
 		end
 	end
@@ -474,7 +436,7 @@ function checkAugLimits()
 	if table.length(cantContainTable) > 0 then
 		for k, augmentString in pairs(cantContainTable) do
 			if string.contains(string.lower(augValue), string.lower(augmentString)) then
-				windower.add_to_chat(123,'You can\'t augment your ' .. cape_name .. 'with ' .. pathName .. ' because it has already been augmented with: ' .. augValue .. ' using ' .. path_item .. '.')
+				windower.add_to_chat(123,'You can\'t augment your ' .. currentCape.en .. 'with ' .. pathName .. ' because it has already been augmented with: ' .. augValue .. ' using ' .. pathItem.en .. '.')
 				return 'notmatching'
 			end
 		end
@@ -483,59 +445,30 @@ function checkAugLimits()
 	return 'allclear'
 end
 
-function injectFirstAugPackets()
+function injectAugmentConfirmationPackets()
+	local optionIndex
+	if firstTimeAug then
+		firstTimeAug = false
+		optionIndex = 512
+	else
+		optionIndex = 256
+	end
+
 	local packet = packets.new('outgoing', 0x05B)
-	packet["Target"] = npc
-	packet["Option Index"] = 512
-	packet["_unknown1"] = opt_ind
-	packet["Target Index"] = target_index
+	packet["Target"] = gorpaID
+	packet["Option Index"] = optionIndex
+	packet["_unknown1"] = pathIndex
+	packet["Target Index"] = gorpaTargetIndex
 	packet["Automated Message"] = true
 	packet["_unknown2"] = 0
-	packet["Zone"] = zone
-	packet["Menu ID"] = menu
+	packet["Zone"] = mhauraID
+	packet["Menu ID"] = gorpaMenuID
 	packets.inject(packet)
 
-	local packet = packets.new('outgoing', 0x05B)
-	packet["Target"] = npc
-	packet["Option Index"] = 512
-	packet["_unknown1"] = opt_ind
-	packet["Target Index"] = target_index
 	packet["Automated Message"] = false
-	packet["_unknown2"] = 0
-	packet["Zone"] = zone
-	packet["Menu ID"] = menu
 	packets.inject(packet)
 
-	local packet = packets.new('outgoing', 0x016, {
-		["Target Index"] = playerIndex,
-	})
-	packets.inject(packet)
-end
-
-function injectAugPackets()
-	local packet = packets.new('outgoing', 0x05B)
-	packet["Target"] = npc
-	packet["Option Index"] = 256
-	packet["_unknown1"] = opt_ind
-	packet["Target Index"] = target_index
-	packet["Automated Message"] = true
-	packet["_unknown2"] = 0
-	packet["Zone"] = zone
-	packet["Menu ID"] = menu
-	packets.inject(packet)
-
-	local packet = packets.new('outgoing', 0x05B)
-	packet["Target"] = npc
-	packet["Option Index"] = 256
-	packet["_unknown1"] = opt_ind
-	packet["Target Index"] = target_index
-	packet["Automated Message"] = false
-	packet["_unknown2"] = 0
-	packet["Zone"] = zone
-	packet["Menu ID"] = menu
-	packets.inject(packet)
-
-	local packet = packets.new('outgoing', 0x016, {
+	packet = packets.new('outgoing', 0x016, {
 		["Target Index"] = playerIndex,
 	})
 	packets.inject(packet)
