@@ -27,7 +27,7 @@
 ]]
 
 -- Addon description
-_addon.name = 'XIVBar'
+_addon.name = 'XIV Bar'
 _addon.author = 'Edeon'
 _addon.version = '1.0'
 _addon.language = 'english'
@@ -92,17 +92,13 @@ function update_bar(bar, text, width, current, pp, flag)
             local x = old_width
 
             if old_width < new_width then
-                x = old_width + math.ceil(((new_width - old_width) * 0.1))
+                x = old_width + math.ceil((new_width - old_width) * 0.1)
 
-                if x > theme_options.bar_width then
-                    x = theme_options.bar_width
-                end
+                x = math.min(x, theme_options.bar_width)
             elseif old_width > new_width then
-                x = old_width - math.ceil(((old_width - new_width) * 0.1))
+                x = old_width - math.ceil((old_width - new_width) * 0.1)
 
-                if x < 0 then
-                    x = 0
-                end
+                x = math.max(x, 0)
             end
 
             if flag == 1 then
@@ -116,6 +112,14 @@ function update_bar(bar, text, width, current, pp, flag)
             bar:size(x, theme_options.total_height)
             bar:show()
         end
+    end
+
+    if flag == 3 and current >= 1000 then
+        text:color(theme_options.full_tp_color_red, theme_options.full_tp_color_green, theme_options.full_tp_color_blue)
+        if theme_options.dim_tp_bar then bar:alpha(255) end
+    else
+        text:color(theme_options.font_color_red, theme_options.font_color_green, theme_options.font_color_blue)
+        if theme_options.dim_tp_bar then bar:alpha(180) end
     end
 
     text:text(tostring(current))

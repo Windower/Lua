@@ -26,6 +26,8 @@ and you can use a compact version for a smaller resolution:
 * **Offset** - moves the HP, MP and TP numbers left (negative number) or right (positive number) the given number of pixels
 * **Size** - The font size for the HP, MP and TP numbers
 * **Stroke** - The font stroke the HP, MP and TP numbers
+* **FullTpColor** - The font color for the TP numbers when the bar is full
+* **DimTpBar** - dim the TP bar when not full
 
 ## How to edit the settings
 1. Login to your character in FFXI
@@ -38,5 +40,5 @@ and you can use a compact version for a smaller resolution:
 ## How to create my own custom theme
 1. Create a folder inside the *theme* directory of the addon: **_Windower4\addons\xivbar\themes\MY_CUSTOM_THEME_**
 2. Create the necessary images. A theme is composed of 5 images: a background for the bars (*bar_bg.png*), a background for the compact mode (*bar_compact.png*), and one image for each bar (*hp_fg.png, mp_fg.png and tp_fg.png*). You can take a look at the default themes.
-3. Edit the theme name of the theme in the settings to yours. This setting must match the name of the folder you just created.
+3. Edit the name of the theme in the settings to yours. This setting must match the name of the folder you just created.
 4. Adjust the bar width, spacing and offset for your custom theme in the settings.

@@ -52,11 +52,16 @@ theme.apply = function (settings)
     options.font_stroke_color_red = settings.Texts.Stroke.Red
     options.font_stroke_color_green = settings.Texts.Stroke.Green
     options.font_stroke_color_blue = settings.Texts.Stroke.Blue
+    options.full_tp_color_red = settings.Texts.FullTpColor.Red
+    options.full_tp_color_green = settings.Texts.FullTpColor.Green
+    options.full_tp_color_blue = settings.Texts.FullTpColor.Blue
     options.text_offset = settings.Texts.Offset
 
     options.bar_width = settings.Theme.Bar.Width
     options.bar_spacing = settings.Theme.Bar.Spacing
     options.bar_offset = settings.Theme.Bar.Offset
+
+    options.dim_tp_bar = settings.Theme.DimTpBar
 
     if settings.Theme.Compact then
         options.bar_background = windower.addon_path .. 'themes/' .. settings.Theme.Name .. '/bar_compact.png'

@@ -73,6 +73,19 @@ function setup_text(text, theme_options)
     text:show()
 end
 
+-- load the images and text
+function ui:load(theme_options)
+    setup_image(self.background, theme_options.bar_background)
+    setup_image(self.hp_bar, theme_options.bar_hp)
+    setup_image(self.mp_bar, theme_options.bar_mp)
+    setup_image(self.tp_bar, theme_options.bar_tp)
+    setup_text(self.hp_text, theme_options)
+    setup_text(self.mp_text, theme_options)
+    setup_text(self.tp_text, theme_options)
+
+    self:position(theme_options)
+end
+
 -- position the images and text
 function ui:position(theme_options)
     local x = windower.get_windower_settings().x_res / 2 - (theme_options.total_width / 2) + theme_options.offset_x
@@ -87,22 +100,9 @@ function ui:position(theme_options)
     self.mp_bar:width(0)
     self.tp_bar:width(0)
 
-    self.hp_text:pos(x + 65 + theme_options.text_offset, self.background:pos_y() + 4)
-    self.mp_text:pos(x + 80 + theme_options.text_offset + theme_options.bar_width + theme_options.bar_spacing, self.background:pos_y() + 4)
-    self.tp_text:pos(x + 90 + theme_options.text_offset + (theme_options.bar_width*2) + (theme_options.bar_spacing*2), self.background:pos_y() + 4)
-end
-
--- load the images and text
-function ui:load(theme_options)
-    setup_image(self.background, theme_options.bar_background)
-    setup_image(self.hp_bar, theme_options.bar_hp)
-    setup_image(self.mp_bar, theme_options.bar_mp)
-    setup_image(self.tp_bar, theme_options.bar_tp)
-    setup_text(self.hp_text, theme_options)
-    setup_text(self.mp_text, theme_options)
-    setup_text(self.tp_text, theme_options)
-
-    self:position(theme_options)
+    self.hp_text:pos(x + 65 + theme_options.text_offset, self.background:pos_y() + 2)
+    self.mp_text:pos(x + 80 + theme_options.text_offset + theme_options.bar_width + theme_options.bar_spacing, self.background:pos_y() + 2)
+    self.tp_text:pos(x + 90 + theme_options.text_offset + (theme_options.bar_width*2) + (theme_options.bar_spacing*2), self.background:pos_y() + 2)
 end
 
 -- hide ui
