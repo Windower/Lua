@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'DistancePlus'
 _addon.author = 'Sammeh'
-_addon.version = '1.3.0.8'
+_addon.version = '1.3.0.9'
 _addon.command = 'dp'
 
 -- 1.3.0.2 Fixed up nil's per recommendation on submission to Windower 
@@ -38,6 +38,7 @@ _addon.command = 'dp'
 -- 1.3.0.6 Fix ability list on job change.
 -- 1.3.0.7 Implement ranged fix w/o ja_distance
 -- 1.3.0.8 Wasn't refreshing 'self' upon job change.  Fixed up spacing.
+-- 1.3.0.9 Fixup MaxDecimal from config plugin addition.
 
 require('tables')
 
@@ -375,10 +376,10 @@ windower.register_event('addon command', function(command)
        option = "Default"
        MaxDistance = 25
        distance:visible(false)
-       distance = texts.new('${value||%.2f}', defaults)
+       distance = texts.new('${value||%.2f}', settings.main)
     elseif command:lower() == 'maxdecimal' then
        distance:visible(false)
-       distance = texts.new('${value||%.12f}', defaults)
+       distance = texts.new('${value||%.12f}', settings.main)
     elseif command:lower() == 'abilitylist' or command:lower() == 'ja' then
         if showabilities then
             showabilities = false
