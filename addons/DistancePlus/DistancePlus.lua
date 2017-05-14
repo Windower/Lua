@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'DistancePlus'
 _addon.author = 'Sammeh'
-_addon.version = '1.3.0.7'
+_addon.version = '1.3.0.8'
 _addon.command = 'dp'
 
 -- 1.3.0.2 Fixed up nil's per recommendation on submission to Windower 
@@ -37,6 +37,7 @@ _addon.command = 'dp'
 -- 1.3.0.5 Implement config plugin.
 -- 1.3.0.6 Fix ability list on job change.
 -- 1.3.0.7 Implement ranged fix w/o ja_distance
+-- 1.3.0.8 Wasn't refreshing 'self' upon job change.  Fixed up spacing.
 
 require('tables')
 
@@ -116,10 +117,10 @@ function displayabilities(distance,master_pet_distance)
         [12] = 1.666666666666667,
     }
 
-    list = 'Abilities:\n'
+    local list = 'Abilities:\n'
     if abilitylist then 
       for key,ability in pairs(abilitylist) do
-        ability_en = res.job_abilities[ability].en
+        ability_en = res.job_abilities[ability].name
         ability_type = res.job_abilities[ability].type
         ability_targets = res.job_abilities[ability].targets
         ability_distance = res.job_abilities[ability].range
@@ -184,13 +185,13 @@ windower.register_event('prerender', function()
     t = windower.ffxi.get_mob_by_target('t') or windower.ffxi.get_mob_by_target('st')
     s = windower.ffxi.get_mob_by_target('me')
     if windower.ffxi.get_mob_by_target('pet') then
-		pet = windower.ffxi.get_mob_by_target('pet')
-	else
-		pet = nil
+        pet = windower.ffxi.get_mob_by_target('pet')
+    else
+        pet = nil
     end
     if pet and self.main_job ~= 'DRG' then
         if self.main_job == 'BST' then
-            PetMaxDistance = 4
+            local PetMaxDistance = 4
             pettargetdistance = PetMaxDistance + pet.model_size + s.model_size
             if pet.model_size > 1.6 then 
                 pettargetdistance = PetMaxDistance + pet.model_size + s.model_size + 0.1
@@ -200,8 +201,8 @@ windower.register_event('prerender', function()
             else
                 petdistance:color(255,255,255) -- White
             end
-        else
-            
+        --else
+        -- may add some stuff here for SMN    
         end
         petdistance.value = pet.distance:sqrt()
         petdistance:visible(pet ~= nil)
@@ -392,9 +393,10 @@ windower.register_event('addon command', function(command)
 end)
 
 windower.register_event('job change', function()
-    check_job()
     coroutine.sleep(2) -- sleeping because jobchange too fast doesn't show new abilities
-	abilitylist = windower.ffxi.get_abilities().job_abilities
+    self = windower.ffxi.get_player()
+    check_job()
+    abilitylist = windower.ffxi.get_abilities().job_abilities
     abilities:visible(false)
     abilities.value = ""
     displayabilities()
@@ -402,19 +404,19 @@ end)
 
 windower.register_event('load', function()
     if windower.ffxi.get_player() then 
-	    self = windower.ffxi.get_player()
-        check_job()
         coroutine.sleep(2) -- sleeping because jobchange too fast doesn't show new abilities
-		abilitylist = windower.ffxi.get_abilities().job_abilities
+        self = windower.ffxi.get_player()
+        check_job()
+        abilitylist = windower.ffxi.get_abilities().job_abilities
         displayabilities()
     end
 end)
 
 
 windower.register_event('login', function()
+    coroutine.sleep(2) -- sleeping because jobchange too fast doesn't show new abilities
     self = windower.ffxi.get_player()
     check_job()
-    coroutine.sleep(2) -- sleeping because jobchange too fast doesn't show new abilities
-	abilitylist = windower.ffxi.get_abilities().job_abilities
+    abilitylist = windower.ffxi.get_abilities().job_abilities
     displayabilities()
 end)
