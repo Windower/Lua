@@ -621,6 +621,13 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
+    <name>XIVBar</name>
+    <author>SirEdeonX (Edeon@Asura)</author>
+    <description>Displays HP, MP and TP bars on the center of the screen, akin to FFXIV, for easy tracking</description>
+    <bugtracker>https://github.com/SirEdeonX/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Asura/Edeon</support>
+  </addon>
+  <addon>
     <name>Yush</name>
     <author>Arcon</author>
     <description>A file-based macro engine</description>
