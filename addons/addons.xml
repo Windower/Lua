@@ -275,6 +275,13 @@
     <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
   </addon>
   <addon>
+    <name>JobChange</name>
+    <author>Sammeh</author>
+    <description>Command line Job Changer</description>
+    <bugtracker>https://github.com/SammehFFXI/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Quetzalcoatl/Sammeh</support>
+  </addon>
+  <addon>
     <name>latentchecker</name>
     <author>byrth,smd111</author>
     <description>Checks weapon skill points of weapon skill trial weapons and mythic weapons</description>
