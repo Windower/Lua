@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'DistancePlus'
 _addon.author = 'Sammeh'
-_addon.version = '1.3.0.9'
+_addon.version = '1.3.0.10'
 _addon.command = 'dp'
 
 -- 1.3.0.2 Fixed up nil's per recommendation on submission to Windower 
@@ -39,6 +39,7 @@ _addon.command = 'dp'
 -- 1.3.0.7 Implement ranged fix w/o ja_distance
 -- 1.3.0.8 Wasn't refreshing 'self' upon job change.  Fixed up spacing.
 -- 1.3.0.9 Fixup MaxDecimal from config plugin addition.
+-- 1.3.0.10  Changed slightly some variable scopes for lower mem usage.
 
 require('tables')
 
@@ -103,7 +104,7 @@ option = "Default"
 showabilities = false
 showheight = false
 
-function displayabilities(distance,master_pet_distance)
+function displayabilities(distance,master_pet_distance,s,t)
     local range_mult = {
         [2] = 1.55,
         [3] = 1.490909,
@@ -117,7 +118,6 @@ function displayabilities(distance,master_pet_distance)
         [11] = 1.454545454545455,
         [12] = 1.666666666666667,
     }
-
     local list = 'Abilities:\n'
     if abilitylist then 
       for key,ability in pairs(abilitylist) do
@@ -183,8 +183,8 @@ end
 
 
 windower.register_event('prerender', function()
-    t = windower.ffxi.get_mob_by_target('t') or windower.ffxi.get_mob_by_target('st')
-    s = windower.ffxi.get_mob_by_target('me')
+    local t = windower.ffxi.get_mob_by_target('t') or windower.ffxi.get_mob_by_target('st')
+    local s = windower.ffxi.get_mob_by_target('me')
     if windower.ffxi.get_mob_by_target('pet') then
         pet = windower.ffxi.get_mob_by_target('pet')
     else
@@ -193,7 +193,7 @@ windower.register_event('prerender', function()
     if pet and self.main_job ~= 'DRG' then
         if self.main_job == 'BST' then
             local PetMaxDistance = 4
-            pettargetdistance = PetMaxDistance + pet.model_size + s.model_size
+            local pettargetdistance = PetMaxDistance + pet.model_size + s.model_size
             if pet.model_size > 1.6 then 
                 pettargetdistance = PetMaxDistance + pet.model_size + s.model_size + 0.1
             end
@@ -212,9 +212,9 @@ windower.register_event('prerender', function()
     end
     if t then
         if pet then 
-            displayabilities(t.distance:sqrt(),pet.distance:sqrt())
+            displayabilities(t.distance:sqrt(),pet.distance:sqrt(),s,t)
         else
-            displayabilities(t.distance:sqrt())
+            displayabilities(t.distance:sqrt(),nil,s,t)
         end
         if t.distance:sqrt() == 0 then
             distance:color(255,255,255)
