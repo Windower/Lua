@@ -1,7 +1,10 @@
+include('organizer-lib')
+
 function get_sets()
     sets.precast = {}
     sets.precast.JA = {}
     
+    sets.weapons = {sub="Twashtar"}
     -- Precast Sets
     sets.precast.JA.Nightingale = {feet="Bihu Slippers +1"}
     
@@ -11,86 +14,252 @@ function get_sets()
     
     sets.precast.FC = {}
     
-    sets.precast.FC.Song = {main="Felibre's Dague",sub="Genbu's Shield",range="Linos",ammo=empty,
-        head="Aoidos' Calot +2",neck="Orunmila's Torque",
-        ear1={name="Loquac. Earring",priority=5},ear2="Enchanter Earring +1",body="Marduk's Jubbah +1",hands={name="Gendewitha Gages +1",priority=4},
-        ring1="Veneficium Ring",ring2={name="Prolix Ring",priority=2},back="Swith Cape +1",waist="Witful Belt",legs={name="Gendewitha Spats +1",priority=1},
-        feet={name="Bihu Slippers +1",priority=3}}
+    sets.precast.FC.Song = {
+        main="Sangoma",
+        sub="Genmei Shield",
+        range={ name="Linos", augments={'Accuracy+11','Occ. quickens spellcasting +3%',}},
+        ammo=empty,
+        head="Fili Calot +1",
+        body="Inyanga Jubbah +1",
+        hands={ name="Gende. Gages +1", augments={'Phys. dmg. taken -3%','Song spellcasting time -5%',}},
+        legs="Querkening Brais",
+        feet={ name="Telchine Pigaches", augments={'Song spellcasting time -7%',}},
+        neck="Orunmila's Torque",
+        waist="Flume Belt +1",
+        left_ear="Loquac. Earring",
+        right_ear="Enchntr. Earring +1",
+        left_ring="Defending Ring",
+        right_ring="Weather. Ring +1",
+        back="Perimede Cape", -- 80% FC, 10% quickens
+    }
+    sets.precast['Honor March'] = {range="Marsyas",ammo=empty}
         
-    sets.precast.FC.Normal = {range="Linos",ammo=empty,
-        head="Nahtirah Hat",neck="Orunmila's Torque",ear1="Loquac. Earring",body="Marduk's Jubbah +1",
-        hands="Gendewitha Gages +1",ring1="Veneficium Ring",ring2="Prolix Ring",back="Swith Cape +1",waist="Witful Belt",legs="Artsieq Hose",
-        feet="Chelona Boots +1"}
+    sets.precast.FC.Normal = {
+        main="Sangoma",
+        sub="Genmei Shield",
+        range={ name="Linos", augments={'Accuracy+11','Occ. quickens spellcasting +3%',}},
+        ammo=empty,
+        head="Nahtirah Hat",
+        neck="Orunmila's Torque",
+        left_ear="Loquac. Earring",
+        right_ear="Enchntr. Earring +1",
+        body="Inyanga Jubbah +1",
+        hands="Gendewitha Gages +1",
+        ring1="Kishar Ring",
+        ring2="Weather. Ring +1",
+        back={ name="Intarabus's Cape", augments={'CHR+20','Mag. Acc+20 /Mag. Dmg.+20','"Fast Cast"+10',}},
+        waist="Witful Belt",
+        legs="Lengo Pants",
+        feet="Chelona Boots +1"} -- 71% FC, 10% Quickens
         
-    sets.precast.Cure = {body="Heka's Kalasiris",legs="Nabu's Shalwar",back="Pahtli Cape"}
+    sets.precast.Cure = {
+        main="Felibre's Dague",
+        sub="Genbu's Shield",
+        body="Heka's Kalasiris",
+        legs="Doyen Pants",
+        back="Pahtli Cape"
+    }
+    
     sets.precast.EnhancingMagic = {waist="Siegel Sash"}
     
-    sets.precast.FC.Lightning = {main='Apamajas I',sub=empty,body="Dalmatica +1"}
-    sets.precast.FC.Fire = {main='Atar I',sub=empty,body="Dalmatica +1"}
-    
     sets.precast.WS = {}
-    sets.precast.WS['Mordant Rime'] = {range="Gjallarhorn",ammo=empty,
-        head="Brioso Roundlet +1",neck="Aqua Gorget",ear1="Steelflash Earring",ear2="Bladeborn Earring",
-        body="Bihu Justaucorps +1",hands="Brioso Cuffs +1",ring1="Carbuncle Ring +1",ring2="Carbuncle Ring +1",
-        back="Kumbira Cape",waist="Windbuffet Belt +1",legs="Bihu Cannions +1",feet="Battlecast Gaiters"}
+    sets.precast.WS['Mordant Rime'] = {
+        range={ name="Linos", augments={'Accuracy+15','"Dbl.Atk."+3','Quadruple Attack +3',}},
+        head="Brioso Roundlet +2",
+        body={ name="Bihu Jstcorps +1", augments={'Enhances "Troubadour" effect',}},
+        hands={ name="Leyline Gloves", augments={'Accuracy+15','Mag. Acc.+15','"Mag.Atk.Bns."+15','"Fast Cast"+3',}},
+        legs="Jokushu Haidate",
+        feet="Aya. Gambieras +1",
+        neck="Fotia Gorget",
+        waist="Grunfeld Rope",
+        left_ear="Ishvara Earring",
+        right_ear="Mache Earring +1",
+        left_ring="Ramuh Ring +1",
+        right_ring="Ramuh Ring +1",
+        back={ name="Intarabus's Cape", augments={'DEX+20','Accuracy+20 Attack+20','"Dual Wield"+10',}},
+    }
+    --[[sets.precast.WS['Mordant Rime'] = {
+        range="Gjallarhorn",
+        ammo=empty,
+        head="Brioso Roundlet +2",
+        body={ name="Bihu Jstcorps +1", augments={'Enhances "Troubadour" effect',}},
+        hands="Brioso Cuffs +2",
+        legs={ name="Bihu Cannions +1", augments={'Enhances "Soul Voice" effect',}},
+        feet="Brioso Slippers +2",
+        neck="Fotia Gorget",
+        waist="Windbuffet Belt +1",
+        left_ear="Ishvara Earring",
+        right_ear="Mache Earring +1",
+        left_ring="Carb. Ring +1",
+        right_ring="Carb. Ring +1",
+        back={ name="Intarabus's Cape", augments={'CHR+20','Mag. Acc+20 /Mag. Dmg.+20','"Fast Cast"+10',}},
+    }]]
+        
+    sets.precast.WS['Evisceration'] = {range={ name="Linos", augments={'Accuracy+15','"Dbl.Atk."+3','Quadruple Attack +3',}},ammo=empty,
+        head="Lustratio Cap +1",neck="Fotia Gorget",ear1="Mache earring +1",ear2="Kuwunga Earring",
+        body="Bihu Justaucorps +1",
+        hands="Leyline Gloves",
+        ring1="Ramuh Ring +1",
+        ring2="Begrudging Ring",
+        back="Rancorous Mantle",
+        waist="Fotia Belt",
+        legs="Lustratio Subligar +1",
+        feet="Aya. Gambieras +1",}
+        
+    sets.precast.WS["Rudra's Storm"] = {range={ name="Linos", augments={'Accuracy+15','"Dbl.Atk."+3','Quadruple Attack +3',}},ammo=empty,
+        head="Lustratio Cap +1",neck="Caro Necklace",ear1="Moonshade Earring",ear2="Mache earring +1",
+        body="Bihu Justaucorps +1",hands="Leyline Gloves",ring1="Ramuh Ring +1",ring2="Ramuh Ring +1",
+        back="Letalis Mantle",waist="Grunfeld Rope",legs="Lustratio Subligar +1",feet="Lustratio Leggings +1"}
+    
+    sets.precast.WS['Aeolian Edge'] = {
+        head="Welkin Crown",
+        body={ name="Bihu Jstcorps +1", augments={'Enhances "Troubadour" effect',}},
+        hands={ name="Chironic Gloves", augments={'Mag. Acc.+24 "Mag.Atk.Bns."+24','Enmity-3','INT+3','Mag. Acc.+10','"Mag.Atk.Bns."+10',}},
+        legs="Gyve Trousers",
+        feet={ name="Lustra. Leggings +1", augments={'HP+65','STR+15','DEX+15',}},
+        neck="Baetyl Pendant",
+        waist="Eschan Stone",
+        left_ear="Friomisi Earring",
+        right_ear={ name="Moonshade Earring", augments={'Attack+4','TP Bonus +25',}},
+        left_ring="Shiva Ring +1",
+        right_ring="Shiva Ring +1",
+    }
     
     -- Midcast Sets
     sets.midcast = {}
         
-    sets.midcast.Haste = {main="Terra's Staff",sub="Oneiros Grip",
+    sets.midcast.Haste = {main="Mafic Cudgel",sub="Genmei Shield",
         head={name="Nahtirah Hat",priority=11},neck="Orunmila's Torque",ear1="Loquac. Earring",ear2={name="Gifted Earring",priority=10},
-        body={name="Hedera Cotehardie",priority=12},hands={name="Gendewitha Gages +1",priority=6},ring2={name="Prolix Ring",priority=7},
-        back={name="Rhapsode's Cape",priority=9},waist="Phasmida Belt",legs="Bihu Cannions +1",feet={name="Chelona Boots +1",priority=8}}
+        body={name="Zendik Robe",priority=12},hands={name="Gendewitha Gages +1",priority=6},ring2={name="Kishar Ring",priority=7},
+        back={name="Pahtli Cape",priority=9},waist="Ninurta's Sash",legs="Bihu Cannions +1",feet={name="Chelona Boots +1",priority=8}}
 
-    sets.midcast.Debuff = {main="Carnwenhan",sub="Genbu's Shield",range="Gjallarhorn",ammo=empty,
-        head="Bihu Roundlet +1",neck="Wind Torque",ear1="Gwati Earring",ear2="Enchanter earring +1",
-        body="Brioso Justaucorps +1",hands="Lurid Mitts",ring1="Carbuncle Ring +1",ring2="Carbuncle Ring +1",
-        back="Rhapsode's Cape",waist="Ovate Rope",legs="Bihu Cannions +1",feet="Artsieq Boots"}
+    sets.midcast.Debuff = {
+        main="Carnwenhan",
+        sub="Ammurapi Shield",
+        range="Gjallarhorn",
+        ammo=empty,
+        head="Brioso Roundlet +2",
+        body={ name="Chironic Doublet", augments={'Mag. Acc.+20 "Mag.Atk.Bns."+20','"Resist Silence"+5','CHR+7','Mag. Acc.+15',}},
+        hands="Inyan. Dastanas +1",
+        legs="Inyanga Shalwar +1",
+        feet="Brioso Slippers +2",
+        neck="Canto Necklace +1",
+        waist="Luminary Sash",
+        left_ear="Dignitary's Earring",
+        right_ear="Enchntr. Earring +1",
+        left_ring="Carb. Ring +1",
+        right_ring="Carb. Ring +1",
+        back={ name="Intarabus's Cape", augments={'CHR+20','Mag. Acc+20 /Mag. Dmg.+20','"Fast Cast"+10',}},
+    }
     
-    sets.midcast.Buff = {main="Carnwenhan",sub="Genbu's Shield",head="Aoidos' Calot +2",neck="Aoidos' Matinee",
-        body="Aoidos' Hngrln. +2",hands="Ad. Mnchtte. +2",legs="Mdk. Shalwar +1",feet="Brioso slippers +1"}
+    sets.midcast.Duration = {
+        main="Carnwenhan",
+        body="Fili Hongreline +1",
+        legs="Inyanga Shalwar +1",
+        feet="Brioso Slippers +2",
+        neck="Moonbow Whistle",
+    }
+    
+    sets.midcast.Buff = {
+        main="Carnwenhan",
+        sub="Genmei Shield",
+        head="Fili Calot +1",
+        neck="Moonbow Whistle",
+        body="Fili Hongreline +1",
+        hands="Fili Manchettes +1",
+        legs="Inyanga Shalwar +1",
+        feet="Brioso Slippers +2",
+    }
     
     sets.midcast.DBuff = {range="Daurdabla",ammo=empty}
     
     sets.midcast.GBuff = {range="Gjallarhorn",ammo=empty}
     
-    sets.midcast.Duration = {body="Aoidos' Hngrln. +2",neck="Aoidos' Matinee",legs="Mdk. Shalwar +1",feet="Brioso slippers +1"}
         
-    sets.midcast.Ballad = {legs="Aoidos' Rhing. +2"}
-        
-    sets.midcast.Scherzo = {feet="Aoidos' Cothrn. +2"}
-        
-    sets.midcast.Paeon = {head="Brioso Roundlet +1"}
+    sets.midcast.Ballad = {legs="Fili Rhingrave +1"}
     
-    sets.midcast.Lullaby = {hands="Brioso Cuffs +1"}
+    sets.midcast.Madrigal = {back={ name="Intarabus's Cape", augments={'CHR+20','Mag. Acc+20 /Mag. Dmg.+20','"Fast Cast"+10',}},}
     
-    sets.midcast.Base = sets.midcast.Haste
+    sets.midcast.Prelude = {back={ name="Intarabus's Cape", augments={'CHR+20','Mag. Acc+20 /Mag. Dmg.+20','"Fast Cast"+10',}},}
+        
+    sets.midcast.Scherzo = {feet="Fili Cothurnes +1"}
+        
+    sets.midcast.Paeon = {head="Brioso Roundlet +2"}
+    
+    sets.midcast.March = {hands="Fili Manchettes +1",}
+    
+    sets.midcast.Lullaby = {range="Daurdabla",hands="Brioso Cuffs +2"}
+    
+    sets.midcast['Honor March'] = {
+        range="Marsyas",
+        ammo=empty,
+        hands="Fili Manchettes +1",
+        }
+    
     
     sets.midcast.Waltz = {}
         
     sets.midcast.Cure = {main="Chatoyant Staff",head="Marduk's Tiara +1",neck="Phalaina Locket",ear2="Novia earring",
-        body="Heka's Kalasiris",hands="Bokwus Gloves",legs="Bihu Cannions +1",feet="Bihu Slippers +1"}
+        body="Heka's Kalasiris",hands="Revealer's Mitts +1",legs="Bihu Cannions +1",feet="Bihu Slippers +1"}
         
-    sets.midcast.Stoneskin = {head="Marduk's Tiara +1",body="Marduk's Jubbah +1",hands="Marduk's Dastanas +1",
+    sets.midcast.Stoneskin = {head="Marduk's Tiara +1",neck="Nodens Gorget",body="Inyanga Jubbah +1",
         legs="Shedir Seraweels",feet="Bihu Slippers +1"}
+    
+    sets.midcast.Cursna={
+        head={ name="Vanya Hood", augments={'Healing magic skill +20','"Cure" spellcasting time -7%','Magic dmg. taken -3',}},
+        body="Vanya Robe",
+        hands="Hieros Mittens",
+        legs={ name="Vanya Slops", augments={'Healing magic skill +20','"Cure" spellcasting time -7%','Magic dmg. taken -3',}},
+        left_ring="Haoma's Ring",
+        right_ring="Haoma's Ring",
+        back="Oretan. Cape +1",
+        feet="Vanya Clogs",
+        neck="Debilis Medallion",
+    }
     
     
     --Aftercast Sets
     sets.aftercast = {}
-    sets.aftercast.Regen = {main={name="Terra's Staff",order=1},sub={name="Oneiros Grip",order=2},range="Oneiros Harp",ammo=empty,
-        head="Bihu Roundlet +1",neck="Twilight Torque",ear1={name="Loquac. Earring",order=7},ear2={name="Gifted Earring",order=5},
-        body="Ischemia Chasu.",hands={name="Umuthi Gloves",order=9},ring1="Defending Ring",ring2={name="Dark Ring",order=8},
-        back="Umbra Cape",waist="Flume Belt +1",legs={name="Nares Trews",order=6},feet="Aoidos' Cothrn. +2"}
+    sets.aftercast.Regen = {main={name="Sangoma",priority=15},sub={name="Genmei Shield",priority=16},range={name="Oneiros Harp",priority=14},ammo={name=empty,priority=13},
+        head="Bihu Roundlet +1",neck="Loricate Torque +1",ear1={name="Loquac. Earring",priority=7},ear2={name="Gifted Earring",priority=5},
+        body="Ischemia Chasuble",hands={name="Umuthi Gloves",priority=9},ring1="Defending Ring",ring2={name="Dark Ring",priority=8},
+        back="Umbra Cape",waist="Flume Belt +1",legs={name="Lengo Pants",priority=6},feet="Fili Cothurnes +1"}
     
-    sets.aftercast.PDT = {main="Terra's Staff",sub="Oneiros Grip",range="Oneiros Harp",ammo=empty,
-        head="Bihu Roundlet +1",neck="Twilight Torque",ear1="Loquac. Earring",ear2="Gifted Earring",
-        body="Bihu Justaucorps +1",hands="Umuthi Gloves",ring1="Defending Ring",ring2="Dark Ring",
-        back="Umbra Cape",waist="Flume Belt +1",legs="Gendewitha Spats +1",feet="Bihu Slippers +1"}
-    
-    sets.aftercast.Engaged = {range="Angel Lyre",ammo=empty,
-        head="Lithelimb Cap",neck="Asperity Necklace",ear1="Brutal Earring",ear2="Suppanomimi",
-        body="Bihu Justaucorps +1",hands="Umuthi Gloves",ring1="Ifrit Ring +1",ring2="Rajas Ring",
-        back="Atheling Mantle",waist="Windbuffet Belt +1",legs="Bihu Cannions +1",feet="Battlecast Gaiters"}
+    sets.aftercast.PDT = {
+        main="Sangoma",
+        sub="Genmei Shield",
+        range="Oneiros Harp",
+        ammo=empty,
+        head="Lithelimb Cap",
+        body="Emet Harness +1",
+        hands="Umuthi Gloves",
+        legs="Jokushu Haidate",
+        feet="Fili Cothurnes +1",
+        neck="Loricate Torque +1",
+        waist="Flume Belt +1",
+        left_ear="Loquac. Earring",
+        right_ear="Gifted Earring",
+        left_ring="Defending Ring",
+        right_ring={ name="Dark Ring", augments={'Breath dmg. taken -4%','Phys. dmg. taken -6%','Magic dmg. taken -5%',}},
+        back="Solemnity Cape",
+    }
+        
+    sets.aftercast.Engaged = {
+        range={ name="Linos", augments={'Accuracy+15','"Dbl.Atk."+3','Quadruple Attack +3',}},
+        ammo=empty,
+        head="Aya. Zucchetto +1",
+        body="Ayanmo Corazza +1",
+        hands={ name="Leyline Gloves", augments={'Accuracy+15','Mag. Acc.+15','"Mag.Atk.Bns."+15','"Fast Cast"+3',}},
+        legs="Jokushu Haidate",
+        feet="Aya. Gambieras +1",
+        neck="Lissome Necklace",
+        waist="Windbuffet Belt +1",
+        left_ear="Telos Earring",
+        right_ear="Mache Earring +1",
+        left_ring="Ramuh Ring +1",
+        right_ring="Rajas Ring",
+        back={ name="Intarabus's Cape", augments={'DEX+20','Accuracy+20 Attack+20','"Dual Wield"+10',}},
+    }
         
     sets.aftercast._tab = {'Regen','PDT'}
     
@@ -98,7 +267,9 @@ function get_sets()
     
     sets.aftercast.Idle = sets.aftercast[sets.aftercast._tab[sets.aftercast._index]]
     
-    DaurdSongs = T{'Water Carol','Water Carol II','Ice Carol','Ice Carol II','Herb Pastoral','Goblin Gavotte'}
+    sets.midcast.Base = sets.aftercast.PDT -- sets.midcast.Haste
+    
+    DaurdSongs = T{'Water Carol','Water Carol II','Herb Pastoral','Goblin Gavotte'}
     
     send_command('input /macro book 3;wait .1;input /macro set 1')
     timer_reg = {}
@@ -121,6 +292,9 @@ function precast(spell)
     if spell.type == 'BardSong' then
             equip_song_gear(spell)
             equip(sets.precast.FC.Song)
+            if spell.english == 'Honor March' then
+                equip(sets.precast['Honor March'])
+            end
     elseif spell.action_type == 'Magic' then
         equip(sets.precast.FC.Normal)
         if string.find(spell.english,'Cur') and spell.name ~= 'Cursna' then
@@ -129,15 +303,11 @@ function precast(spell)
         if spell.skill == 'Enhancing Magic' then
             equip(sets.precast.EnhancingMagic)
         end
-    elseif spell.prefix == '/weaponskill' then
-        if sets.precast.WS[spell.name] then
-            equip(sets.precast.WS[spell.name])
-        end
+    elseif spell.prefix == '/weaponskill' and sets.precast.WS[spell.name] then
+        equip(sets.precast.WS[spell.name])
     end
     
-    if sets.precast.FC[tostring(spell.element)] then equip(sets.precast.FC[tostring(spell.element)]) end
-    if sets.precast.JA[spell.english] then equip(sets.precast.JA[spell.english]) end
-    if player.status == 'Engaged' then equip({range=nil}) end
+    --if player.status == 'Engaged' then equip({range=nil}) end -- Why?
 end
 
 function midcast(spell)
@@ -145,68 +315,22 @@ function midcast(spell)
         equip_song_gear(spell)
     elseif string.find(spell.english,'Waltz') and spell.english ~= 'Healing Waltz' then
         equip(sets.midcast.Base,sets.midcast.Waltz)
+    elseif sets.midcast[spell.english] then
+        equip(sets.midcast.Base,sets.midcast[spell.english])
     elseif string.find(spell.english,'Cur') then
         equip(sets.midcast.Base,sets.midcast.Cure)
-    elseif spell.english=='Stoneskin' then
-        equip(sets.midcast.Base,sets.midcast.Stoneskin)
+    elseif spell.prefix == '/weaponskill' and sets.precast.WS[spell.name] then
+        equip(sets.precast.WS[spell.name])
+    else
+        equip(sets.midcast.Base)
     end
+    
+    if sets.precast.JA[spell.english] then equip(sets.precast.JA[spell.english]) end
 end
 
 function aftercast(spell)
     if midaction() then return end
---[[    if spell.type and spell.type == 'BardSong' and spell.target and spell.target.type:upper() == 'SELF' then
-        local t = os.time()
-        
-        -- Eliminate songs that have already expired
-        local tempreg = {}
-        for i,v in pairs(timer_reg) do
-            if v < t then tempreg[i] = true end
-        end
-        for i,v in pairs(tempreg) do
-            timer_reg[i] = nil
-        end
-        
-        local dur = calculate_duration(spell.name)
-        if timer_reg[spell.name] then
-            if (timer_reg[spell.name] - t) <= 120 then
-                send_command('timers delete "'..spell.name..'"')
-                timer_reg[spell.name] = t + dur
-                send_command('timers create "'..spell.name..'" '..dur..' down')
-            end
-        else
-            local maxsongs = 2
-            if player.equipment.range == 'Daurdabla' then
-                maxsongs = maxsongs+2
-            end
-            if buffactive['Clarion Call'] then
-                maxsongs = maxsongs+1
-            end
-            if maxsongs < table.length(timer_reg) then
-                maxsongs = table.length(timer_reg)
-            end
-            
-            if table.length(timer_reg) < maxsongs then
-                timer_reg[spell.name] = t+dur
-                send_command('timers create "'..spell.name..'" '..dur..' down')
-            else
-                local rep,repsong
-                for i,v in pairs(timer_reg) do
-                    if t+dur > v then
-                        if not rep or rep > v then
-                            rep = v
-                            repsong = i
-                        end
-                    end
-                end
-                if repsong then
-                    timer_reg[repsong] = nil
-                    send_command('timers delete "'..repsong..'"')
-                    timer_reg[spell.name] = t+dur
-                    send_command('timers create "'..spell.name..'" '..dur..' down')
-                end
-            end
-        end
-    end]]
+    
     if player.status == 'Engaged' then
         equip(sets.aftercast.Engaged)
     else
@@ -217,7 +341,7 @@ end
 function status_change(new,old)
     if new == 'Engaged' then
         equip(sets.aftercast.Engaged)
-        disable('main','sub','ammo')
+        --disable('main','sub','ammo')
     elseif T{'Idle','Resting'}:contains(new) then
         equip(sets.aftercast.Idle)
     end
@@ -243,58 +367,18 @@ function equip_song_gear(spell)
         if spell.target.type == 'MONSTER' then
             equip(sets.midcast.Base,sets.midcast.Debuff,sets.midcast.GBuff)
             if buffactive.troubadour or buffactive['elemental seal'] then
-                equip(sets.midcast.Duration)
+                equip(sets.midcast.Duration,{range="Marsyas",ammo="empty"})
             end
             if string.find(spell.english,'Lullaby') then equip(sets.midcast.Duration,sets.midcast.Lullaby) end
         else
             equip(sets.midcast.Base,sets.midcast.Buff,sets.midcast.GBuff)
-            if string.find(spell.english,'Ballad') then equip(sets.midcast.Ballad) end
-            if string.find(spell.english,'Scherzo') then equip(sets.midcast.Scherzo) end
-            if string.find(spell.english,'Paeon') then equip(sets.midcast.Paeon) end
+            if spell.english == 'Honor March' then equip(sets.midcast['Honor March'])
+            elseif string.find(spell.english,'Ballad') then equip(sets.midcast.Ballad)
+            elseif string.find(spell.english,'Scherzo') then equip(sets.midcast.Scherzo)
+            elseif string.find(spell.english,'Paeon') then equip(sets.midcast.Paeon)
+            elseif string.find(spell.english,'Prelude') then equip(sets.midcast.Prelude)
+            elseif string.find(spell.english,'Madrigal') then equip(sets.midcast.Madrigal)
+            end
         end
     end
 end
-
-function calculate_duration(name)
-    local mult,ext = 1,0
-    if player.equipment.range == 'Daurdabla' then mult = mult + 0.3 end
-    if player.equipment.range == "Gjallarhorn" then mult = mult + 0.4 end
-    
-    if player.equipment.neck == "Aoidos' Matinee" then mult = mult + 0.1 end
-    if player.equipment.feet == "Brioso Slippers" then mult = mult + 0.1 end
-    if player.equipment.body == "Aoidos' Hngrln. +2" then mult = mult + 0.1 end
-    if player.equipment.legs == "Mdk. Shalwar +1" then mult = mult + 0.1 end
-    if player.equipment.main == "Carnwenhan" then mult = mult + 0.5 end
-    
-    if string.find(name,'March') and player.equipment.hands == 'Ad. Mnchtte. +2' then mult = mult + 0.1 end
-    if string.find(name,'Minuet') and player.equipment.body == "Aoidos' Hngrln. +2" then mult = mult + 0.1 end
-    if string.find(name,'Madrigal') and player.equipment.head == "Aoidos' Calot +2" then mult = mult + 0.1 end
-    if string.find(name,'Ballad') and player.equipment.legs == "Aoidos' Rhing. +2" then mult = mult + 0.1 end
-    if string.find(name,'Scherzo') and player.equipment.feet == "Aoidos' Cothrn. +2" then mult = mult + 0.1 end
-    if string.find(name,'Paeon') and player.equipment.head == "Brioso Roundlet +1" then mult = mult + 0.1 end
-    
-    if buffactive.Troubadour then
-        mult = mult*2
-    end
-    if string.find(name,'Scherzo') and buffactive['Soul Voice'] then
-        mult = mult*2
-    elseif string.find(name,'Scherzo') and buffactive.marcato then
-        mult = mult*1.5
-    end
-    
-    if buffactive['Clarion Call'] then
-        ext = 20
-    end
-    
-    return mult*120 + ext
-end
-
-function reset_timers()
-    for i,v in pairs(timer_reg) do
-        send_command('timers delete "'..i..'"')
-    end
-    timer_reg = {}
-end
-
-windower.register_event('zone change',reset_timers)
-windower.register_event('logout',reset_timers)

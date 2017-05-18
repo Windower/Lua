@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'RollTracker'
-_addon.version = '1.3.0.0'
+_addon.version = '1.5.0.0'
 _addon.author = 'Balloon'
 _addon.command = 'rolltracker'
 
@@ -128,7 +128,7 @@ windower.register_event('load', function()
         ['Blitzer\'s'] = {2,3.4,4.5,11.3,5.3,6.4,7.2,8.3,1.5,10.2,12.1,'-?', '% Attack delay reduction',4, 1, {4,11080, 5}},
         ['Courser\'s'] = {'?','?','?','?','?','?','?','?','?','?','?','?',' Snapshot',3, 0},
         ['Runeist\'s'] = {'?','?','?','?','?','?','?','?','?','?','?','?',' Magic Evasion',4, 0},
-        ['Naturalist\'s'] = {'?','?','?','?','?','?','?','?','?','?','?','?',' Enhancing Magic Duration',3, 0}
+        ['Naturalist\'s'] = {6,7,15,8,9,10,5,11,12,13,20,'-5','% Enhancing Magic Duration',3, 1}
     }
 
     rollInfo = {}
@@ -239,7 +239,11 @@ function RollEffect(rollid, rollnum)
     if rollName == "Companion\'s" then
         local hpVal = rollVal[1]
         local tpVal = rollVal[2]
-        if gearTable[13] == 28548 or gearTable[14]== 28548 or ringBonus then
+        if gearTable[9] == 26038 or ringBonus then
+            hpVal =  hpVal + (rollInfo[rollid][16][1]*7)
+            tpVal = tpVal  + (rollInfo[rollid][16][2]*7)
+            ringBonus = true
+        elseif gearTable[13] == 28548 or gearTable[14]== 28548 or ringBonus then
             hpVal =  hpVal + (rollInfo[rollid][16][1]*5)
             tpVal = tpVal  + (rollInfo[rollid][16][2]*5)
             ringBonus = true
@@ -253,7 +257,10 @@ function RollEffect(rollid, rollnum)
 
     --If there's no Roll Val can't add to it
     if rollVal ~= '?' then
-        if gearTable[13] == 28548 or gearTable[14] == 28548 or ringBonus then
+        if gearTable[9] == 26038 or ringBonus then
+            rollVal = rollVal + (rollInfo[rollid][16]*7)
+            ringBonus = true
+        elseif gearTable[13] == 28548 or gearTable[14] == 28548 or ringBonus then
             rollVal = rollVal + (rollInfo[rollid][16]*5)
             ringBonus = true
         elseif gearTable[13] == 28547 or gearTable[14] == 28547 or ringBonus then

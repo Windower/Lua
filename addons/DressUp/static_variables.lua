@@ -1,4 +1,4 @@
--- Copyright (c) 2013, Cairthenn
+-- Copyright © 2013-2014, Cairthenn
 -- All rights reserved.
 
 -- Redistribution and use in source and binary forms, with or without

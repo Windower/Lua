@@ -43,7 +43,7 @@ Command list:
   RS <stat> [<playerName>] [<target>]
   Reports the given stat. Supported stats are:
       mavg, mrange, acc, ravg, rrange, racc, critavg, critrange, crit,
-      rcritavg, rcritrange, rcrit, wsavg
+      rcritavg, rcritrange, rcrit, wsavg, wsacc
   
   'playerName' may be the name of a player if you wish to see only one player.
   

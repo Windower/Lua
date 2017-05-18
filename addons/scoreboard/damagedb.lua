@@ -18,7 +18,7 @@ DamageDB.player_stat_fields = T{
     'mavg', 'mrange', 'critavg', 'critrange',
     'ravg', 'rrange', 'rcritavg', 'rcritrange',
     'acc', 'racc', 'crit', 'rcrit',
-    'wsavg'
+    'wsavg', 'wsacc'
 }
 
 function DamageDB:new (o)
@@ -142,6 +142,7 @@ function DamageDB:add_r_hit(m, p, d)         self:_get_player(m, p):add_r_hit(d)
 function DamageDB:add_r_crit(m, p, d)        self:_get_player(m, p):add_r_crit(d)        end
 function DamageDB:incr_misses(m, p)          self:_get_player(m, p):incr_m_misses()      end
 function DamageDB:incr_r_misses(m, p)        self:_get_player(m, p):incr_r_misses()      end
+function DamageDB:incr_ws_misses(m, p)       self:_get_player(m, p):incr_ws_misses()     end
 function DamageDB:add_damage(m, p, d)        self:_get_player(m, p):add_damage(d)        end
 function DamageDB:add_ws_damage(m, p, d, id) self:_get_player(m, p):add_ws_damage(id, d) end
 

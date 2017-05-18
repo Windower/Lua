@@ -1,10 +1,38 @@
+--Copyright (c) 2013~2016, Byrthnoth
+--All rights reserved.
+
+--Redistribution and use in source and binary forms, with or without
+--modification, are permitted provided that the following conditions are met:
+
+--    * Redistributions of source code must retain the above copyright
+--      notice, this list of conditions and the following disclaimer.
+--    * Redistributions in binary form must reproduce the above copyright
+--      notice, this list of conditions and the following disclaimer in the
+--      documentation and/or other materials provided with the distribution.
+--    * Neither the name of <addon name> nor the
+--      names of its contributors may be used to endorse or promote products
+--      derived from this software without specific prior written permission.
+
+--THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+--ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+--WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+--DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
+--DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+--(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+--LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+--ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+--(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+--SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 function export_set(options)
-    local item_list = {}
-    local targinv,xml,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing
+    local item_list = T{}
+    local targinv,all_items,xml,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing
     if #options > 0 then
         for _,v in ipairs(options) do
             if S{'inventory','inv','i'}:contains(v:lower()) then
                 targinv = true
+            elseif v:lower() == 'all' then
+                all_items = true
             elseif S{'xml'}:contains(v:lower()) then
                 xml = true
             elseif S{'sets','set','s'}:contains(v:lower()) then
@@ -24,7 +52,9 @@ function export_set(options)
     end
     
     local buildmsg = 'Exporting '
-    if targinv then
+    if all_items then
+        buildmsg = buildmsg..'your all items'
+    elseif targinv then
         buildmsg = buildmsg..'your current inventory'
     elseif all_sets then
         buildmsg = buildmsg..'your current sets table'
@@ -53,43 +83,18 @@ function export_set(options)
         windower.create_dir(windower.addon_path..'data/export')
     end
     
-    local inv = items.inventory
-    if targinv then
-        -- Load the entire inventory
-        for _,v in pairs(inv) do
-            if type(v) == 'table' and v.id ~= 0 then
-                if res.items[v.id] then
-                    item_list[#item_list+1] = {}
-                    item_list[#item_list].name = res.items[v.id][language]
-                    local potslots,slot = copy_entry(res.items[v.id].slots)
-                    if potslots then
-                        slot = res.slots[potslots:it()()].english:gsub(' ','_'):lower() -- Multi-lingual support requires that we add more languages to slots.lua
-                    end
-                    item_list[#item_list].slot = slot or 'item'
-                    if not xml then
-                        local augments = extdata.decode(v).augments or {}
-                        local aug_str = ''
-                        for aug_ind,augment in pairs(augments) do
-                            if augment ~= 'none' then aug_str = aug_str.."'"..augment.."'," end
-                        end
-                        if string.len(aug_str) > 0 then
-                            item_list[#item_list].augments = aug_str
-                        end
-                    end
-                else
-                    msg.addon_msg(123,'You possess an item that is not in the resources yet.')
-                end
-            end
+    if all_items then
+        for i = 0, #res.bags do
+            item_list:extend(get_item_list(items[res.bags[i].english:gsub(' ', ''):lower()]))
         end
+    elseif targinv then
+        item_list:extend(get_item_list(items.inventory))
     elseif all_sets then
         -- Iterate through user_env.sets and find all the gear.
         item_list,exported = unpack_names({},'L1',user_env.sets,{},{empty=true})
     else
------------------------------------------- CHECK WHETHER THIS STILL WORKS --------------------------------------------------
         -- Default to loading the currently worn gear.
-        local gear = table.reassign({},items.equipment)
-        local ward = items.wardrobe
-
+        
         for i = 1,16 do -- ipairs will be used on item_list
             if not item_list[i] then
                 item_list[i] = {}
@@ -98,15 +103,12 @@ function export_set(options)
             end
         end
         
-        for slot_name,gs_item_tab in pairs(gear) do
+        for slot_name,gs_item_tab in pairs(items.equipment) do
             if gs_item_tab.slot ~= empty then
                 local item_tab
-                if gs_item_tab.bag_id == 0 and res.items[inv[gs_item_tab.slot].id] then
-                    item_tab = inv[gs_item_tab.slot]
-                elseif gs_item_tab.bag_id == 8 and res.items[ward[gs_item_tab.slot].id] then
-                    item_tab = ward[gs_item_tab.slot]
-                end
-                if res.items[item_tab.id] then
+                local bag_name = to_windower_bag_api(res.bags[gs_item_tab.bag_id].en)
+                if res.items[items[bag_name][gs_item_tab.slot].id] then
+                    item_tab = items[bag_name][gs_item_tab.slot]
                     item_list[slot_map[slot_name]+1] = {
                         name = res.items[item_tab.id][language],
                         slot = slot_name
@@ -115,7 +117,7 @@ function export_set(options)
                         local augments = extdata.decode(item_tab).augments or {}
                         local aug_str = ''
                         for aug_ind,augment in pairs(augments) do
-                            if augment ~= 'none' then aug_str = aug_str.."'"..augment.."'," end
+                            if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
                         end
                         if string.len(aug_str) > 0 then
                             item_list[slot_map[slot_name]+1].augments = aug_str
@@ -157,7 +159,7 @@ function export_set(options)
     elseif use_subjob_in_filename then
         path = path..'_'..windower.ffxi.get_player().main_job..'_'..windower.ffxi.get_player().sub_job
     else
-        path = path..os.date(' %H %M %S%p  %y-%d-%m')
+        path = path..os.date(' %Y-%m-%d %H-%M-%S')
     end
     if xml then
         -- Export in .xml
@@ -219,13 +221,13 @@ function unpack_names(ret_tab,up,tab_level,unpacked_table,exported)
                 if tab_level.augments then
                     local aug_str = ''
                     for aug_ind,augment in pairs(tab_level.augments) do
-                        if augment ~= 'none' then aug_str = aug_str.."'"..augment.."'," end
+                        if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
                     end
                     if aug_str ~= '' then unpacked_table[#unpacked_table].augments = aug_str end
                 end
                 if tab_level.augment then
                     local aug_str = unpacked_table[#unpacked_table].augments or ''
-                    if tab_level.augment ~= 'none' then aug_str = aug_str.."'"..augment.."'," end
+                    if tab_level.augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
                     if aug_str ~= '' then unpacked_table[#unpacked_table].augments = aug_str end
                 end
                 exported[tempname:lower()] = true
@@ -262,4 +264,35 @@ end
 function xmlify(phrase)
     if tonumber(phrase:sub(1,1)) then phrase = 'NUM'..phrase end
     return phrase --:gsub('"','&quot;'):gsub("'","&apos;"):gsub('<','&lt;'):gsub('>','&gt;'):gsub('&&','&amp;')
+end
+
+function get_item_list(bag)
+    local items_in_bag = {}
+    -- Load the entire inventory
+    for _,v in pairs(bag) do
+        if type(v) == 'table' and v.id ~= 0 then
+            if res.items[v.id] then
+                items_in_bag[#items_in_bag+1] = {}
+                items_in_bag[#items_in_bag].name = res.items[v.id][language]
+                local potslots,slot = copy_entry(res.items[v.id].slots)
+                if potslots then
+                    slot = res.slots[potslots:it()()].english:gsub(' ','_'):lower() -- Multi-lingual support requires that we add more languages to slots.lua
+                end
+                items_in_bag[#items_in_bag].slot = slot or 'item'
+                if not xml then
+                    local augments = extdata.decode(v).augments or {}
+                    local aug_str = ''
+                    for aug_ind,augment in pairs(augments) do
+                        if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
+                    end
+                    if string.len(aug_str) > 0 then
+                        items_in_bag[#items_in_bag].augments = aug_str
+                    end
+                end
+            else
+                msg.addon_msg(123,'You possess an item that is not in the resources yet.')
+            end
+        end
+    end
+    return items_in_bag
 end

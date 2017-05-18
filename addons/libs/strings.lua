@@ -35,7 +35,7 @@ function string.psplit(str, sep, maxsplit, include)
 end
 
 -- Splits a string into a table by a separator string.
-function string.split(str, sep, maxsplit, include, pattern)
+function string.split(str, sep, maxsplit, include, raw)
     if not sep or sep == '' then
         local res = {}
         local key = 0
@@ -53,8 +53,8 @@ function string.split(str, sep, maxsplit, include, pattern)
     end
 
     maxsplit = maxsplit or 0
-    if pattern == nil then
-        pattern = true
+    if raw == nil then
+        raw = true
     end
 
     local res = {}
@@ -64,7 +64,7 @@ function string.split(str, sep, maxsplit, include, pattern)
     local match
     while i <= #str + 1 do
         -- Find the next occurence of sep.
-        startpos, endpos = str:find(sep, i, pattern)
+        startpos, endpos = str:find(sep, i, raw)
         -- If found, get the substring and append it to the table.
         if startpos then
             match = str:sub(i, startpos - 1)

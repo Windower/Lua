@@ -17,6 +17,7 @@ function Player:new (o)
         clock = nil,            -- specific DPS clock for this player
         damage = 0,             -- total damage done by this player
         ws  = T{},              -- table of all WS and their corresponding damage
+        ws_misses = 0,          -- total ws misses
         m_hits = 0,             -- total melee hits
         m_misses = 0,           -- total melee misses
         m_min = math.huge,      -- minimum melee damage
@@ -107,6 +108,7 @@ end
 
 function Player:incr_m_misses() self.m_misses = self.m_misses + 1 end
 
+function Player:incr_ws_misses() self.ws_misses = self.ws_misses + 1 end
 
 function Player:add_r_hit(damage)
     -- increment hits

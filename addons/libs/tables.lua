@@ -489,7 +489,9 @@ function table.copy(t, deep)
 
     for value, key in table.it(t) do
         -- If a value is a table, recursively copy that.
-        if type(value) == 'table' then
+        if type(value) == 'table' and deep then
+            -- If it has a copy function in its __index metatable (but not main table), use that.
+            -- Otherwise, default to the table.copy function.
             value = (not rawget(value, copy) and value.copy or table.copy)(value)
         end
         res[key] = value

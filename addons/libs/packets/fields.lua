@@ -8,11 +8,16 @@ require('strings')
 require('maths')
 require('lists')
 require('sets')
-bit = require('bit')
+local bit = require('bit')
 
 local fields = {}
-fields.outgoing = {_func = {}}
-fields.incoming = {_func = {}}
+fields.outgoing = {}
+fields.incoming = {}
+
+local func = {
+    incoming = {},
+    outgoing = {},
+}
 
 -- String decoding definitions
 local ls_name_msg = T('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ':split())
@@ -23,7 +28,7 @@ local ls_name_ext = T(('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' ..
 ls_name_ext[0] = '`'
 
 -- Function definitions. Used to display packet field information.
-res = require('resources')
+local res = require('resources')
 
 local function s(val, from, to)
     from = from - 1
@@ -61,27 +66,39 @@ local function div(denom, val)
     return val/denom
 end
 
-local time = function()
+local function add(amount, val)
+    return val + amount
+end
+
+local function sub(amount, val)
+    return val - amount
+end
+
+local time
+local utime
+do
     local now = os.time()
     local h, m = (os.difftime(now, os.time(os.date('!*t', now))) / 3600):modf()
 
     local timezone = '%+.2d:%.2d':format(h, 60 * m)
-    now, h, m = nil, nil, nil
-    return function(ts)
-        return os.date('%Y-%m-%dT%H:%M:%S' .. timezone, os.time() - ts)
-    end
-end()
 
-local utime = function()
-    local now = os.time()
-    local h, m = (os.difftime(now, os.time(os.date('!*t', now))) / 3600):modf()
-
-    local timezone = '%+.2d:%.2d':format(h, 60 * m)
-    now, h, m = nil, nil, nil
-    return function(ts)
+    local fn = function(ts)
         return os.date('%Y-%m-%dT%H:%M:%S' .. timezone, ts)
     end
-end()
+
+    time = function(ts)
+        return fn(os.time() - ts)
+    end
+
+    utime = function(ts)
+        return fn(ts)
+    end
+
+    bufftime = function(ts)
+        -- Todo...
+        return fn(ts)
+    end
+end
 
 local time_ms = time .. function(val) return val/1000 end
 
@@ -114,6 +131,10 @@ local function weather(val)
     return res.weather[val].name
 end
 
+local function buff(val)
+    return val ~= 0xFF and res.buffs[val].name or '-'
+end
+
 local function chat(val)
     return res.chat[val].name
 end
@@ -144,6 +165,10 @@ end
 
 local function slot(val)
     return res.slots[val].name
+end
+
+local function statuses(val)
+    return res.statuses[val].name
 end
 
 local function srank(val)
@@ -326,6 +351,7 @@ enums['action'] = {
     [0x12] = 'Dismount Chocobo',
     [0x14] = 'Zoning/Appear', -- I think, the resource for this is ambiguous.
     [0x19] = 'Monsterskill',
+    [0x1A] = 'Mount',
 }
 
 -- Action
@@ -484,13 +510,13 @@ enums['ah otype'] = {
     [0x10] = 'Item sold',
 }
 
-fields.outgoing._func[0x04E] = {}
-fields.outgoing._func[0x04E].base = L{
+func.outgoing[0x04E] = {}
+func.outgoing[0x04E].base = L{
     {ctype='unsigned char',     label='Type',               fn=e+{'ah otype'}}, -- 04
 }
 
 -- Sent when putting an item up for auction (request)
-fields.outgoing._func[0x04E][0x04] = L{
+func.outgoing[0x04E][0x04] = L{
     {ctype='data[3]',           label='_unknown1'},                             -- 05
     {ctype='unsigned int',      label='Price',              fn=gil},            -- 08
     {ctype='unsigned short',    label='Inventory Index',    fn=inv+{0}},        -- 0C
@@ -500,18 +526,18 @@ fields.outgoing._func[0x04E][0x04] = L{
 }
 
 -- Sent when checking your sale status
-fields.outgoing._func[0x04E][0x05] = L{
+func.outgoing[0x04E][0x05] = L{
     {ctype='char*',             label='_junk'},                                 -- 05
 }
 
 -- Sent when initially opening the AH menu
-fields.outgoing._func[0x04E][0x0A] = L{
+func.outgoing[0x04E][0x0A] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0xFF},        -- 05
     {ctype='char*',             label='_junk'},                                 -- 06
 }
 
 -- Sent when putting an item up for auction (confirmation)
-fields.outgoing._func[0x04E][0x0B] = L{
+func.outgoing[0x04E][0x0B] = L{
     {ctype='unsigned char',     label='Slot'},                                  -- 05
     {ctype='data[2]',           label='_unknown1'},                             -- 06
     {ctype='unsigned int',      label='Price',              fn=gil},            -- 08
@@ -522,19 +548,19 @@ fields.outgoing._func[0x04E][0x0B] = L{
 }
 
 -- Sent when stopping an item from sale
-fields.outgoing._func[0x04E][0x0C] = L{
+func.outgoing[0x04E][0x0C] = L{
     {ctype='unsigned char',     label='Slot'},                                  -- 05
     {ctype='char*',             label='_junk'},                                 -- 06
 }
 
 -- Sent after receiving the sale status list for each item
-fields.outgoing._func[0x04E][0x0D] = L{
+func.outgoing[0x04E][0x0D] = L{
     {ctype='unsigned char',     label='Slot'},                                  -- 05
     {ctype='char*',             label='_junk'},                                 -- 06
 }
 
 -- Sent when bidding on an item
-fields.outgoing._func[0x04E][0x0E] = L{
+func.outgoing[0x04E][0x0E] = L{
     {ctype='unsigned char',     label='Slot'},                                  -- 05
     {ctype='unsigned short',    label='_unknown3'},                             -- 06
     {ctype='unsigned int',      label='Price',              fn=gil},            -- 08
@@ -545,18 +571,18 @@ fields.outgoing._func[0x04E][0x0E] = L{
 }
 
 -- Sent when taking a sold item from the list
-fields.outgoing._func[0x04E][0x10] = L{
+func.outgoing[0x04E][0x10] = L{
     {ctype='unsigned char',     label='Slot'},                                  -- 05
     {ctype='char*',             label='_junk'},                                 -- 06
 }
 
 -- Auction Interaction
 fields.outgoing[0x04E] = function()
-    local self = fields.outgoing._func[0x04E]
+    local self = func.outgoing[0x04E]
     local fields = self.base
 
-    return function(data)
-        return self.base + (self[data:byte(5)] or L{})
+    return function(data, type)
+        return self.base + (self[type or data:byte(5)] or L{})
     end
 end()
 
@@ -575,17 +601,17 @@ types.equipset = L{
     {ctype='unsigned char',     label='_padding1'},                             -- 03
 }
 
-fields.outgoing._func[0x051] = {}
-fields.outgoing._func[0x051].base = L{
+func.outgoing[0x051] = {}
+func.outgoing[0x051].base = L{
     {ctype='unsigned char',     label='Count'},                                 -- 04
     {ctype='unsigned char[3]',  label='_unknown1'},                             -- 05   Same as _unknown1 in outgoing 0x052
 }
 
 -- Equipset
-fields.outgoing[0x051] = function(data)
-    local count = data:byte(5, 5)
+fields.outgoing[0x051] = function(data, count)
+    count = count or data:byte(5)
 
-    return fields.outgoing._func[0x051].base + L{
+    return func.outgoing[0x051].base + L{
         -- Only the number given in Count will be properly populated, the rest is junk
         {ref=types.equipset,        count=count},                                   -- 08
         {ctype='data[%u]':format((16 - count) * 4), label='_junk1'},                -- 08 + 4 * count
@@ -659,7 +685,8 @@ fields.outgoing[0x05C] = L{
     {ctype='float',             label='Y'},                                     -- 0C
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 10   NPC that you are requesting a warp from
     {ctype='unsigned int',      label='_unknown1'},                             -- 14   01 00 00 00 observed
-    {ctype='unsigned int',      label='_unknown2'},                             -- 18   Likely contains information about the particular warp being requested, like menu ID
+    {ctype='unsigned short',    label='Zone'},                                  -- 18
+    {ctype='unsigned short',    label='Menu ID'},                               -- 1A
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 1C
     {ctype='unsigned short',    label='_unknown3'},                             -- 1E   Not zone ID
 }
@@ -1244,7 +1271,7 @@ fields.incoming[0x00B] = L{
 -- PC Update
 fields.incoming[0x00D] = L{
     -- The flags in this byte are complicated and may not strictly be flags.
-    -- Byte 32: -- Mentor is somewhere in this byte
+    -- Byte 0x20: -- Mentor is somewhere in this byte
     -- 01 = None
     -- 02 = Deletes everyone
     -- 04 = Deletes everyone
@@ -1255,7 +1282,7 @@ fields.incoming[0x00D] = L{
     -- 128 = None
 
 
-    -- Byte 33:
+    -- Byte 0x21:
     -- 01 = None
     -- 02 = None
     -- 04 = None
@@ -1265,7 +1292,7 @@ fields.incoming[0x00D] = L{
     -- 64 = Away
     -- 128 = None
 
-    -- Byte 34:
+    -- Byte 0x22:
     -- 01 = POL Icon, can target?
     -- 02 = no notable effect
     -- 04 = DCing
@@ -1275,7 +1302,7 @@ fields.incoming[0x00D] = L{
     -- 64 = No linkshell again
     -- 128 = No linkshell again
 
-    -- Byte 35:
+    -- Byte 0x23:
     -- 01 = Trial Account
     -- 02 = Trial Account
     -- 04 = GM Mode
@@ -1285,53 +1312,47 @@ fields.incoming[0x00D] = L{
     -- 64 = None
     -- 128 = Bazaar
 
-    ---- Mask bits, from antiquity:
-    -- 0x01: "Basic"
-    -- 0x02: "Bit 1"
-    -- 0x04: Status
-    -- 0x08: Name
-    -- 0x10: Gear
-    -- 0x20: Bit 5
-    -- 0x40: Bit 6
-    -- 0x80: Bit 7
     {ctype='unsigned int',      label='Player',             fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
-    {ctype='unsigned char',     label='Mask',               fn=bin+{1}},        -- 0A
-    {ctype='unsigned char',     label='Body Rotation',      fn=dir},            -- 0B
+    {ctype='boolbit',           label='Update Position'},                       -- 0A:0 Position, Rotation, Target, Speed  
+    {ctype='boolbit',           label='Update Status'},                         -- 1A:1 Not used for 0x00D
+    {ctype='boolbit',           label='Update Vitals'},                         -- 0A:2 HP%, Status, Flags, LS color, "Face Flags"
+    {ctype='boolbit',           label='Update Name'},                           -- 0A:3 Name
+    {ctype='boolbit',           label='Update Model'},                          -- 0A:4 Race, Face, Gear models
+    {ctype='boolbit',           label='Despawn'},                               -- 0A:5 Only set if player runs out of range or zones
+    {ctype='boolbit',           label='_unknown1'},                             -- 0A:6
+    {ctype='boolbit',           label='_unknown2'},                             -- 0A:6
+    {ctype='unsigned char',     label='Heading',            fn=dir},            -- 0B
     {ctype='float',             label='X'},                                     -- 0C
     {ctype='float',             label='Z'},                                     -- 10
     {ctype='float',             label='Y'},                                     -- 14
-    {ctype='unsigned short',    label='Head Rotation',      fn=dir},            -- 18
-    {ctype='unsigned short',    label='Target Index *2',    fn=index..s+{2,15}},-- 1A
-    {ctype='unsigned char',     label='Current Speed'},                         -- 1C
-    {ctype='unsigned char',     label='Base Speed'},                            -- 1D
+    {ctype='bit[13]',           label='Run Count'},                             -- 18:0 Analogue to Run Count from outgoing 0x015
+    {ctype='bit[3]',            label='_unknown3'},                             -- 19:5 Analogue to Run Count from outgoing 0x015
+    {ctype='boolbit',           label='_unknown4'},                             -- 1A:0
+    {ctype='bit[15]',           label='Target Index',       fn=index},          -- 1A:1
+    {ctype='unsigned char',     label='Movement Speed'},                        -- 1C   32 represents 100%
+    {ctype='unsigned char',     label='Animation Speed'},                       -- 1D   32 represents 100%
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 1E
-    {ctype='unsigned char',     label='Animation'},                             -- 1F
-    {ctype='unsigned char',     label='Status'},                                -- 20
-    {ctype='unsigned char',     label='_unknown1'},                             -- 21
-    {ctype='unsigned short',    label='Flags',              fn=bin+{2}},        -- 22
+    {ctype='unsigned char',     label='Status',             fn=statuses},       -- 1F
+    {ctype='unsigned int',      label='Flags',              fn=bin+{4}},        -- 20
     {ctype='unsigned char',     label='Linkshell Red'},                         -- 24
     {ctype='unsigned char',     label='Linkshell Green'},                       -- 25
     {ctype='unsigned char',     label='Linkshell Blue'},                        -- 26
-    {ctype='unsigned int',      label='_unknown3'},                             -- 27
-    {ctype='unsigned int',      label='_unknown4'},                             -- 2B   Flags again
-    {ctype='unsigned int',      label='_unknown5'},                             -- 2F
-    {ctype='unsigned int',      label='_unknown6'},                             -- 33   DSP notes that the 6th bit of byte 54 is the Ballista flag
-    {ctype='unsigned int',      label='_unknown7'},                             -- 37
-    {ctype='unsigned int',      label='_unknown8'},                             -- 3B
-    {ctype='unsigned int',      label='_unknown9'},                             -- 3F
+    {ctype='unsigned char',     label='_unknown5'},                             -- 27   Probably junk from the LS color dword
+    {ctype='data[0x1B]',        label='_unknown6'},                             -- 28   DSP notes that the 6th bit of byte 54 is the Ballista flag
     {ctype='unsigned char',     label='Face Flags'},                            -- 43   0, 3, 4, or 8
-    {ctype='unsigned char',     label='Face'},                                  -- 44
-    {ctype='unsigned char',     label='Race'},                                  -- 45
-    {ctype='unsigned short',    label='Head'},                                  -- 46
-    {ctype='unsigned short',    label='Body'},                                  -- 48
-    {ctype='unsigned short',    label='Hands'},                                 -- 4A
-    {ctype='unsigned short',    label='Legs'},                                  -- 4C
-    {ctype='unsigned short',    label='Feet'},                                  -- 4E
-    {ctype='unsigned short',    label='Main'},                                  -- 50
-    {ctype='unsigned short',    label='Sub'},                                   -- 52
-    {ctype='unsigned short',    label='Ranged'},                                -- 54
-    {ctype='char*',             label='Character Name'},                        -- 56 -   *
+    {ctype='data[4]',           label='_unknown7'},                             -- 44
+    {ctype='unsigned char',     label='Face'},                                  -- 48
+    {ctype='unsigned char',     label='Race'},                                  -- 49
+    {ctype='unsigned short',    label='Head'},                                  -- 4A
+    {ctype='unsigned short',    label='Body'},                                  -- 4C
+    {ctype='unsigned short',    label='Hands'},                                 -- 4E
+    {ctype='unsigned short',    label='Legs'},                                  -- 50
+    {ctype='unsigned short',    label='Feet'},                                  -- 52
+    {ctype='unsigned short',    label='Main'},                                  -- 54
+    {ctype='unsigned short',    label='Sub'},                                   -- 56
+    {ctype='unsigned short',    label='Ranged'},                                -- 58
+    {ctype='char*',             label='Character Name'},                        -- 5A -   *
 }
 
 -- NPC Update
@@ -1373,7 +1394,7 @@ fields.incoming[0x00E] = L{
     {ctype='unsigned int',      label='Walk Count'},                            -- 18   Steadily increases until rotation changes. Does not reset while the mob isn't walking. Only goes until 0xFF1F.
     {ctype='unsigned short',    label='_unknown1',          fn=bin+{2}},        -- 1A
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 1E
-    {ctype='unsigned char',     label='Status',             fn=status},         -- 1F   Status used to be 0x20
+    {ctype='unsigned char',     label='Status',             fn=statuses},       -- 1F   Status used to be 0x20
     {ctype='unsigned int',      label='_unknown2',          fn=bin+{4}},        -- 20
     {ctype='unsigned int',      label='_unknown3',          fn=bin+{4}},        -- 24
     {ctype='unsigned int',      label='_unknown4',          fn=bin+{4}},        -- 28
@@ -1385,7 +1406,7 @@ fields.incoming[0x00E] = L{
 
 -- Incoming Chat
 fields.incoming[0x017] = L{
-    {ctype='unsigned char',     label='Mode'},                                  -- 04
+    {ctype='unsigned char',     label='Mode',               fn=chat},           -- 04
     {ctype='bool',              label='GM'},                                    -- 05
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 06   Set only for Yell
     {ctype='char[16]',          label='Sender Name'},                           -- 08
@@ -1436,8 +1457,12 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned char',     label='Sack Size'},                             -- 0A
     {ctype='unsigned char',     label='Case Size'},                             -- 0B
     {ctype='unsigned char',     label='Wardrobe Size'},                         -- 0C
-    {ctype='data[7]',           label='_padding1',          const=''},          -- 0D
-    {ctype='unsigned short',    label='_dupeInventory Size'},                   -- 14
+    {ctype='unsigned char',     label='Safe 2 Size'},                           -- 0D
+    {ctype='unsigned char',     label='Wardrobe 2 Size'},                       -- 0E
+    {ctype='unsigned char',     label='Wardrobe 3 Size'},                       -- 0F
+    {ctype='unsigned char',     label='Wardrobe 4 Size'},                       -- 10
+    {ctype='data[3]',           label='_padding1',          const=''},          -- 11
+    {ctype='unsigned short',    label='_dupeInventory Size'},                   -- 14   These "dupe" sizes are set to 0 if the inventory disabled.
     {ctype='unsigned short',    label='_dupeSafe Size'},                        -- 16
     {ctype='unsigned short',    label='_dupeStorage Size'},                     -- 18   The accumulated storage from all items (uncapped) -1
     {ctype='unsigned short',    label='_dupeTemporary Size'},                   -- 1A
@@ -1446,7 +1471,11 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned short',    label='_dupeSack Size'},                        -- 20
     {ctype='unsigned short',    label='_dupeCase Size'},                        -- 22
     {ctype='unsigned short',    label='_dupeWardrobe Size'},                    -- 24
-    {ctype='data[14]',          label='_padding2',          const=''},          -- 26
+    {ctype='unsigned short',    label='_dupeSafe 2 Size'},                      -- 26
+    {ctype='unsigned short',    label='_dupeWardrobe 2 Size'},                  -- 28
+    {ctype='unsigned short',    label='_dupeWardrobe 3 Size'},                  -- 2A   This is not set to 0 despite being disabled for whatever reason
+    {ctype='unsigned short',    label='_dupeWardrobe 4 Size'},                  -- 2C   This is not set to 0 despite being disabled for whatever reason
+    {ctype='data[6]',          label='_padding2',          const=''},           -- 2E
 }
 
 -- Finish Inventory
@@ -1460,7 +1489,8 @@ fields.incoming[0x01E] = L{
     {ctype='unsigned int',      label='Count'},                                 -- 04
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 08
     {ctype='unsigned char',     label='Index',              fn=inv+{0}},        -- 09
-    {ctype='unsigned short',    label='_junk1'},                                -- 10
+    {ctype='unsigned char',     label='Status',             fn=e+{'itemstat'}}, -- 0A
+    {ctype='unsigned char',     label='_junk1'},                                -- 0B
 }
 
 -- Item Assign
@@ -1532,15 +1562,16 @@ fields.incoming[0x026] = L{
     {ctype='data[22]',          label='_unknown2',          const=0},           -- 06
 }
 
--- Encumbrance Release
+-- String Message
 fields.incoming[0x027] = L{
-    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
-    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08
-    {ctype='unsigned short',    label='Message ID'},                            -- 0A   
-    {ctype='unsigned int',      label='_unknown1'},                             -- 0C  
-    {ctype='unsigned int',      label='Param 1'},                               -- 10
-    {ctype='unsigned char',     label='_unknown3'},                             -- 14
-    {ctype='data[11]',          label='_unknown4'},                             -- 15
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04   0x0112413A in Omen, 0x010B7083 in Legion, Layer Reserve ID for Ambuscade queue, 0x01046062 for Chocobo circuit
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 08   0x013A in Omen, 0x0083 in Legion , Layer Reserve Index for Ambuscade queue, 0x0062 for Chocobo circuit
+    {ctype='unsigned short',    label='Message ID',         fn=sub+{0x8000}},            -- 0A   -0x8000
+    {ctype='unsigned int',      label='Type'},                                  -- 0C   0x04 for Fishing/Salvage, 0x05 for Omen/Legion/Ambuscade queue/Chocobo Circuit
+    {ctype='unsigned int',      label='Param 1'},                               -- 10   Parameter 0 on the display messages dat files
+    {ctype='unsigned int',      label='Param 2'},                               -- 14   Parameter 1 on the display messages dat files
+    {ctype='unsigned int',      label='Param 3'},                               -- 18   Parameter 2 on the display messages dat files
+    {ctype='unsigned int',      label='Param 4'},                               -- 1C   Parameter 3 on the display messages dat files
     {ctype='char[16]',          label='Player Name'},                           -- 20
     {ctype='data[16]',          label='_unknown6'},                             -- 30
     {ctype='char[16]',          label='_dupePlayer Name'},                      -- 40
@@ -1548,9 +1579,9 @@ fields.incoming[0x027] = L{
 }
 
 -- Action
-fields.incoming._func[0x028] = {}
+func.incoming[0x028] = {}
 fields.incoming[0x028] = function()
-    local self = fields.incoming._func[0x028]
+    local self = func.incoming[0x028]
 
     -- start and length are both in bits
     local extract = function(data, start, length)
@@ -1645,7 +1676,7 @@ enums.action_in = {
     [15] = 'Job Ability RUN',
 }
 
-fields.incoming._func[0x028].base = L{
+func.incoming[0x028].base = L{
     {ctype='unsigned char',     label='Size'},                                  -- 04
     {ctype='unsigned int',      label='Actor',              fn=id},             -- 05
     {ctype='bit[10]',           label='Target Count'},                          -- 09:0
@@ -1655,12 +1686,12 @@ fields.incoming._func[0x028].base = L{
     {ctype='bit[32]',           label='Recast'},                                -- 10:6
 }
 
-fields.incoming._func[0x028].target_base = L{
+func.incoming[0x028].target_base = L{
     {ctype='bit[32]',           label='ID',                 fn=id},             -- 00:0
     {ctype='bit[4]',            label='Action Count'},                          -- 04:0
 }
 
-fields.incoming._func[0x028].action_base = L{
+func.incoming[0x028].action_base = L{
     {ctype='bit[5]',            label='Reaction'},                              -- 00:0
     {ctype='bit[11]',           label='Animation'},                             -- 00:5
     {ctype='bit[5]',            label='Effect'},                                -- 02:0
@@ -1670,22 +1701,22 @@ fields.incoming._func[0x028].action_base = L{
     {ctype='bit[31]',           label='_unknown'},                              -- 07:4
 }
 
-fields.incoming._func[0x028].add_effect_base = L{
+func.incoming[0x028].add_effect_base = L{
     {ctype='boolbit',           label='Has Added Effect'},                      -- 00:0
 }
 
-fields.incoming._func[0x028].add_effect_body = L{
+func.incoming[0x028].add_effect_body = L{
     {ctype='bit[6]',            label='Added Effect Animation'},                -- 00:0
     {ctype='bit[4]',            label='Added Effect Effect'},                   -- 00:6
     {ctype='bit[17]',           label='Added Effect Param'},                    -- 01:2
     {ctype='bit[10]',           label='Added Effect Message'},                  -- 04:1
 }
 
-fields.incoming._func[0x028].spike_effect_base = L{
+func.incoming[0x028].spike_effect_base = L{
     {ctype='boolbit',           label='Has Spike Effect'},                      -- 00:0
 }
 
-fields.incoming._func[0x028].spike_effect_body = L{
+func.incoming[0x028].spike_effect_body = L{
     {ctype='bit[6]',            label='Spike Effect Animation'},                -- 00:0
     {ctype='bit[4]',            label='Spike Effect Effect'},                   -- 00:6
     {ctype='bit[14]',           label='Spike Effect Param'},                    -- 01:2
@@ -2007,7 +2038,7 @@ fields.incoming[0x037] = L{
     {ctype='bit[4]',            label='_flags3'},                               -- 2D
     {ctype='bit[9]',            label='Yalms per step'},                        -- 2E   Determines how quickly your animation walks
     {ctype='bit[7]',            label='_flags4'},                               -- 2F
-    {ctype='unsigned char',     label='Status',             fn=status},         -- 30
+    {ctype='unsigned char',     label='Status',             fn=statuses},       -- 30
     {ctype='unsigned char',     label='LS Color Red'},                          -- 31
     {ctype='unsigned char',     label='LS Color Green'},                        -- 32
     {ctype='unsigned char',     label='LS Color Blue'},                         -- 33
@@ -2025,6 +2056,7 @@ fields.incoming[0x037] = L{
     {ctype='bit[7]',            label='Indi Buff',          fn=e+{'indi'}},     -- 58
     {ctype='bit[9]',            label='_unknown5'},                             -- 58
     {ctype='unsigned short',    label='_junk1'},                                -- 5A
+    {ctype='unsigned int',      label='_flags8'},                               -- 5C   Two least significant bits seem to indicate whether Wardrobes 3 and 4, respectively, are enabled
 }
 
 -- Entity Animation
@@ -2066,6 +2098,8 @@ types.shop_item = L{
     {ctype='unsigned int',      label='Price',              fn=gil},            -- 00
     {ctype='unsigned short',    label='Item',               fn=item},           -- 04
     {ctype='unsigned short',    label='Shop Slot'},                             -- 08
+    {ctype='unsigned short',    label='Craft Skill'},                           -- 0A Zero on normal shops, has values that correlate to res\skills.
+    {ctype='unsigned short',    label='Craft Rank'},                            -- 0C Correlates to Rank able to purchase product from GuildNPC
 }
 
 -- Shop
@@ -2124,20 +2158,20 @@ fields.incoming[0x042] = L{
 -- using a Maneuver on PUP to changing job. The two packets are the same length. The first
 -- contains information about your main job. The second contains information about your
 -- subjob and has the Subjob flag flipped.
-fields.incoming._func[0x044] = {}
-fields.incoming[0x044] = function(data)
-    return fields.incoming._func[0x044].base + (fields.incoming._func[0x044][data:sub(5,5):byte()] or L{})
+func.incoming[0x044] = {}
+fields.incoming[0x044] = function(data, type)
+    return func.incoming[0x044].base + (func.incoming[0x044][type or data:byte(5)] or L{})
 end
 
 -- Base, shared by all jobs
-fields.incoming._func[0x044].base = L{
-    {ctype='unsigned char',     label='Job'},                                   -- 04
+func.incoming[0x044].base = L{
+    {ctype='unsigned char',     label='Job',                fn=job},            -- 04
     {ctype='bool',              label='Subjob'},                                -- 05
     {ctype='unsigned short',    label='_unknown1'},                             -- 06
 }
 
 -- PUP
-fields.incoming._func[0x044][0x12] = L{
+func.incoming[0x044][0x12] = L{
     {ctype='unsigned char',     label='Automaton Head'},                        -- 08   Harlequinn 1, Valoredge 2, Sharpshot 3, Stormwaker 4, Soulsoother 5, Spiritreaver 6
     {ctype='unsigned char',     label='Automaton Frame'},                       -- 09   Harlequinn 20, Valoredge 21, Sharpshot 22, Stormwaker 23
     {ctype='unsigned char',     label='Slot 1'},                                -- 0A   Attachment assignments are based off their position in the equipment list.
@@ -2200,7 +2234,7 @@ fields.incoming._func[0x044][0x12] = L{
 -- For BLM, 0x29 to 0x43 appear to represent the black magic that you know
 
 -- MON
-fields.incoming._func[0x044][0x17] = L{
+func.incoming[0x044][0x17] = L{
     {ctype='unsigned short',    label='Species'},                               -- 08
     {ctype='unsigned short',    label='_unknown2'},                             -- 0A
     {ctype='unsigned short[12]',label='Instinct'},                              -- 0C   Instinct assignments are based off their position in the equipment list.
@@ -2223,11 +2257,11 @@ fields.incoming[0x047] = L{
 -- Likely contributes to that information.
 
 -- Delivery Item
-fields.incoming._func[0x04B] = {}
+func.incoming[0x04B] = {}
 fields.incoming[0x04B] = function()
     local full = S{0x01, 0x04, 0x06, 0x08, 0x0A} -- This might not catch all packets with 'slot-info' (extra 68 bytes)
-    return function(data)
-        return full:contains(data:byte(5, 5)) and fields.incoming._func[0x04B].slot or fields.incoming._func[0x04B].base
+    return function(data, type)
+        return full:contains(type or data:byte(5)) and func.incoming[0x04B].slot or func.incoming[0x04B].base
     end
 end()
 
@@ -2269,7 +2303,7 @@ enums.delivery = {
 }
 
 -- This is always sent for every packet of this ID
-fields.incoming._func[0x04B].base = L{
+func.incoming[0x04B].base = L{
     {ctype='unsigned char',     label='Type',               fn=e+{'delivery'}}, -- 04
     {ctype='unsigned char',     label='_unknown1'},                             -- 05   FF if Type is 05, otherwise 01
     {ctype='signed char',       label='Delivery Slot'},                         -- 06   This goes left to right and then drops down a row and left to right again. Value is 00 through 07
@@ -2285,8 +2319,8 @@ fields.incoming._func[0x04B].base = L{
 }
 
 -- If the type is 0x01, 0x04, 0x06, 0x08 or 0x0A, these fields appear in the packet in addition to the base. Maybe more
-fields.incoming._func[0x04B].slot = L{
-    {ref=fields.incoming._func[0x04B].base, count=1},                           -- 04
+func.incoming[0x04B].slot = L{
+    {ref=func.incoming[0x04B].base, count=1},                           -- 04
     {ctype='char[16]',          label='Player Name'},                           -- 14 This is used for sender (in inbox) and recipient (in outbox)
     {ctype='unsigned int',      label='_unknown8'},                             -- 24   46 32 00 00 and 42 32 00 00 observed - Possibly flags. Rare vs. Rare/Ex.?
     {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 28
@@ -2310,12 +2344,12 @@ enums['ah itype'] = {
     [0x0D] = 'Sales item status',
 }
 
-fields.incoming._func[0x04C] = {}
-fields.incoming._func[0x04C].base = L{
+func.incoming[0x04C] = {}
+func.incoming[0x04C].base = L{
     {ctype='unsigned char',     label='Type',               fn=e+{'ah itype'}}, -- 04
 }
 
-fields.incoming._func[0x04C][0x02] = L{
+func.incoming[0x04C][0x02] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0xFF},        -- 05
     {ctype='unsigned char',     label='Success',            fn=bool},           -- 06
     {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 07
@@ -2323,14 +2357,14 @@ fields.incoming._func[0x04C][0x02] = L{
 }
 
 -- Sent when initating logout
-fields.incoming._func[0x04C][0x03] = L{
+func.incoming[0x04C][0x03] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0xFF},        -- 05
     {ctype='unsigned char',     label='Success',            fn=bool},           -- 06
     {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 07
     {ctype='char*',             label='_junk'},                                 -- 08
 }
 
-fields.incoming._func[0x04C][0x04] = L{
+func.incoming[0x04C][0x04] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0xFF},        -- 05
     {ctype='unsigned char',     label='Success',            fn=bool},           -- 06
     {ctype='unsigned char',     label='_unknown2'},                             -- 07
@@ -2341,7 +2375,7 @@ fields.incoming._func[0x04C][0x04] = L{
     {ctype='char*',             label='_junk'},                                 -- 11
 }
 
-fields.incoming._func[0x04C][0x05] = L{
+func.incoming[0x04C][0x05] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0xFF},        -- 05
     {ctype='unsigned char',     label='Success',            fn=bool},           -- 06
     {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 07
@@ -2360,7 +2394,7 @@ enums['sale stat'] = {
 -- 0x0A, 0x0B and 0x0D could probably be combined, the fields seem the same.
 -- However, they're populated a bit differently. Both 0x0B and 0x0D are sent twice
 -- on action completion, the second seems to contain updated information.
-fields.incoming._func[0x04C][0x0A] = L{
+func.incoming[0x04C][0x0A] = L{
     {ctype='unsigned char',     label='Slot'},                                  -- 05
     {ctype='unsigned char',     label='_unknown1',          const=0x01},        -- 06
     {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 07
@@ -2379,7 +2413,7 @@ fields.incoming._func[0x04C][0x0A] = L{
     {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 38
 }
 
-fields.incoming._func[0x04C][0x0B] = L{
+func.incoming[0x04C][0x0B] = L{
     {ctype='unsigned char',     label='Slot'},                                  -- 05
     {ctype='unsigned char',     label='_unknown1'},                             -- 06   This packet, like 0x0D, is sent twice, the first one always has 0x02 here, the second one 0x01
     {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 07
@@ -2398,7 +2432,7 @@ fields.incoming._func[0x04C][0x0B] = L{
     {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 38
 }
 
-fields.incoming._func[0x04C][0x0D] = L{
+func.incoming[0x04C][0x0D] = L{
     {ctype='unsigned char',     label='Slot'},                                  -- 05
     {ctype='unsigned char',     label='_unknown1'},                             -- 06   Some sort of type... the packet seems to always be sent twice, once with this value as 0x02, followed by 0x01
     {ctype='unsigned char',     label='_unknown2'},                             -- 07   If 0x06 is 0x01 this seems to be 0x01 as well, otherwise 0x00
@@ -2417,7 +2451,7 @@ fields.incoming._func[0x04C][0x0D] = L{
     {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 38
 }
 
-fields.incoming._func[0x04C][0x10] = L{
+func.incoming[0x04C][0x10] = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 05
     {ctype='unsigned char',     label='Success',            fn=bool},           -- 06
     {ctype='unsigned char',     label='_unknown2',          const=0x00},        -- 07
@@ -2428,10 +2462,10 @@ fields.incoming._func[0x04C][0x10] = L{
 -- All types in here are server responses to the equivalent type in 0x04E
 -- The only exception is type 0x02, which is sent to initiate the AH menu
 fields.incoming[0x04C] = function()
-    local fields = fields.incoming._func[0x04C]
+    local fields = func.incoming[0x04C]
 
-    return function(data)
-        return fields.base + (fields[data:byte(5)] or L{})
+    return function(data, type)
+        return fields.base + (fields[type or data:byte(5)] or L{})
     end
 end()
 
@@ -2498,8 +2532,8 @@ fields.incoming[0x053] = L{
 fields.incoming[0x055] = L{
     -- There are 6 of these packets sent on zone, which likely corresponds to the 6 categories of key items.
     -- FFing these packets between bytes 0x14 and 0x82 gives you access to all (or almost all) key items.
-    {ctype='data[0x40]',        label='Key item available', fn=hex},            -- 04
-    {ctype='data[0x40]',        label='Key item examined',  fn=hex},            -- 44   Bit field correlating to the previous, 1 if KI has been examined, 0 otherwise
+    {ctype='data[0x40]',        label='Key item available', fn=hex+{0x40}},     -- 04
+    {ctype='data[0x40]',        label='Key item examined',  fn=hex+{0x40}},     -- 44   Bit field correlating to the previous, 1 if KI has been examined, 0 otherwise
     {ctype='unsigned int',      label='Type'},                                  -- 84   Goes from 0 to 5, determines which KI are being sent
 }
 
@@ -2728,20 +2762,20 @@ fields.incoming[0x062] = L{
 -- It also appears in three chunks, so it's double-varying.
 -- Packet was expanded in the March 2014 update and now includes a fourth packet, which contains CP values.
 
-fields.incoming._func[0x063] = {}
-fields.incoming[0x063] = function(data)
-    return fields.incoming._func[0x063].base + (fields.incoming._func[0x063][data:sub(5,5):byte()] or L{})
+func.incoming[0x063] = {}
+fields.incoming[0x063] = function(data, type)
+    return func.incoming[0x063].base + (func.incoming[0x063][type or data:byte(5)] or L{})
 end
 
-fields.incoming._func[0x063].base = L{
+func.incoming[0x063].base = L{
     {ctype='unsigned short',    label='Order'},                                 -- 04
 }
 
-fields.incoming._func[0x063][0x02] = L{
+func.incoming[0x063][0x02] = L{
     {ctype='data[7]',           label='_flags1',            fn=bin+{7}},        -- 06   The 3rd bit of the last byte is the flag that indicates whether or not you are xp capped (blue levels)
 }
 
-fields.incoming._func[0x063][0x03] = L{
+func.incoming[0x063][0x03] = L{
     {ctype='unsigned short',    label='_flags1'},                               -- 06   Consistently D8 for me
     {ctype='unsigned short',    label='_flags2'},                               -- 08   Vary when I change species
     {ctype='unsigned short',    label='_flags3'},                               -- 0A   Consistent across species
@@ -2757,7 +2791,7 @@ fields.incoming._func[0x063][0x03] = L{
     {ctype='data[128]',         label='Monster Level Char field'},              -- 5C   Mapped onto the item ID for these creatures. (00 doesn't exist, 01 is rabbit, 02 is behemoth, etc.)
 }
 
-fields.incoming._func[0x063][0x04] = L{
+func.incoming[0x063][0x04] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 06   B0 00
     {ctype='data[126]',         label='_unknown2'},                             -- 08   FF-ing has no effect.
     {ctype='unsigned char',     label='Slime Level'},                           -- 86
@@ -2766,11 +2800,24 @@ fields.incoming._func[0x063][0x04] = L{
     {ctype='data[32]',          label='Variants Bitfield'},                     -- 94   Does not show normal monsters, only variants. Bit is 1 if the variant is owned. Length is an estimation including the possible padding.
 }
 
--- fields.incoming._func[0x063][0x05] :: Has 8 content bytes of header, followed by 6 bytes per job, in the order they appear in the resources.
--- The first 2 bytes of each subfield is the current CP collected on the job (out of 30,000).
--- The next two bytes are the current number of job points collected on the job.
--- The last two bytes were unused the last time I checked.
--- Pointwatch extracts this information if you need an example.
+types.job_point_info = L{
+    {ctype='unsigned short',    label='Capacity Points'},                       -- 00
+    {ctype='unsigned short',    label='Job Points'},                            -- 02
+    {ctype='unsigned short',    label='Spent Job Points'},                      -- 04
+}
+
+func.incoming[0x063][0x05] = L{
+    {ctype='unsigned short',    label='_unknown1',          const=0x0098},      -- 06
+    {ctype='unsigned short',    label='_unknown2'},                             -- 08   Lowest bit of this might indicate JP availability
+    {ctype='unsigned short',    label='_unknown3'},                             -- 0A
+    {ref=types.job_point_info,  lookup={res.jobs, 0x00},    count=24},          -- 0C
+}
+
+func.incoming[0x063][0x09] = L{
+    {ctype='unsigned short',    label='_unknown1',          const=0x00C4},      -- 06
+    {ctype='unsigned short[32]',label='Buffs',              fn=buff},           -- 08
+    {ctype='unsigned int[32]',  label='Time',               fn=bufftime},       -- 48
+}
 
 -- Repositioning
 fields.incoming[0x065] = L{
@@ -2807,11 +2854,24 @@ fields.incoming[0x067] = L{
     {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 0C
     {ctype='unsigned char',     label='Current HP%',        fn=percent},        -- 0E
     {ctype='unsigned char',     label='Current MP%',        fn=percent},        -- 0F
-    {ctype='unsigned short',    label='Pet TP%',            fn=percent},        -- 10   Multiplied by 10
-    {ctype='unsigned short',    label='_unknown1'},                             -- 12
-    {ctype='unsigned short',    label='_unknown2'},                             -- 14
-    {ctype='unsigned short',    label='_unknown3'},                             -- 16
-    {ctype='char*',             label='Pet Name'},                              -- 18   Packet expands to accommodate pet name length.
+    {ctype='unsigned int',      label='Pet TP'},                                -- 10
+    {ctype='unsigned int',      label='_unknown1'},                             -- 14
+    {ctype='char*',             label='Pet Name'},                              -- 18
+}
+
+-- Pet Status
+-- It is sent every time a pet performs an action, every time anything about its vitals changes (HP, MP, TP) and every time its target changes
+fields.incoming[0x068] = L{
+    {ctype='bit[6]',            label='Message Type',       const=0x04},        -- 04   Seems to always be 4
+    {ctype='bit[10]',           label='Message Length'},                        -- 05   Number of bytes from the start of the packet (including header) until the last non-null character in the name
+    {ctype='unsigned short',    label='Owner Index',        fn=index},          -- 06
+    {ctype='unsigned int',      label='Owner ID',           fn=id},             -- 08
+    {ctype='unsigned short',    label='Pet Index',          fn=index},          -- 0C
+    {ctype='unsigned char',     label='Current HP%',        fn=percent},        -- 0E
+    {ctype='unsigned char',     label='Current MP%',        fn=percent},        -- 0F
+    {ctype='unsigned int',      label='Pet TP'},                                -- 10
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 14
+    {ctype='char*',             label='Pet Name'},                              -- 18
 }
 
 -- Self Synth Result
@@ -2863,7 +2923,7 @@ types.party_buff_entry = L{
 }
 
 fields.incoming[0x076] = L{
-    {ref=types.party_buff_entry,label='Party Buffs',        count='5'},         -- 04  This is 00'd out for absent party members.
+    {ref=types.party_buff_entry,label='Party Buffs',        count=5},           -- 04  This is 00'd out for absent party members.
 }
 
 -- Proposal
@@ -2932,11 +2992,11 @@ types.merit_entry = L{
 }
 
 -- Merits
-fields.incoming[0x08C] = function(data)
+fields.incoming[0x08C] = function(data, merits)
     return L{
         {ctype='unsigned char', label='Count'},                                 -- 04   Number of merits entries in this packet (possibly a short, although it wouldn't make sense)
         {ctype='data[3]',       label='_unknown1'},                             -- 05   Always 00 0F 01?
-        {ref=types.merit_entry, count=data:byte(5, 5)},                         -- 08
+        {ref=types.merit_entry, count=merits or data:byte(5)},                  -- 08
         {ctype='unsigned int',  label='_unknown2',          const=0x00000000},  ---04
     }
 end
@@ -2982,9 +3042,11 @@ fields.incoming[0x0A0] = L{
     {ctype='float',             label='Y'},                                     -- 14
 }
 
+--0x0AA, 0x0AC, and 0x0AE are all bitfields where the lsb indicates whether you have index 0 of the related resource.
+
 -- Help Desk submenu open
 fields.incoming[0x0B5] = L{
-    {ctype='data[20]',          label='_unknown1'},                             -- 04
+    {ctype='data[0x14]',        label='_unknown1'},                             -- 04
     {ctype='unsigned int',      label='Number of Opens'},                       -- 18
     {ctype='unsigned int',      label='_unknown2'},                             -- 1C
 }
@@ -2994,20 +3056,20 @@ fields.incoming[0x0C8] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04
     {ctype='data[3]',           label='_junk1'},                                -- 05
     {ref=types.alliance_member, count=18},                                      -- 08
-    {ctype='data[24]',          label='_unknown3',          const=''},          -- E0   Always 0?
+    {ctype='data[0x18]',        label='_unknown3',          const=''},          -- E0   Always 0?
 }
 
 types.check_item = L{
     {ctype='unsigned short',    label='Item',               fn=item},           -- 00
     {ctype='unsigned char',     label='Slot',               fn=slot},           -- 02
     {ctype='unsigned char',     label='_unknown1'},                             -- 03
-    {ctype='data[24]',          label='ExtData',            fn=hex+{24}},       -- 04
+    {ctype='data[0x18]',        label='ExtData',            fn=hex+{0x18}},     -- 04
 }
 
 -- Check data
-fields.incoming._func[0x0C9] = {}
-fields.incoming[0x0C9] = function(data)
-    return fields.incoming._func[0x0C9].base + fields.incoming._func[0x0C9][data:byte(0x0B, 0x0B)]
+func.incoming[0x0C9] = {}
+fields.incoming[0x0C9] = function(data, type)
+    return func.incoming[0x0C9].base + func.incoming[0x0C9][type or data:byte(0x0B)]
 end
 
 enums[0x0C9] = {
@@ -3016,21 +3078,21 @@ enums[0x0C9] = {
 }
 
 -- Common to all messages
-fields.incoming._func[0x0C9].base = L{
+func.incoming[0x0C9].base = L{
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08
     {ctype='unsigned char',     label='Type',               fn=e+{0x0C9}},      -- 0A
 }
 
 -- Equipment listing
-fields.incoming._func[0x0C9][0x03] = L{
+func.incoming[0x0C9][0x03] = L{
     {ctype='unsigned char',     label='Count'},                                 -- 0B
     {ref=types.check_item,      count_ref=0x0B},                                -- 0C
 }
 
 -- Metadata
 -- The title needs to be somewhere in here, but not sure where, maybe bit packed?
-fields.incoming._func[0x0C9][0x01] = L{
+func.incoming[0x0C9][0x01] = L{
     {ctype='data[3]',           label='_junk1'},                                -- 0B
     {ctype='unsigned char',     label='Icon Set Subtype'},                      -- 0E   0 = Unopened Linkshell?, 1 = Linkshell, 2 = Pearlsack, 3 = Linkpearl, 4 = Ripped Pearlsack (I think), 5 = Broken Linkpearl?
     {ctype='unsigned char',     label='Icon Set ID'},                           -- 0F   This identifies the icon set, always 2 for linkshells.
@@ -3354,14 +3416,14 @@ fields.incoming[0x113] = L{
     {ctype='signed int',        label='Guild Points (Alchemy)'},                -- 3C
     {ctype='signed int',        label='Guild Points (Cooking)'},                -- 40
     {ctype='signed int',        label='Cinders'},                               -- 44
-    {ctype='unsigned char',     label='Syngery Fewell (Fire)'},                 -- 48
-    {ctype='unsigned char',     label='Syngery Fewell (Ice)'},                  -- 49
-    {ctype='unsigned char',     label='Syngery Fewell (Wind)'},                 -- 4A
-    {ctype='unsigned char',     label='Syngery Fewell (Earth)'},                -- 4B
-    {ctype='unsigned char',     label='Syngery Fewell (Lightning)'},            -- 4C
-    {ctype='unsigned char',     label='Syngery Fewell (Water)'},                -- 4D
-    {ctype='unsigned char',     label='Syngery Fewell (Light)'},                -- 4E
-    {ctype='unsigned char',     label='Syngery Fewell (Dark)'},                 -- 4F
+    {ctype='unsigned char',     label='Synergy Fewell (Fire)'},                 -- 48
+    {ctype='unsigned char',     label='Synergy Fewell (Ice)'},                  -- 49
+    {ctype='unsigned char',     label='Synergy Fewell (Wind)'},                 -- 4A
+    {ctype='unsigned char',     label='Synergy Fewell (Earth)'},                -- 4B
+    {ctype='unsigned char',     label='Synergy Fewell (Lightning)'},            -- 4C
+    {ctype='unsigned char',     label='Synergy Fewell (Water)'},                -- 4D
+    {ctype='unsigned char',     label='Synergy Fewell (Light)'},                -- 4E
+    {ctype='unsigned char',     label='Synergy Fewell (Dark)'},                 -- 4F
     {ctype='signed int',        label='Ballista Points'},                       -- 50
     {ctype='signed int',        label='Fellow Points'},                         -- 54
     {ctype='unsigned short',    label='Chocobucks (San d\'Oria)'},              -- 58
@@ -3426,17 +3488,17 @@ fields.incoming[0x116] = L{
     {ref=types.equipset_build,  lookup={res.slots, 0x00},   count=0x10},
 }
 
-fields.incoming._func[0x117] = {}
-fields.incoming._func[0x117].base = L{
+func.incoming[0x117] = {}
+func.incoming[0x117].base = L{
     {ctype='unsigned char',     label='Count'},                                 -- 04
     {ctype='unsigned char[3]',  label='_unknown1'},                             -- 05
 }
 
 -- Equipset
-fields.incoming[0x117] = function(data)
-    local count = data:byte(5, 5)
+fields.incoming[0x117] = function(data, count)
+    count = count or data:byte(5)
 
-    return fields.incoming._func[0x117].base + L{
+    return func.incoming[0x117].base + L{
         -- Only the number given in Count will be properly populated, the rest is junk
         {ref=types.equipset,        count=count},                                   -- 08
         {ctype='data[%u]':format((16 - count) * 4), label='_junk1'},                -- 08 + 4 * count
@@ -3501,129 +3563,6 @@ types.ability_recast = L{
 fields.incoming[0x119] = L{
     {ref=types.ability_recast,                              count=0x1F},        -- 04
 }
-
-local sizes = {}
-sizes['bool'] = 1
-sizes['char'] = 1
-sizes['unsigned char'] = 1
-sizes['signed char'] = 1
-sizes['short'] = 2
-sizes['unsigned short'] = 2
-sizes['signed short'] = 2
-sizes['int'] = 4
-sizes['unsigned int'] = 4
-sizes['signed int'] = 4
-sizes['long'] = 8
-sizes['unsigned long'] = 8
-sizes['signed long'] = 8
-sizes['float'] = 4
-sizes['double'] = 8
-sizes['data'] = 1
-
-local size
-size = function(fs)
-    if fs.ctype then
-        local ctype, count_str = fs.ctype:match('(.*)%[(.+)%]')
-        local count_num = count_str and count_str:number() or 1
-        ctype = ctype or fs.ctype
-
-        if ctype == 'bit' or ctype == 'boolbit' then
-            return 0, count_num
-        end
-
-        return count_num * sizes[ctype]
-    end
-
-    local acc = 0
-    local offset = 0
-    for f in (fs.ref or fs):it() do
-        local bytes, bits = size(f)
-        offset = offset + (bits or 0)
-        acc = acc + bytes + (offset / 8):floor()
-        offset = offset % 8
-    end
-
-    return (fs.ref or fs):map(size):sum(), offset
-end
-
-local non_array_types = S{'char', 'bit', 'data'}
-
-local parse
-parse = function(fs, data, index, max, lookup)
-    max = max == '*' and 0 or max or 1
-    index = index or 4
-
-    if not data then
-        local bytes, bits = size(fs)
-        data = 0:char():rep(4 + 4 * (bytes + ((bits or 0) / 8):ceil() / 4):floor())
-    end
-
-    local res = L{}
-    local count = 0
-    local bit_offset = 0
-    while index < #data do
-        count = count + 1
-        for field in fs:it() do
-            if field.ctype then
-                field = table.copy(field)
-                local ctype, count_str = field.ctype:match('(.*)%[(.+)%]')
-                local count_num = count_str and count_str:number() or 1
-                ctype = ctype or field.ctype
-                if count_str and not non_array_types:contains(ctype) then
-                    field.ctype = ctype
-                    local ext, new_index = parse(L{field}, data, index, count_num)
-                    res = res + ext
-                    index = new_index
-                else
-                    if max ~= 1 then
-                        if lookup then
-                            local resource = lookup[1][count + lookup[2] - 1]
-                            field.label = '%s %s':format(resource and resource.name or 'Unknown %d':format(count + lookup[2] - 1), field.label)
-                        else
-                            field.label = '%s %d':format(field.label, count)
-                        end
-                    end
-
-                    res:append(field)
-                    if ctype == 'bit' or ctype == 'boolbit' then
-                        index = index + ((bit_offset + count_num) / 8):floor()
-                        bit_offset = (bit_offset + count_num) % 8
-                    elseif ctype:endswith('*') then
-                        -- Finished, * can only be applied to the last field
-                        index = #data
-                    else
-                        index = index + count_num * sizes[ctype]
-                    end
-                end
-            else
-                local type_count = field.count
-                if not type_count then
-                    local byte_index = field.count_ref + 1
-                    type_count = data:byte(byte_index, byte_index)
-                end
-                if type_count == 10 then x = true end
-                local ext, new_index = parse(field.ref, data, index, type_count, field.lookup)
-                x = false
-                res = res + ext
-                index = new_index
-            end
-        end
-
-        if count == max then
-            return res, index
-        end
-    end
-
-    return res, index
-end
-
-fields.get = function(dir, id, data)
-    local f = fields[dir][id]
-    if type(f) == 'function' then
-        f = f(data)
-    end
-    return f and parse(f, data) or nil
-end
 
 return fields
 

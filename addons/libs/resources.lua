@@ -63,6 +63,8 @@ function resource_group(r, fn, attr)
     return setmetatable(res, resource_mt)
 end
 
+resource_mt.__class = 'Resource'
+
 resource_mt.__index = function(t, k)
     local res = slots[t] and slots[t]:contains(k) and resource_group:endapply(k)
 
@@ -75,7 +77,7 @@ resource_mt.__index = function(t, k)
 
     return res
 end
-resource_mt.__class = 'Resource'
+
 resource_mt.__tostring = function(t)
     return '{' .. t:map(table.get:endapply('name')):concat(', ') .. '}'
 end
