@@ -13,9 +13,9 @@ _meta = _meta or {}
 _meta.S = {}
 
 do
-	local _set, _table = set, table
-	
-	_meta.S.__index = function(s, k) return rawget(_set, k) or rawget(_table, k) end
+    local _set, _table = set, table
+    
+    _meta.S.__index = function(s, k) return rawget(_set, k) or rawget(_table, k) end
 end
 
 _meta.S.__class = 'Set'
