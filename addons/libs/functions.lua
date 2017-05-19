@@ -4,7 +4,7 @@
 
 _libs = _libs or {}
 
-local string, math, table = require 'string', require 'math', require 'table'
+local string, math, table, coroutine = require('string'), require('math'), require('table'), require('coroutine')
 
 functions = {}
 boolean = {}

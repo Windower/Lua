@@ -4,9 +4,9 @@ Library for a matrix data structure and operations defined on it.
 
 _libs = _libs or {}
 
-require 'tables'
-require 'maths'
-require 'vectors'
+require('tables')
+require('maths')
+require('vectors')
 
 local table, math, vector = _libs.tables, _libs.maths, _libs.vectors
 
@@ -253,7 +253,7 @@ function matrix.vprint(m)
 end
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

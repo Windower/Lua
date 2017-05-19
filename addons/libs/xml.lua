@@ -4,13 +4,13 @@
 
 _libs = _libs or {}
 
-require 'tables'
-require 'lists'
-require 'sets'
-require 'strings'
+require('tables')
+require('lists')
+require('sets')
+require('strings')
 
 local table, list, set, string = _libs.tables, _libs.lists, _libs.sets, _libs.strings
-local files = require 'files'
+local files = require('files')
 
 local xml = {}
 
@@ -583,7 +583,7 @@ end
 return xml
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

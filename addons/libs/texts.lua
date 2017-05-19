@@ -2,6 +2,9 @@
     A library to facilitate text primitive creation and manipulation.
 ]]
 
+local table = require('table')
+local math = require('math')
+
 local texts = {}
 local meta = {}
 

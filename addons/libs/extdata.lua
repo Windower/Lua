@@ -2,14 +2,14 @@
 
 _libs = _libs or {}
 
-require 'tables'
-require 'strings'
-require 'functions'
-require 'pack'
+require('tables')
+require('strings')
+require('functions')
+require('pack')
 
 local table, string, functions = _libs.tables, _libs.strings, _libs.functions
-local math = require 'math'
-local res = require 'resources'
+local math = require('math')
+local res = require('resources')
 
 -- MASSIVE LOOKUP TABLES AND OTHER CONSTANTS
 

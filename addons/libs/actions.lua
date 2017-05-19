@@ -5,7 +5,7 @@ The primary functionality provided here are iterators which allow for
 easy traversal of the sub-tables within the packet. Example:
 
 =======================================================================================
-require 'actions'
+require('actions')
 
 function event_action(act)
   action = Action(act) -- constructor
@@ -28,10 +28,10 @@ end
 
 _libs = _libs or {}
 
-require 'tables'
+require('tables')
 
 local table = _libs.tables
-local res = require 'resources'
+local res = require('resources')
 
 _libs.actions = true
 
@@ -592,7 +592,7 @@ function action:get_additional_effect_conclusion()
 end
 
 --[[
-Copyright (c) 2013, Suji
+Copyright © 2013, Suji
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

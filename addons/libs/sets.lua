@@ -4,8 +4,8 @@ A library providing sets as a data structure.
 
 _libs = _libs or {}
 
-require 'tables'
-require 'functions'
+require('tables')
+require('functions')
 
 local table, functions = _libs.tables, _libs.functions
 

@@ -4,13 +4,13 @@
 
 _libs = _libs or {}
 
-require 'functions'
-require 'tables'
-require 'strings'
+require('functions')
+require('tables')
+require('strings')
 
 local functions, table, string = _libs.functions, _libs.tables, _libs.strings
-local files = require 'files'
-local xml = require 'xml'
+local files = require('files')
+local xml = require('xml')
 
 local fns = {}
 

@@ -4,14 +4,14 @@ A library to facilitate packet usage
 
 _libs = _libs or {}
 
-require 'lists'
-require 'maths'
-require 'strings'
-require 'functions'
-require 'pack'
+require('lists')
+require('maths')
+require('strings')
+require('functions')
+require('pack')
 
 local list, math, string, functions = _libs.lists, _libs.maths, _libs.strings
-local table = require 'table'
+local table = require('table')
 
 local packets = {}
 

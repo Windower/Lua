@@ -1,9 +1,9 @@
 _libs       = _libs or {}
 
-require 'lists'
+require('lists')
 
 local list = _libs.lists
-local math = require 'math'
+local math = require('math')
 
 local slips = {}
 

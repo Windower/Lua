@@ -4,13 +4,13 @@
 
 _libs = _libs or {}
 
-require 'functions'
-require 'maths'
+require('functions')
+require('maths')
 
 local functions, math = _libs.functions, _libs.maths
-local table = require 'table'
+local table = require('table')
 
-local string = require 'string'
+local string = require('string')
 
 _libs.strings = string
 

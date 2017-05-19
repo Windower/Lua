@@ -8,12 +8,12 @@
 
 _libs = _libs or {}
 
-require 'maths'
-require 'functions'
+require('maths')
+require('functions')
 
 local math, functions = _libs.maths, _libs.functions
 
-local table = require 'table'
+local table = require('table')
 
 _libs.tables = table
 

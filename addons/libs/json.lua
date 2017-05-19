@@ -4,13 +4,13 @@ Small implementation of a JSON file reader.
 
 _libs = _libs or {}
 
-require 'tables'
-require 'lists'
-require 'sets'
-require 'strings'
+require('tables')
+require('lists')
+require('sets')
+require('strings')
 
 local table, list, set, string = _libs.tables, _libs.lists, _libs.sets, _libs.strings
-local files = require 'files'
+local files = require('files')
 
 local json = {}
 

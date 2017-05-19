@@ -4,7 +4,7 @@
 
 _libs = _libs or {}
 
-require 'tables'
+require('tables')
 
 local table = _libs.tables
 

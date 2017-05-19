@@ -4,8 +4,8 @@ File handler.
 
 _libs = _libs or {}
 
-require 'strings'
-require 'tables'
+require('strings')
+require('tables')
 
 local string, table = _libs.strings, _libs.tables
 

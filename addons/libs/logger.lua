@@ -4,11 +4,11 @@ This library provides a set of functions to aid in debugging.
 
 _libs = _libs or {}
 
-require 'strings'
-require 'chat'
+require('strings')
+require('chat')
 
 local string, chat = _libs.strings, _libs.chat
-local table = require 'table'
+local table = require('table')
 
 local logger = {}
 

@@ -4,16 +4,16 @@
 
 _libs = _libs or {}
 
-require 'tables'
-require 'sets'
-require 'strings'
+require('tables')
+require('sets')
+require('strings')
 
 local table, set, string = _libs.tables, _libs.sets, _libs.strings
 
 local chat = {}
 
-chat.colors = require 'chat/colors'
-chat.controls = require 'chat/controls'
+chat.colors = require('chat/colors')
+chat.controls = require('chat/controls')
 
 _libs.chat = chat
 
@@ -105,7 +105,7 @@ chat.text_color_reset = '\\cr'
 return chat
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

@@ -4,15 +4,15 @@
 
 _libs = _libs or {}
 
-require 'tables'
-require 'sets'
-require 'lists'
-require 'strings'
+require('tables')
+require('sets')
+require('lists')
+require('strings')
 
 local table, set, list, string = _libs.tables, _libs.sets, _libs.lists, _libs.strings
-local xml = require 'xml'
-local files = require 'files'
-local json = require 'json'
+local xml = require('xml')
+local files = require('files')
+local json = require('json')
 
 local config = {}
 

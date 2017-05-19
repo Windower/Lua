@@ -4,8 +4,8 @@ Vectors for operations in a d-dimensional space.
 
 _libs = _libs or {}
 
-require 'tables'
-require 'maths'
+require('tables')
+require('maths')
 
 local table, math = _libs.tables, _libs.maths
 
