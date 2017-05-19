@@ -1746,9 +1746,9 @@ fields.incoming[0x029] = L{
     5 = 'Tier 6', --- furiously.  Unused currently
     - But if there are no mobs left in area, or no mobs nearby, field1 will be the KeyItem#
     1253 = 'Clear Abyssite'
-	1254 = 'Colorful Abyssite'
-	1564 = 'Clear Demilune Abyssite'
-	etc.
+    1254 = 'Colorful Abyssite'
+    1564 = 'Clear Demilune Abyssite'
+    etc.
 
     Field2 will be direction:
     0 = 'East'
@@ -1764,9 +1764,9 @@ fields.incoming[0x029] = L{
 
     Field4 will be KI# of the abyssite used. Ex:
     1253 = 'Clear Abyssite'
-	1254 = 'Colorful Abyssite'
-	1564 = 'Clear Demilune Abyssite'
-	etc.
+    1254 = 'Colorful Abyssite'
+    1564 = 'Clear Demilune Abyssite'
+    etc.
 ]]
 
 --[[  0x2A can also be triggered by buying/disposing of a VWNM KI from an NPC:
@@ -1856,7 +1856,7 @@ fields.incoming[0x030] = L{
       1 = woodworking
       2 = smithing
       3 = goldsmithing
-      4 = clothcraft	
+      4 = clothcraft    
       5 = leatherworking
       6 = bonecraft
       7 = Alchemy
@@ -3028,7 +3028,7 @@ types.alliance_member = L{
     {ctype='unsigned short',    label='Index',              fn=index},          -- 04
     {ctype='unsigned short',    label='Flags',              fn=bin+{2}},        -- 06
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 08
-    {ctype='unsigned short',    label='_unknown2'},                             -- 0A	Always 0?
+    {ctype='unsigned short',    label='_unknown2'},                             -- 0A    Always 0?
 }
 
 -- Party Map Marker

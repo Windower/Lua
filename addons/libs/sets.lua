@@ -3,21 +3,21 @@ A library providing sets as a data structure.
 ]]
 
 _libs = _libs or {}
-_libs.sets = true
-_libs.tables = _libs.tables or require('tables')
-_libs.functions = _libs.functions or require('functions')
+
+require 'tables'
+require 'functions'
+
+local table, functions = _libs.tables, _libs.functions
 
 set = {}
 
+local set = set
+
+_libs.sets = set
+
 _meta = _meta or {}
 _meta.S = {}
-
-do
-    local _set, _table = set, table
-    
-    _meta.S.__index = function(s, k) return rawget(_set, k) or rawget(_table, k) end
-end
-
+_meta.S.__index = function(s, k) return rawget(set, k) or rawget(table, k) end
 _meta.S.__class = 'Set'
 
 function S(t)

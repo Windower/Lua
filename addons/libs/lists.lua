@@ -3,29 +3,31 @@
 ]]
 
 _libs = _libs or {}
-_libs.lists = true
-_libs.tables = _libs.tables or require('tables')
+
+require 'tables'
+
+local table = _libs.tables
+
+list = {}
+
+local list = list
+
+_libs.lists = list
 
 _raw = _raw or {}
 _raw.table = _raw.table or {}
 
-list = {}
-
 _meta = _meta or {}
 _meta.L = {}
 
-do
-    local _list, _table = list, table
-    
-    _meta.L.__index = function(l, k)
-        if type(k) == 'number' then
-            k = k < 0 and l.n + k + 1 or k
+_meta.L.__index = function(l, k)
+    if type(k) == 'number' then
+        k = k < 0 and l.n + k + 1 or k
 
-            return rawget(l, k)
-        end
-
-        return _list[k] or _table[k]
+        return rawget(l, k)
     end
+
+    return list[k] or table[k]
 end
 
 _meta.L.__newindex = function(l, k, v)

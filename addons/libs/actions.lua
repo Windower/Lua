@@ -27,9 +27,13 @@ end
 ]]
 
 _libs = _libs or {}
-_libs.actions = true
-_libs.tables = _libs.tables or require 'tables'
+
+require 'tables'
+
+local table = _libs.tables
 local res = require 'resources'
+
+_libs.actions = true
 
 local category_strings = {
     'melee',
@@ -51,7 +55,6 @@ local category_strings = {
 
 -- ActionPacket operations
 ActionPacket = {}
-
 
 local actionpacket = {}
 -- Constructor for Actions.
@@ -151,7 +154,6 @@ local function act_to_string(original,act)
     return react
 end
 
-
 -- Opens a listener event for the action packet at the incoming chunk level before modifications.
 -- Passes in the documented act structures for the original and modified packets.
 -- If a table is returned, the library will treat it as a modified act table and recompose the packet string from it.
@@ -220,7 +222,7 @@ end
 
 --Returns the id of the actor
 function actionpacket:get_id()
-	return self.raw['actor_id']
+    return self.raw['actor_id']
 end
 
 -- Returns an iterator for this actionpacket's targets
@@ -480,7 +482,6 @@ function action:get_message_id()
     return message_id or 0
 end
 
-
 ---------------------------------------- Additional Effects ----------------------------------------
 local add_effect_animation_strings = {}
 
@@ -589,9 +590,6 @@ end
 function action:get_additional_effect_conclusion()
     return msg_id_to_conclusion(rawget(rawget(self,'raw'),'spike_effect_message'))
 end
-
-
-
 
 --[[
 Copyright (c) 2013, Suji

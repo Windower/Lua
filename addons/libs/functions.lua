@@ -3,16 +3,21 @@
 ]]
 
 _libs = _libs or {}
-_libs.functions = true
+
+local string, math, table = require 'string', require 'math', require 'table'
 
 functions = {}
 boolean = {}
+
+_libs.functions = functions
+
+local functions, boolean = functions, boolean
 
 -- The empty function.
 functions.empty = function() end
 
 debug.setmetatable(false, {__index = function(_, k)
-    return boolean[k] or (_raw and _raw.error or error)('"%s" is not defined for booleans':format(tostring(k)), 2)
+    return _boolean[k] or (_raw and _raw.error or error)('"%s" is not defined for booleans':format(tostring(k)), 2)
 end})
 
 for _, t in pairs({functions, boolean, math, string, table}) do
@@ -147,11 +152,11 @@ end
 
 -- Returns a function that, when called, will execute the underlying function delayed by the provided number of seconds
 function functions.delay(fn, time, ...)
-	local args = {...}
+    local args = {...}
 
-	return function()
-		fn:schedule(time, unpack(args))
-	end
+    return function()
+        fn:schedule(time, unpack(args))
+    end
 end
 
 -- Returns a wrapper table representing the provided function with additional functions:
@@ -223,12 +228,13 @@ end
 -- * fn+{...} partially applies a function to arguments.
 -- * fn-{...} partially applies a function to arguments from the end.
 -- * fn1..fn2 pipes input from fn2 to fn1.
+
 debug.setmetatable(functions.empty, {
     __index = index,
     __add = add,
     __sub = sub,
-    __concat = functions.pipe,
-    __unm = functions.negate,
+    __concat = _functions.pipe,
+    __unm = _functions.negate,
     __class = 'Function'
 })
 
@@ -269,7 +275,7 @@ end
 
 -- Returns true if two values are the same.
 function boolean._is(val1, val2)
-    return val1 ~= val2
+    return val1 == val2
 end
 
 --[[

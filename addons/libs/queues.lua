@@ -3,13 +3,17 @@
 ]]
 
 _libs = _libs or {}
-_libs.queues = true
-_libs.tables = _libs.tables or require('tables')
+
+require 'tables'
+
+local table = _libs.tables
+
+local queue = {}
+
+_libs.queues = queue
 
 _raw = _raw or {}
 _raw.table = _raw.table or {}
-
-local queue = {}
 
 _meta = _meta or {}
 _meta.Q = {}
