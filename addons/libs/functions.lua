@@ -17,7 +17,7 @@ local functions, boolean = functions, boolean
 functions.empty = function() end
 
 debug.setmetatable(false, {__index = function(_, k)
-    return _boolean[k] or (_raw and _raw.error or error)('"%s" is not defined for booleans':format(tostring(k)), 2)
+    return boolean[k] or (_raw and _raw.error or error)('"%s" is not defined for booleans':format(tostring(k)), 2)
 end})
 
 for _, t in pairs({functions, boolean, math, string, table}) do
@@ -233,8 +233,8 @@ debug.setmetatable(functions.empty, {
     __index = index,
     __add = add,
     __sub = sub,
-    __concat = _functions.pipe,
-    __unm = _functions.negate,
+    __concat = functions.pipe,
+    __unm = functions.negate,
     __class = 'Function'
 })
 
