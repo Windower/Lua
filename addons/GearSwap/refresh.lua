@@ -112,7 +112,7 @@ function load_user_files(job_id,user_file)
         sets = nil
         return
     end
-    
+
     user_env = {gearswap = _G, _global = _global, _settings = _settings,_addon=_addon,
         -- Player functions
         equip = equip, cancel_spell=cancel_spell, change_target=change_target, cast_delay=cast_delay,
@@ -124,7 +124,7 @@ function load_user_files(job_id,user_file)
         language=language,
         
         -- Library functions
-        string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,pack=pack,
+        string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,pack=pack,functions=functions,
         os=os,texts=texts,type=type,tostring=tostring,tonumber=tonumber,pairs=pairs,
         ipairs=ipairs, print=print, add_to_chat=add_to_chat_user,unpack=unpack,next=next,
         select=select,lua_base_path=windower.addon_path,empty=empty,file=file,
@@ -132,6 +132,7 @@ function load_user_files(job_id,user_file)
         
         debug=debug,coroutine=coroutine,setmetatable=setmetatable,getmetatable=getmetatable,
         rawset=rawset,rawget=rawget,require=include_user,
+        _libs=_libs,
         
         -- Player environment things
         buffactive=buffactive,
