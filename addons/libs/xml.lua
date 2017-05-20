@@ -2,15 +2,19 @@
     Small implementation of a fully-featured XML reader.
 ]]
 
+_libs = _libs or {}
+
+require('tables')
+require('lists')
+require('sets')
+require('strings')
+
+local table, list, set, string = _libs.tables, _libs.lists, _libs.sets, _libs.strings
+local files = require('files')
+
 local xml = {}
 
-_libs = _libs or {}
 _libs.xml = xml
-_libs.tables = _libs.tables or require('tables')
-_libs.lists = _libs.lists or require('lists')
-_libs.sets = _libs.sets or require('sets')
-_libs.strings = _libs.strings or require('strings')
-_libs.files = _libs.files or require('files')
 
 -- Local functions
 local entity_unescape
@@ -579,7 +583,7 @@ end
 return xml
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

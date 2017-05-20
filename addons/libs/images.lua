@@ -2,6 +2,9 @@
     A library to facilitate image primitive creation and manipulation.
 ]]
 
+local table = require('table')
+local math = require('math')
+
 local images = {}
 local meta = {}
 

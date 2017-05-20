@@ -3,11 +3,17 @@ A library providing sets as a data structure.
 ]]
 
 _libs = _libs or {}
-_libs.sets = true
-_libs.tables = _libs.tables or require('tables')
-_libs.functions = _libs.functions or require('functions')
+
+require('tables')
+require('functions')
+
+local table, functions = _libs.tables, _libs.functions
 
 set = {}
+
+local set = set
+
+_libs.sets = set
 
 _meta = _meta or {}
 _meta.S = {}
