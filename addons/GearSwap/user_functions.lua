@@ -302,11 +302,10 @@ function include_user(str, load_include_in_this_table)
         error('\nGearSwap: include() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)
     end
     
-    if T{'math', 'string', 'table', 'coroutine'}:contains(str:lower()) then
+    str = str:lower()
+    if type(package.loaded[str]) == 'table' then
         return package.loaded[str]
-    elseif T{'bit','socket','mime'}:contains(str:lower()) then
-        return _G[str:lower()]
-    elseif T{'pack'}:contains(str:lower()) then
+    elseif T{'pack'}:contains(str) then
         return
     end
     
