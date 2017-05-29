@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <addons>
   <addon>
     <name>Example</name>
@@ -124,9 +124,9 @@
   </addon>
   <addon>
     <name>chars</name>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <author>Giuliano Riccio (Zohno@Phoenix - R.I.P)</author>
     <description>Lets you input special chars using simple tags (ex.: &lt;note&gt; for ♪).</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
@@ -199,10 +199,10 @@
     <support>http://www.ffxiah.com/player/Ragnarok/Pesche</support>
   </addon>
   <addon>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <author>Giuliano Riccio (Zohno@Phoenix - R.I.P)</author>
     <name>enternity</name>
     <description>Enters "Enter" automatically when prompted during a cutscene or when talking to NPCs. It will not skip choice dialog boxes.</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
@@ -228,9 +228,9 @@
   </addon>
   <addon>
     <name>findAll</name>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <author>Giuliano Riccio (Zohno@Phoenix - R.I.P)</author>
     <description>Searches items stored on all your characters and allows live on-screen tracking of specified items.</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
@@ -377,9 +377,9 @@
   </addon>
   <addon>
     <name>plasmon</name>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <author>Giuliano Riccio (Zohno@Phoenix - R.I.P)</author>
     <description>tracks plasm, killed mobs and dropped airlixirs during a delve.</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
@@ -398,9 +398,9 @@
   </addon>
   <addon>
     <name>porter</name>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <author>Giuliano Riccio (Zohno@Phoenix - R.I.P)</author>
     <description>Shows the slips' items highlighting those that are stored.</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
@@ -419,9 +419,9 @@
   </addon>
   <addon>
     <name>reive</name>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <author>Giuliano Riccio (Zohno@Phoenix - R.I.P)</author>
     <description>Tracks exp, bayld, momentum scores and bonuses during a reive.</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
@@ -587,9 +587,9 @@
   </addon>
   <addon>
     <name>timestamp</name>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <author>Giuliano Riccio (Zohno@Phoenix - R.I.P)</author>
     <description>Prefixes any chat message with a timestamp. Based on Timestamp plugin.</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
@@ -629,9 +629,9 @@
   </addon>
   <addon>
     <name>vwhl</name>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <author>Giuliano Riccio (Zohno@Phoenix - R.I.P)</author>
     <description>Redirects the nm's weaknesses (VW or Abyssea) to the "tell" stream so that they can be held using the chat filters' function and highlights the important info.</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
