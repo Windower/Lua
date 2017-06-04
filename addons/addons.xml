@@ -644,7 +644,7 @@
   <addon>
     <name>CapeTrader</name>
     <author>Lygre, Burntwaffle</author>
-    <description>Automates trading ambuscade capes.</description>
+    <description>Automates the ambuscade cape augmentation process.</description>
     <bugtracker>https://github.com/OdinBurntwaffle/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Odin/Burntwaffle</support>
   </addon>
