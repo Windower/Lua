@@ -1,0 +1,42 @@
+<?xml version="1.1" ?>
+<settings>
+    <global>
+        <bg>
+            <alpha>255</alpha>
+            <blue>0</blue>
+            <green>0</green>
+            <red>0</red>
+            <visible>true</visible>
+        </bg>
+        <flags>
+            <bold>false</bold>
+            <bottom>false</bottom>
+            <draggable>true</draggable>
+            <italic>false</italic>
+            <right>true</right>
+        </flags>
+        <padding>0</padding>
+        <pos>
+            <x>-40</x>
+            <y>45</y>
+        </pos>
+        <text>
+            <alpha>255</alpha>
+            <blue>255</blue>
+            <font>Arial</font>
+            <fonts>
+
+            </fonts>
+            <green>255</green>
+            <red>255</red>
+            <size>14</size>
+            <stroke>
+                <alpha>-64770</alpha>
+                <blue>0</blue>
+                <green>0</green>
+                <red>0</red>
+                <width>0</width>
+            </stroke>
+        </text>
+    </global>
+</settings>
