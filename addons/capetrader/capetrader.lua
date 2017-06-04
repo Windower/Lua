@@ -29,26 +29,10 @@ _addon.author = 'Lygre, Burntwaffle'
 _addon.version = '1.0.2'
 _addon.commands = {'capetrader', 'ct'}
 
---NOTE: It is possible that the correct values for the following four variables can change after a version update.
-local gorpaID = 0x010F9099
-local mhauraID = 0x0F9
-local gorpaTargetIndex = 0x099
-local gorpaMenuID = 0x183
---NOTE: To maintain this addon these values might need to be updated after any version update.
---NOTE: If an update to these variables is necessary you can follow the following steps to find their correct values:
---[[
-    1. Uncomment the line involving the function call to printGorpaPacketInfo() in the register_event('outgoing chunk' code block.
-    2. Reload the capetrader addon.
-    3. Trade a cape and one of a abdhaljs dye/thread/dust/sap to Gorpa-Masorpa.
-    4a. If the cape has been augmented before you can choose the "Think about it some more" dialog option. This is also the option to choose if the traded cape has already been maxed out in that augment path.
-    4b. If the cape has NOT been augmented before you can choose the "Nothing for now" dialog option.
-    5. The correct values for these variables should be printed out in your ffxi chatbox. You can copy these values down and replace the four variables if necessary.
-    6. Comment out the line where printGorpaPacketInfo() is called and reload the addon.
-]]
-
 require('luau')
 require('pack')
 require('sets')
+require('tables')
 require('functions')
 require('strings')
 local res = require('resources')
@@ -57,6 +41,28 @@ local augPaths = require('allAugPaths')
 local maxAugMap = require('maxAugMap')
 local extData = require('extdata')
 local jobToCapeMap = require('jobToCapeMap')
+local validItemNames = require('validItemNames')
+
+function getValidItems()
+    local allItems = res.items
+    local itemTable = T{}
+    local counter = 0
+    local numberOfValidItems = validItemNames:length()
+
+    for key, item in pairs(allItems) do
+        if counter >= numberOfValidItems then
+            break
+        end
+
+        if validItemNames:contains(item.english) then
+            itemTable:update(T{ [item.english:lower()] = item })
+            counter = counter + 1
+        end
+    end
+
+    return itemTable
+end
+local validItemTable = getValidItems()
 
 --The following variables need to be carefully tracked and updated throughout all parts of this file.
 --TODO: Find ways to reduce the amount of global variables in this list
@@ -89,9 +95,16 @@ local blueTextColor = 466
 local redTextColor = 123
 local greenTextColor = 158
 
+--NOTE: It is possible that the correct values for the following variables can change after a version update.
+local gorpaID = nil
+local gorpaTargetIndex = nil
+local gorpaMenuID = 0x183
+local mhauraID = res.zones:with('english','Mhaura').id
+
 windower.register_event('addon command', function(input, ...)
     local cmd = string.lower(input)
     local args = {...}
+
     if cmd == 'prep' then
         if args[1] and args[2] and args[3] then
             prepareCapeForAugments(args[2], args[1], args[3])
@@ -136,11 +149,7 @@ function getItemIndex(capeOrAugItem)
 end
 
 function getItem(itemName)
-    for k, item in pairs(res.items) do
-        if item.name:lower() == itemName:lower() then
-            return item
-        end
-    end
+    return validItemTable[itemName:lower()]
 end
 
 function buildTrade(capeIndex,augmentItemIndex)
@@ -190,7 +199,7 @@ windower.register_event('incoming chunk', function(id, data, modified, injected,
         if tradeReady then
             tradeReady = false
 
-            if not pathItem.name:lower():endswith(' dye') then
+            if not pathItem.english:lower():endswith(' dye') then
                 startAugmentingCape:schedule(dustSapThreadTradeDelay, numberOfTimesToAugment - timesAugmentedCount + 1, false)
             else
                 startAugmentingCape:schedule(dyeTradeDelay, numberOfTimesToAugment - timesAugmentedCount + 1, false)
@@ -199,22 +208,15 @@ windower.register_event('incoming chunk', function(id, data, modified, injected,
     end
 end)
 
-windower.register_event('outgoing chunk',function(id,data)
-    if id == 0x05B then
-        local dialogChoicePacket = packets.parse('outgoing',data)
-        if dialogChoicePacket['Automated Message'] then
-            --NOTE: Uncomment the following printGorpaPacketInfo call if you suspect gorpa information needs to be updated.
-            --NOTE: Comment out the line if you have successfully updated the gorpa information variables.
-            -- printGorpaPacketInfo(dialogChoicePacket)
-        end
-    end
-end)
-
-function checkDistanceToNPC()
+function checkDistanceToGorpa()
     local zoneID = tonumber(windower.ffxi.get_info().zone)
+    local gorpa
     if zoneID == mhauraID then
-        local target = windower.ffxi.get_mob_by_id(gorpaID)
-        if target and target.distance < 36 then
+        gorpa = windower.ffxi.get_mob_by_name('Gorpa-Masorpa')
+        gorpaID = gorpa.id
+        gorpaTargetIndex = gorpa.index
+
+        if gorpa and gorpa.distance < 36 then
             return true
         else
             windower.add_to_chat(redTextColor, "You're not close enough to Gorpa-Masorpa, please get closer!")
@@ -242,10 +244,10 @@ function checkAugItemCount(numberOfAugmentAttempts)
         if tonumber(numberOfAugmentAttempts) < 1 then
             windower.add_to_chat(redTextColor, 'Please enter a number of 1 or greater.')
             return false
-        elseif tonumber(numberOfAugmentAttempts) > maxAmountSapAndDye and (pathItem.name:lower():endswith(' dye') or pathItem.name:lower():endswith(' sap')) then
+        elseif tonumber(numberOfAugmentAttempts) > maxAmountSapAndDye and (pathItem.english:lower():endswith(' dye') or pathItem.english:lower():endswith(' sap')) then
             windower.add_to_chat(redTextColor, 'For sap or dye, the max number of times you can augment a cape is ' .. maxAmountSapAndDye .. ' times. You entered: ' .. numberOfAugmentAttempts)
             return false
-        elseif tonumber(numberOfAugmentAttempts) > maxAmountDustAndThread and (pathItem.name:lower():endswith(' dust') or pathItem.name:lower():endswith(' thread')) then
+        elseif tonumber(numberOfAugmentAttempts) > maxAmountDustAndThread and (pathItem.english:lower():endswith(' dust') or pathItem.english:lower():endswith(' thread')) then
             windower.add_to_chat(redTextColor, 'For dust or thread, the max number of times you can augment a cape is ' .. maxAmountDustAndThread .. ' times. You entered: ' .. numberOfAugmentAttempts)
             return false
         elseif tonumber(numberOfAugmentAttempts) > pathItemCount then
@@ -316,7 +318,7 @@ function prepareCapeForAugments(augItemType, jobName, augPath)
 
         if augPath and augItemTypeIsValid and validArguments then
             local isValidPath = false
-            for i, v in pairs(augPaths[pathItem.name:lower()]) do
+            for i, v in pairs(augPaths[pathItem.english:lower()]) do
                 if augPath:lower() == v:lower() then
                     pathIndex = i
                     pathName = augPath
@@ -352,7 +354,7 @@ function startAugmentingCape(numberOfRepeats, firstAttempt)
     local augStatus = nil
     local capeIndex
     local augmentItemIndex
-    if capeHasBeenPrepared and checkCapeCount() and checkAugItemCount(numberOfRepeats) and checkDistanceToNPC() then
+    if capeHasBeenPrepared and checkCapeCount() and checkAugItemCount(numberOfRepeats) and checkDistanceToGorpa() then
         augStatus = checkAugLimits():lower()
         capeIndex = getItemIndex(currentCape)
         augmentItemIndex = getItemIndex(pathItem)
@@ -420,13 +422,13 @@ function checkAugLimits()
 
     local augValue
     if augmentTable then
-        if pathItem.name:lower():endswith(' thread') then
+        if pathItem.english:lower():endswith(' thread') then
             augValue = augmentTable[threadIndex]
-        elseif pathItem.name:lower():endswith(' dust') then
+        elseif pathItem.english:lower():endswith(' dust') then
             augValue = augmentTable[dustIndex]
-        elseif pathItem.name:lower():endswith(' dye') then
+        elseif pathItem.english:lower():endswith(' dye') then
             augValue = augmentTable[dyeIndex]
-        elseif pathItem.name:lower():endswith(' sap') then
+        elseif pathItem.english:lower():endswith(' sap') then
             augValue = augmentTable[sapIndex]
         end
     else
@@ -490,13 +492,6 @@ function injectAugmentConfirmationPackets()
         ["Target Index"] = windower.ffxi.get_mob_by_target('me').index,
     })
     packets.inject(playerUpdatePacket)
-end
-
-function printGorpaPacketInfo(dialogChoicePacket)
-    windower.add_to_chat(blueTextColor,'gorpaID: 0x' .. string.format("%X", dialogChoicePacket['Target']))
-    windower.add_to_chat(blueTextColor,'mhauraID: 0x' .. string.format("%X", dialogChoicePacket['Zone']))
-    windower.add_to_chat(blueTextColor,'gorpaTargetIndex: 0x' .. string.format("%X", dialogChoicePacket['Target Index']))
-    windower.add_to_chat(blueTextColor,'gorpaMenuID: 0x' .. string.format("%X", dialogChoicePacket['Menu ID']))
 end
 
 function printAugList()
