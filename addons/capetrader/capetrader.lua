@@ -105,6 +105,8 @@ windower.register_event('addon command', function(input, ...)
     local cmd = string.lower(input)
     local args = {...}
 
+    updateGorpaID()
+
     if cmd == 'prep' then
         if args[1] and args[2] and args[3] then
             prepareCapeForAugments(args[2], args[1], args[3])
@@ -210,11 +212,8 @@ end)
 
 function checkDistanceToGorpa()
     local zoneID = tonumber(windower.ffxi.get_info().zone)
-    local gorpa
     if zoneID == mhauraID then
-        gorpa = windower.ffxi.get_mob_by_name('Gorpa-Masorpa')
-        gorpaID = gorpa.id
-        gorpaTargetIndex = gorpa.index
+        local gorpa = windower.ffxi.get_mob_by_id(gorpaID)
 
         if gorpa and gorpa.distance < 36 then
             return true
@@ -492,6 +491,17 @@ function injectAugmentConfirmationPackets()
         ["Target Index"] = windower.ffxi.get_mob_by_target('me').index,
     })
     packets.inject(playerUpdatePacket)
+end
+
+function updateGorpaID()
+    if not gorpaID then
+        local zoneID = tonumber(windower.ffxi.get_info().zone)
+        if zoneID == mhauraID then
+            local gorpa = windower.ffxi.get_mob_by_name('Gorpa-Masorpa')
+            gorpaID = gorpa.id
+            gorpaTargetIndex = gorpa.index
+        end
+    end
 end
 
 function printAugList()

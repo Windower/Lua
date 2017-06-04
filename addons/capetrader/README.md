@@ -27,9 +27,9 @@ There are some conditions that you need to meet in order to use the important go
 
 Suppose you want to augment an ogma's cape from scratch with dex, accuracy and attack, and double attack. You can use the following steps:
 
-1.	Enter //ct prep run thread dex
+1. Enter //ct prep run thread dex
 
-2.	Enter //ct go 20
+2. Enter //ct go 20
 
 3. Wait for the ending message
 
@@ -37,11 +37,11 @@ Suppose you want to augment an ogma's cape from scratch with dex, accuracy and a
 
 5. Enter //ct go 20
 
-6.	Wait for the ending message.
+6. Wait for the ending message.
 
 7. Enter //ct prep run sap doubleattack
 
-8.	Enter //ct go 10
+8. Enter //ct go 10
 
 9. Upon receiving the completion message you can then consider augmenting another cape.
 
