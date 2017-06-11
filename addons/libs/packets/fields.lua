@@ -2098,6 +2098,8 @@ types.shop_item = L{
     {ctype='unsigned int',      label='Price',              fn=gil},            -- 00
     {ctype='unsigned short',    label='Item',               fn=item},           -- 04
     {ctype='unsigned short',    label='Shop Slot'},                             -- 08
+    {ctype='unsigned short',    label='Craft Skill'},                           -- 0A Zero on normal shops, has values that correlate to res\skills.
+    {ctype='unsigned short',    label='Craft Rank'},                            -- 0C Correlates to Rank able to purchase product from GuildNPC  
 }
 
 -- Shop
@@ -3568,7 +3570,7 @@ fields.incoming[0x118] = L{
     {ctype='unsigned int',      label='Hallmarks'},                                 -- 50
     {ctype='unsigned int',      label='Total Hallmarks'},                           -- 54
     {ctype='unsigned int',      label='Badges of Gallantry'},                       -- 58
-    {ctype='data[0x04]',        label='_unknown1'},                                 -- 5C   Room for future additions, currently holds no value
+    {ctype='data[0x04]',        label='_unknown5'},                                 -- 5C   Room for future additions, currently holds no value
 }
 
 
