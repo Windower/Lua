@@ -2098,8 +2098,6 @@ types.shop_item = L{
     {ctype='unsigned int',      label='Price',              fn=gil},            -- 00
     {ctype='unsigned short',    label='Item',               fn=item},           -- 04
     {ctype='unsigned short',    label='Shop Slot'},                             -- 08
-    {ctype='unsigned short',    label='Craft Skill'},                           -- 0A Zero on normal shops, has values that correlate to res\skills.
-    {ctype='unsigned short',    label='Craft Rank'},                            -- 0C Correlates to Rank able to purchase product from GuildNPC
 }
 
 -- Shop
@@ -3549,8 +3547,30 @@ fields.incoming[0x118] = L{
     {ctype='unsigned char',     label='Leaforb Stones Stored'},                     -- 36
     {ctype='unsigned char',     label='Leaforb Stones +1 Stored'},                  -- 37
     {ctype='unsigned char',     label='Leaforb Stones +2 Stored'},                  -- 38
-    {ctype='data[0x0F]',        label='_unknown2'},                                 -- 39   Room for future additions, currently holds no value
+    {ctype='unsigned char',     label='Duskslit Stones Stored'},                    -- 39
+    {ctype='unsigned char',     label='Duskslit Stones +1 Stored'},                 -- 3A
+    {ctype='unsigned char',     label='Duskslit Stones +2 Stored'},                 -- 3B
+    {ctype='unsigned char',     label='Dusktip Stones Stored'},                     -- 3C
+    {ctype='unsigned char',     label='Dusktip Stones +1 Stored'},                  -- 3D
+    {ctype='unsigned char',     label='Dusktip Stones +2 Stored'},                  -- 3E
+    {ctype='unsigned char',     label='Duskdim Stones Stored'},                     -- 3F
+    {ctype='unsigned char',     label='Duskdim Stones +1 Stored'},                  -- 40
+    {ctype='unsigned char',     label='Duskdim Stones +2 Stored'},                  -- 41
+    {ctype='unsigned char',     label='Duskorb Stones Stored'},                     -- 42
+    {ctype='unsigned char',     label='Duskorb Stones +1 Stored'},                  -- 43
+    {ctype='unsigned char',     label='Duskorb Stones +2 Stored'},                  -- 44
+    {ctype='unsigned char',     label='Pellucid Stones Stored'},                    -- 45
+    {ctype='unsigned char',     label='Fern Stones Stored'},                        -- 46
+    {ctype='unsigned char',     label='Taupe Stones Stored'},                       -- 47
+    {ctype='unsigned short',    label='Potpourri'},                                 -- 48
+    {ctype='unsigned short',    label='Escha Beads'},                               -- 4A
+    {ctype='signed int',        label='Escha Silt'},                                -- 4C
+    {ctype='unsigned int',      label='Hallmarks'},                                 -- 50
+    {ctype='unsigned int',      label='Total Hallmarks'},                           -- 54
+    {ctype='unsigned int',      label='Badges of Gallantry'},                       -- 58
+    {ctype='data[0x04]',        label='_unknown1'},                                 -- 5C   Room for future additions, currently holds no value
 }
+
 
 types.ability_recast = L{
     {ctype='unsigned short',    label='Duration',           fn=div+{1}},        -- 00
