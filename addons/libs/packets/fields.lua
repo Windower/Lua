@@ -3564,15 +3564,12 @@ fields.incoming[0x118] = L{
     {ctype='unsigned char',     label='Pellucid Stones Stored'},                    -- 45
     {ctype='unsigned char',     label='Fern Stones Stored'},                        -- 46
     {ctype='unsigned char',     label='Taupe Stones Stored'},                       -- 47
-    {ctype='unsigned short',    label='Potpourri'},                                 -- 48
+    {ctype='unsigned short',    label='_unknown2'},                                 -- 48
     {ctype='unsigned short',    label='Escha Beads'},                               -- 4A
     {ctype='signed int',        label='Escha Silt'},                                -- 4C
-    {ctype='unsigned int',      label='Hallmarks'},                                 -- 50
-    {ctype='unsigned int',      label='Total Hallmarks'},                           -- 54
-    {ctype='unsigned int',      label='Badges of Gallantry'},                       -- 58
-    {ctype='data[0x04]',        label='_unknown5'},                                 -- 5C   Room for future additions, currently holds no value
+    {ctype='unsigned short',    label='Potpourri'},                                 -- 50
+    {ctype='data[0x0E]',        label='_unknown3'},                                 -- 52   Room for future additions, currently holds no value
 }
-
 
 types.ability_recast = L{
     {ctype='unsigned short',    label='Duration',           fn=div+{1}},        -- 00
