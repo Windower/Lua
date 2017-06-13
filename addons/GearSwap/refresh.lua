@@ -125,7 +125,7 @@ function load_user_files(job_id,user_file)
         
         -- Library functions
         string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,pack=pack,functions=functions,
-        os=os,texts=texts,type=type,tostring=tostring,tonumber=tonumber,pairs=pairs,
+        os=os,texts=texts,bit=bit,type=type,tostring=tostring,tonumber=tonumber,pairs=pairs,
         ipairs=ipairs, print=print, add_to_chat=add_to_chat_user,unpack=unpack,next=next,
         select=select,lua_base_path=windower.addon_path,empty=empty,file=file,
         loadstring=loadstring,assert=assert,error=error,pcall=pcall,io=io,dofile=dofile,
@@ -640,7 +640,7 @@ function refresh_item_list(itemlist)
         if type(v) == 'table' and v.id and v.id ~= 0 then
             -- If we don't already have the primary item name in the table, add it.
             if res.items[v.id] and res.items[v.id][language] and not retarr[res.items[v.id][language]] then
-                retarr[res.items[v.id][language]] = v
+                retarr[res.items[v.id][language]] = table.copy(v)
                 retarr[res.items[v.id][language]].shortname=res.items[v.id][language]:lower()
                 -- If a long version of the name exists, and is different from the short version,
                 -- add the long name to the info table and point the long name's key at that table.
