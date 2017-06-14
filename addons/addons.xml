@@ -669,4 +669,11 @@
     <bugtracker>https://github.com/OdinBurntwaffle/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Odin/Burntwaffle</support>
   </addon>
+  <addon>
+    <name>craft</name>
+    <author>Mojo</author>
+    <description>A Final Fantasy XI Crafting Addon</description>
+    <bugtracker>https://github.com/Snapsmojo/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Fenrir/Snaps</support>
+  </addon>
 </addons>
