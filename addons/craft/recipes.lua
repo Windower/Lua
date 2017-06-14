@@ -5315,7 +5315,7 @@ return {
         },
     },
     ["Bonecraft Set 45"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Dhalmel Leather",
             "Crab Shell",
@@ -5350,14 +5350,14 @@ return {
         },
     },
     ["Bonecraft Set 85"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Imp Horn",
             "Colibri Beak",
         },
     },
     ["Bonecraft Set 90"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Beetle Jaw",
             "Dragon Talon",
@@ -5365,7 +5365,7 @@ return {
         },
     },
     ["Bonecraft Set 95"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Sheep Leather",
             "Ram Leather",
@@ -7776,7 +7776,7 @@ return {
         },
     },
     ["Clothcraft Kit 25"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Linen Thread",
             "Linen Cloth",
@@ -7786,7 +7786,7 @@ return {
         },
     },
     ["Clothcraft Kit 45"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Wool Thread",
             "Wool Cloth",
@@ -7795,7 +7795,7 @@ return {
         },
     },
     ["Clothcraft Kit 64"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Wool Thread",
             "Silk Cloth",
@@ -7803,7 +7803,7 @@ return {
         },
     },
     ["Clothcraft Kit 70"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Gold Thread",
             "Gold Thread",
@@ -7811,14 +7811,14 @@ return {
         },
     },
     ["Clothcraft Kit 75"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Imp. Silk Cloth",
             "Battle Bracers",
         },
     },
     ["Clothcraft Kit 80"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Rainbow Thread",
             "Rainbow Thread",
@@ -7829,14 +7829,14 @@ return {
         },
     },
     ["Clothcraft Kit 85"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Rainbow Cloth",
             "Carbon Fiber",
         },
     },
     ["Clothcraft Kit 90"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Rainbow Thread",
             "Rainbow Thread",
@@ -7847,7 +7847,7 @@ return {
         },
     },
     ["Clothcraft Kit 95"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Wool Thread",
             "Rainbow Thread",
@@ -14329,21 +14329,21 @@ return {
         },
     },
     ["Goldsmithing Set 25"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Silver Ingot",
             "Lizard Belt",
         },
     },
     ["Goldsmithing Set 45"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Peridot",
             "Mythril Earring",
         },
     },
     ["Goldsmithing Set 65"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Moonstone",
             "Gold Earring",
@@ -14383,7 +14383,7 @@ return {
         },
     },
     ["Goldsmithing Set 90"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Gold Ingot",
             "Emerald",
@@ -18807,7 +18807,7 @@ return {
         },
     },
     ["Leathercraft Set 66"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Iron Scales",
             "Ram Leather",
@@ -18844,7 +18844,7 @@ return {
         },
     },
     ["Leathercraft Set 90"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Gold Chain",
             "Manticore Lth.",
@@ -18852,7 +18852,7 @@ return {
         },
     },
     ["Leathercraft Set 95"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Grass Thread",
             "Peiste Skin",
@@ -29404,7 +29404,7 @@ return {
         },
     },
     ["Smithing Set 76"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Darksteel Ingot",
             "Tin Ingot",
@@ -29420,7 +29420,7 @@ return {
         },
     },
     ["Smithing Set 84"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Steel Sheet",
             "Darksteel Mufflers",
@@ -34906,7 +34906,7 @@ return {
         },
     },
     ["Woodworking Set 25"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Lauan Lumber",
             "Elm Lumber",
@@ -34926,7 +34926,7 @@ return {
         },
     },
     ["Woodworking Set 71"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Ebony Lumber",
             "Ebony Lumber",
@@ -34941,7 +34941,7 @@ return {
         },
     },
     ["Woodworking Set 81"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Holly Lumber",
             "Oak Lumber",
@@ -34951,7 +34951,7 @@ return {
         },
     },
     ["Woodworking Set 84"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Ancient Lumber",
             "Ancient Lumber",
@@ -34959,7 +34959,7 @@ return {
         },
     },
     ["Woodworking Set 90"] = {
-        ["crystal"] = "Terra Crystal",
+        ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
             "Ancient Lumber",
             "Ancient Lumber",

@@ -1,5 +1,5 @@
 --[[
-Craft v1.03312017
+Craft v1.1.0
 
 Copyright © 2017 Mojo
 All rights reserved.
@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name     = 'craft'
 _addon.author   = 'Mojo'
-_addon.version  = '1.03312017'
+_addon.version  = '1.1.0'
 _addon.commands = {'craft'}
 
 require('chat')
@@ -69,15 +69,21 @@ local supported = false
 local appropriated = {}
 local inventory = {}
 
-local bags = {
-    safe = 1,
-    storage = 2,
-    locker = 4,
-    satchel = 5,
-    sack = 6,
-    case = 7,
-    safe2 = 9
-}
+local function filter_bag(v)
+    return not (v.name:match("Inventory") or
+        v.name:match("Temporary") or
+        v.name:match("Wardrobe"))
+end
+
+local function get_bag_command(k)
+    return res.bags[k].command
+end
+
+local function get_bag_id(bag)
+    return bag.id
+end
+
+local bags = res.bags:filter(filter_bag):key_map(get_bag_command):map(get_bag_id)
 
 local support_npcs = {
     {name = "Orechiniel", zone = 230, menu = 650, buff = 240},
@@ -93,7 +99,7 @@ local support_npcs = {
 }
 
 local exceptions = {
-    ['Terra Crystal'] = 6509,
+    ['Geo Crystal'] = 6509,
 }
 
 local clusters = {
@@ -260,7 +266,7 @@ local function busy_wait(block, timeout, message)
     end
     if os.time() - start >= timeout then
         conditions[block] = false
-        return "timed out - %s":format(message)
+        return "Timed out - %s":format(message)
     else
         inventory = windower.ffxi.get_items()
     end
@@ -358,9 +364,9 @@ local function fetch_ingredient(ingredient)
                 return fetch_ingredient(ingredient)
             end
         end
-        return "unable to locate %s":format(ingredient)
+        return "Unable to locate %s":format(ingredient)
     else
-        return "unknown item %s":format(ingredient)
+        return "Unknown item %s":format(ingredient)
     end
 end
 
@@ -498,8 +504,8 @@ local function check_queue()
             if food then
                 consume_food()
             end
-            local item = queue:pop()
-            local msg = item[1](item[2])
+            local fn, arg = unpack(queue:pop())
+            local msg = fn(arg)
             if msg then
                 error(msg)
             end
@@ -539,12 +545,12 @@ local function handle_status()
 end
 
 local function handle_delay(seconds)
-    local status, err = pcall(tonumber, seconds)
-    if not err then
-        return "invalid delay %s":format(seconds)
+    local n = tonumber(seconds)
+    if n == nil then
+        return "Invalid delay %s":format(seconds)
     else
         notice("Setting delay to %s":format(seconds))
-        delay = seconds
+        delay = n
     end
 end
 
@@ -578,10 +584,10 @@ local function handle_jiggle(key)
 end
 
 local function handle_repeat(count)
-    count = count or 1
-    local status, err = pcall(tonumber, count)
-    if not err then
-        return "invalid count %s":format(count)
+    local count = count or 1
+    local n = tonumber(count)
+    if n == nil then
+        return "Invalid count %s":format(count)
     end
     notice("Adding %d repeat commands to the queue":format(count))
     for i = 1, count do
@@ -592,10 +598,10 @@ local function handle_repeat(count)
 end
 
 local function handle_make(item, count)
-    count = count or 1
-    local status, err = pcall(tonumber, count)
-    if not err then
-        return "invalid count %s":format(count)
+    local count = count or 1
+    local n = tonumber(count)
+    if n == nil then
+        return "Invalid count %s":format(count)
     end
     local recipe = fetch_recipe(item)
     if not recipe then
@@ -620,7 +626,7 @@ local function handle_food(item)
             notice("Setting auto food to %s":format(name.en))
             food = name.en
         else
-            return "invalid food %s":format(item)
+            return "Invalid food %s":format(item)
         end
     end
 end
@@ -629,7 +635,7 @@ local function handle_put(ingredient, bag)
     if bag then
         bag = bag:lower()
         if not bags[bag] then
-            return "unknown bag %s":format(bag)
+            return "Unknown bag %s":format(bag)
         end
     end
     local search = res.items:name(ingredient)
@@ -639,7 +645,7 @@ local function handle_put(ingredient, bag)
         local args = {
             ['id'] = id,
             ['bag'] = bag,
-            ['name'] = name.en,
+            ['name'] = name.english,
         }
         local item = {put, args}
         if bag then
@@ -651,7 +657,7 @@ local function handle_put(ingredient, bag)
         queue:push(item)
         process_queue()
     else
-        return "unknown item %s":format(ingredient)
+        return "Unknown item %s":format(ingredient)
     end
 end
 
@@ -664,20 +670,20 @@ end
 
 local function handle_display()
     if display then
-        notice("Disabling display.")
+        notice("Disabling display")
         display = false
     else
-        notice("Enabling display.")
+        notice("Enabling display")
         display = true
     end
 end
 
 local function handle_support()
     if support then
-        notice("Disabling support.")
+        notice("Disabling support")
         support = false
     else
-        notice("Enabling support.")
+        notice("Enabling support")
         support = true
     end
 end
@@ -715,18 +721,15 @@ handlers['jiggle'] = handle_jiggle
 handlers['support'] = handle_support
 handlers['find'] = handle_find
 
-local function handle_command(...)
-    local cmd  = (...) and (...):lower()
-    local args = {select(2, ...)}
+local function handle_command(cmd, ...)
+    local cmd = cmd or 'help'
     if handlers[cmd] then
-        local msg = handlers[cmd](unpack(args))
+        local msg = handlers[cmd](unpack({...}))
         if msg then
             error(msg)
         end
-    elseif cmd then
-        error("unknown command %s":format(cmd))
     else
-        error("no command passed")
+        error("Unknown command %s":format(cmd))
     end
 end
 
