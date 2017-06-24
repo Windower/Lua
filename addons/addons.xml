@@ -151,6 +151,13 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
+    <name>closetCleaner</name>
+    <author>Brimstone</author>
+    <description>Creates a report of usage tallies and location of all your gear in your gearswap lua files</description>
+    <bugtracker>https://github.com/Fox214/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Fenrir/Brimstonefox</support>
+  </addon>
+  <addon>
     <name>ConsoleBG</name>
     <author>Arcon</author>
     <description>Displays a dark (by default) background behind the Windower console to make it more readable.</description>
