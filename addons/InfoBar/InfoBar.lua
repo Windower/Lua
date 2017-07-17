@@ -67,8 +67,7 @@ infobar.new_line = '\n'
 windower.register_event('load',function()
     db = sqlite3.open(windower.addon_path..'\database.db')
     notesdb = sqlite3.open(windower.addon_path..'/notes.db')
-    notesdb:exec('CREATE TABLE notes')
-    notesdb:exec('CREATE TABLE notes(name, note)')
+    notesdb:exec('CREATE TABLE IF NOT EXISTS notes(name TEXT primary key, note TEXT)')
     if not windower.ffxi.get_info().logged_in then return end
     local target = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t') or windower.ffxi.get_player()
     get_target(target.index)
@@ -286,12 +285,11 @@ windower.register_event('addon command', function(...)
                 if not target then windower.add_to_chat(207,"No target selected") return end
                 for i,v in pairs(args) do args[i]=windower.convert_auto_trans(args[i]) end
                 local str = table.concat(args," ",3)
-                notesdb:exec('delete from notes where name = "'..target.name..'"') --deleting previous notes
-                notesdb:exec('insert into notes values ("'..target.name..'","'..str..'")')
+                notesdb:exec('INSERT OR REPLACE INTO notes VALUES ("'..target.name..'","'..str..'")')
                 get_target(target.index)
             elseif args[2]:lower() == 'delete' then
                 if not target then windower.add_to_chat(207,"No target selected") return end
-                notesdb:exec('delete from notes where name = "'..target.name..'"')
+                notesdb:exec('DELETE FROM notes WHERE name = "'..target.name..'"')
                 get_target(target.index)
             else
                 windower.add_to_chat(207,"Second argument wrong, use '//ib|infobar help' for info.")
