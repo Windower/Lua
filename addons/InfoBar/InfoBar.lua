@@ -59,10 +59,6 @@ defaults.display.text.size = 12
 
 settings = config.load(defaults)
 
-Notes = {}
-
-notes = config.load('data/notes.xml')
-
 box = texts.new("", settings.display, settings)
 
 local infobar = {}
@@ -70,6 +66,9 @@ infobar.new_line = '\n'
 
 windower.register_event('load',function()
     db = sqlite3.open(windower.addon_path..'\database.db')
+    notesdb = sqlite3.open(windower.addon_path..'/notes.db')
+    notesdb:exec('CREATE TABLE notes')
+    notesdb:exec('CREATE TABLE notes(name, note)')
     if not windower.ffxi.get_info().logged_in then return end
     local target = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t') or windower.ffxi.get_player()
     get_target(target.index)
@@ -77,6 +76,7 @@ end)
 
 windower.register_event('unload',function()
     db:close()
+    notesdb:close()
 end)
 
 function getDegrees()
@@ -162,14 +162,24 @@ function get_db(target, zones, level)
     box:update(MOB_infobar)
 end
 
+function get_notes(target)
+    local query = 'SELECT * FROM "notes" WHERE name = "'..target..'"'
+    if notesdb:isopen() and query then
+        for name, note in notesdb:urows(query) do
+            if name == target then
+                return note or nil
+            end
+        end
+    end
+end
+
 function get_target(index)
     local player = windower.ffxi.get_player()
     local target = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t') or player
     infobar.name = target.name
     infobar.id = target.id
     infobar.index = target.index
-    local tname = string.gsub(target.name, ' ', '_')
-    infobar.notes = type(notes[tname:lower()]) == "string" and notes[tname:lower()] or nil
+    infobar.notes = get_notes(target.name)
     if index == 0 or index == player.index then
         infobar.main_job = player.main_job
         infobar.main_job_level = player.main_job_level
@@ -276,15 +286,12 @@ windower.register_event('addon command', function(...)
                 if not target then windower.add_to_chat(207,"No target selected") return end
                 for i,v in pairs(args) do args[i]=windower.convert_auto_trans(args[i]) end
                 local str = table.concat(args," ",3)
-                notes[tname:lower()] = str
-                notes:save('all')
-                notes:reload()
+                notesdb:exec('delete from notes where name = "'..target.name..'"') --deleting previous notes
+                notesdb:exec('insert into notes values ("'..target.name..'","'..str..'")')
                 get_target(target.index)
             elseif args[2]:lower() == 'delete' then
                 if not target then windower.add_to_chat(207,"No target selected") return end
-                notes[tname:lower()] = ''
-                notes:save('all')
-                notes:reload()
+                notesdb:exec('delete from notes where name = "'..target.name..'"')
                 get_target(target.index)
             else
                 windower.add_to_chat(207,"Second argument wrong, use '//ib|infobar help' for info.")
