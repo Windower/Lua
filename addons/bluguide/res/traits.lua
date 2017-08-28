@@ -317,7 +317,7 @@ return {
             { name = "Quadrastrike", points = 6, cost = 5, id = 693 },
             { name = "Paralyzing Triad", points = 8, cost = 6, id = 704 },
         },
-        tiers = { [8] = 8, [16] = 12, [24] = 16, [32] = 20 , [40] = 23 },
+        tiers = { [8] = 8, [16] = 12, [24] = 16, [32] = 20, [40] = 23 },
         subs = { ['DNC'] = 8 },
     },
     ['Store TP'] = {
