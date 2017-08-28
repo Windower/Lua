@@ -42,7 +42,7 @@ return {
             { name = "Winds of Promy.", points = 4, cost = 5, id = 681 },
         },
         tiers = { [8] = 1 },
-        subs = { ['PLD'] = 8, ['SNM'] = 8 },
+        subs = { ['PLD'] = 8, ['SMN'] = 8 },
     },
     ['Auto Regen'] = {
         name = "Auto Regen",
@@ -176,12 +176,12 @@ return {
     ['Gilfinder/TH'] = {
         name = "Gilfinder/TH",
         spells = { 
-            { name = "Charged Whisker", points = 4, cost = 5, id = 680 },
-            { name = "Evryone. Grudge", points = 4, cost = 4, id = 683 },
-            { name = "Amorphic Spikes", points = 4, cost = 4, id = 697 },
+            { name = "Charged Whisker", points = 6, cost = 5, id = 680 },
+            { name = "Evryone. Grudge", points = 6, cost = 4, id = 683 },
+            { name = "Amorphic Spikes", points = 6, cost = 4, id = 697 },
         },
-        tiers = { [8] = "GF", [12] = "TH" },
-        subs = { ['THF'] = 12 },
+        tiers = { [8] = "GF", [16] = "TH" },
+        subs = { ['THF'] = 16 },
     },
     ['Lizard Killer'] = {
         name = "Lizard Killer",
@@ -214,12 +214,12 @@ return {
     ['Magic Burst Bonus'] = {
         name = "Magic Burst Bonus",
         spells = { 
-            { name = "Leafstorm", points = 4, cost = 4, id = 663 },
-            { name = "Cimicine Discharge", points = 4, cost = 3, id = 660 },
-            { name = "Reaving Wind", points = 4, cost = 4, id = 684 },
+            { name = "Leafstorm", points = 6, cost = 4, id = 663 },
+            { name = "Cimicine Discharge", points = 6, cost = 3, id = 660 },
+            { name = "Reaving Wind", points = 6, cost = 4, id = 684 },
             { name = "Rail Cannon", points = 8, cost = 6, id = 712 },
         },
-        tiers = { [8] = 5, [16] = 7, [24] = 9, [32] = 11 },
+        tiers = { [8] = 5, [16] = 7, [24] = 9, [32] = 11, [40] = 13 },
         subs = { ['BLM'] = 8 },
     },
     ['Magic Defense Bonus'] = {
@@ -312,12 +312,12 @@ return {
     ['Skillchain Bonus'] = {
         name = "Skillchain Bonus",
         spells = { 
-            { name = "Goblin Rush", points = 4, cost = 3, id = 666 },
-            { name = "Benthic Typhoon", points = 4, cost = 4, id = 670 },
-            { name = "Quadrastrike", points = 4, cost = 5, id = 693 },
+            { name = "Goblin Rush", points = 6, cost = 3, id = 666 },
+            { name = "Benthic Typhoon", points = 6, cost = 4, id = 670 },
+            { name = "Quadrastrike", points = 6, cost = 5, id = 693 },
             { name = "Paralyzing Triad", points = 8, cost = 6, id = 704 },
         },
-        tiers = { [8] = 8, [16] = 12, [24] = 16, [32] = 20 },
+        tiers = { [8] = 8, [16] = 12, [24] = 16, [32] = 20, [40] = 23 },
         subs = { ['DNC'] = 8 },
     },
     ['Store TP'] = {
@@ -399,7 +399,7 @@ return {
         subs = { ['PUP'] = 16, ['BST'] = 16, ['SMN'] = 16, ['DNC'] = 8, },
     },
 }
---Copyright © 2015, Anissa
+--Copyright Â© 2015, Anissa
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
