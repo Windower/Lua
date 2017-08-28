@@ -6,7 +6,7 @@ traitboxes = require("ui/traitboxes")
 spellboxes = require("ui/spellboxes")
 setspells = require("masterlist")
 
-_addon.version = '1.2 Aug 28th, 2017'
+_addon.version = '1.2'
 _addon.name = 'bluGuide'
 _addon.author = 'Anissa of Cerberus'
 
