@@ -2884,7 +2884,7 @@ fields.incoming[0x06F] = L{
     {ctype='unsigned short[8]', label='Lost Item',          fn=item},           -- 0A
     {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A
     {ctype='unsigned char[4]',  label='Skillup',            fn=div+{10}},       -- 1E
-    {ctype='unsigned short',    label='_junk2'},                                -- 22
+    {ctype='unsigned short',    label='Crystal',            fn=item},           -- 22
 }
 
 -- Others Synth Result
