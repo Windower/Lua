@@ -98,8 +98,10 @@ def get_items():
     items = get_items_dictionary()
     inverted = {}
     for k, v in items.items():
-        inverted[v['en'].lower()] = k
-        inverted[v['enl'].lower()] = k
+        if not v['en'].lower() in inverted:
+            inverted[v['en'].lower()] = k
+        if not v['enl'].lower() in inverted:
+            inverted[v['enl'].lower()] = k
     inverted.update(exceptions)
     return items, inverted
 
