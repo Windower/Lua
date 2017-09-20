@@ -33,72 +33,72 @@ config = require('config')
 require('strings')
 
 function sleep (n)
-  local t0 = os.clock()
-  while os.clock() - t0 <= n do end
+    local t0 = os.clock()
+    while os.clock() - t0 <= n do end
 end
 
 function addon_command (...)
-  local args = {...}
-  if args[1]:lower() == 'disableall' then
-    if args[2]:lower() == 'on' then
-      settings.globaldisable = 1
-      windower.add_to_chat(17, 'All automated macro switching disabled.')
-    elseif args[2]:lower() == 'off' then
-      settings.globaldisable = 0
-      windower.add_to_chat(17, 'Automated macro switching enabled.')
-    end
-   elseif args[1]:lower() == 'help' then
-     windower.add_to_chat(17, 'MacroChanger Commands:')
-     windower.add_to_chat(17, 'disableall [on|off]')
-     windower.add_to_chat(17, '   on - Disables all automated macro switching')
-     windower.add_to_chat(17, '   off - Enables all automated macro switching not disabled individually')
-     windower.add_to_chat(17, '   Resets to what is stored in settings upon unloading of addon.  To Permanently change, please change the option in the settings file.')
-   end
+    local args = {...}
+    if args[1]:lower() == 'disableall' then
+        if args[2]:lower() == 'on' then
+            settings.globaldisable = 1
+            windower.add_to_chat(17, 'All automated macro switching disabled.')
+        elseif args[2]:lower() == 'off' then
+            settings.globaldisable = 0
+            windower.add_to_chat(17, 'Automated macro switching enabled.')
+        end
+     elseif args[1]:lower() == 'help' then
+         windower.add_to_chat(17, 'MacroChanger Commands:')
+         windower.add_to_chat(17, 'disableall [on|off]')
+         windower.add_to_chat(17, '     on - Disables all automated macro switching')
+         windower.add_to_chat(17, '     off - Enables all automated macro switching not disabled individually')
+         windower.add_to_chat(17, '     Resets to what is stored in settings upon unloading of addon.    To Permanently change, please change the option in the settings file.')
+     end
 end
 
 function job_change ()
 -- Could use the job ID passed into this function, but the addon would have to include the resources library
-  local mjob = windower.ffxi.get_player().main_job
-  local sjob = windower.ffxi.get_player().sub_job
-  local job  = ''
-  local book = ''
-  local page = ''
-  if settings.globaldisable == 0 then
-    if mjob and sjob and settings.macros[(mjob..sjob):lower()] then
-      job = mjob..sjob
-    elseif mjob and settings.macros[(mjob):lower()] then
-      job = mjob
+    local mjob = windower.ffxi.get_player().main_job
+    local sjob = windower.ffxi.get_player().sub_job
+    local job    = ''
+    local book = ''
+    local page = ''
+    if settings.globaldisable == 0 then
+        if mjob and sjob and settings.macros[(mjob..sjob):lower()] then
+            job = mjob..sjob
+        elseif mjob and settings.macros[(mjob):lower()] then
+            job = mjob
+        else
+            if sjob then job = mjob..' or '..mjob..sjob else job = mjob end
+            windower.add_to_chat(17, '         No Auto Macro Settings Available for '..job..'.')
+            return
+        end
+        page = settings.macros[(job):lower()].page
+        book = settings.macros[(job):lower()].book
+        if ((book == 'disabled') or (page == 'disabled')) then
+            windower.add_to_chat(17, '         Auto Macro Switching Disabled for ' .. job ..'.')
+        else
+            windower.add_to_chat(17, '         Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '. Job Changed to ' .. job)
+            windower.send_command('input /macro book '..book..';wait 0.2;input /macro set '..page..';')
+        end
     else
-      if sjob then job = mjob..' or '..mjob..sjob else job = mjob end
-      windower.add_to_chat(17, '     No Auto Macro Settings Available for '..job..'.')
-      return
+        windower.add_to_chat(17, '         Auto Macro Switching Disabled for All Jobs.')
     end
-    page = settings.macros[(job):lower()].page
-    book = settings.macros[(job):lower()].book
-    if ((book == 'disabled') or (page == 'disabled')) then
-      windower.add_to_chat(17, '     Auto Macro Switching Disabled for ' .. job ..'.')
-    else
-      windower.add_to_chat(17, '     Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '.  Job Changed to ' .. job)
-      windower.send_command('input /macro book '..book..';wait 0.2;input /macro set '..page..';')
-    end
-  else
-    windower.add_to_chat(17, '     Auto Macro Switching Disabled for All Jobs.')
-  end
 end
 
 function login (name)
-  local defaults = {
-    character = '',
-    globaldisable = 0,
-    macros = {
-      war = {book = 1, page = 1},
-    },
-  }
-  settings = config.load(defaults)
-  if name then
-    sleep(2)
-    job_change()
-  end
+    local defaults = {
+        character = '',
+        globaldisable = 0,
+        macros = {
+            war = {book = 1, page = 1},
+        },
+    }
+    settings = config.load(defaults)
+    if name then
+        sleep(2)
+        job_change()
+    end
 end
 
 settings = {}
