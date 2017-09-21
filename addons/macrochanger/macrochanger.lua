@@ -38,23 +38,25 @@ function addon_command (...)
     local args = {...}
     if args[1]:lower() == 'disableall' then
         if args[2]:lower() == 'on' then
-            settings.globaldisable = 1
+            settings.enabled = false
             windower.add_to_chat(17, 'All automated macro switching disabled.')
         elseif args[2]:lower() == 'off' then
-            settings.globaldisable = 0
+            settings.enabled = true
             windower.add_to_chat(17, 'Automated macro switching enabled.')
+        else
+            windower.add_to_chat(17, 'Unknown setting disableall ['..args[2]..'].')
         end
-     elseif args[1]:lower() == 'help' then
-         windower.add_to_chat(17, 'MacroChanger Commands:')
-         windower.add_to_chat(17, 'disableall [on|off]')
-         windower.add_to_chat(17, '     on - Disables all automated macro switching')
-         windower.add_to_chat(17, '     off - Enables all automated macro switching not disabled individually')
-         windower.add_to_chat(17, '     Resets to what is stored in settings upon unloading of addon.    To Permanently change, please change the option in the settings file.')
-     end
+    elseif args[1]:lower() == 'help' then
+        windower.add_to_chat(17, 'MacroChanger Commands:')
+        windower.add_to_chat(17, 'disableall [on|off]')
+        windower.add_to_chat(17, '    on - Disables all automated macro switching')
+        windower.add_to_chat(17, '    off - Enables all automated macro switching not disabled individually')
+        windower.add_to_chat(17, '    Resets to what is stored in settings upon unloading of addon. To Permanently change, please change the option in the settings file.')
+    end
 end
 
 function job_change (main,_,sub,_)
-    if settings.globaldisable == 0 then
+    if settings.enabled == true then
         local job
         local mjob = res.jobs[main].english_short
         local sjob = res.jobs[sub].english_short
@@ -83,7 +85,7 @@ end
 function login (name)
     local defaults = {
         character = '',
-        globaldisable = 0,
+        enabled = true,
         macros = {
             war = {book = 1, page = 1},
         },
