@@ -55,15 +55,15 @@ end
 function job_change ()
     if settings.globaldisable == 0 then
         -- Could use the job ID passed into this function, but the addon would have to include the resources library
+        local job
         local mjob = windower.ffxi.get_player().main_job
         local sjob = windower.ffxi.get_player().sub_job
-        local job
-        if mjob and sjob and settings.macros[(mjob..sjob):lower()] then
-            job = mjob..sjob
+        if mjob and sjob and settings.macros[(mjob..'_'..sjob):lower()] then
+            job = mjob..'_'..sjob
         elseif mjob and settings.macros[(mjob):lower()] then
             job = mjob
         else
-            if sjob then job = mjob..' or '..mjob..sjob else job = mjob end
+            if sjob then job = mjob..' or '..mjob..'_'..sjob else job = mjob end
             windower.add_to_chat(17, '         No Auto Macro Settings Available for '..job..'.')
             return
         end
@@ -100,5 +100,3 @@ windower.register_event('addon command', addon_command)
 windower.register_event('job change', job_change)
 windower.register_event('login', login)
 windower.register_event('load', login)
-
-
