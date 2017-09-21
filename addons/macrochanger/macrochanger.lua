@@ -31,6 +31,7 @@ _addon.version = '1.0.0.2r0'
 _addon.commands = {'mc','macrochanger'}
 
 config = require('config')
+res = require('resources')
 require('strings')
 
 function addon_command (...)
@@ -52,12 +53,11 @@ function addon_command (...)
      end
 end
 
-function job_change ()
+function job_change (main,_,sub,_)
     if settings.globaldisable == 0 then
-        -- Could use the job ID passed into this function, but the addon would have to include the resources library
         local job
-        local mjob = windower.ffxi.get_player().main_job
-        local sjob = windower.ffxi.get_player().sub_job
+        local mjob = res.jobs[main].english_short
+        local sjob = res.jobs[sub].english_short
         if mjob and sjob and settings.macros[(mjob..'_'..sjob):lower()] then
             job = mjob..'_'..sjob
         elseif mjob and settings.macros[(mjob):lower()] then
