@@ -89,7 +89,7 @@ function login (name)
     }
     settings = config.load(defaults)
     if name then
-        sleep(2)
+        coroutine.sleep(2)
         job_change()
     end
 end
