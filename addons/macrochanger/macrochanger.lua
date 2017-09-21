@@ -32,11 +32,6 @@ _addon.commands = {'mc','macrochanger'}
 config = require('config')
 require('strings')
 
-function sleep (n)
-    local t0 = os.clock()
-    while os.clock() - t0 <= n do end
-end
-
 function addon_command (...)
     local args = {...}
     if args[1]:lower() == 'disableall' then
@@ -57,13 +52,11 @@ function addon_command (...)
 end
 
 function job_change ()
--- Could use the job ID passed into this function, but the addon would have to include the resources library
-    local mjob = windower.ffxi.get_player().main_job
-    local sjob = windower.ffxi.get_player().sub_job
-    local job    = ''
-    local book = ''
-    local page = ''
     if settings.globaldisable == 0 then
+        -- Could use the job ID passed into this function, but the addon would have to include the resources library
+        local mjob = windower.ffxi.get_player().main_job
+        local sjob = windower.ffxi.get_player().sub_job
+        local job
         if mjob and sjob and settings.macros[(mjob..sjob):lower()] then
             job = mjob..sjob
         elseif mjob and settings.macros[(mjob):lower()] then
@@ -73,11 +66,11 @@ function job_change ()
             windower.add_to_chat(17, '         No Auto Macro Settings Available for '..job..'.')
             return
         end
-        page = settings.macros[(job):lower()].page
-        book = settings.macros[(job):lower()].book
         if ((book == 'disabled') or (page == 'disabled')) then
             windower.add_to_chat(17, '         Auto Macro Switching Disabled for ' .. job ..'.')
         else
+            local page = settings.macros[(job):lower()].page
+            local book = settings.macros[(job):lower()].book
             windower.add_to_chat(17, '         Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '. Job Changed to ' .. job)
             windower.send_command('input /macro book '..book..';wait 0.2;input /macro set '..page..';')
         end
