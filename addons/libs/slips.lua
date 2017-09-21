@@ -1,8 +1,14 @@
 _libs       = _libs or {}
-_libs.slips = true
-_libs.lists = _libs.lists or require 'lists'
+
+require('lists')
+
+local list = _libs.lists
+local math = require('math')
 
 local slips = {}
+
+_libs.slips = slips
+
 
 slips.default_storages = {'inventory', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case', 'wardrobe', 'safe2'}
 slips.storages         = L{29312, 29313, 29314, 29315, 29316, 29317, 29318, 29319, 29320, 29321, 29322, 29323, 29324, 29325, 29326, 29327, 29328, 29329, 29330, 29331, 29332, 29333, 29334, 29335, 29336,}

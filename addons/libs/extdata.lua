@@ -1,13 +1,15 @@
 -- Extdata lib first pass
 
 _libs = _libs or {}
-_libs.actions = true
-_libs.tables = _libs.tables or require 'tables'
-local res = require 'resources'
-_libs.strings = _libs.strings or require 'strings'
-_libs.functions = _libs.functions or require 'functions'
-require 'pack'
 
+require('tables')
+require('strings')
+require('functions')
+require('pack')
+
+local table, string, functions = _libs.tables, _libs.strings, _libs.functions
+local math = require('math')
+local res = require('resources')
 
 -- MASSIVE LOOKUP TABLES AND OTHER CONSTANTS
 
@@ -1969,7 +1971,9 @@ id_mapping = {
 -- ACTUAL EXTDATA LIB FUNCTIONS
     
 local extdata = {}
-    
+
+_libs.extdata = extdata
+
 function extdata.decode(tab)
     if not tab then error('extdata.decode was passed a nil value') end
     if not tab.id or not tonumber(tab.id) then

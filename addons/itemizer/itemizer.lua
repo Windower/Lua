@@ -1,6 +1,6 @@
 _addon.name = 'Itemizer'
 _addon.author = 'Ihina'
-_addon.version = '3.0.1.2'
+_addon.version = '3.0.1.3'
 _addon.command = 'itemizer'
 
 require('luau')
@@ -328,7 +328,7 @@ windower.register_event('outgoing text', function()
 
                     if bag == 'inventory' then
                         inventory_items:add(item.id)
-                    elseif bag == 'wardrobe' then
+                    elseif S{'wardrobe','wardrobe2','wardrobe3','wardrobe4'}:contains(bag) then
                         wardrobe_items:add(item.id)
                     end
                 end

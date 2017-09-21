@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <addons>
   <addon>
     <name>Example</name>
@@ -124,9 +124,9 @@
   </addon>
   <addon>
     <name>chars</name>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <author>Giuliano Riccio (Zohno@Phoenix - R.I.P)</author>
     <description>Lets you input special chars using simple tags (ex.: &lt;note&gt; for ♪).</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
@@ -172,6 +172,13 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
+    <name>DistancePlus</name>
+    <author>Sammeh</author>
+    <description>Replacement for Distance Addon to show distance to current target and distance from pet.  Also color coordinates distance based on job and abilities, such as magic, ranged attacks, and JA's.  Also shows height differential for fights requiring height delta to avoid AOE.</description>
+    <bugtracker>https://github.com/SammehFFXI/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Quetzalcoatl/Sammeh</support>
+  </addon>
+  <addon>
     <name>DressUp</name>
     <author>Cairthenn</author>
     <description>Emulates BlinkMeNot functionality. Allows for customization of gear display for you or anyone else.</description>
@@ -192,10 +199,10 @@
     <support>http://www.ffxiah.com/player/Ragnarok/Pesche</support>
   </addon>
   <addon>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <author>Giuliano Riccio (Zohno@Phoenix - R.I.P)</author>
     <name>enternity</name>
     <description>Enters "Enter" automatically when prompted during a cutscene or when talking to NPCs. It will not skip choice dialog boxes.</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
@@ -221,9 +228,9 @@
   </addon>
   <addon>
     <name>findAll</name>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <author>Giuliano Riccio (Zohno@Phoenix - R.I.P)</author>
     <description>Searches items stored on all your characters and allows live on-screen tracking of specified items.</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
@@ -266,6 +273,13 @@
     <description>Use commands to move items and gear between bags.</description>
     <bugtracker>https://github.com/Jayjs20/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Bismarck/Ihina</support>
+  </addon>
+  <addon>
+    <name>JobChange</name>
+    <author>Sammeh</author>
+    <description>Command line Job Changer</description>
+    <bugtracker>https://github.com/SammehFFXI/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Quetzalcoatl/Sammeh</support>
   </addon>
   <addon>
     <name>latentchecker</name>
@@ -363,9 +377,9 @@
   </addon>
   <addon>
     <name>plasmon</name>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <author>Giuliano Riccio (Zohno@Phoenix - R.I.P)</author>
     <description>tracks plasm, killed mobs and dropped airlixirs during a delve.</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
@@ -384,9 +398,9 @@
   </addon>
   <addon>
     <name>porter</name>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <author>Giuliano Riccio (Zohno@Phoenix - R.I.P)</author>
     <description>Shows the slips' items highlighting those that are stored.</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
@@ -405,9 +419,9 @@
   </addon>
   <addon>
     <name>reive</name>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <author>Giuliano Riccio (Zohno@Phoenix - R.I.P)</author>
     <description>Tracks exp, bayld, momentum scores and bonuses during a reive.</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
@@ -573,9 +587,9 @@
   </addon>
   <addon>
     <name>timestamp</name>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <author>Giuliano Riccio (Zohno@Phoenix - R.I.P)</author>
     <description>Prefixes any chat message with a timestamp. Based on Timestamp plugin.</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
@@ -615,10 +629,17 @@
   </addon>
   <addon>
     <name>vwhl</name>
-    <author>Giuliano Riccio (Zohno@Phoenix)</author>
+    <author>Giuliano Riccio (Zohno@Phoenix - R.I.P)</author>
     <description>Redirects the nm's weaknesses (VW or Abyssea) to the "tell" stream so that they can be held using the chat filters' function and highlights the important info.</description>
-    <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
+    <name>XIVBar</name>
+    <author>SirEdeonX (Edeon@Asura)</author>
+    <description>Displays HP, MP and TP bars on the center of the screen, akin to FFXIV, for easy tracking</description>
+    <bugtracker>https://github.com/SirEdeonX/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Asura/Edeon</support>
   </addon>
   <addon>
     <name>Yush</name>
@@ -638,6 +659,20 @@
     <name>temps</name>
     <author>Mojo</author>
     <description>Makes buying temporary items from escha npcs much easier.</description>
+    <bugtracker>https://github.com/Snapsmojo/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Fenrir/Snaps</support>
+  </addon>
+  <addon>
+    <name>CapeTrader</name>
+    <author>Lygre, Burntwaffle</author>
+    <description>Automates the ambuscade cape augmentation process.</description>
+    <bugtracker>https://github.com/OdinBurntwaffle/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Odin/Burntwaffle</support>
+  </addon>
+  <addon>
+    <name>craft</name>
+    <author>Mojo</author>
+    <description>A Final Fantasy XI Crafting Addon</description>
     <bugtracker>https://github.com/Snapsmojo/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Fenrir/Snaps</support>
   </addon>

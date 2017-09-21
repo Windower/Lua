@@ -1746,9 +1746,9 @@ fields.incoming[0x029] = L{
     5 = 'Tier 6', --- furiously.  Unused currently
     - But if there are no mobs left in area, or no mobs nearby, field1 will be the KeyItem#
     1253 = 'Clear Abyssite'
-	1254 = 'Colorful Abyssite'
-	1564 = 'Clear Demilune Abyssite'
-	etc.
+    1254 = 'Colorful Abyssite'
+    1564 = 'Clear Demilune Abyssite'
+    etc.
 
     Field2 will be direction:
     0 = 'East'
@@ -1764,9 +1764,9 @@ fields.incoming[0x029] = L{
 
     Field4 will be KI# of the abyssite used. Ex:
     1253 = 'Clear Abyssite'
-	1254 = 'Colorful Abyssite'
-	1564 = 'Clear Demilune Abyssite'
-	etc.
+    1254 = 'Colorful Abyssite'
+    1564 = 'Clear Demilune Abyssite'
+    etc.
 ]]
 
 --[[  0x2A can also be triggered by buying/disposing of a VWNM KI from an NPC:
@@ -1856,7 +1856,7 @@ fields.incoming[0x030] = L{
       1 = woodworking
       2 = smithing
       3 = goldsmithing
-      4 = clothcraft	
+      4 = clothcraft    
       5 = leatherworking
       6 = bonecraft
       7 = Alchemy
@@ -2098,6 +2098,8 @@ types.shop_item = L{
     {ctype='unsigned int',      label='Price',              fn=gil},            -- 00
     {ctype='unsigned short',    label='Item',               fn=item},           -- 04
     {ctype='unsigned short',    label='Shop Slot'},                             -- 08
+    {ctype='unsigned short',    label='Craft Skill'},                           -- 0A Zero on normal shops, has values that correlate to res\skills.
+    {ctype='unsigned short',    label='Craft Rank'},                            -- 0C Correlates to Rank able to purchase product from GuildNPC  
 }
 
 -- Shop
@@ -2882,7 +2884,7 @@ fields.incoming[0x06F] = L{
     {ctype='unsigned short[8]', label='Lost Item',          fn=item},           -- 0A
     {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A
     {ctype='unsigned char[4]',  label='Skillup',            fn=div+{10}},       -- 1E
-    {ctype='unsigned short',    label='_junk2'},                                -- 22
+    {ctype='unsigned short',    label='Crystal',            fn=item},           -- 22
 }
 
 -- Others Synth Result
@@ -3026,7 +3028,7 @@ types.alliance_member = L{
     {ctype='unsigned short',    label='Index',              fn=index},          -- 04
     {ctype='unsigned short',    label='Flags',              fn=bin+{2}},        -- 06
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 08
-    {ctype='unsigned short',    label='_unknown2'},                             -- 0A	Always 0?
+    {ctype='unsigned short',    label='_unknown2'},                             -- 0A    Always 0?
 }
 
 -- Party Map Marker
@@ -3547,7 +3549,26 @@ fields.incoming[0x118] = L{
     {ctype='unsigned char',     label='Leaforb Stones Stored'},                     -- 36
     {ctype='unsigned char',     label='Leaforb Stones +1 Stored'},                  -- 37
     {ctype='unsigned char',     label='Leaforb Stones +2 Stored'},                  -- 38
-    {ctype='data[0x0F]',        label='_unknown2'},                                 -- 39   Room for future additions, currently holds no value
+    {ctype='unsigned char',     label='Duskslit Stones Stored'},                    -- 39
+    {ctype='unsigned char',     label='Duskslit Stones +1 Stored'},                 -- 3A
+    {ctype='unsigned char',     label='Duskslit Stones +2 Stored'},                 -- 3B
+    {ctype='unsigned char',     label='Dusktip Stones Stored'},                     -- 3C
+    {ctype='unsigned char',     label='Dusktip Stones +1 Stored'},                  -- 3D
+    {ctype='unsigned char',     label='Dusktip Stones +2 Stored'},                  -- 3E
+    {ctype='unsigned char',     label='Duskdim Stones Stored'},                     -- 3F
+    {ctype='unsigned char',     label='Duskdim Stones +1 Stored'},                  -- 40
+    {ctype='unsigned char',     label='Duskdim Stones +2 Stored'},                  -- 41
+    {ctype='unsigned char',     label='Duskorb Stones Stored'},                     -- 42
+    {ctype='unsigned char',     label='Duskorb Stones +1 Stored'},                  -- 43
+    {ctype='unsigned char',     label='Duskorb Stones +2 Stored'},                  -- 44
+    {ctype='unsigned char',     label='Pellucid Stones Stored'},                    -- 45
+    {ctype='unsigned char',     label='Fern Stones Stored'},                        -- 46
+    {ctype='unsigned char',     label='Taupe Stones Stored'},                       -- 47
+    {ctype='unsigned short',    label='_unknown2'},                                 -- 48
+    {ctype='unsigned short',    label='Escha Beads'},                               -- 4A
+    {ctype='signed int',        label='Escha Silt'},                                -- 4C
+    {ctype='unsigned short',    label='Potpourri'},                                 -- 50
+    {ctype='data[0x0E]',        label='_unknown3'},                                 -- 52   Room for future additions, currently holds no value
 }
 
 types.ability_recast = L{
