@@ -56,7 +56,7 @@ function addon_command (...)
 end
 
 function job_change (main,_,sub,_)
-    if settings.enabled == true then
+    if settings.enabled then
         local job
         local mjob = res.jobs[main].english_short
         local sjob = res.jobs[sub].english_short
