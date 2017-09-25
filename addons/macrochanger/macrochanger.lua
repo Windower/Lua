@@ -31,35 +31,32 @@ _addon.version = '1.0.0.2r0'
 _addon.commands = {'mc','macrochanger'}
 
 config = require('config')
+require('options')
 res = require('resources')
 require('strings')
 
 function addon_command (...)
     local args = {...}
-    if args[1]:lower() == 'disableall' then
-        if args[2]:lower() == 'on' then
-            settings.enabled = false
-            windower.add_to_chat(17, 'All automated macro switching disabled.')
-        elseif args[2]:lower() == 'off' then
-            settings.enabled = true
-            windower.add_to_chat(17, 'Automated macro switching enabled.')
+    local i = 1
+    while i < #args + 1 do
+        if options[args[i]] then
+            options[args[i]](args[i+1])
+            i = i + 2
         else
-            windower.add_to_chat(17, 'Unknown setting disableall ['..args[2]..'].')
+            windower.add_to_chat(17, 'Unknown parameter: '..args[i])
+            options.help()
+            return
         end
-    elseif args[1]:lower() == 'help' then
-        windower.add_to_chat(17, 'MacroChanger Commands:')
-        windower.add_to_chat(17, 'disableall [on|off]')
-        windower.add_to_chat(17, '    on - Disables all automated macro switching')
-        windower.add_to_chat(17, '    off - Enables all automated macro switching not disabled individually')
-        windower.add_to_chat(17, '    Resets to what is stored in settings upon unloading of addon. To Permanently change, please change the option in the settings file.')
     end
 end
 
-function job_change (main,_,sub,_)
-    if settings.enabled then
+function job_change (main,_,subj,_)
+    if settings.enabled == 'default' then
+        options.notice() 
+    elseif settings.enabled then
         local job
         local mjob = res.jobs[main].english_short
-        local sjob = res.jobs[sub].english_short
+        local sjob = res.jobs[subj].english_short
         if mjob and sjob and settings.macros[(mjob..'_'..sjob):lower()] then
             job = mjob..'_'..sjob
         elseif mjob and settings.macros[(mjob):lower()] then
@@ -82,23 +79,12 @@ function job_change (main,_,sub,_)
     end
 end
 
-function login (name)
-    local defaults = {
-        character = '',
-        enabled = true,
-        macros = {
-            war = {book = 1, page = 1},
-        },
-    }
-    settings = config.load(defaults)
-    if name then
-        coroutine.sleep(2)
-        job_change()
-    end
-end
 
-settings = {}
+defaults = {
+    default = true,
+    enabled = false
+}
+settings = config.load(defaults)
+
 windower.register_event('addon command', addon_command)
 windower.register_event('job change', job_change)
-windower.register_event('login', login)
-windower.register_event('load', login)
