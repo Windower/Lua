@@ -63,19 +63,19 @@ function job_change (main,_,subj,_)
             job = mjob
         else
             if sjob then job = mjob..' or '..mjob..'_'..sjob else job = mjob end
-            windower.add_to_chat(17, '         No Auto Macro Settings Available for '..job..'.')
+            windower.add_to_chat(17, 'No Auto Macro Settings Available for '..job..'.')
             return
         end
         if ((book == 'disabled') or (page == 'disabled')) then
-            windower.add_to_chat(17, '         Auto Macro Switching Disabled for ' .. job ..'.')
+            windower.add_to_chat(17, 'Auto Macro Switching Disabled for ' .. job ..'.')
         else
             local page = settings.macros[(job):lower()].page
             local book = settings.macros[(job):lower()].book
-            windower.add_to_chat(17, '         Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '. Job Changed to ' .. job)
+            windower.add_to_chat(17, 'Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '. Job Changed to ' .. job)
             windower.send_command('input /macro book '..book..';wait 0.2;input /macro set '..page..';')
         end
     else
-        windower.add_to_chat(17, '         Auto Macro Switching Disabled for All Jobs.')
+        windower.add_to_chat(17, 'Auto Macro Switching Disabled for All Jobs.')
     end
 end
 
