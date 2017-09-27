@@ -39,7 +39,9 @@ function addon_command (...)
     local args = {...}
     local i = 1
     while i < #args + 1 do
-        if options[args[i]] then
+        if args[i] == 'help' then
+            options.help()
+        elseif options[args[i]] then
             options[args[i]](args[i+1])
             i = i + 2
         else
