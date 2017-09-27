@@ -43,25 +43,6 @@ def get_recipe(row):
     return name, crystal, ingredients
 
 def get_sphere_recipe(row):
-    crystals = [
-        'Dark Crystal',
-        'Light Crystal',
-        'Earth Crystal',
-        'Water Crystal',
-        'Fire Crystal',
-        'Wind Crystal',
-        'Lightning Crystal',
-        'Ice Crystal',
-        'Pyre Crystal',
-        'Frost Crystal',
-        'Vortex Crystal',
-        'Geo Crystal',
-        'Terra II Crystal',
-        'Bolt Crystal',
-        'Fluid Crystal',
-        'Glimmer Crystal',
-        'Shadow Crystal',
-    ]
     c, i, r = [
         td for td in row.findAll('td')
     ]
