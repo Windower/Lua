@@ -37,10 +37,10 @@ Disables all automated macro switching.
                 <book>1</book>
                 <page>6</page>
             </mnk>
-            <warmnk>
+            <war_mnk>
                 <book>2</book>
                 <page>1</page>
-            </warmnk>
+            </war_mnk>
         </macros>
     </cecil>
 </settings>
