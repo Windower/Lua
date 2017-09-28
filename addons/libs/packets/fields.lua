@@ -691,6 +691,15 @@ fields.outgoing[0x05C] = L{
     {ctype='unsigned short',    label='_unknown3'},                             -- 1E   Not zone ID
 }
 
+-- Outgoing emote
+fields.outgoing[0x05D] = L{
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08                      
+    {ctype='unsigned char',     label='Emote',              fn=emote},          -- 0A
+    {ctype='unsigned char',     label='Type'},                                  -- 0B  2 for motion, 0 otherwise
+    {ctype='unsigned int',      label='_unknown1',          const=0},           -- 0C
+}
+
 -- Zone request
 -- Sent when crossing a zone line.
 fields.outgoing[0x05E] = L{
@@ -2549,6 +2558,20 @@ enums.spawntype = {
     [0x03] = 'Monster',
     [0x00] = 'Casket or NPC',
     [0x0A] = 'Self',
+}
+
+-- Emote
+fields.incoming[0x05A] = L{
+    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04 
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 08
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0E
+    {ctype='unsigned short',    label='Emote',              fn=emote},          -- 10
+    {ctype='unsigned short',    label='_unknown1',          const=2},           -- 12
+    {ctype='unsigned short',    label='_unknown2'},                             -- 14
+    {ctype='unsigned char',     label='Type'},                                  -- 16   2 for motion, 0 otherwise
+    {ctype='unsigned char',     label='_unknown3'},                             -- 17
+    {ctype='data[32]',          label='_unknown4'},                             -- 18
 }
 
 -- Spawn
