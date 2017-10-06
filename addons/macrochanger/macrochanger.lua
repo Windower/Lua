@@ -53,7 +53,7 @@ function addon_command (...)
 end
 
 function job_change (main,_,subj,_)
-    if settings.enabled == 'default' then
+    if settings.default then
         options.notice() 
     elseif settings.enabled then
         local job
