@@ -1,4 +1,4 @@
---Copyright (c) 2016~2017, Brimstone
+--Copyright (c) 2016-2017, Brimstone
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -9,14 +9,14 @@
 --    * Redistributions in binary form must reproduce the above copyright
 --      notice, this list of conditions and the following disclaimer in the
 --      documentation and/or other materials provided with the distribution.
---    * Neither the name of <addon name> nor the
+--    * Neither the name of closetCleaner nor the
 --      names of its contributors may be used to endorse or promote products
 --      derived from this software without specific prior written permission.
 
 --THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 --ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 --WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
---DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
+--DISCLAIMED. IN NO EVENT SHALL Brimstone BE LIABLE FOR ANY
 --DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 --(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 --LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -- _addon.name = 'closetCleaner'
--- _addon.version = '0.7'
+-- _addon.version = '0.9'
 -- _addon.author = 'Brimstone'
 -- _addon.commands = {'cc','closetCleaner'}
 
@@ -39,35 +39,36 @@ cc.sandbox.windower.register_unhandled_command = functions.empty()
 register_unhandled_command(function(...)
     local cmds = {...}
     for _,v in ipairs(cmds) do
-        if S{'closetCleaner','cc'}:contains(v:lower()) then
-			setmetatable(cc.sandbox, {__index = gearswap.user_env})
-			cc.sandbox.itemsBylongName = T{}
-			cc.sandbox.itemsByName = T{}
-			cc.sandbox.inventoryGear = T{}
-			cc.sandbox.gsGear = T{}
-			for k,v in pairs(gearswap.res.items) do
-				cc.sandbox.itemsBylongName[gearswap.res.items[k].enl:lower()] = k
-				cc.sandbox.itemsByName[gearswap.res.items[k].en:lower()] = k
-			end
-			cc.sandbox.jobs = {}
-			for k,v in pairs(gearswap.res.jobs) do
-				cc.sandbox.jobs[gearswap.res.jobs[k].ens] = k
-			end
-			if not windower.dir_exists(windower.addon_path..'report') then
-				windower.create_dir(windower.addon_path..'report')
-			end
-			local path = windower.addon_path:gsub('\\','/')
-			path = path..'report/'..player.name
+        if S{'closetcleaner','cc'}:contains(v:lower()) then
+            print("NEW RUN!")
+            setmetatable(cc.sandbox, {__index = gearswap.user_env})
+            cc.sandbox.itemsBylongName = T{}
+            cc.sandbox.itemsByName = T{}
+            cc.sandbox.inventoryGear = T{}
+            cc.sandbox.gsGear = T{}
+            for k,v in pairs(gearswap.res.items) do
+                cc.sandbox.itemsBylongName[gearswap.res.items[k].name_log:lower()] = k
+                cc.sandbox.itemsByName[gearswap.res.items[k].name:lower()] = k
+            end
+            cc.sandbox.jobs = {}
+            for k,v in pairs(gearswap.res.jobs) do
+                cc.sandbox.jobs[gearswap.res.jobs[k].ens] = k
+            end
+            if not windower.dir_exists(windower.addon_path..'report') then
+                windower.create_dir(windower.addon_path..'report')
+            end
+            local path = windower.addon_path:gsub('\\','/')
+            path = path..'report/'..player.name
             require 'ccConfig'
-			cc.run_report(path)
-			cc.sandbox = nil
+            cc.run_report(path)
+            cc.sandbox = nil
         end
     end
-	cc.sandbox = {}
-	cc.sandbox.windower = setmetatable({}, {__index = windower})
-	cc.sandbox.windower.register_event = functions.empty()
-	cc.sandbox.windower.raw_register_event = functions.empty()
-	cc.sandbox.windower.register_unhandled_command = functions.empty()
+    cc.sandbox = {}
+    cc.sandbox.windower = setmetatable({}, {__index = windower})
+    cc.sandbox.windower.register_event = functions.empty()
+    cc.sandbox.windower.raw_register_event = functions.empty()
+    cc.sandbox.windower.register_unhandled_command = functions.empty()
     return true
 end)
 
@@ -103,7 +104,7 @@ function cc.run_report(path)
 				cc.job_used[k] = " "
 			end
 			for i,s in ipairs(ccignore) do
-				if string.match(gearswap.res.items[k].en, s) or string.match(gearswap.res.items[k].en, s) then
+				if windower.wc_match(gearswap.res.items[k].en, s) or string.match(gearswap.res.items[k].en, s) then
 					printthis = nil
 					if cc.sandbox.inventoryGear[k] == nil then
 						data = T{gearswap.res.items[k].en, " | ", tostring(v), " | ", "NOT FOUND", " | ", cc.job_used[k], " | ", gearswap.res.items[k].enl}
@@ -196,7 +197,7 @@ function cc.export_sets(path)
 	fpath = string.lower(fpath)
 	dpath = fpath..'data/'
 	for i,v in ipairs(ccjobs) do
-		dname = string.lower(dpath..player.name..'/'..v..'.lua')
+        dname = string.lower(dpath..player.name..'/'..v..'.lua')
 		lname = string.lower(dpath..player.name..'_'..v..'.lua')
 		lgname = string.lower(dpath..player.name..'_'..v..'_gear.lua')
 		sname = string.lower(dpath..v..'.lua')
@@ -215,7 +216,6 @@ function cc.export_sets(path)
 		   print('lua file for '..v..' not found!')
 		end
 	end
-	
 	cc.list_sets(cc.supersets, fsets) 
 	cc.supersets = nil
 	if ccDebug then
@@ -232,7 +232,7 @@ function cc.extract_sets(file)
 	    user_file() 
 		local def_gear = cc.sandbox.init_get_sets or cc.sandbox.get_sets
 		if def_gear then 
-			def_gear() 
+            def_gear() 
 		end
 		return cc.deepcopy(cc.sandbox.sets)
 	else	
@@ -265,7 +265,6 @@ function cc.list_sets(t, f)
 							if write_sets[itemid] == nil then
 								write_sets[itemid] = 1
 								if cc.job_used[itemid] == nil then
-									-- print("found item "..itemid)
 									cc.job_used[itemid] = job
 									cc.job_logged[itemid..job] = 1
 								else
@@ -281,6 +280,8 @@ function cc.list_sets(t, f)
 							end
 						end
 					end
+				elseif (type(val)=="number") then
+					print("Found Number: "..val.." from "..pos.." table "..t)
 				else
 					print("Error: Val needs to be table or string "..type(val))
 				end
