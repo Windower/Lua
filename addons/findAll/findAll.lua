@@ -193,6 +193,7 @@ storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05'
 merged_storages_orders = storages_order + storage_slips_order + L{'key items'}
 
 function search(query, export)    
+    update_global_storage()
     update()
     if query:length() == 0 then
         return
@@ -490,14 +491,6 @@ function update()
         self_storage:create()
     end
     
-    global_storages = T{} -- global_storages[server str][character_name str][inventory_name str][item_id num] = count num
-    
-    for _,f in pairs(windower.get_dir(windower.addon_path.."\\"..storages_path)) do
-        if f:sub(-4) == '.lua' and f:sub(1,-5) ~= player_name then
-            global_storages[f:sub(1,-5)] = dofile(windower.addon_path..'\\'..storages_path..'\\'..f)
-        end
-    end
-    
 	local local_storage = get_local_storage()
 
 	if local_storage then
@@ -509,6 +502,25 @@ function update()
     self_storage:write('return '..make_table(local_storage,0)..'\n')
     collectgarbage()
     return true
+end
+
+
+function update_global_storage()
+    local player_name   = windower.ffxi.get_player().name
+    
+    global_storages = T{} -- global_storages[server str][character_name str][inventory_name str][item_id num] = count num
+    
+    for _,f in pairs(windower.get_dir(windower.addon_path.."\\"..storages_path)) do
+        if f:sub(-4) == '.lua' and f:sub(1,-5) ~= player_name then
+            local success,result = pcall(dofile,windower.addon_path..'\\'..storages_path..'\\'..f)
+            if success then
+                global_storages[f:sub(1,-5)] = result
+            else
+                warning('Unable to retrieve updated item storage for %s.':format(f:sub(1,-5)))
+            end
+        end
+        coroutine.yield()
+    end
 end
 
 windower.register_event('load', update:cond(function() return windower.ffxi.get_info().logged_in end))
