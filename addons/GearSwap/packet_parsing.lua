@@ -567,13 +567,14 @@ parse.i[0x063] = function (data)
 end
 
 parse.i[0x067] = function (data)
-    if data:byte(7)%128 == 4 and player.index == data:unpack('H',0x0D) then -- You are the owner
+    if player.index == data:unpack('H',0x0D) then -- You are the owner
         _ExtraData.pet.tp = data:unpack('H',0x11)
     end
 end
 
 parse.i[0x068] = function (data)
-    if data:byte(7)%128 == 4 and player.id == data:unpack('I',0x09) then -- You are the owner
+    
+    if player.index == data:unpack('H',0x07) then -- You are the owner
         _ExtraData.pet.tp = data:unpack('H',0x11)
     end
 end
