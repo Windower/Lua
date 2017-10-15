@@ -3500,7 +3500,7 @@ fields.incoming[0x111] = L{
 
 -- RoE Quest Log
 fields.incoming[0x112] = L{
-    {ctype='data[128]',         label='RoE Quest Bitfield'},                    -- 04   See next line
+    {ctype='data[132]',         label='RoE Quest Bitfield'},                    -- 04   See next line
     -- Bitpacked quest completion flags. The position of the bit is the quest ID.
     -- Data regarding available quests and repeatability is handled client side or
     -- somewhere else
