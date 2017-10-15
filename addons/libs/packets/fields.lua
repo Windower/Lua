@@ -3492,11 +3492,11 @@ types.roe_quest = L{
 -- Eminence Update
 fields.incoming[0x111] = L{
     {ref=types.roe_quest,       count=30},                                      -- 04
-    {ctype='data[128]',         label='_junk'},                                 -- 7C   All 0s observed. Likely reserved in case they decide to expand allowed objectives.
-    {ctype='byte',              label='_unknown1'},                             -- 100  May be related to limited time objectives?
-    {ctype='byte',              label='_unknown2'},                             -- 100  May be related to limited time objectives? Potentially bit flags
-    {ctype='unsigned short',    label='_unknown3'},                             -- 102  0 or 1 observed
+    {ctype='data[132]',         label='_junk'},                                 -- 7C   All 0s observed. Likely reserved in case they decide to expand allowed objectives.
+    {ctype='bit[12]',           label='Limited Time RoE Quest ID'},             -- 100
+    {ctype='bit[20]',           label='Limited Time RoE Quest Progress'},       -- 101 upper 4
 }
+
 
 -- RoE Quest Log
 fields.incoming[0x112] = L{
