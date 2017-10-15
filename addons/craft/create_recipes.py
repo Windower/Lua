@@ -42,10 +42,22 @@ def get_recipe(row):
             ingredients.append(english)
     return name, crystal, ingredients
 
-def get_recipes_from_rows(rows):
+def get_sphere_recipe(row):
+    c, i, r = [
+        td for td in row.findAll('td')
+    ]
+    name = str(r.findAll('a')[0]['title'])
+    crystal = str(c.findAll('img')[0]['alt']).rstrip(' icon.png')
+    ingredients = [str(i.findAll('a')[0]['title'])]
+    return name, crystal, ingredients
+
+def get_recipes_from_rows(rows, spheres=False):
     recipes = {}
     for row in rows:
-        name, crystal, ingredients = get_recipe(row)
+        if spheres:
+            name, crystal, ingredients = get_sphere_recipe(row)
+        else:
+            name, crystal, ingredients = get_recipe(row)
         while name in recipes.keys():
             if name[-1].isdigit():
                 name = name[:-2] + (" %d" % (int(name[-1]) + 1))
@@ -54,11 +66,13 @@ def get_recipes_from_rows(rows):
         recipes[name] = [crystal, ingredients]
     return recipes
 
-def get_recipes_from_soup(soup):
+def get_recipes_from_soup(soup, spheres=False):
+    string = "Sphere Results" if spheres else "Synthesis Information"
+    count = 3 if spheres else 4
     subtables = [
         descendant.parent.parent.parent
         for descendant in soup.descendants
-        if "Synthesis Information" in descendant
+        if string in descendant
     ]
     rows = []
     for subtable in subtables:
@@ -66,10 +80,10 @@ def get_recipes_from_soup(soup):
             row
             for row in subtable.children
             if (hasattr(row, 'findAll') and
-                len(row.findAll('td')) == 4)
+                len(row.findAll('td')) == count)
         ]
         rows.extend(children)
-    return get_recipes_from_rows(rows)
+    return get_recipes_from_rows(rows, spheres)
 
 def get_items_dictionary():
     path = 'C:\\Program Files (x86)\\Windower4\\res\\items.lua'
@@ -153,7 +167,7 @@ def save_recipes(recipes):
             fd.write(build_recipe_string(key, *recipes[key]))
         fd.write("}\n")
 
-def get_recipes(craft):
+def get_recipes(craft, spheres=False):
     base = "https://www.bg-wiki.com/bg/"
     name = "%s.html" % craft
     if not os.path.exists(name):
@@ -163,7 +177,7 @@ def get_recipes(craft):
     with open(name, 'r') as fd:
         page = fd.read()
         soup = BeautifulSoup(page, 'lxml')
-        return get_recipes_from_soup(soup)
+        return get_recipes_from_soup(soup, spheres)
 
 if __name__ == "__main__":
     crafts = [
@@ -179,5 +193,6 @@ if __name__ == "__main__":
     recipes = {}
     for craft in crafts:
         recipes.update(get_recipes(craft))
+    recipes.update(get_recipes('Category:Escutcheons', True))
     fix_recipes(recipes)
     save_recipes(recipes)
