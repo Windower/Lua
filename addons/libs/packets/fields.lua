@@ -3491,16 +3491,15 @@ types.roe_quest = L{
 
 -- Eminence Update
 fields.incoming[0x111] = L{
-    {ref=types.roe_quest,       count=16},                                      -- 04
+    {ref=types.roe_quest,       count=30},                                      -- 04
 }
 
 -- RoE Quest Log
 fields.incoming[0x112] = L{
     {ctype='data[128]',         label='RoE Quest Bitfield'},                    -- 04   See next line
-    -- There's probably one bit to indicate that a quest can be undertaken and another
-    --  that indicates whether it has been completed once. The meaning of the individual
-    --  bits obviously varies with Order. RoE quests with storyline are in the Packet
-    --  with Order == 3. Most normal quests are in Order == 0
+    -- Bitpacked quest completion flags. The position of the bit is the quest ID.
+    -- Data regarding available quests and repeatability is handled client side or
+    -- somewhere else
     {ctype='unsigned int',      label='Order'},                                 -- 84   0,1,2,3
 }
 
