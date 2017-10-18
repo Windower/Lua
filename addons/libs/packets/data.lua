@@ -203,6 +203,7 @@ data.incoming[0x0AC] = {name='Ability List',        description='Packet that sho
 data.incoming[0x0AE] = {name='Mount List',          description='Packet that shows your current mounts.'}
 data.incoming[0x0B4] = {name='Seek AnonResp',       description='Server response sent after you put up party or anon flag.'}
 data.incoming[0x0B5] = {name='Help Desk Open',      description='Sent when you open the Help Desk submenu.'}
+data.incoming[0x0BF] = {name='Reservation Response',description='Sent to inform the client about the status of entry to an instanced area.'}
 data.incoming[0x0C8] = {name='Party Struct Update', description='Updates all party member info in one struct. No player vital data (HP/MP/TP) or names are sent here.'}
 data.incoming[0x0C9] = {name='Show Equip',          description='Shows another player your equipment after using the Check command.'}
 data.incoming[0x0CA] = {name='Bazaar Message',      description='Shows another players bazaar message after using the Check command or sets your own on zoning.'}
