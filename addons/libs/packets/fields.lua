@@ -414,7 +414,7 @@ enums[0x033] = {
 -- Sent when accepting, confirming or canceling a trade
 fields.outgoing[0x033] = L{
     {ctype='unsigned int',      label='Type',               fn=e+{0x033}},      -- 04
-    {ctype='data[4]',           label='_unknown1'}                              -- 08
+    {ctype='unsigned int',      label='Trade Count'}                            -- 08   Necessary to set if you are receiving items, comes from incoming packet 0x023
 }
 
 -- Trade offer
@@ -3492,7 +3492,11 @@ types.roe_quest = L{
 -- Eminence Update
 fields.incoming[0x111] = L{
     {ref=types.roe_quest,       count=30},                                      -- 04
+    {ctype='data[132]',         label='_junk'},                                 -- 7C   All 0s observed. Likely reserved in case they decide to expand allowed objectives.
+    {ctype='bit[12]',           label='Limited Time RoE Quest ID'},             -- 100
+    {ctype='bit[20]',           label='Limited Time RoE Quest Progress'},       -- 101 upper 4
 }
+
 
 -- RoE Quest Log
 fields.incoming[0x112] = L{
