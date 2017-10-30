@@ -222,7 +222,7 @@ local function help()
         * clear : removes objectives if space is needed (default true)
         * clearprogress : remove objectives even if they have non-zero progress (default false)
         * clearall : clears every objective before setting new ones (default false)
-6. blacklist [add|remove] <id> : blacklists a quest from ever being removes
+6. blacklist [add|remove] <id> : blacklists a quest from ever being removed
     - I do not currently have a mapping of quest IDs to names]])
 end
 
