@@ -180,10 +180,10 @@
   </addon>
   <addon>
     <name>DressUp</name>
-    <author>Cairthenn</author>
+    <author>Cair</author>
     <description>Emulates BlinkMeNot functionality. Allows for customization of gear display for you or anyone else.</description>
     <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
-    <support>http://www.bluegartr.com/members/34070-Cairthenn</support>
+    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>DynamisHelper</name>
@@ -214,7 +214,7 @@
   </addon>
   <addon>
     <name>FastCS</name>
-    <author>Cairthenn</author>
+    <author>Cair</author>
     <description>Dramatically speeds up cutscenes by disabling the frame rate cap. Requires the config plugin.</description>
     <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
     <support>https://discord.gg/b275nMv</support>
@@ -262,10 +262,10 @@
   </addon>
   <addon>
     <name>InfoReplacer</name>
-    <author>Cairthenn</author>
+    <author>Cair</author>
     <description>Replaces outgoing text prefixed by % with respective game information.</description>
     <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
-    <support>http://www.bluegartr.com/members/34070-Cairthenn</support>
+    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>Itemizer</name>
@@ -444,6 +444,13 @@
     <author>trv</author>
     <support>https://discord.gg/b275nMv</support>
     <bugtracker>https://github.com/trv6/Lua/issues</bugtracker>
+  </addon>
+  <addon>
+    <name>ROE</name>
+    <author>Cair</name>
+    <description>Let's you save your Records of Eminence objectives to profiles for easily swapping out objectives.</description>
+    <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
+    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>RollTracker</name>
