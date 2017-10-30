@@ -216,8 +216,7 @@ local function help()
     - Objectives may be canceled automatically based on settings.
     - The default setting is to only cancel ROE that have 0 progress if space is needed
 4. unset : removes currently set objectives
-    - By default, this will only remove objectives
-	- Handles 1:1 replacement, similar to .DAT swapping. 
+    - By default, this will only remove objectives without progress made
 5. settings <settings name> : toggles the specified setting
     * settings:
         * clear : removes objectives if space is needed (default true)
