@@ -50,7 +50,7 @@ settings = config.load(defaults)
 
 _roe = T{
     active = T{},
-    complete = T{}    
+    complete = T{},    
     max_count = 30,
 }
 
