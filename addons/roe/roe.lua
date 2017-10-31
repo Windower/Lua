@@ -51,6 +51,7 @@ settings = config.load(defaults)
 _roe = T{
     active = T{},
     complete = T{}    
+    max_count = 30,
 }
 
 
@@ -117,7 +118,7 @@ local function set(name)
 
     
     local needed_quests = settings.profiles[name]:diff(_roe.active:keyset())   
-    local available_slots = 30 - _roe.active:length()
+    local available_slots = _roe.max_count - _roe.active:length()
     local to_remove = S{}
            
     if settings.clearall then
@@ -163,7 +164,7 @@ local function unset()
 end
 
 local true_strings = S{'true','t','y','yes','on'}
-local false_strings = S{'false','f','n','off'}
+local false_strings = S{'false','f','n','no','off'}
 local bool_strings = true_strings:union(false_strings)
 
 local function handle_setting(setting,val)
@@ -241,7 +242,7 @@ local cmd_handlers = {
 local function inc_chunk_handler(id,data)
     if id == 0x111 then
         _roe.active:clear()
-        for i = 1,30 do
+        for i = 1, _roe.max_count do
             local offset = 5 + ((i - 1) * 4)
             local id,progress = data:unpack('b12b20', offset)
             if id > 0 then
@@ -254,7 +255,7 @@ local function inc_chunk_handler(id,data)
                 return (k + 1024*data:unpack('H', 133) - 1) 
             end):map(
             function(v) 
-                return (v == 1 and true) or false
+                return (v == 1)
             end)
         _roe.complete:update(complete)
     end
