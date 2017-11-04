@@ -642,11 +642,11 @@ function filter_pretarget(action)
         local available_spells = windower.ffxi.get_spells()
         bool,err = check_spell(available_spells,action)
     elseif category == 7 then
-		local available = windower.ffxi.get_abilities().weapon_skills
+        local available = windower.ffxi.get_abilities().weapon_skills
         if not available[action.id] then
             bool,err = false,"Unable to execute command. You do not have access to that weapon skill."
         end
-	elseif category == 9 then
+    elseif category == 9 then
         local available = windower.ffxi.get_abilities().job_abilities
         if not available[action.id] then
             bool,err = false,"Unable to execute command. You do not have access to that job ability."
