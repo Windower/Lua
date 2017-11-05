@@ -14,8 +14,9 @@ This addon lets you save your currently set objectives to profiles that can be l
 3. set <profile name> : attempts to set the ROE objectives in the profile
     - Objectives may be canceled automatically based on settings.
     - The default setting is to only cancel ROE that have 0 progress if space is needed
-4. unset : removes currently set objectives
-    - By default, this will only remove objectives without progress made
+4. unset <profile name> : removes currently set objectives
+    - if a profile name is specified, every objective in that profile will be removed
+    - if a profile name is not specificed, all objectives will be removed (based on your settings)
 5. settings <settings name> : toggles the specified setting
     * settings:
         * clear : removes objectives if space is needed (default true)

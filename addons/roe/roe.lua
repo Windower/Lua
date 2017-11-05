@@ -60,7 +60,7 @@ local function cancel_roe(id)
     
     if not id then return end
     
-    if settings.blacklist[id] then return end
+    if settings.blacklist[id] or not _roe.active[id] then return end
     
     local p = packets.new('outgoing', 0x10d, {['RoE Quest'] = id })
     packets.inject(p)
@@ -111,12 +111,6 @@ local function set(name)
         return
     end
     
-    if type(settings.profiles[name]) == "string" then
-        settings.profiles[name] = S(settings.profiles[name]:split(','):map(tonumber))
-    end
-    
-
-    
     local needed_quests = settings.profiles[name]:diff(_roe.active:keyset())   
     local available_slots = _roe.max_count - _roe.active:length()
     local to_remove = S{}
@@ -154,13 +148,28 @@ local function set(name)
 
 end
 
-local function unset()
-    for id,progress in pairs(_roe.active:copy()) do
-        if progress == 0 or settings.clearprogress then
+local function unset(name)
+
+    name = name and name:lower()
+
+    if name and settings.profiles[name] then
+        for id in _roe.active:keyset():intersection(settings.profiles[name]):it() do
             cancel_roe(id)
             coroutine.sleep(.5)
         end
+        notice('unset the profile \'%s\'':format(name))
+    elseif name then
+        error('`unset` : the profile \'%s\' does not exist':format(name))
+    elseif not name then
+        notice('clearing ROE objectives.')
+        for id,progress in pairs(_roe.active:copy()) do
+            if progress == 0 or settings.clearprogress then
+                cancel_roe(id)
+                coroutine.sleep(.5)
+            end
+        end
     end
+
 end
 
 local true_strings = S{'true','t','y','yes','on'}
@@ -272,8 +281,15 @@ local function addon_command_handler(command,...)
 end
 
 local function load_handler()
+    for k,v in pairs(settings.profiles) do
+        if type(v) == "string" then
+            settings.profiles[k] = S(v:split(','):map(tonumber))
+        end
+    end
+    
     local last_roe = windower.packets.last_incoming(0x111)
     if last_roe then inc_chunk_handler(0x111,last_roe) end
+
 end
 
 windower.register_event('incoming chunk', inc_chunk_handler)
