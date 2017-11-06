@@ -447,8 +447,8 @@
   </addon>
   <addon>
     <name>ROE</name>
-    <author>Cair</name>
-    <description>Let's you save your Records of Eminence objectives to profiles for easily swapping out objectives.</description>
+    <author>Cair</author>
+    <description>Lets you save your Records of Eminence objectives to profiles for easily swapping out objectives.</description>
     <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
     <support>https://discord.gg/b275nMv</support>
   </addon>
