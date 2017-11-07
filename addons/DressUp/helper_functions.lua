@@ -83,8 +83,6 @@ function blink_logic(blink_type,character_index,player)
     elseif settings.blinking[blink_type]["combat"] and player.in_combat then
         return true
     end
-        
-    log(settings.blinking["all"]["target"], player.target_index, character_index)
 
     if settings.blinking["all"]["target"] and player.target_index == character_index then
         return true
