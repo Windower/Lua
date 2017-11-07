@@ -150,7 +150,7 @@ windower.register_event('incoming chunk',function (id, _, data)
             Feet    = character.models[6]+0x5000,
             Main    = character.models[7]+0x6000,
             Sub     = character.models[8]+0x7000,
-            Ranged  = character.models[9]+0x8000})
+            Ranged  = character.models[9]+0x8000}
     end
 
     if not info.names[char_id] then
