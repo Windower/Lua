@@ -1,4 +1,4 @@
--- Copyright © 2013-2015, Cairthenn
+-- Copyright © 2013-2017, Cairthenn
 -- All rights reserved.
 
 -- Redistribution and use in source and binary forms, with or without
@@ -25,19 +25,16 @@
 -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'DressUp'
-_addon.author = 'Cairthenn'
-_addon.version = '1.1'
+_addon.author = 'Cair'
+_addon.version = '1.2'
 _addon.commands = {'DressUp','du'}
 
---Libs
-require('luau')
+
 packets = require('packets')
-
---DressUp files
-
-
+require('luau')
 require('helper_functions')
 require('static_variables')
+
 
 models = {}
 require('head')
@@ -47,12 +44,22 @@ require('legs')
 require('feet')
 
 settings = config.load(defaults)
+info = T{
+    names = T{},
+    self = T{},
+    party = S{}
+}
+
+model_names = S{"Face","Race","Head","Body","Hands","Legs","Feet","Main","Sub","Ranged"}
 
 local initialize = function()
     local player = windower.ffxi.get_player()
-    _char = player.name:lower()
-    if not settings[_char] then
-        settings[_char] = {}
+    info.self.name = player.name:lower()
+    info.self.id = player.id
+    info.self.index = player.index
+
+    if not settings[info.self.name] then
+        settings[info.self.name] = {}
     end
 
     print_blink_settings("global")
@@ -60,7 +67,7 @@ local initialize = function()
         notice('Loaded profile: ' .. player.main_job)
     end
 
-    update_model(player.index)
+    update_model(info.self.index)
 end
 
 windower.register_event('load', function()
@@ -72,17 +79,16 @@ end)
 windower.register_event('login', initialize)
 
 windower.register_event('logout', function()
-    _char = nil
+    info.self:clear()
 end)
 
 windower.register_event('job change',function(job)
     if load_profile(res.jobs[job].name) then
-        update_model(windower.ffxi.get_player().index)
-        notice('Loaded profile: ' .. job)
+        update_model(info.self.index)
+        notice('Loaded profile: ' .. res.jobs[job].name)
     end
 end)
 
-model_names = S{"Face","Race","Head","Body","Hands","Legs","Feet","Main","Sub","Ranged"}
 
 local modify_gear = function(packet, name, freeze, models)
     local modified = false
@@ -109,65 +115,75 @@ local modify_gear = function(packet, name, freeze, models)
 end
 
 windower.register_event('incoming chunk',function (id, _, data)
+    
     if id ~= 0x00A and id ~= 0x00D and id ~= 0x051 then
         return
     end
 
     local packet = packets.parse('incoming', data)
-    local player = windower.ffxi.get_player()
     local modified
 
     -- Processing based on packet type
     if id == 0x00A then
-        if not _char then
-            return
-        end
-        modified,packet = modify_gear(packet, _char)
+        info.self.id = packet['Player']
+        info.self.index = packet['Player Index']
+        info.self.name = packet['Player Name']:lower()
+        modified,packet = modify_gear(packet, info.self.name)
         return modified and packets.build(packet)
     end
-    
-    -- Check whether the character is loaded into memory yet.
-    local character = windower.ffxi.get_mob_by_index(packet.Index or player and player.index or -1) -- Target of 0x00D or yourself for 0x051
-    local blink_type, models, name = 'others'
+
+    local char_id = packet.Player or info.self.id
+    local char_index = packet.Index or info.self.index
+    local character = windower.ffxi.get_mob_by_index(char_index)
+    local blink_type, name = 'others'
+    local models
+
     if character and character.models and table.length(character.models) == 9 and
         (id == 0x051 or (id == 0x00D and character.id == packet.Player) ) then
-        models = {Race=character.race,
-            Face = character.models[1],
-            Head=character.models[2]+0x1000,
-            Body=character.models[3]+0x2000,
-            Hands=character.models[4]+0x3000,
-            Legs=character.models[5]+0x4000,
-            Feet=character.models[6]+0x5000,
-            Main=character.models[7]+0x6000,
-            Sub=character.models[8]+0x7000,
-            Ranged=character.models[9]+0x8000}
-    else
-        return
+        models = T{
+            Race    = character.race,
+            Face    = character.models[1],
+            Head    = character.models[2]+0x1000,
+            Body    = character.models[3]+0x2000,
+            Hands   = character.models[4]+0x3000,
+            Legs    = character.models[5]+0x4000,
+            Feet    = character.models[6]+0x5000,
+            Main    = character.models[7]+0x6000,
+            Sub     = character.models[8]+0x7000,
+            Ranged  = character.models[9]+0x8000})
     end
-    
-    if character then
-        if player.follow_index == character.index then
-            blink_type = "follow"
-        elseif character.in_alliance then
-            blink_type = "party"
-        else
-            blink_type = "others"
-        end
 
-        if character.name == player.name then
-            name = _char
-            blink_type = "self"
-        elseif settings[character.name:lower()] then
-            name = character.name:lower()
+    if not info.names[char_id] then
+        if packet['Update Name'] then
+            info.names[char_id] = packet['Character Name']:lower()
+        elseif character then
+            info.names[char_id] = character.name:lower()
         else
-            name = "others"
+            return
         end
+    end
+
+    local player = windower.ffxi.get_player()
+
+    if player.follow_index == char_index then
+        blink_type = "follow"
+    elseif character and character.in_alliance then
+        blink_type = "party"
+    else
+        blink_type = "others"
+    end
+
+    if info.names[char_id] == info.self.name then
+        name = info.self.name
+        blink_type = "self"
+    elseif settings[info.names[char_id]] then
+        name = info.names[char_id]
     else
         name = "others"
     end
     
     -- Model ID 0xFFFF in ranged slot signifies a monster. This prevents undesired results.
-    modified,packet = modify_gear(packet, name or _char, blink_logic(blink_type, character, player), models)
+    modified,packet = modify_gear(packet, name, blink_logic(blink_type, char_index, player), models)
     return packet['Ranged'] ~= 0xFFFF and modified and packets.build(packet)
 end)
 
@@ -224,7 +240,7 @@ windower.register_event('addon command', function (command,...)
         if command == "player" then
             command = args:remove(1)
         elseif command == "self" then
-            command = _char
+            command = info.self.name
         end
         
         if not settings[command] then
@@ -453,7 +469,7 @@ windower.register_event('addon command', function (command,...)
             return
         end
     end
-    if settings.autoupdate and ((command == _char) or (_clear == _char)) then
+    if settings.autoupdate and ((command == info.self.name) or (_clear == info.self.name)) then
         update_model(windower.ffxi.get_player().index)
     end
     
