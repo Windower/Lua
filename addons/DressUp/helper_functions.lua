@@ -71,7 +71,7 @@ function save_profile(name)
     notice('Saved your current settings to the profile: ' .. name)
 end
 
-function blink_logic(blink_type,character,player)
+function blink_logic(blink_type,character_index,player)
     if settings.blinking["all"]["always"] then
         return true
     elseif settings.blinking[blink_type]["always"] then
@@ -83,10 +83,10 @@ function blink_logic(blink_type,character,player)
     elseif settings.blinking[blink_type]["combat"] and player.in_combat then
         return true
     end
-    
-    if settings.blinking["all"]["target"] and player.target_index == character.index then
+
+    if settings.blinking["all"]["target"] and player.target_index == character_index then
         return true
-    elseif settings.blinking[blink_type]["target"] and player.target_index == character.index then
+    elseif settings.blinking[blink_type]["target"] and player.target_index == character_index then
         return true
     end
     

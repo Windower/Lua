@@ -641,11 +641,15 @@ function filter_pretarget(action)
     elseif category == 3 then
         local available_spells = windower.ffxi.get_spells()
         bool,err = check_spell(available_spells,action)
-    elseif category == 7 or category == 9 then
-        local available = windower.ffxi.get_abilities()
-        available = S(available.job_abilities):union(S(available.weapon_skills))
-        if not available[action.id] then
-            bool,err = false,"Unable to excute command. You do not have access to that ability."
+    elseif category == 7 then
+        local available = windower.ffxi.get_abilities().weapon_skills
+        if not table.contains(available,action.id) then
+            bool,err = false,"Unable to execute command. You do not have access to that weapon skill."
+        end
+    elseif category == 9 then
+        local available = windower.ffxi.get_abilities().job_abilities
+        if not table.contains(available,action.id) then
+            bool,err = false,"Unable to execute command. You do not have access to that job ability."
         end
     elseif category == 25 and (not player.main_job_id == 23 or not windower.ffxi.get_mjob_data().species or
         not res.monstrosity[windower.ffxi.get_mjob_data().species] or not res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[action.id] or
