@@ -360,7 +360,7 @@ windower.register_event('addon command', function (command,...)
         if _clear == "player" then
             _clear = args:remove(1)
         elseif _clear == "self" then
-            _clear = _char
+            _clear = info.self.name
         end
         
         local _selection = S{"head","body","hands","legs","feet","main","sub","ranged","race","face"}:contains(args[1]) and args:remove(1)
