@@ -134,7 +134,7 @@ windower.register_event('incoming chunk',function (id, _, data)
 
     local char_id = packet.Player or info.self.id
     local char_index = packet.Index or info.self.index
-    local character = windower.ffxi.get_mob_by_index(char_index)
+    local character = windower.ffxi.get_mob_by_index(char_index or -1)
     local blink_type, name = 'others'
     local models
 
