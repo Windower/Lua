@@ -577,14 +577,10 @@ func.outgoing[0x04E][0x10] = L{
 }
 
 -- Auction Interaction
-fields.outgoing[0x04E] = function()
-    local self = func.outgoing[0x04E]
-    local fields = self.base
-
-    return function(data, type)
-        return self.base + (self[type or data:byte(5)] or L{})
-    end
-end()
+fields.outgoing[0x04E] = function(data, type)
+    type = type or data and data:byte(5)
+    return func.outgoing[0x04E].base  + (func.outgoing[0x04E][type] or L{})
+end
 
 -- Equip
 fields.outgoing[0x050] = L{
