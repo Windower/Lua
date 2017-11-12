@@ -3068,6 +3068,10 @@ types.guild_entry = L{
 -- Guild Inv List
 fields.incoming[0x083] = L{
     {ref=types.guild_entry,     label='Item',               count='*'},         -- 04
+    {ctype='unsigned char',     label='Item Count'},
+    {ctype='bit[4]',            label='Order'},
+    {ctype='bit[4]',            label='_unknown'},
+    {ctype='unsigned short',    label='_padding'}
 }
 
 -- Guild Sell Response
@@ -3081,6 +3085,10 @@ fields.incoming[0x084] = L{
 -- Guild Sale List
 fields.incoming[0x085] = L{
     {ref=types.guild_entry,     label='Item',               count='*'},         -- 04
+    {ctype='unsigned char',     label='Item Count'},
+    {ctype='bit[4]',            label='Order'},
+    {ctype='bit[4]',            label='_unknown'},
+    {ctype='unsigned short',    label='_padding'}
 }
 -- Guild Open
 -- Sent to update guild status or open the guild menu.
