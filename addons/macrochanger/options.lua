@@ -26,7 +26,7 @@ options.enabled = function(opt)
 
     if switch[opt] then
         switch[opt]()
-	else
+    else
         options.help()
     end
 end

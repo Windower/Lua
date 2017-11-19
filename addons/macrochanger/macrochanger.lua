@@ -41,6 +41,7 @@ function addon_command (...)
     while i < #args + 1 do
         if args[i] == 'help' then
             options.help()
+			return
         elseif options[args[i]] then
             options[args[i]](args[i+1])
             i = i + 2
