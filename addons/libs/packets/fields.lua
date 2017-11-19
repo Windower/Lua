@@ -414,7 +414,7 @@ enums[0x033] = {
 -- Sent when accepting, confirming or canceling a trade
 fields.outgoing[0x033] = L{
     {ctype='unsigned int',      label='Type',               fn=e+{0x033}},      -- 04
-    {ctype='data[4]',           label='_unknown1'}                              -- 08
+    {ctype='unsigned int',      label='Trade Count'}                            -- 08   Necessary to set if you are receiving items, comes from incoming packet 0x023
 }
 
 -- Trade offer
@@ -577,14 +577,10 @@ func.outgoing[0x04E][0x10] = L{
 }
 
 -- Auction Interaction
-fields.outgoing[0x04E] = function()
-    local self = func.outgoing[0x04E]
-    local fields = self.base
-
-    return function(data, type)
-        return self.base + (self[type or data:byte(5)] or L{})
-    end
-end()
+fields.outgoing[0x04E] = function(data, type)
+    type = type or data and data:byte(5)
+    return func.outgoing[0x04E].base  + (func.outgoing[0x04E][type] or L{})
+end
 
 -- Equip
 fields.outgoing[0x050] = L{
@@ -689,6 +685,15 @@ fields.outgoing[0x05C] = L{
     {ctype='unsigned short',    label='Menu ID'},                               -- 1A
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 1C
     {ctype='unsigned short',    label='_unknown3'},                             -- 1E   Not zone ID
+}
+
+-- Outgoing emote
+fields.outgoing[0x05D] = L{
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 04
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 08                      
+    {ctype='unsigned char',     label='Emote',              fn=emote},          -- 0A
+    {ctype='unsigned char',     label='Type'},                                  -- 0B  2 for motion, 0 otherwise
+    {ctype='unsigned int',      label='_unknown1',          const=0},           -- 0C
 }
 
 -- Zone request
@@ -2537,6 +2542,94 @@ fields.incoming[0x055] = L{
     {ctype='unsigned int',      label='Type'},                                  -- 84   Goes from 0 to 5, determines which KI are being sent
 }
 
+enums.quest_mission_log = {
+    [0x0030] = 'Completed Campaign Missions',
+    [0x0038] = 'Completed Campaign Missions (2)',       -- Starts at index 256
+    [0x0050] = 'Current San d\'Oria Quests',
+    [0x0058] = 'Current Bastok Quests',
+    [0x0060] = 'Current Windurst Quests',
+    [0x0068] = 'Current Jeuno Quests',
+    [0x0070] = 'Current Other Quests',
+    [0x0078] = 'Current Outlands Quests',
+    [0x0080] = 'Current TOAU Quests and Missions (TOAU, WOTG, Assault, Campaign)',
+    [0x0088] = 'Current WOTG Quests',
+    [0x0090] = 'Completed San d\'Oria Quests',
+    [0x0098] = 'Completed Bastok Quests',
+    [0x00A0] = 'Completed Windurst Quests',
+    [0x00A8] = 'Completed Jeuno Quests',
+    [0x00B0] = 'Completed Other Quests',
+    [0x00B8] = 'Completed Outlands Quests',
+    [0x00C0] = 'Completed TOAU Quests and Assaults',
+    [0x00C8] = 'Completed WOTG Quests',
+    [0x00D0] = 'Completed Missions (Nations, Zilart)',
+    [0x00D8] = 'Completed Missions (TOAU, WOTG)',
+    [0x00E0] = 'Current Abyssea Quests',
+    [0x00E8] = 'Completed Abyssea Quests',
+    [0x00F0] = 'Current Adoulin Quests',
+    [0x00F8] = 'Completed Adoulin Quests',
+    [0x0100] = 'Current Coalition Quests', 
+    [0x0108] = 'Completed Coalition Quests', 
+    [0xFFFF] = 'Current Missions',               
+}
+
+-- There are 27 variations of this packet to populate different quest information.
+-- Current quests, completed quests, and completed missions (where applicable) are represented by bit flags where the position
+-- corresponds to the quest index in the respective DAT.
+-- "Current Mission" fields refer to the mission ID, except COP, SOA, and ROV, which represent a mapping of some sort(?)
+-- Additionally, COP, SOA, and ROV do not have a "completed" missions packet, they are instead updated with the current mission.
+-- Quests will remain in your 'current' list after they are completed unless they are repeatable.
+
+func.incoming[0x056] = {}
+fields.incoming[0x056] = function (data, type)
+    return (func.incoming[0x056][type or data and data:unpack('H',0x25)] or L{{ctype='data[32]', label='Quest Flags'}}) + func.incoming[0x056].type
+end
+
+func.incoming[0x056].type = L{ 
+    {ctype='int',                label='Type',   fn=e+{'quest_mission_log'}}    -- 24
+}
+
+func.incoming[0x056][0x0080] = L{
+    {ctype='data[16]',      label='Current TOAU Quests'},                       -- 04
+    {ctype='int',           label='Current Assault Mission'},                   -- 14
+    {ctype='int',           label='Current TOAU Mission'},                      -- 18
+    {ctype='int',           label='Current WOTG Mission'},                      -- 1C
+    {ctype='int',           label='Current Campaign Mission'},                  -- 20
+}
+
+func.incoming[0x056][0x00C0] = L{
+    {ctype='data[16]',      label='Completed TOAU Quests'},                     -- 04
+    {ctype='data[16]',      label='Completed Assaults'},                        -- 14
+}
+
+func.incoming[0x056][0x00D0] = L{
+    {ctype='data[8]',       label='Completed San d\'Oria Missions'},            -- 04
+    {ctype='data[8]',       label='Completed Bastok Missions'},                 -- 0C
+    {ctype='data[8]',       label='Completed Windurst Missions'},               -- 14
+    {ctype='data[8]',       label='Completed Zilart Missions'},                 -- 1C
+}
+
+func.incoming[0x056][0x00D8] = L{
+    {ctype='data[8]',       label='Completed TOAU Missions'},                   -- 04
+    {ctype='data[8]',       label='Completed WOTG Missions'},                   -- 0C
+    {ctype='data[16]',      label='_junk'},                                     -- 14
+}
+
+func.incoming[0x056][0xFFFF] = L{
+    {ctype='int',           label='Nation'},                                    -- 04
+    {ctype='int',           label='Current Nation Mission'},                    -- 08
+    {ctype='int',           label='Current ROZ Mission'},                       -- 0C
+    {ctype='int',           label='Current COP Mission'},                       -- 10 Doesn't correspond directly to DAT
+    {ctype='int',           label='_unknown1'},                                 -- 14
+    {ctype='bit[4]',        label='Current ACP Mission'},                       -- 18 lower 4
+    {ctype='bit[4]',        label='Current MKD Mission'},                       -- 18 upper 4
+    {ctype='bit[4]',        label='Current ASA Mission'},                       -- 19 lower 4
+    {ctype='bit[4]',        label='_junk1'},                                    -- 19 upper 4
+    {ctype='short',         label='_junk2'},                                    -- 1A
+    {ctype='int',           label='Current SOA Mission'},                       -- 1C Doesn't correspond directly to DAT
+    {ctype='int',           label='Current ROV Mission'},                       -- 20 Doesn't correspond directly to DAT
+}
+
+
 -- Weather Change
 fields.incoming[0x057] = L{
     {ctype='unsigned int',      label='Vanadiel Time',      fn=vtime},          -- 04   Units of minutes.
@@ -2549,6 +2642,20 @@ enums.spawntype = {
     [0x03] = 'Monster',
     [0x00] = 'Casket or NPC',
     [0x0A] = 'Self',
+}
+
+-- Emote
+fields.incoming[0x05A] = L{
+    {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04 
+    {ctype='unsigned int',      label='Target ID',          fn=id},             -- 08
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
+    {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0E
+    {ctype='unsigned short',    label='Emote',              fn=emote},          -- 10
+    {ctype='unsigned short',    label='_unknown1',          const=2},           -- 12
+    {ctype='unsigned short',    label='_unknown2'},                             -- 14
+    {ctype='unsigned char',     label='Type'},                                  -- 16   2 for motion, 0 otherwise
+    {ctype='unsigned char',     label='_unknown3'},                             -- 17
+    {ctype='data[32]',          label='_unknown4'},                             -- 18
 }
 
 -- Spawn
@@ -2960,7 +3067,11 @@ types.guild_entry = L{
 }
 -- Guild Inv List
 fields.incoming[0x083] = L{
-    {ref=types.guild_entry,     label='Item',               count='*'},         -- 04
+    {ref=types.guild_entry,     label='Item',               count='30'},        -- 04
+    {ctype='unsigned char',     label='Item Count'},                            -- F4
+    {ctype='bit[4]',            label='Order'},                                 -- F5
+    {ctype='bit[4]',            label='_unknown'},                              
+    {ctype='unsigned short',    label='_padding'}                               -- F6
 }
 
 -- Guild Sell Response
@@ -2973,7 +3084,11 @@ fields.incoming[0x084] = L{
 
 -- Guild Sale List
 fields.incoming[0x085] = L{
-    {ref=types.guild_entry,     label='Item',               count='*'},         -- 04
+    {ref=types.guild_entry,     label='Item',               count='30'},        -- 04
+    {ctype='unsigned char',     label='Item Count'},                            -- F4
+    {ctype='bit[4]',            label='Order'},                                 -- F5
+    {ctype='bit[4]',            label='_unknown'},                              
+    {ctype='unsigned short',    label='_padding'}                               -- F6
 }
 -- Guild Open
 -- Sent to update guild status or open the guild menu.
@@ -3380,16 +3495,19 @@ types.roe_quest = L{
 
 -- Eminence Update
 fields.incoming[0x111] = L{
-    {ref=types.roe_quest,       count=16},                                      -- 04
+    {ref=types.roe_quest,       count=30},                                      -- 04
+    {ctype='data[132]',         label='_junk'},                                 -- 7C   All 0s observed. Likely reserved in case they decide to expand allowed objectives.
+    {ctype='bit[12]',           label='Limited Time RoE Quest ID'},             -- 100
+    {ctype='bit[20]',           label='Limited Time RoE Quest Progress'},       -- 101 upper 4
 }
+
 
 -- RoE Quest Log
 fields.incoming[0x112] = L{
     {ctype='data[128]',         label='RoE Quest Bitfield'},                    -- 04   See next line
-    -- There's probably one bit to indicate that a quest can be undertaken and another
-    --  that indicates whether it has been completed once. The meaning of the individual
-    --  bits obviously varies with Order. RoE quests with storyline are in the Packet
-    --  with Order == 3. Most normal quests are in Order == 0
+    -- Bitpacked quest completion flags. The position of the bit is the quest ID.
+    -- Data regarding available quests and repeatability is handled client side or
+    -- somewhere else
     {ctype='unsigned int',      label='Order'},                                 -- 84   0,1,2,3
 }
 
