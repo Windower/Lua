@@ -132,7 +132,7 @@ windower.register_event('incoming chunk',function (id, _, data)
         return modified and packets.build(packet)
     end
 
-    if id == 0x0D and not p['Update Model'] then
+    if id == 0x0D and not packet['Update Model'] then
         return
     end
 
