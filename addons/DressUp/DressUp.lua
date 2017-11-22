@@ -26,7 +26,7 @@
 
 _addon.name = 'DressUp'
 _addon.author = 'Cair'
-_addon.version = '1.2'
+_addon.version = '1.21'
 _addon.commands = {'DressUp','du'}
 
 
@@ -94,7 +94,7 @@ local modify_gear = function(packet, name, freeze, models)
     local modified = false
 
     for k, v in pairs(packet) do
-        if model_names:contains(k) and v ~= 0 then
+        if model_names[k] then
             if rawget(settings, name) and settings[name][k:lower()] then
                 -- Settings for individuals
                 packet[k] = settings[name][k:lower()]
@@ -130,6 +130,10 @@ windower.register_event('incoming chunk',function (id, _, data)
         info.self.name = packet['Player Name']:lower()
         modified,packet = modify_gear(packet, info.self.name)
         return modified and packets.build(packet)
+    end
+
+    if id == 0x0D and not p['Update Model'] then
+        return
     end
 
     local char_id = packet.Player or info.self.id
