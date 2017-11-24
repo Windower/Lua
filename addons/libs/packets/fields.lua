@@ -1908,7 +1908,7 @@ fields.incoming[0x034] = L{
     {ctype='unsigned short',    label='NPC Index',          fn=index},          -- 28
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 2A
     {ctype='unsigned short',    label='Menu ID'},                               -- 2C   Seems to select between menus within a zone
-    {ctype='unsigned short',    label='_unknown1',}                             -- 2E   Ususually 8, but often not for newer menus
+    {ctype='unsigned short',    label='_unknown1'},                             -- 2E   Ususually 8, but often not for newer menus
     {ctype='unsigned short',    label='_dupeZone',          fn=zone},           -- 30
     {ctype='data[2]',           label='_junk1'},                                -- 31   Always 00s for me
 }
