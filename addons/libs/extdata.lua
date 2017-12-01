@@ -1589,8 +1589,8 @@ function decode.Augmented(str)
     
     if flag_2%16/8 >= 1 then -- Crafting shields
         rettab.objective = str:byte(6)
-        local units = {30,40,50,100}
-        rettab.stage = math.min(1,math.max(4,str:byte(0x9)))
+        local units = {30,50,100,100}
+        rettab.stage = math.max(1,math.min(4,str:byte(0x9)))
         rettab.completion = str:unpack('H',7)/units[rettab.stage]
     elseif flag_2%64/32 >=1 then
         rettab.augment_system = 2
