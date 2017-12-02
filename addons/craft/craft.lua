@@ -131,7 +131,7 @@ craft - Command List:
 * put "Dragon Mask" safe2 - Moves all Dragon Masks to Mog
   Safe 2 (if available).
 5.  delay - Sets the delay between crafting attempts
-    (default 24)
+    (default 24, minimum 20)
 * delay 30 - Sets the delay between crafting to 30
   seconds.]]
 
@@ -505,6 +505,7 @@ local function check_queue()
                 consume_food()
             end
             local fn, arg = unpack(queue:pop())
+            log(fn,arg)
             local msg = fn(arg)
             if msg then
                 error(msg)
@@ -549,7 +550,8 @@ local function handle_delay(seconds)
     if n == nil then
         return "Invalid delay %s":format(seconds)
     else
-        notice("Setting delay to %s":format(seconds))
+        n = math.max(20, n)
+        notice("Setting delay to %d":format(n))
         delay = n
     end
 end
