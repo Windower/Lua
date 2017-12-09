@@ -1,4 +1,4 @@
---Copyright (c) 2016-2017, Brimstone
+--Copyright © 2016-2017, Brimstone
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -24,50 +24,62 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
--- _addon.name = 'closetCleaner'
--- _addon.version = '0.9'
--- _addon.author = 'Brimstone'
--- _addon.commands = {'cc','closetCleaner'}
+-- _addon.version = '1.0'
 
 local cc = {}
+config = require ('config')
 cc.sandbox = {}
 cc.sandbox.windower = setmetatable({}, {__index = windower})
-cc.sandbox.windower.register_event = functions.empty()
-cc.sandbox.windower.raw_register_event = functions.empty()
-cc.sandbox.windower.register_unhandled_command = functions.empty()
+cc.sandbox.windower.coroutine = functions.empty
+cc.sandbox.windower.register_event = functions.empty
+cc.sandbox.windower.raw_register_event = functions.empty
+cc.sandbox.windower.register_unhandled_command = functions.empty
 
-register_unhandled_command(function(...)
-    local cmds = {...}
-    for _,v in ipairs(cmds) do
-        if S{'closetcleaner','cc'}:contains(v:lower()) then
-            setmetatable(cc.sandbox, {__index = gearswap.user_env})
-            cc.sandbox.itemsBylongName = T{}
-            cc.sandbox.itemsByName = T{}
-            cc.sandbox.inventoryGear = T{}
-            cc.sandbox.gsGear = T{}
-            for k,v in pairs(gearswap.res.items) do
-                cc.sandbox.itemsBylongName[gearswap.res.items[k].name_log:lower()] = k
-                cc.sandbox.itemsByName[gearswap.res.items[k].name:lower()] = k
-            end
-            cc.sandbox.jobs = {}
-            for k,v in pairs(gearswap.res.jobs) do
-                cc.sandbox.jobs[gearswap.res.jobs[k].ens] = k
-            end
-            if not windower.dir_exists(windower.addon_path..'report') then
-                windower.create_dir(windower.addon_path..'report')
-            end
-            local path = windower.addon_path:gsub('\\','/')
-            path = path..'report/'..player.name
-            require 'ccConfig'
-            cc.run_report(path)
-            cc.sandbox = nil
-        end
+defaults = T{}
+-- Jobs you want to execute with, recomment put all active jobs you have lua for will look for <job>.lua or <playername>_<job>.lua files
+defaults.ccjobs = { 'BLM', 'BLU', 'BRD', 'BST', 'COR', 'DNC', 'DRG', 'DRK', 'GEO', 'MNK', 'NIN', 'PLD', 'PUP', 'RDM', 'RNG', 'RUN', 'SAM', 'SCH', 'SMN', 'THF', 'WAR', 'WHM' }
+-- Put any items in your inventory here you don't want to show up in the final report
+-- recommended for furniture, food, meds, pop items or any gear you know you want to keep for some reason
+-- use * for anything. 
+defaults.ccignore = S{ "Rem's Tale*", "Storage Slip *" }
+-- Set to nil or delete for unlimited
+defaults.ccmaxuse = nil
+-- List bags you want to not check against, needs to match "Location" column in <player>_report.txt
+defaults.ccskipBags = S{ 'Storage', 'Temporary' }
+-- this prints out the _sets _ignored and _inventory files
+ccDebug = false
+
+settings = config.load('ccConfig.xml',defaults)
+
+register_unhandled_command(function(command)
+    command = command and command:lower() or nil
+    if command ~= 'cc' and command ~= 'closetcleaner' then
+        return
+    end        
+    setmetatable(cc.sandbox, {__index = gearswap.user_env})
+    cc.sandbox.itemsBylongName = T{}
+    cc.sandbox.itemsByName = T{}
+    cc.sandbox.inventoryGear = T{}
+    cc.sandbox.gsGear = T{}
+    for k,v in pairs(gearswap.res.items) do
+        cc.sandbox.itemsBylongName[gearswap.res.items[k].name_log:lower()] = k
+        cc.sandbox.itemsByName[gearswap.res.items[k].name:lower()] = k
     end
+    cc.sandbox.jobs = {}
+    for k,v in pairs(gearswap.res.jobs) do
+        cc.sandbox.jobs[gearswap.res.jobs[k].english_short] = k
+    end
+    if not windower.dir_exists(windower.addon_path..'report') then
+        windower.create_dir(windower.addon_path..'report')
+    end
+    local path = windower.addon_path:gsub('\\','/')
+    path = path..'report/'..player.name
+    cc.run_report(path)
     cc.sandbox = {}
     cc.sandbox.windower = setmetatable({}, {__index = windower})
-    cc.sandbox.windower.register_event = functions.empty()
-    cc.sandbox.windower.raw_register_event = functions.empty()
-    cc.sandbox.windower.register_unhandled_command = functions.empty()
+    cc.sandbox.windower.register_event = functions.empty
+    cc.sandbox.windower.raw_register_event = functions.empty
+    cc.sandbox.windower.register_unhandled_command = functions.empty
     return true
 end)
 
@@ -97,18 +109,18 @@ function cc.run_report(path)
         cc.print_break(f2, form)
     end
     for k,v in cc.spairs(cc.sandbox.gsGear, function(t,a,b) return t[b] > t[a] end) do
-        if ccmaxuse == nil or v <= ccmaxuse then
+        if settings.ccmaxuse == nil or v <= settings.ccmaxuse then
             printthis = 1
             if not cc.job_used[k] then
                 cc.job_used[k] = " "
             end
-            for i,s in ipairs(ccignore) do
-                if windower.wc_match(gearswap.res.items[k].en, s) or string.match(gearswap.res.items[k].en, s) then
+            for s in pairs(settings.ccignore) do
+                if windower.wc_match(gearswap.res.items[k].english, s) then
                     printthis = nil
                     if cc.sandbox.inventoryGear[k] == nil then
-                        data = T{gearswap.res.items[k].en, " | ", tostring(v), " | ", "NOT FOUND", " | ", cc.job_used[k], " | ", gearswap.res.items[k].enl}
+                        data = T{gearswap.res.items[k].english, " | ", tostring(v), " | ", "NOT FOUND", " | ", cc.job_used[k], " | ", gearswap.res.items[k].english_log}
                     else
-                        data = T{gearswap.res.items[k].en, " | ", tostring(v), " | ", cc.sandbox.inventoryGear[k], " | ", cc.job_used[k], " | ", gearswap.res.items[k].enl}
+                        data = T{gearswap.res.items[k].english, " | ", tostring(v), " | ", cc.sandbox.inventoryGear[k], " | ", cc.job_used[k], " | ", gearswap.res.items[k].english_log}
                     end
                     if ccDebug then
                         cc.print_row(f2, data, form)
@@ -118,9 +130,9 @@ function cc.run_report(path)
             end
             if printthis then
                 if cc.sandbox.inventoryGear[k] == nil then
-                    data = T{gearswap.res.items[k].en, " | ", tostring(v), " | ", "NOT FOUND", " | ", cc.job_used[k], " | ", gearswap.res.items[k].enl}
+                    data = T{gearswap.res.items[k].english, " | ", tostring(v), " | ", "NOT FOUND", " | ", cc.job_used[k], " | ", gearswap.res.items[k].english_log}
                 else
-                    data = T{gearswap.res.items[k].en, " | ", tostring(v), " | ", cc.sandbox.inventoryGear[k], " | ", cc.job_used[k], " | ", gearswap.res.items[k].enl}
+                    data = T{gearswap.res.items[k].english, " | ", tostring(v), " | ", cc.sandbox.inventoryGear[k], " | ", cc.job_used[k], " | ", gearswap.res.items[k].english_log}
                 end
                 cc.print_row(f, data, form)
             end
@@ -146,7 +158,7 @@ function cc.export_inv(path)
     local item_list = T{}
     checkbag = true 
     for n = 0, #gearswap.res.bags do
-        if not skipBags:contains(gearswap.res.bags[n].english) then
+        if not settings.ccskipBags:contains(gearswap.res.bags[n].english) then
             for i,v in ipairs(gearswap.get_item_list(gearswap.items[gearswap.res.bags[n].english:gsub(' ', ''):lower()])) do
                 if v.name ~= empty then
                     local slot = gearswap.xmlify(tostring(v.slot))
@@ -186,16 +198,14 @@ function cc.export_sets(path)
         fsets:write('closetCleaner sets Report:\n')
         fsets:write('=====================\n\n')
     end
-        
     cc.supersets = {}
     cc.job_used = T{}
     cc.job_logged = T()
-    
     fpath = windower.addon_path:gsub('\\','/')
     fpath = fpath:gsub('//','/')
     fpath = string.lower(fpath)
     dpath = fpath..'data/'
-    for i,v in ipairs(ccjobs) do
+    for i,v in ipairs(settings.ccjobs) do
         dname = string.lower(dpath..player.name..'/'..v..'.lua')
         lname = string.lower(dpath..player.name..'_'..v..'.lua')
         lgname = string.lower(dpath..player.name..'_'..v..'_gear.lua')
@@ -299,7 +309,7 @@ function cc.list_sets(t, f)
         cc.print_break(f, form)
         f:write('\n')
         for k,v in pairs(write_sets) do
-            data = T{gearswap.res.items[k].en, " | ", tostring(v), " | ", cc.job_used[k], " | ", gearswap.res.items[k].enl}
+            data = T{gearswap.res.items[k].english, " | ", tostring(v), " | ", cc.job_used[k], " | ", gearswap.res.items[k].english_log}
             cc.print_row(f, data, form)
             cc.sandbox.gsGear[k] = v
         end
