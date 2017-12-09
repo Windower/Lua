@@ -505,7 +505,6 @@ local function check_queue()
                 consume_food()
             end
             local fn, arg = unpack(queue:pop())
-            log(fn,arg)
             local msg = fn(arg)
             if msg then
                 error(msg)
