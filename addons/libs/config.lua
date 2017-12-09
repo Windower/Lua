@@ -153,7 +153,7 @@ function merge(t, t_merge, path)
     end
     
     for lkey, val in pairs(t_merge) do
-        local key = keys[lkey:lower()]
+        local key = keys[tonumber(lkey) or lkey:lower()]
         if not key then
             if type(val) == 'table' then
                 t[lkey] = setmetatable(table.copy(val), getmetatable(val) or _meta.T)
@@ -317,7 +317,7 @@ function settings_table(node, settings, key, meta)
             else
                 childdict = settings
             end
-            t[child.name:lower()] = settings_table(child, childdict, key, meta)
+            t[tonumber(child.name) or child.name:lower()] = settings_table(child, childdict, key, meta)
         end
     end
 
