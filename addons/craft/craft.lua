@@ -131,7 +131,7 @@ craft - Command List:
 * put "Dragon Mask" safe2 - Moves all Dragon Masks to Mog
   Safe 2 (if available).
 5.  delay - Sets the delay between crafting attempts
-    (default 24, minimum 20)
+    (default 24, minimum 17)
 * delay 30 - Sets the delay between crafting to 30
   seconds.]]
 
@@ -320,6 +320,7 @@ local function consume_item(item)
 end
 
 local function fetch_ingredient(ingredient)
+
     local id, name
     if exceptions[ingredient] then
         id = exceptions[ingredient]
@@ -403,7 +404,12 @@ local function hash(crystal, item, count)
 end
 
 local function build_recipe(item)
+    if windower.ffxi.get_player().status ~= 0 then
+        return "You can't craft at the moment"
+    end
+
     local recipe = fetch_recipe(item)
+    
     if recipe then
         inventory = windower.ffxi.get_items()
         appropriated = {}
@@ -549,7 +555,7 @@ local function handle_delay(seconds)
     if n == nil then
         return "Invalid delay %s":format(seconds)
     else
-        n = math.max(20, n)
+        n = math.max(17, n)
         notice("Setting delay to %d":format(n))
         delay = n
     end
