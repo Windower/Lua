@@ -1,0 +1,47 @@
+<?xml version="1.1" ?>
+<settings>
+    <global>
+        <Bars>
+            <OffsetX>-290</OffsetX>
+            <OffsetY>-365</OffsetY>
+        </Bars>
+        <Texts>
+            <Color>
+                <Alpha>255</Alpha>
+                <Blue>250</Blue>
+                <Green>252</Green>
+                <Red>253</Red>
+            </Color>
+            <Font>sans-serif</Font>
+            <FullTpColor>
+                <Blue>250</Blue>
+                <Green>180</Green>
+                <Red>80</Red>
+            </FullTpColor>
+            <Offset>0</Offset>
+            <Size>14</Size>
+            <Stroke>
+                <Alpha>200</Alpha>
+                <Blue>50</Blue>
+                <Green>50</Green>
+                <Red>50</Red>
+                <Width>2</Width>
+            </Stroke>
+        </Texts>
+        <Theme>
+            <Bar>
+                <Compact>
+                    <Offset>0</Offset>
+                    <Spacing>16</Spacing>
+                    <Width>116</Width>
+                </Compact>
+                <Offset>0</Offset>
+                <Spacing>18</Spacing>
+                <Width>132</Width>
+            </Bar>
+            <Compact>false</Compact>
+            <DimTpBar>true</DimTpBar>
+            <Name>ffxi</Name>
+        </Theme>
+    </global>
+</settings>

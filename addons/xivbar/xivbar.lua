@@ -51,6 +51,8 @@ local ui = require('ui')
 local player = require('player')
 local xivbar = require('variables')
 
+local force_hide = false
+
 -- initialize addon
 function initialize()
     ui:load(theme_options)
@@ -92,13 +94,17 @@ function update_bar(bar, text, width, current, pp, flag)
             local x = old_width
 
             if old_width < new_width then
-                x = old_width + math.ceil((new_width - old_width) * 0.1)
+                x = old_width + math.ceil(((new_width - old_width) * 0.1))
 
-                x = math.min(x, theme_options.bar_width)
+                if x > theme_options.bar_width then
+                    x = theme_options.bar_width
+                end
             elseif old_width > new_width then
-                x = old_width - math.ceil((old_width - new_width) * 0.1)
+                x = old_width - math.ceil(((old_width - new_width) * 0.1))
 
-                x = math.max(x, 0)
+                if x < 0 then
+                    x = 0
+                end
             end
 
             if flag == 1 then
@@ -217,4 +223,15 @@ windower.register_event('status change', function(new_status_id)
         xivbar.hide_bars = false
         show()
     end
+end)
+
+windower.register_event('keyboard', function(dik, flags, blocked)
+  if dik == 70 and flags == true and (force_hide == true) then
+    force_hide = false
+    show()
+  elseif dik == 70 and flags == true and (force_hide == false) then
+    force_hide = true
+    hide()
+  end
+  return false
 end)
