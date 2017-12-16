@@ -107,9 +107,9 @@ defaults.Texts.Exp.Flags.Draggable = false
 defaults.Texts.Exp.Flags.Italic = false
 defaults.Texts.Exp.Padding = 0
 defaults.Texts.Exp.Text = {}
-defaults.Texts.Exp.Text.Size = 10
-defaults.Texts.Exp.Text.Font = 'Montserrat'
-defaults.Texts.Exp.Text.Fonts = {'Ubuntu Mono', 'sans-serif'}
+defaults.Texts.Exp.Text.Size = 9
+defaults.Texts.Exp.Text.Font = 'sans-serif'
+defaults.Texts.Exp.Text.Fonts = {'Trebuchet MS', 'Arial'}
 defaults.Texts.Exp.Text.Alpha = 255
 defaults.Texts.Exp.Text.Red = 253
 defaults.Texts.Exp.Text.Green = 252
@@ -125,9 +125,9 @@ defaults.ShowDetails.MainJob = true
 defaults.ShowDetails.SubJob = true
 defaults.ShowDetails.Level = true
 defaults.ShowDetails.ExperiencePoints = true
-defaults.ShowDetails.ToNextLevel = true
-defaults.ShowDetails.Percent = true
-defaults.ShowDetails.Rate = true
+defaults.ShowDetails.ToNextLevel = false
+defaults.ShowDetails.Percent = false
+defaults.ShowDetails.Rate = false
 
 approved_commands = S{
     'clear','c',
@@ -173,6 +173,11 @@ function load_text_box()
     exp_text:bg_visible(settings.Texts.Exp.Background.Visible)
     exp_text:font(settings.Texts.Exp.Text.Font, unpack(settings.Texts.Exp.Text.Fonts))
     exp_text:size(settings.Texts.Exp.Text.Size)
+    exp_text:italic(settings.Texts.Exp.Flags.Italic)
+    exp_text:bold(settings.Texts.Exp.Flags.Bold)
+    --exp_text:draggable(settings.Texts.Exp.Flags.Draggable)
+    exp_text:bottom_justified(settings.Texts.Exp.Flags.Bottom)
+    exp_text:right_justified(settings.Texts.Exp.Flags.Right)
     exp_text:color(settings.Texts.Exp.Text.Red, settings.Texts.Exp.Text.Green, settings.Texts.Exp.Text.Blue)
     exp_text:stroke_alpha(settings.Texts.Exp.Text.Stroke.Alpha)
     exp_text:stroke_color(settings.Texts.Exp.Text.Stroke.Red, settings.Texts.Exp.Text.Stroke.Green,
@@ -260,14 +265,14 @@ function analyze_points_table(tab)
             end
         end
     end
-    
+
     local rate
     if maximum_timestamp == 29 then
         rate = 0
     else
         rate = math.floor((running_total/maximum_timestamp)*3600)
     end
-    
+
     return rate
 end
 
@@ -280,11 +285,11 @@ function calc_new_width()
 end
 
 function position_images()
-    local x = windower.get_windower_settings().x_res / 2 - settings.Images.Background.Size.Width / 2
-    
-    background_image:pos(x, settings.Images.Background.Pos.Y)
-    foreground_image:pos(x + 2, settings.Images.Foreground.Pos.Y)
-    rested_bonus_image:pos(x + settings.Images.Background.Size.Width, settings.Images.Background.Pos.Y - 6)
+    --local x = windower.get_windower_settings().x_res / 2 - settings.Images.Background.Size.Width / 2
+
+    --background_image:pos(x, settings.Images.Background.Pos.Y)
+    --foreground_image:pos(x + 2, settings.Images.Foreground.Pos.Y)
+    --rested_bonus_image:pos(settings.Images.Background.Size.Width - 236, settings.Images.Background.Pos.Y - 4)
 end
 
 function position_text()
@@ -308,5 +313,9 @@ function show()
 end
 
 function mog_house()
-    return (windower.ffxi.get_info().mog_house and rested_bonus_image:show() or rested_bonus_image:hide())
+  if (windower.ffxi.get_info().mog_house) then
+    rested_bonus_image:show()
+  else
+    rested_bonus_image:hide()
+  end
 end

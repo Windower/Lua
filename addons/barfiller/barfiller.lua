@@ -28,7 +28,7 @@
 
 _addon.name = 'BarFiller'
 _addon.author = 'Morath'
-_addon.version = '0.2.5'
+_addon.version = '0.2.6'
 _addon.commands = {'bf','barfiller'}
 _addon.language = 'english'
 
@@ -54,6 +54,9 @@ exp_text = texts.new(settings.Texts.Exp)
 debug = false
 ready = false
 chunk_update = false
+
+local force_hide = false
+local pause_hide = false
 
 windower.register_event('load',function()
     if windower.ffxi.get_info().logged_in then
@@ -142,6 +145,32 @@ windower.register_event('level down', function(level)
     update_strings()
 end)
 
+windower.register_event('job change', function(main_job_id,main_job_level,sub_job_id,sub_job_level)
+    update_strings()
+end)
+
 windower.register_event('zone change', function(new_id,old_id)
+    update_strings()
     mog_house()
+end)
+
+windower.register_event('keyboard', function(dik, flags, blocked)
+  if dik == 70 and flags == true and (force_hide == true) then
+    force_hide = false
+    initialize()
+  elseif dik == 70 and flags == true and (force_hide == false) then
+    force_hide = true
+    hide()
+  end
+  return false
+end)
+
+windower.register_event('status change', function(new_status_id)
+    if pause_hide == false and (new_status_id == 4) then
+        pause_hide = true
+        hide()
+    elseif pause_hide and new_status_id ~= 4 then
+        pause_hide = false
+        initialize()
+    end
 end)
