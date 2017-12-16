@@ -23,15 +23,19 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --]]
 
-targetBarHeight = 12
-targetBarWidth = 598
-subtargetBarHeight = 12
-subtargetBarWidth = 198
+targetBarHeight = 7
+targetBarWidth = 300
+subtargetBarHeight = 7
+subtargetBarWidth = 200
 visible = false
+hasTarget = false
+
+force_hide = false
 
 bg_cap_path = windower.addon_path.. 'bg_cap.png'
 bg_body_path = windower.addon_path.. 'bg_body.png'
 fg_body_path = windower.addon_path.. 'fg_body.png'
+pointer_path = windower.addon_path.. 'pointer_s.png'
 
 center_screen = windower.get_windower_settings().x_res / 2 - targetBarWidth / 2
 
@@ -45,15 +49,26 @@ text_settings.text.font = 'Arial'
 text_settings.text.fonts = {'Arial'}
 text_settings.text.stroke = {}
 text_settings.text.stroke.width = 2
-text_settings.text.stroke.alpha = 127
+text_settings.text.stroke.alpha = 200
 text_settings.text.stroke.red = 50
 text_settings.text.stroke.green = 50
-text_settings.text.stroke.blue = 50 
+text_settings.text.stroke.blue = 50
 text_settings.flags = {}
+text_settings.flags.italic = true
 text_settings.flags.bold = true
 text_settings.flags.draggable = false
 text_settings.bg = {}
 text_settings.bg.visible = false
+
+pointer_settings = {}
+pointer_settings.pos = {}
+pointer_settings.pos.x = center_screen
+pointer_settings.pos.y = 50
+pointer_settings.visible = true
+pointer_settings.texture = {}
+pointer_settings.texture.path = pointer_path
+pointer_settings.texture.fit = true
+pointer_settings.draggable = false
 
 tbg_cap_settings = {}
 tbg_cap_settings.pos = {}
@@ -67,7 +82,7 @@ tbg_cap_settings.color.green = 0
 tbg_cap_settings.color.blue = 0
 tbg_cap_settings.size = {}
 tbg_cap_settings.size.width = 1
-tbg_cap_settings.size.height = 598
+tbg_cap_settings.size.height = targetBarHeight
 tbg_cap_settings.texture = {}
 tbg_cap_settings.texture.path = bg_cap_path
 tbg_cap_settings.texture.fit = true
@@ -212,7 +227,7 @@ defaults.pos.y = 50
 settings = config.load(defaults)
 config.save(settings)
 
-config.register(settings, function(settings_table) 
+config.register(settings, function(settings_table)
     --Validating settings.xml values
     local nx = 0
     if settings_table.pos.x == nil or settings_table.pos.x < 0 then
@@ -220,54 +235,58 @@ config.register(settings, function(settings_table)
     else
         nx = settings_table.pos.x
     end
-    
-    text_settings.pos.x = nx
-    text_settings.pos.y = settings_table.pos.y
+
+    text_settings.pos.x = nx - 8
+    text_settings.pos.y = settings_table.pos.y - 15
     text_settings.text.font = settings_table.font
     text_settings.text.size = settings_table.font_size
-    
+
     tbg_cap_settings.pos.x = nx
     tbg_cap_settings.pos.y = settings_table.pos.y
- 
+
     stbg_cap_settings.pos.x = nx
     stbg_cap_settings.pos.y = settings_table.pos.y
-   
+
     tbg_body_settings.pos.x = nx
     tbg_body_settings.pos.y = settings_table.pos.y
- 
+
     stbg_body_settings.pos.x = nx
     stbg_body_settings.pos.y = settings_table.pos.y
-  
+
     tfgg_body_settings.pos.x = nx
     tfgg_body_settings.pos.y = settings_table.pos.y
-  
+
     tfg_body_settings.pos.x = nx
     tfg_body_settings.pos.y = settings_table.pos.y
- 
+
     stfg_body_settings.pos.x = nx
     stfg_body_settings.pos.y = settings_table.pos.y
-    
+
+    pointer_settings.pos.y = settings_table.pos.y - 2
+
     tbg_cap_l = images.new(tbg_cap_settings)
     tbg_cap_r = images.new(tbg_cap_settings)
     tbg_body = images.new(tbg_body_settings)
     tfgg_body = images.new(tfgg_body_settings)
     tfg_body = images.new(tfg_body_settings)
-    t_text = texts.new('  ${name|(Name)} - HP: ${hpp|(100)}% ${debug|}', text_settings)
-        
+    t_text = texts.new('  ${name|(Name)} ${debug|}', text_settings)
+
+    pointer = images.new(pointer_settings)
     stbg_cap_l = images.new(stbg_cap_settings)
     stbg_cap_r = images.new(stbg_cap_settings)
     stbg_body = images.new(stbg_body_settings)
     stfg_body = images.new(stfg_body_settings)
     st_text = texts.new(' ${name|(Name)}', text_settings)
-    
+
     tbg_cap_l:pos_x(tbg_cap_l:pos_x() - 1)
     tbg_cap_r:pos_x(tbg_cap_r:pos_x() + targetBarWidth + 1)
-    
-    stbg_cap_l:pos(stbg_cap_l:pos_x() + 399, 65)
-    stbg_cap_r:pos(stbg_cap_r:pos_x() + subtargetBarWidth + 1, 65)
-    stfg_body:pos(stfg_body:pos_x() + 400, 65)
-    stbg_body:pos(stbg_body:pos_x() + 400, 65)
-    st_text:pos(st_text:pos_x() + 400, 65)
+
+    pointer:pos_x(tbg_cap_r:pos_x() + 3)
+    stbg_cap_l:pos_x(stbg_cap_l:pos_x() + 320)
+    stbg_cap_r:pos_x(stbg_cap_r:pos_x() + subtargetBarWidth)
+    stfg_body:pos_x(stfg_body:pos_x() + 320)
+    stbg_body:pos_x(stbg_body:pos_x() + 320)
+    st_text:pos_x(st_text:pos_x() + 324)
 end)
 
 
@@ -280,7 +299,7 @@ check_claim = function(claim_id)
             member = windower.ffxi.get_mob_by_target('p'..i)
             if member == nil then
                 -- do nothing
-            elseif member.id == claim_id then 
+            elseif member.id == claim_id then
                 return true
             end
         end
@@ -291,8 +310,27 @@ end
 target_change = function(index)
     if index == 0 then
         visible = false
+        hasTarget = false
     else
         visible = true
+        hasTarget = true
 	end
 end
 
+windower.register_event('keyboard', function(dik, flags, blocked)
+  if dik == 70 and flags == true and (hasTarget == true) and visible == true then
+    visible = false
+  elseif dik == 70 and flags == true and (hasTarget == true) and visible == false then
+    visible = true
+  end
+end)
+
+windower.register_event('status change', function(new_status_id)
+    if force_hide == false and (new_status_id == 4)  and (hasTarget == true) and visible == true then
+        force_hide = true
+        visible = false
+    elseif force_hide and new_status_id ~= 4 and (hasTarget == true) and visible == false then
+        force_hide = false
+        visible = true
+    end
+end)
