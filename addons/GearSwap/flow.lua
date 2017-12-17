@@ -184,6 +184,11 @@ function equip_sets(swap_type,ts,...)
                     chunk_table:append(minichunk)
                 end
             end
+
+            if swap_type == 'midcast' and command_registry[ts] and command_registry[ts].proposed_packet and not _settings.demo_mode then
+                windower.packets.inject_outgoing(command_registry[ts].proposed_packet:byte(1),command_registry[ts].proposed_packet)
+            end
+
             if chunk_table.n >= 3 then
                 local big_chunk = string.char(0x51,0x24,0,0,chunk_table.n,0,0,0)
                 for i=1,chunk_table.n do
@@ -424,9 +429,6 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function send_action(ts)
-    if command_registry[ts].proposed_packet then
-        if not _settings.demo_mode then windower.packets.inject_outgoing(command_registry[ts].proposed_packet:byte(1),command_registry[ts].proposed_packet) end
-        command_registry[ts].midaction = true
-        equip_sets('midcast',ts,command_registry[ts].spell)
-    end
+    command_registry[ts].midaction = true
+    equip_sets('midcast',ts,command_registry[ts].spell)
 end
