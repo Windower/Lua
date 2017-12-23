@@ -29,11 +29,11 @@
 local defaults = {}
 
 defaults.Bars = {}
-defaults.Bars.OffsetX = 0
-defaults.Bars.OffsetY = 0
+defaults.Bars.OffsetX = -290
+defaults.Bars.OffsetY = -370
 
 defaults.Theme = {}
-defaults.Theme.Name = 'ffxiv'
+defaults.Theme.Name = 'ffxi'
 defaults.Theme.Compact = false
 defaults.Theme.Bar = {}
 defaults.Theme.Bar.Width = 132
@@ -65,4 +65,5 @@ defaults.Texts.FullTpColor.Red = 80
 defaults.Texts.FullTpColor.Green = 180
 defaults.Texts.FullTpColor.Blue = 250
 
+defaults.HideKey = 70
 return defaults

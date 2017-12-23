@@ -51,7 +51,9 @@ local ui = require('ui')
 local player = require('player')
 local xivbar = require('variables')
 
-local force_hide = false
+local is_hidden_by_key = false
+local is_hidden_by_cutscene = false
+hideKey = settings.HideKey
 
 -- initialize addon
 function initialize()
@@ -216,22 +218,23 @@ windower.register_event('prerender', function()
 end)
 
 windower.register_event('status change', function(new_status_id)
-    if xivbar.hide_bars == false and (new_status_id == 4) then
+    if (xivbar.hide_bars == false) and (new_status_id == 4) and (is_hidden_by_key == false) then
         xivbar.hide_bars = true
+        is_hidden_by_cutscene = true
         hide()
-    elseif xivbar.hide_bars and new_status_id ~= 4 then
+    elseif (xivbar.hide_bars == true) and (new_status_id ~= 4) and (is_hidden_by_key == false) then
         xivbar.hide_bars = false
+        is_hidden_by_cutscene = false
         show()
     end
 end)
 
 windower.register_event('keyboard', function(dik, flags, blocked)
-  if dik == 70 and flags == true and (force_hide == true) then
-    force_hide = false
+  if (dik == hideKey) and (flags == true) and (is_hidden_by_key == true) and (is_hidden_by_cutscene == false) then
+    is_hidden_by_key = false
     show()
-  elseif dik == 70 and flags == true and (force_hide == false) then
-    force_hide = true
+  elseif (dik == hideKey) and (flags == true) and (is_hidden_by_key == false) and (is_hidden_by_cutscene == false) then
+    is_hidden_by_key = true
     hide()
   end
-  return false
 end)
