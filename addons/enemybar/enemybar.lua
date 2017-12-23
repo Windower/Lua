@@ -49,6 +49,6 @@ windower.register_event('prerender', render_subtarget_bar)
 windower.register_event('target change', target_change)
 
 windower.register_event('logout', function(...)
-    -- This is a super cheap fix, but it works. 
-    windower.send_command("input //lua r enemybar");        
+    -- This is a super cheap fix, but it works.
+    windower.send_command("input //lua r enemybar");
 end)
