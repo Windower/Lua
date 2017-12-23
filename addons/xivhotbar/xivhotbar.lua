@@ -47,6 +47,8 @@ local defaults = require('defaults')
 local settings = config.load(defaults)
 config.save(settings)
 
+local hideKey = settings.HideKey
+
 -- Load theme options according to settings
 local theme = require('theme')
 local theme_options = theme.apply(settings)
@@ -58,7 +60,8 @@ local player = require('player')
 local ui = require('ui')
 local xivhotbar = require('variables')
 
-local force_hide = false
+local is_hidden_by_key = false
+local is_hidden_by_cutscene = false
 
 -----------------------------
 -- Main
@@ -331,7 +334,9 @@ end)
 
 -- ON KEY
 windower.register_event('keyboard', function(dik, flags, blocked)
+
     if xivhotbar.ready == false or windower.ffxi.get_info().chat_open then
+        change_active_hotbar(1)
         return
     end
 
@@ -407,12 +412,14 @@ end)
 -- ON STATUS CHANGE
 windower.register_event('status change', function(new_status_id)
     -- hide/show bar in cutscenes
-    if xivhotbar.hide_hotbars == false and new_status_id == 4 then
+    if xivhotbar.hide_hotbars == false and new_status_id == 4 and is_hidden_by_key == false then
         xivhotbar.hide_hotbars = true
         ui:hide()
-    elseif xivhotbar.hide_hotbars and new_status_id ~= 4 then
+        is_hidden_by_cutscene = true
+    elseif xivhotbar.hide_hotbars and new_status_id ~= 4 and is_hidden_by_key == false then
         xivhotbar.hide_hotbars = false
         ui:show(player.hotbar, player.hotbar_settings.active_environment)
+        is_hidden_by_cutscene = false
     end
 
     -- alternate environment on battle
@@ -432,12 +439,11 @@ windower.register_event('job change',function(main_job, main_job_level, sub_job,
 end)
 
 windower.register_event('keyboard', function(dik, flags, blocked)
-  if dik == 70 and flags == true and (force_hide == true) then
-    force_hide = false
+  if dik == hideKey and flags == true and (is_hidden_by_key == true) and is_hidden_by_cutscene == false then
+    is_hidden_by_key = false
     ui:show(player.hotbar, player.hotbar_settings.active_environment)
-  elseif dik == 70 and flags == true and (force_hide == false) then
-    force_hide = true
+  elseif dik == hideKey and flags == true and (is_hidden_by_key == false) and is_hidden_by_cutscene == false then
+    is_hidden_by_key = true
     ui:hide()
   end
-  return false
 end)

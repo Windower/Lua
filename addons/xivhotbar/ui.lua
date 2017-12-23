@@ -168,7 +168,7 @@ function ui:load(theme_options)
         for i=1,10,1 do
             local slot_pos_x = self:get_slot_x(h, i)
             local slot_pos_y = self:get_slot_y(h, i)
-            local right_slot_pos_x = slot_pos_x - windower.get_windower_settings().x_res + 16
+            local right_slot_pos_x = slot_pos_x - windower.get_windower_settings().ui_x_res
 
             self.hotbars[h].slot_background[i] = images.new(images_setup)
             self.hotbars[h].slot_icon[i] = images.new(images_setup)
@@ -176,8 +176,8 @@ function ui:load(theme_options)
             self.hotbars[h].slot_frame[i] = images.new(images_setup)
             self.hotbars[h].slot_element[i] = images.new(images_setup)
             self.hotbars[h].slot_text[i] = texts.new(text_setup)
-            self.hotbars[h].slot_cost[i] = texts.new(right_text_setup)
-            self.hotbars[h].slot_recast_text[i] = texts.new(right_text_setup)
+            self.hotbars[h].slot_cost[i] = texts.new(text_setup)
+            self.hotbars[h].slot_recast_text[i] = texts.new(text_setup)
             self.hotbars[h].slot_key[i] = texts.new(text_setup)
 
             setup_image(self.hotbars[h].slot_background[i], windower.addon_path..'/themes/' .. (theme_options.slot_theme:lower()) .. '/slot.png')
@@ -197,9 +197,9 @@ function ui:load(theme_options)
             self.hotbars[h].slot_frame[i]:pos(slot_pos_x, slot_pos_y)
             self.hotbars[h].slot_element[i]:pos(slot_pos_x + 28, slot_pos_y - 4)
 
-            self.hotbars[h].slot_text[i]:pos(slot_pos_x - 2, slot_pos_y + 40)
-            self.hotbars[h].slot_cost[i]:pos(right_slot_pos_x + 30, slot_pos_y + 28)
-            self.hotbars[h].slot_recast_text[i]:pos(right_slot_pos_x + 20, slot_pos_y + 14)
+            self.hotbars[h].slot_text[i]:pos(slot_pos_x, slot_pos_y + 40)
+            self.hotbars[h].slot_cost[i]:pos(slot_pos_x, slot_pos_y + 28)
+            self.hotbars[h].slot_recast_text[i]:pos(slot_pos_x, slot_pos_y + 14)
             self.hotbars[h].slot_recast_text[i]:size(9)
             self.hotbars[h].slot_key[i]:pos(slot_pos_x - 1, slot_pos_y - 4)
             self.hotbars[h].slot_key[i]:size(9)
@@ -352,9 +352,13 @@ function ui:load_action(hotbar, slot, action, player_vitals)
             end
         end
 
-        self.hotbars[hotbar].slot_background[slot]:alpha(15)
+
         self.hotbars[hotbar].slot_icon[slot]:pos(self:get_slot_x(hotbar, slot) + 4, self:get_slot_y(hotbar, slot) + 4) -- temporary fix for 32 x 32 icons
         self.hotbars[hotbar].slot_icon[slot]:show()
+
+        self.hotbars[hotbar].slot_key[slot]:show()
+        self.hotbars[hotbar].slot_background[slot]:alpha(200)
+        self.hotbars[hotbar].slot_background[slot]:show()
 
         if skill ~= nil then
             -- display skill element
@@ -394,7 +398,7 @@ function ui:load_action(hotbar, slot, action, player_vitals)
 
     -- if action is custom
     if action.icon ~= nil then
-        self.hotbars[hotbar].slot_background[slot]:alpha(15)
+        self.hotbars[hotbar].slot_background[slot]:alpha(200)
         self.hotbars[hotbar].slot_icon[slot]:pos(self:get_slot_x(hotbar, slot), self:get_slot_y(hotbar, slot))
         self.hotbars[hotbar].slot_icon[slot]:path(windower.addon_path .. '/images/icons/custom/' .. action.icon .. '.png')
         self.hotbars[hotbar].slot_icon[slot]:show()
@@ -423,7 +427,7 @@ function ui:clear_slot(hotbar, slot)
     self.hotbars[hotbar].slot_frame[slot]:hide()
     self.hotbars[hotbar].slot_icon[slot]:path(windower.addon_path .. '/images/other/blank.png')
     self.hotbars[hotbar].slot_icon[slot]:hide()
-    self.hotbars[hotbar].slot_icon[slot]:alpha(self.theme.slot_opacity)
+    self.hotbars[hotbar].slot_icon[slot]:alpha(255)
     self.hotbars[hotbar].slot_icon[slot]:color(255, 255, 255)
     self.hotbars[hotbar].slot_element[slot]:path(windower.addon_path .. '/images/other/blank.png')
     self.hotbars[hotbar].slot_element[slot]:alpha(255)

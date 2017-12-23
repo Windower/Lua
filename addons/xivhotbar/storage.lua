@@ -34,7 +34,8 @@ storage.file = nil
 
 -- setup storage for current player
 function storage:setup(player)
-    self.filename = player.main_job .. '-' .. player.sub_job
+    local filename = (player.sub_job and player.main_job .. '-' .. player.sub_job or player.main_job)
+    self.filename = filename
     self.directory = player.server .. '/' .. player.name
 
     self.file = file.new('data/hotbar/' .. self.directory .. '/' .. self.filename .. '.xml')

@@ -35,23 +35,23 @@ defaults.Hotbar.HideActionName = false
 defaults.Hotbar.HideActionCost = false
 defaults.Hotbar.HideActionElement = true
 defaults.Hotbar.HideRecastAnimation = false
-defaults.Hotbar.HideRecastText = false
-defaults.Hotbar.HideBattleNotice = false
+defaults.Hotbar.HideRecastText = true
+defaults.Hotbar.HideBattleNotice = true
 
 defaults.Controls = {}
 defaults.Controls.ToggleBattleMode = 43
 
 defaults.Theme = {}
-defaults.Theme.BattleNotice = 'ffxiv'
-defaults.Theme.Slot = 'ffxiv'
-defaults.Theme.Frame = 'ffxiv'
+defaults.Theme.BattleNotice = 'ffxi'
+defaults.Theme.Slot = 'ffxi'
+defaults.Theme.Frame = 'ffxi'
 
 defaults.Style = {}
-defaults.Style.SlotAlpha = 100
-defaults.Style.SlotSpacing = 6
+defaults.Style.SlotAlpha = 200
+defaults.Style.SlotSpacing = 12
 defaults.Style.HotbarSpacing = 56
-defaults.Style.OffsetX = 0
-defaults.Style.OffsetY = 0
+defaults.Style.OffsetX = -295
+defaults.Style.OffsetY = -370
 
 defaults.Color = {}
 defaults.Color.MpCost = {}
@@ -70,19 +70,20 @@ defaults.Color.Disabled.Opacity = 100
 
 defaults.Texts = {}
 defaults.Texts.Font = 'sans-serif'
-defaults.Texts.Size = 7
+defaults.Texts.Size = 6
 defaults.Texts.OffsetX = 0
 defaults.Texts.OffsetY = 0
 defaults.Texts.Color = {}
 defaults.Texts.Color.Alpha = 255
-defaults.Texts.Color.Red = 255
-defaults.Texts.Color.Green = 255
-defaults.Texts.Color.Blue = 255
+defaults.Texts.Color.Red = 253
+defaults.Texts.Color.Green = 252
+defaults.Texts.Color.Blue = 250
 defaults.Texts.Stroke = {}
 defaults.Texts.Stroke.Width = 2
 defaults.Texts.Stroke.Alpha = 200
-defaults.Texts.Stroke.Red = 20
-defaults.Texts.Stroke.Green = 20
-defaults.Texts.Stroke.Blue = 20
+defaults.Texts.Stroke.Red = 50
+defaults.Texts.Stroke.Green = 50
+defaults.Texts.Stroke.Blue = 50
 
+defaults.HideKey = 70
 return defaults

@@ -92,7 +92,6 @@ function player:load_from_file()
         windower.console.write('XIVHOTBAR: invalid hotbar on ' .. storage.filename)
         return
     end
-
     -- parse xml to hotbar
     for key, environment in ipairs(contents.children) do
         if environment.name == 'field' or environment.name == 'battle' then
