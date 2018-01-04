@@ -899,9 +899,9 @@ fields.outgoing[0x0BE] = L{
 }
 
 -- Job Point Increase
--- This chunk was sent on three consecutive outgoing packets the only time I've used it
 fields.outgoing[0x0BF] = L{
-    {ctype='unsigned short',    label='Job Point'},                             -- 04
+    {ctype='bit[5]',            label='Type'},                                  -- 04
+    {ctype='bit[11]',           label='Job',                fn=job},            -- 04
     {ctype='unsigned short',    label='_junk1',             const=0x0000},      -- 06   No values seen so far
 }
 
