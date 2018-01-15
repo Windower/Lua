@@ -334,7 +334,6 @@ end)
 
 -- ON KEY
 windower.register_event('keyboard', function(dik, flags, blocked)
-
     if xivhotbar.ready == false or windower.ffxi.get_info().chat_open then
         change_active_hotbar(1)
         return
@@ -345,23 +344,23 @@ windower.register_event('keyboard', function(dik, flags, blocked)
     end
 
     -- activate third hotbar
-    if dik == keyboard.ctrl and flags == true and xivhotbar.pressing_combo_key_2 == false then
+    if dik == theme_options.controls_hotbar2_key and flags == true and xivhotbar.pressing_combo_key_2 == false then
         xivhotbar.pressing_combo_key_2 = true
         change_active_hotbar(3)
     end
 
-    if dik == keyboard.ctrl and flags == false and xivhotbar.pressing_combo_key_2 == true then
+    if dik == theme_options.controls_hotbar2_key and flags == false and xivhotbar.pressing_combo_key_2 == true then
         xivhotbar.pressing_combo_key_2 = false
         change_active_hotbar(1)
     end
 
     -- activate second hotbar
-    if dik == keyboard.shift and flags == true and xivhotbar.pressing_combo_key_1 == false then
+    if dik == theme_options.controls_hotbar1_key and flags == true and xivhotbar.pressing_combo_key_1 == false then
         xivhotbar.pressing_combo_key_1 = true
         change_active_hotbar(2)
     end
 
-    if dik == keyboard.shift and flags == false and xivhotbar.pressing_combo_key_1 == true then
+    if dik == theme_options.controls_hotbar1_key and flags == false and xivhotbar.pressing_combo_key_1 == true then
         xivhotbar.pressing_combo_key_1 = false
         change_active_hotbar(1)
     end

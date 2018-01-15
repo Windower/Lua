@@ -75,6 +75,8 @@ theme.apply = function (settings)
     options.text_offset_y = settings.Texts.OffsetY
 
     options.controls_battle_mode = settings.Controls.ToggleBattleMode
+    options.controls_hotbar1_key = settings.Controls.Hotbar1Key
+    options.controls_hotbar2_key = settings.Controls.Hotbar2Key
 
     return options
 end

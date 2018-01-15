@@ -40,6 +40,8 @@ defaults.Hotbar.HideBattleNotice = true
 
 defaults.Controls = {}
 defaults.Controls.ToggleBattleMode = 43
+defaults.Controls.Hotbar1Key = 42
+defaults.Controls.Hotbar2Key = -1
 
 defaults.Theme = {}
 defaults.Theme.BattleNotice = 'ffxi'

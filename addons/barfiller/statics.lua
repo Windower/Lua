@@ -110,11 +110,13 @@ function load_images()
     background_image:path(settings.Images.Background.Texture.Path)
     background_image:repeat_xy(settings.Images.Background.Repeatable.X, settings.Images.Background.Repeatable.Y)
     background_image:color(settings.Images.Background.Color.Red,settings.Images.Background.Color.Green,settings.Images.Background.Color.Blue,settings.Images.Background.Color.Alpha)
+    background_image:draggable(settings.Images.Background.Draggable)
     background_image:show()
 
     foreground_image:path(settings.Images.Foreground.Texture.Path)
     foreground_image:fit(settings.Images.Foreground.Texture.Fit)
     foreground_image:color(settings.Images.Foreground.Color.Red,settings.Images.Foreground.Color.Green,settings.Images.Foreground.Color.Blue,settings.Images.Foreground.Color.Alpha)
+    foreground_image:draggable(settings.Images.Foreground.Draggable)
     foreground_image:show()
 
     rested_bonus_image:visible(settings.Images.RestedBonus.Visible)
@@ -172,7 +174,7 @@ function update_bar()
   local new_width = calc_new_width()
 
   -- Thanks to Iryoku for the logic on smooth animations
-  if new_width ~= nil and new_width > 0 then
+  if new_width ~= nil and new_width >= 0 then
       if old_width < new_width then
           local last_update = 0
           local x = old_width + math.ceil(((new_width - old_width) * 0.1))
@@ -260,11 +262,9 @@ function analyze_points_table(tab)
 end
 
 function calc_new_width()
-    if xp.current > 0 and xp.total > 0 then
-        local calc = math.floor((xp.current / xp.total) * 468)
-        xp.rate = analyze_points_table(xp.registry)
-        return calc
-    end
+    local calc = math.floor((xp.current / xp.total) * 468)
+    xp.rate = analyze_points_table(xp.registry)
+    return calc
 end
 
 function position_images()

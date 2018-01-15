@@ -24,8 +24,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --]]
 
 render_subtarget_bar = function(...)
-    if visible == true then
-        local subtarget = windower.ffxi.get_mob_by_target('st')
+    if visible == true and is_hidden_by_cutscene == false then
+        old_subtarget = subtarget
+        subtarget = windower.ffxi.get_mob_by_target('st')
         if subtarget ~= nil and target ~= nil then
             pointer:show()
             stbg_cap_l:show()
@@ -36,20 +37,23 @@ render_subtarget_bar = function(...)
             st_text:show()
 
             local player = windower.ffxi.get_mob_by_target('me')
-            local i = target.hpp / 100
+            local i = subtarget.hpp / 100
             local new_width = math.floor(subtargetBarWidth * i)
             local old_width = stfgg_body:width()
-            stfgg_body:width(0)
-            local now = os.clock()
-            if new_width ~= nil and new_width > 0 then
-                if new_width < old_width and player.in_combat then
+            if (old_subtarget ~= nil and subtarget.id == old_subtarget.id) and new_width ~= nil and new_width > 0 then
+                if new_width < old_width then
                     local x = old_width + math.floor(((new_width - old_width) * 0.1))
+                    stfg_body:width(new_width)
                     stfgg_body:width(x)
-                elseif new_width >= old_width or not player.in_combat then
+                elseif new_width >= old_width then
+                    local zx = old_width + math.ceil(((new_width - old_width) * 0.1))
                     stfgg_body:width(new_width)
+                    stfg_body:width(zx)
                 end
+            else
+                stfgg_body:width(new_width)
+                stfg_body:width(new_width)
             end
-            stfg_body:width(new_width)
             stbg_body:width(subtargetBarWidth)
             stfgg_body:height(subtargetBarHeight)
             stbg_cap_l:height(subtargetBarHeight)
@@ -131,5 +135,14 @@ render_subtarget_bar = function(...)
             stfgg_body:width(0)
             st_text:hide()
         end
+    else
+        pointer:hide()
+        stbg_cap_l:hide()
+        stbg_cap_r:hide()
+        stbg_body:hide()
+        stfg_body:hide()
+        stfgg_body:show()
+        stfgg_body:width(0)
+        st_text:hide()
     end
 end

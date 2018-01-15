@@ -34,6 +34,7 @@ visible = false
 hasTarget = false
 is_hidden_by_key = false
 is_hidden_by_cutscene = false
+is_hidden_by_macro = false
 
 defaults = {}
 defaults.text = {}
@@ -53,6 +54,15 @@ defaults.subTargetBar.width = 200
 defaults.subTargetBar.height = 5
 defaults.useRoundCap = true
 defaults.hideKey = 70
+defaults.macroBar = {}
+defaults.macroBar.ctrlKey = 29
+defaults.macroBar.altKey = 56
+defaults.macroBar.hide = {}
+defaults.macroBar.hide.enabled = true
+defaults.macroBar.move = {}
+defaults.macroBar.move.enabled = false
+defaults.macroBar.move.height = 40
+
 
 bg_cap_l_path = windower.addon_path.. 'bg_cap_l.png'
 bg_cap_r_path = windower.addon_path.. 'bg_cap_r.png'
@@ -86,7 +96,7 @@ pointer_settings.pos = {}
 pointer_settings.pos.x = center_screen
 pointer_settings.pos.y = 50
 pointer_settings.size = {}
-pointer_settings.size.width = 16
+pointer_settings.size.width = 20
 pointer_settings.size.height = 11
 pointer_settings.visible = true
 pointer_settings.texture = {}
@@ -363,15 +373,8 @@ config.register(settings, function(settings_table)
 
     st_text = texts.new('${name|(Name)}', text_settings)
 
-    tbg_cap_l:pos_x(tbg_body:pos_x() - tbg_cap_settings.size.width)
-    tbg_cap_r:pos_x(tbg_body:pos_x() + targetBarWidth)
-    stbg_cap_l:pos_x(stbg_body:pos_x() - stbg_cap_settings.size.width)
-    stbg_cap_r:pos_x(stbg_body:pos_x() + subtargetBarWidth)
-    t_text:pos_x(tfg_body:pos_x())
-    st_text:pos_x(stfg_body:pos_x())
+    set_xPos()
 end)
-
-
 
 check_claim = function(claim_id, player_id)
     if player_id == claim_id then
@@ -399,8 +402,34 @@ target_change = function(index)
 	end
 end
 
+shift_y = function(quantity)
+    tbg_cap_l:pos_y(settings.pos.y + quantity)
+    tbg_cap_r:pos_y(settings.pos.y + quantity)
+    stbg_cap_l:pos_y(settings.pos.y + quantity)
+    stbg_cap_r:pos_y(settings.pos.y + quantity)
+    tbg_body:pos_y(settings.pos.y + quantity)
+    stbg_body:pos_y(settings.pos.y + quantity)
+    tfg_body:pos_y(settings.pos.y + quantity)
+    stfg_body:pos_y(settings.pos.y + quantity)
+    tfgg_body:pos_y(settings.pos.y + quantity)
+    stfgg_body:pos_y(settings.pos.y + quantity)
+    pointer:pos_y(settings.pos.y + (settings.subTargetBar.height/2) - (pointer_settings.size.height/2) + quantity)
+    t_text:pos_y(settings.pos.y - settings.text.padding + quantity)
+    st_text:pos_y(settings.pos.y - settings.text.padding + quantity)
+    set_xPos()
+end
+
+set_xPos = function()
+    tbg_cap_l:pos_x(tbg_body:pos_x() - tbg_cap_settings.size.width)
+    tbg_cap_r:pos_x(tbg_body:pos_x() + targetBarWidth)
+    stbg_cap_l:pos_x(stbg_body:pos_x() - stbg_cap_settings.size.width)
+    stbg_cap_r:pos_x(stbg_body:pos_x() + subtargetBarWidth)
+    t_text:pos_x(tfg_body:pos_x())
+    st_text:pos_x(stfg_body:pos_x())
+end
+
 windower.register_event('status change', function(new_status_id)
-    if (new_status_id == 4)  and (hasTarget == true) and (is_hidden_by_key == false) then
+    if (new_status_id == 4)  and (hasTarget == true) and (is_hidden_by_key == false) and (is_hidden_by_macro == false) then
         visible = false
         is_hidden_by_cutscene = true
     elseif new_status_id ~= 4 then
@@ -415,5 +444,21 @@ windower.register_event('keyboard', function(dik, flags, blocked)
   elseif (dik == hideKey) and (flags == true) and (hasTarget == true) and (visible == false) and (is_hidden_by_cutscene == false) then
     is_hidden_by_key = false
     visible = true
+  end
+
+  if (dik == settings.macroBar.ctrlKey and flags) or (dik == settings.macroBar.altKey and flags) then
+      if (settings.macroBar.hide.enabled) then
+          visible = false
+          is_hidden_by_macro = true
+      elseif (settings.macroBar.move.enabled) then
+          shift_y(settings.macroBar.move.height)
+      end
+  elseif (dik == settings.macroBar.ctrlKey and flags == false) or (dik == settings.macroBar.altKey and flags == false) then
+      if (settings.macroBar.hide.enabled and is_hidden_by_key == false) then
+          visible = true
+          is_hidden_by_macro = false
+      elseif (settings.macroBar.move.enabled) then
+          shift_y(0)
+      end
   end
 end)

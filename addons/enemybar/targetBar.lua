@@ -23,10 +23,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --]]
 
-force_hide = false
-
 render_target_bar = function (...)
-    if visible == true then
+    if visible == true and is_hidden_by_cutscene == false then
+        old_target = target
         target = windower.ffxi.get_mob_by_target('t')
 
         local subtarget = windower.ffxi.get_mob_by_target('st')
@@ -46,19 +45,22 @@ render_target_bar = function (...)
             local i = target.hpp / 100
             local new_width = math.floor(targetBarWidth * i)
             local old_width = tfgg_body:width()
-            tfgg_body:width(0)
-            local now = os.clock()
-            if new_width ~= nil and new_width > 0 then
-                if new_width < old_width and player.in_combat then
+            if (old_target ~= nil and target.id == old_target.id) and new_width ~= nil and new_width > 0 then
+                if new_width < old_width then
                     local x = old_width + math.floor(((new_width - old_width) * 0.1))
                     tfgg_body:width(x)
-                elseif new_width >= old_width or not player.in_combat then
+                    tfg_body:width(new_width)
+                elseif new_width >= old_width then
+                    local zx = old_width + math.ceil(((new_width - old_width) * 0.1))
+                    tfg_body:width(zx)
                     tfgg_body:width(new_width)
                 end
+            else
+                tfgg_body:width(new_width)
+                tfg_body:width(new_width)
             end
-            tfg_body:width(new_width)
-            tbg_body:width(targetBarWidth) -- I still have no idea why removing this breaks the bg.
             tfgg_body:height(targetBarHeight)
+            tbg_body:width(targetBarWidth) -- I still have no idea why removing this breaks the bg.
             tbg_cap_l:height(targetBarHeight)
             tbg_cap_r:height(targetBarHeight)
 

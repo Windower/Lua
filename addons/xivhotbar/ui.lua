@@ -392,7 +392,7 @@ function ui:load_action(hotbar, slot, action, player_vitals)
         self.hotbars[hotbar].slot_icon[slot]:pos(self:get_slot_x(hotbar, slot), self:get_slot_y(hotbar, slot))
         self.hotbars[hotbar].slot_icon[slot]:path(windower.addon_path .. '/images/icons/custom/item.png')
         self.hotbars[hotbar].slot_icon[slot]:show()
-    else
+    elseself.hotbars[hotbar].slot_key[slot]:show()
         self.hotbars[hotbar].slot_icon[slot]:pos(self:get_slot_x(hotbar, slot), self:get_slot_y(hotbar, slot))
     end
 
@@ -402,6 +402,7 @@ function ui:load_action(hotbar, slot, action, player_vitals)
         self.hotbars[hotbar].slot_icon[slot]:pos(self:get_slot_x(hotbar, slot), self:get_slot_y(hotbar, slot))
         self.hotbars[hotbar].slot_icon[slot]:path(windower.addon_path .. '/images/icons/custom/' .. action.icon .. '.png')
         self.hotbars[hotbar].slot_icon[slot]:show()
+        self.hotbars[hotbar].slot_key[slot]:show()
     end
 
     -- check if action is on cooldown

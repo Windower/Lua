@@ -88,6 +88,7 @@ settings.GilImage.texture.fit = true
 settings.GilImage.size = {}
 settings.GilImage.size.height = 23
 settings.GilImage.size.width = 23
+settings.GilImage.draggable = false
 settings.GilImage.repeatable = {}
 settings.GilImage.repeatable.x = 1
 settings.GilImage.repeatable.y = 1

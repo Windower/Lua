@@ -209,7 +209,7 @@ local current_column = 1
 local last_column = 1
 local items = {}
 local slot_images = {}
-local current_time = 0
+local update_time = 0
 
 windower.register_event('load',function()
     if windower.ffxi.get_info().logged_in then
@@ -219,26 +219,28 @@ end)
 
 windower.register_event('login', function()
     initialize()
+    update_time = os.time()
 end)
 
 windower.register_event('logout', function(...)
     hide()
+    clear()
 end)
 
 windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blocked)
-    if (os.time() - current_time > 10 and id == 0x50 or id == 0xE0 or id == 0x1D) then
+    if (os.time() - update_time > 30 and id == 0x50 or id == 0xE0 or id == 0x1D) then
       update()
     end
 end)
 
 windower.register_event('add item', function(...)
-    if (os.time() - current_time > 10) then
+    if (os.time() - update_time > 30) then
         update()
     end
 end)
 
 windower.register_event('remove item', function(...)
-    if (os.time() - current_time > 10) then
+    if (os.time() - update_time > 30) then
         update()
     end
 end)
@@ -246,13 +248,10 @@ end)
 function initialize()
     hideKey = settings.HideKey
     update()
-    hide()
-    update()
     show()
 end
 
 function update()
-    current_time = os.time()
     current_block = 0
     last_column = 1
     items = windower.ffxi.get_items()
@@ -296,7 +295,7 @@ function update_items()
     update_bag(settings.SlotImage.mogWardrobe,items.wardrobe3,items.max_wardrobe3,items.enabled_wardrobe3)
     update_bag(settings.SlotImage.mogWardrobe,items.wardrobe4,items.max_wardrobe4,items.enabled_wardrobe4)
     update_temp_bag(settings.SlotImage.tempInventory,items.treasure,#items.treasure,items.enabled_treasure)
-    update_temp_bag(settings.SlotImage.tempInventory,items.temporary,items.max_temporary,items.enabled_temporary)
+    --update_temp_bag(settings.SlotImage.tempInventory,items.temporary,items.max_temporary,items.enabled_temporary)
 end
 
 function update_bag(config, bag, max, enabled)
@@ -434,6 +433,10 @@ function hide()
             slot.box:hide()
         end
     end
+end
+
+function clear()
+    slot_images = {}
 end
 
 windower.register_event('status change', function(new_status_id)
