@@ -51,6 +51,7 @@ defaults.Images.RestedBonus.Color.Green = 255
 defaults.Images.RestedBonus.Color.Blue = 255
 defaults.Texts = {}
 defaults.Texts.Exp = {}
+defaults.Texts.Exp.Draggable = false
 defaults.Texts.Exp.Background = {}
 defaults.Texts.Exp.Background.Alpha = 0
 defaults.Texts.Exp.Background.Red = 0
