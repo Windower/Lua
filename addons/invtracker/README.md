@@ -14,4 +14,3 @@ This addon displays a grid detailing empty and filled inventory slots, similar t
 ## Issues:
 1. You may need to log out from you character and enter again in order to have the addon display properly if loaded manually.
 2. There is no way to get the inventory sort order, so all items in the grid will be ordered by status and item count.
-3. Since there is no way to know many items determine a full stack, all regular items are painted blue. Instead, bazaar equipped items are painted orange, linkshell and equipped items are painted green, and temporary items are painted red.
