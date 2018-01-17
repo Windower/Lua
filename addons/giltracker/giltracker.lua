@@ -35,66 +35,74 @@ config = require('config')
 images = require('images')
 texts = require('texts')
 
-hideKey = 70
+local GIL_ITEM_ID = 0xFFFF
+local CUTSCENE_STATUS_ID = 4
+local SCROLL_LOCK_KEY = 70
+
+hideKey = SCROLL_LOCK_KEY
 is_hidden_by_cutscene = false
 is_hidden_by_key = false
 
 defaults = {}
-defaults.HideKey = 70
-defaults.GilText = {}
-defaults.GilText.bg = {}
-defaults.GilText.bg.alpha = 100
-defaults.GilText.bg.red = 0
-defaults.GilText.bg.green = 0
-defaults.GilText.bg.blue = 0
-defaults.GilText.bg.visible = false
-defaults.GilText.text = {}
-defaults.GilText.text.font = 'sans-serif'
-defaults.GilText.text.fonts = {'Arial','Trebuchet MS'}
-defaults.GilText.text.size = 9
-defaults.GilText.flags = {}
-defaults.GilText.flags.italic = true
-defaults.GilText.flags.bold = false
-defaults.GilText.flags.right = true
-defaults.GilText.flags.bottom = true
-defaults.GilText.pos = {}
-defaults.GilText.pos.x = -285
-defaults.GilText.pos.y = -35
-defaults.GilText.text.alpha = 255
-defaults.GilText.text.red = 253
-defaults.GilText.text.green = 252
-defaults.GilText.text.blue = 250
-defaults.GilText.text.stroke = {}
-defaults.GilText.text.stroke.alpha = 200
-defaults.GilText.text.stroke.red = 50
-defaults.GilText.text.stroke.green = 50
-defaults.GilText.text.stroke.blue = 50
-defaults.GilText.text.stroke.width = 2
-defaults.GilText.text.visible = true
-defaults.GilImage = {}
-defaults.GilImage.color = {}
-defaults.GilImage.color.alpha = 255
-defaults.GilImage.color.red = 255
-defaults.GilImage.color.green = 255
-defaults.GilImage.color.blue = 255
-defaults.GilImage.visible = true
+defaults.hideKey = SCROLL_LOCK_KEY
+defaults.gilText = {}
+defaults.gilText.bg = {}
+defaults.gilText.bg.alpha = 100
+defaults.gilText.bg.red = 0
+defaults.gilText.bg.green = 0
+defaults.gilText.bg.blue = 0
+defaults.gilText.bg.visible = false
+defaults.gilText.text = {}
+defaults.gilText.text.font = 'sans-serif'
+defaults.gilText.text.fonts = {'Arial','Trebuchet MS'}
+defaults.gilText.text.size = 9
+defaults.gilText.flags = {}
+defaults.gilText.flags.italic = true
+defaults.gilText.flags.bold = false
+defaults.gilText.flags.right = true
+defaults.gilText.flags.bottom = true
+defaults.gilText.pos = {}
+defaults.gilText.pos.x = -285
+defaults.gilText.pos.y = -35
+defaults.gilText.text.alpha = 255
+defaults.gilText.text.red = 253
+defaults.gilText.text.green = 252
+defaults.gilText.text.blue = 250
+defaults.gilText.text.stroke = {}
+defaults.gilText.text.stroke.alpha = 200
+defaults.gilText.text.stroke.red = 50
+defaults.gilText.text.stroke.green = 50
+defaults.gilText.text.stroke.blue = 50
+defaults.gilText.text.stroke.width = 2
+defaults.gilText.text.visible = true
+defaults.gilImage = {}
+defaults.gilImage.color = {}
+defaults.gilImage.color.alpha = 255
+defaults.gilImage.color.red = 255
+defaults.gilImage.color.green = 255
+defaults.gilImage.color.blue = 255
+defaults.gilImage.visible = true
 
 local settings = config.load(defaults)
 config.save(settings)
 
-settings.GilImage.texture = {}
-settings.GilImage.texture.path = windower.addon_path..'gil.png'
-settings.GilImage.texture.fit = true
-settings.GilImage.size = {}
-settings.GilImage.size.height = 23
-settings.GilImage.size.width = 23
-settings.GilImage.draggable = false
-settings.GilImage.repeatable = {}
-settings.GilImage.repeatable.x = 1
-settings.GilImage.repeatable.y = 1
+settings.gilImage.texture = {}
+settings.gilImage.texture.path = windower.addon_path..'gil.png'
+settings.gilImage.texture.fit = true
+settings.gilImage.size = {}
+settings.gilImage.size.height = 23
+settings.gilImage.size.width = 23
+settings.gilImage.draggable = false
+settings.gilImage.repeatable = {}
+settings.gilImage.repeatable.x = 1
+settings.gilImage.repeatable.y = 1
 
-gil_image = images.new(settings.GilImage)
-gil_text = texts.new(settings.GilText)
+gil_image = images.new(settings.gilImage)
+gil_text = texts.new(settings.gilText)
+
+config.register(settings, function(settings)
+    hideKey = settings.hideKey
+end)
 
 windower.register_event('load',function()
     if windower.ffxi.get_info().logged_in then
@@ -111,33 +119,51 @@ windower.register_event('logout', function(...)
 end)
 
 windower.register_event('add item', function(...)
-    update_gil()
+    update_gil_if_item_id_matches(id)
 end)
 
-windower.register_event('remove item', function(original, modified, original_mode, modified_mode, blocked)
-    if (string.match(original,"gil")) then
-        update_gil()
-    end
+windower.register_event('remove item', function(bag, slot, id, count)
+    update_gil_if_item_id_matches(id)
 end)
 
+windower.register_event('incoming text', function(original, ...)
+    update_gil_if_string_contains_gil(original)
+end)
 
-windower.register_event('incoming text', function(...)
-    update_gil()
+windower.register_event('status change', function(new_status_id)
+    local is_cutscene_playing = is_cutscene(new_status_id)
+    toggle_display_if_cutscene(is_cutscene_playing)
+end)
+
+windower.register_event('keyboard', function(dik, down, flags, blocked)
+    toggle_display_if_hide_key_is_pressed(dik, down)
 end)
 
 function initialize()
-    hideKey = settings.HideKey
-    local xRes = windower.get_windower_settings().ui_x_res
-    local yRes = windower.get_windower_settings().ui_y_res
+    local windower_settings = windower.get_windower_settings()
+    local xRes = windower_settings.ui_x_res
+    local yRes = windower_settings.ui_y_res
     update_gil()
-    gil_image:pos(xRes + settings.GilText.pos.x + 1 ,
-      yRes + settings.GilText.pos.y - (settings.GilImage.size.height/6))
+    gil_image:pos(xRes + settings.gilText.pos.x + 1,
+        yRes + settings.gilText.pos.y - (settings.gilImage.size.height/6))
     show()
 end
 
+function update_gil_if_item_id_matches(id)
+    if (id == GIL_ITEM_ID) then
+        update_gil()
+    end
+end
+
+function update_gil_if_string_contains_gil(input_string)
+    if (string.match(input_string,"gil")) then
+        update_gil()
+    end
+end
+
 function update_gil()
-  local gil = windower.ffxi.get_items().gil
-  gil_text:text(''..comma_value(gil))
+    local gil = windower.ffxi.get_items('gil')
+    gil_text:text(comma_value(gil))
 end
 
 function show()
@@ -151,32 +177,36 @@ function hide()
 end
 
 function comma_value(amount)
-  local formatted = amount
-  while true do
-    formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-    if (k==0) then
-      break
+    local formatted = tostring(amount)
+    while true do
+        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+        if (k==0) then
+            break
+        end
     end
-  end
-  return formatted
+    return formatted
 end
 
-windower.register_event('status change', function(new_status_id)
-    if (new_status_id == 4) and (is_hidden_by_key == false) then
+function is_cutscene(status_id)
+    return status_id == CUTSCENE_STATUS_ID
+end
+
+function toggle_display_if_cutscene(is_cutscene_playing)
+    if (is_cutscene_playing) and (not is_hidden_by_key) then
         is_hidden_by_cutscene = true
         hide()
-    elseif (new_status_id ~= 4) and (is_hidden_by_key == false) then
+    elseif (not is_cutscene_playing) and (not is_hidden_by_key) then
         is_hidden_by_cutscene = false
         show()
     end
-end)
+end
 
-windower.register_event('keyboard', function(dik, flags, blocked)
-  if (dik == hideKey) and (flags == true) and (is_hidden_by_key == true) and (is_hidden_by_cutscene == false) then
-    is_hidden_by_key = false
-    show()
-  elseif (dik == hideKey) and (flags == true) and (is_hidden_by_key == false) and (is_hidden_by_cutscene == false) then
-    is_hidden_by_key = true
-    hide()
-  end
-end)
+function toggle_display_if_hide_key_is_pressed(key_pressed, key_down)
+    if (key_pressed == hideKey) and (key_down) and (is_hidden_by_key) and (not is_hidden_by_cutscene) then
+        is_hidden_by_key = false
+        show()
+    elseif (key_pressed == hideKey) and (key_down) and (not is_hidden_by_key) and (not is_hidden_by_cutscene) then
+        is_hidden_by_key = true
+        hide()
+    end
+end
