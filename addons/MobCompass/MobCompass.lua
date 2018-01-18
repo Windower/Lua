@@ -10,14 +10,14 @@ modification, are permitted provided that the following conditions are met:
     * Redistributions in binary form must reproduce the above copyright
     notice, this list of conditions and the following disclaimer in the
     documentation and/or other materials provided with the distribution.
-    * Neither the name of <addon name> nor the
+    * Neither the name of MobCompass nor the
     names of its contributors may be used to endorse or promote products
     derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
+DISCLAIMED. IN NO EVENT SHALL Sebastien Gomez BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -26,392 +26,223 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-
 _addon.name = 'MobCompass'
-_addon.version = '1.0'
-_addon.commands = {'mobcompass','mc'}
+_addon.version = '2.0.1'
 
-require 'tables'  -- Required for various table related features. Made by Arcon
-require 'logger'       -- Made by arcon. Here for debugging purposes
-require 'strings' -- Required to parse the other files. Probably made by Arcon
-require 'maths'
-local config = require 'config'
-file = require 'files'
+texts = require('texts')
+config = require('config')
 
-local settingtab = nil
-local settings_file = 'data/settings.xml'
+do
+    local s_arrows={
+        pos = {},
+        bg = {visible=false},
+        flags = {draggable=false},
+        text = {size=33,font='Wingdings'}
+    }
 
-windower.register_event('load', function()
-	player = windower.ffxi.get_player()
+    circle = texts.new('l',s_arrows)
+    circle2 = texts.new('l',s_arrows)
 
-	defaults = {}
-	defaults.geomode = {}
-	defaults.thfmode = {}
-	defaults.bg_red = 0
-	defaults.bg_blue = 0
-	defaults.bg_green = 0
-	defaults.txt_red = 255
-	defaults.txt_blue = 0
-	defaults.txt_green = 0
-	defaults.txt_bold = true
-	defaults.x_pos = 260
-	defaults.y_pos = 550
-	defaults.defaultmode = 'geo'
-	defaults.geomode.showbuff = true
-	defaults.thfmode.showangle = 'always'
-	settingtab = config.load(defaults)
-	
-	if settingtab == nil then
-		print('No settings file found. Ensure you have a file at data/settings.xml')
-	end
-	
-	box_name = T()
-	local i = 1
-	
-	for i = 1, 3 do 
-		box_name[i] = 'd'..i
-		windower.text.create(box_name[i])
-		windower.text.set_bg_color(box_name[i], 0, settingtab['bg_red'], settingtab['bg_green'], settingtab['bg_blue'])
-		windower.text.set_bg_visibility(box_name[i], true)
-		windower.text.set_bold(box_name[i], settingtab['txt_bold'])
-		windower.text.set_right_justified(box_name[i], false)
-		windower.text.set_color(box_name[i], 0, settingtab['txt_red'], settingtab['txt_green'], settingtab['txt_blue'])
-		checktext = T()
-		checktext[i] = ''
-		if i < 3 then
-			windower.text.set_location(box_name[i], settingtab['x_pos'], settingtab['y_pos'])
-		else
-			windower.text.set_location(box_name[i], settingtab['x_pos'], settingtab['y_pos'] - 20)
-		end
-	end
+    n = texts.new('Ã™',s_arrows)
+    s = texts.new('Ãš',s_arrows)
+    w = texts.new('Ã—',s_arrows)
+    e = texts.new('Ã˜',s_arrows)
 
-	mode = tostring(settingtab['defaultmode'])
-	showbuff = settingtab.geomode.showbuff
-	showangle = tostring(settingtab.thfmode.showangle)
-	loop = 1
-		
-	if windower.ffxi.get_info().logged_in then
-		loop = 0
-		print('Commands are:')
-		print('To change Compass style: ')
-		print('Command = " MC mode [thf | geo] "')
-		print('To change Displays while in associated modes: ')
-		print('Geo command : " MC mode geo showbuff "')
-		print('Thf command : " MC mode thf showangle [always | behind | never] "')
-		get_target()
-	end
+    s_arrows.text.size = 20
 
-end)
+    ne = texts.new('w',s_arrows)
+    nw = texts.new('w',s_arrows)
+    sw = texts.new('w',s_arrows)
+    se = texts.new('w',s_arrows)
 
-windower.register_event('unload', function()
-	loop = 1
-	local i = 1
-	for i = 1,3 do
-		windower.text.delete(box_name[i])
-	end
-end)
+    _defaults = config.load({
+        x_pos = 0,
+        y_pos = 0,
+    })
+    x_pos = _defaults.x_pos
+    y_pos = _defaults.y_pos
+    
+    config.register(_defaults, function(settings_table)
+        local x_pos = settings_table.x_pos
+        local y_pos = settings_table.y_pos
+            
+        n:pos(x_pos+29,y_pos)
+        s:pos(x_pos+29,y_pos+58)
+        e:pos(x_pos+62,y_pos+29)
+        w:pos(x_pos,y_pos+29)
 
-windower.register_event('login', function()
-	loop = 0
-	get_target()
-end)
+        circle:pos(x_pos+22,y_pos+14)
+        circle2:pos(x_pos-8,y_pos-27)
 
-windower.register_event('logout', function(name)
-	loop = 1
-	local i = 1
-	for i = 1, 3 do
-		set_tb(0,'',i)
-	end
-end)
+        sw:pos(x_pos+19,y_pos+60)
+        se:pos(x_pos+64,y_pos+60)
+        nw:pos(x_pos+19,y_pos+17)
+        ne:pos(x_pos+64,y_pos+17)
+        sas:pos(x_pos+32,y_pos+40)
+        labels:pos(x_pos-22,y_pos-18)
 
-windower.register_event('addon command',function (...)
-    local term = table.concat({...}, ' ')
-	broken = term:split(' ',4)
+    end)
 
-	if broken ~= nil then
-		if tostring(broken[1]):lower() == 'mode' then
-			if broken[2] ~= nil then
-				if broken[2] == 'thf' or broken[2] == 'geo' then
-					
-					mode = broken[2]
-					
-					if broken[3] ~= nil and broken[2] == 'geo' then
-						if broken[3] == 'showbuff' then
-							showbuff = not showbuff
-							print('MC mode geo "showbuff" changed to "'..tostring(showbuff)..'".')
-						else 
-							print('Command "'..broken[3]..'" is not valid.')
-							print('Use "//MC mode geo showbuff" to change display')
-						end
-					elseif broken[3] ~= nil and broken[2] == 'thf' then
-							--print('Thf mode set. Use "//MC mode thf showangle [always | behind | never]" to change display')
-						if broken[3] == 'showangle' and broken[4] ~= nil then
-							if broken[4] == 'always' then
-								showangle = 'always'
-								print('MC mode thf "showangle" changed to "'..showangle..'".')
-							elseif broken[4] == 'behind' then
-								showangle = 'behind'
-								print('MC mode thf "showangle" changed to "'..showangle..'".')
-							elseif broken[4] == 'never' then
-								showangle = 'never'
-								print('MC mode thf "showangle" changed to "'..showangle..'".')
-							else
-								print('Command "'..broken[4]..'" is not valid.')
-								print('Use "//MC mode thf showangle [always | behind | never]" to change display')
-							end
-						else 
-							print('Command "'..broken[3]..'" is not valid.')
-							print('Use "//MC mode thf showangle [always | behind | never]" to change display')
-						end
-					end
-				else
-					print('Command "'..broken[2]..'" is not valid.')
-					print('Commands are:')
-					print('Command 1 : //MC mode [thf|geo]')
-				end
-			end
-		else
-			print('Command "'..broken[1]..'" is not valid.')
-			print('Commands are:')
-			print('To change Compass style: ')
-			print('Command = " MC mode [thf | geo] "')
-			print('To change Displays while in associated modes: ')
-			print('Geo command : " MC mode geo showbuff "')
-			print('Thf command : " MC mode thf showangle [always | behind | never] "')
-		end
-	end
-end)
+    sas = texts.new('360',{
+        pos = {x=x_pos+32,y=y_pos+40},
+        bg = {visible=false},
+        flags = {draggable=false},
+        text = {size=15,font='Consolas',}
+    })
 
-function get_target()
-	--Player info
-	player = T(windower.ffxi.get_player())
-	P = T(windower.ffxi.get_mob_by_id(player.id))
-	local Px = P.x_pos
-	local Py = P.y_pos
-	local tb_text = T()
-	
-	-- Target info
-	target = T(windower.ffxi.get_mob_by_index(player.target_index))
-	target_id = target.id
-	local i = 1
-	for i = 1,3 do
-		tb_text[i] = ''
-	end
-	
-	if (target_id ~= 0) and (target_id ~= nil) and (target_id ~= player.id) and (target.is_npc == true) then
-		
-		local Mx = target.x_pos
-		local My = target.y_pos
-						
-		if mode == 'geo' then
-			local angle = calc_standard_angle(Px, Py, Mx, My)
-			local direction = angle_to_direction(angle)
-			tb_text[1] = direction..' '..angle..' °'
-			
-			tb_text[2] = ''
-			
-			set_tb(0,tostring(tb_text[2]),2)
-			set_tb(255,tostring(tb_text[1]),1)
-			
-			if showbuff and direction == 'N' then
-				tb_text[3] = 'buff = Recast'
-			elseif showbuff and direction == 'NE' then
-				tb_text[3] = 'buff = Recast + Macc'
-			elseif showbuff and direction == 'E' then
-				tb_text[3] = 'buff = Macc'
-			elseif showbuff and direction == 'SE' then
-				tb_text[3] = 'buff = Macc + MCR'
-			elseif showbuff and direction == 'S' then
-				tb_text[3] = 'buff = MCR'
-			elseif showbuff and direction == 'SW' then
-				tb_text[3] = 'buff = MCR + Matt'
-			elseif showbuff and direction == 'W' then
-				tb_text[3] = 'buff = Matt'
-			elseif showbuff and direction == 'NW' then
-				tb_text[3] = 'buff = Matt + Recast'
-			else
-				tb_text[3] = 'buff = ...'
-			end
-			set_tb(255,tostring(tb_text[3]),3)
-			
-			if showbuff == false then 
-				tb_text[3] = ''
-				set_tb(0,tostring(tb_text[3]),3)
-			end
-			
-		elseif mode == 'thf' then
-			local Mfacing = target.facing
-			local angle2 = calc_behind(Mfacing, Px, Py, Mx, My)
-			tb_text[2] = is_sa(angle2)
-			
-			tb_text[1] = ''
-			set_tb(0,tostring(tb_text[1]),1)
-			tb_text[3] = ''
-			set_tb(0,tostring(tb_text[3]),3)
-			
-			if showangle == 'always' and tb_text[2] == 'BAD' then
-				tb_text[2] = 'SA: '..tb_text[2]..' | Behind: '..angle2..' °'
-			elseif showangle == 'always' and tb_text[2] == 'OK' then
-				tb_text[2] = 'SA: '..tb_text[2].. ' | Behind: '..angle2..' °'
-			elseif showangle == 'behind' and tb_text[2] == 'BAD' then
-				tb_text[2] = 'SA: '..tb_text[2]
-			elseif tb_text[2] == 'OK' and tb_text[2] == 'BAD' then
-				tb_text[2] = 'SA: '..tb_text[2].. ' | Behind: '..angle2..' °'
-			elseif showangle == 'never' then
-				tb_text[2] = 'SA: '..tb_text[2]
-			end
-			set_tb(255,tostring(tb_text[2]),2)
-		end
-		
-	elseif (target_id == 0) or (target_id == nil) or (target_id == player.id) or (target.is_npc == false) then
-		for i = 1,3 do
-			tb_text[i] = ''
-			set_tb(0,tostring(tb_text[i]),i)
-		end
-	end
-	
-	for i = 1,3 do
-		checktext[i] = tb_text[i]
-	end
-	
-	if loop == 0 then
-		windower.send_command('@wait 0.1;lua i MobCompass get_target')
-	end
-	
+    labels = texts.new('       Crit\n\n\n\nMB               Att\n\n\n\n        Acc',{
+        pos = {x=x_pos-22,y=y_pos-18},
+        bg = {visible=false},
+        flags = {draggable=false},
+        text = {size=10,font='Consolas',}
+    })
+
+    n:pos(x_pos+29,y_pos)
+    s:pos(x_pos+29,y_pos+58)
+    e:pos(x_pos+62,y_pos+29)
+    w:pos(x_pos,y_pos+29)
+
+    circle:pos(x_pos+22,y_pos+14)
+    circle2:pos(x_pos-8,y_pos-27)
+
+    sw:pos(x_pos+19,y_pos+60)
+    se:pos(x_pos+64,y_pos+60)
+    nw:pos(x_pos+19,y_pos+17)
+    ne:pos(x_pos+64,y_pos+17)
+
+    circle:size(53)
+    circle:alpha(100)
+    circle2:size(111)
+    circle2:color(0,0,165)
+    circle2:alpha(28)
+
+    s_arrows.text.alpha = 255
 end
 
-function set_tb(alpha,text,tb_number)	
-	tb_number = tonumber(tb_number)
-	windower.text.set_bg_color(box_name[tb_number], alpha,settingtab['bg_red'], settingtab['bg_green'], settingtab['bg_blue'])
-	windower.text.set_color(box_name[tb_number], alpha,settingtab['txt_red'], settingtab['txt_green'], settingtab['txt_blue'])
-	if checktext[tb_number] ~= text then
-		windower.text.set_text(box_name[tb_number], text)
-	end
+do
+    local drag_and_drop
+    
+    windower.register_event('mouse', function(type, x, y, delta, blocked)
+        if blocked then return end
+        if type == 0 then
+            if drag_and_drop then
+                sas:pos(x-drag_and_drop[1]+32,y-drag_and_drop[2]+40)
+                n:pos(x-drag_and_drop[1]+29,y-drag_and_drop[2])
+                s:pos(x-drag_and_drop[1]+29,y-drag_and_drop[2]+58)
+                e:pos(x-drag_and_drop[1]+62,y-drag_and_drop[2]+29)
+                w:pos(x-drag_and_drop[1],y-drag_and_drop[2]+29)
+                sw:pos(x-drag_and_drop[1]+19,y-drag_and_drop[2]+60)
+                se:pos(x-drag_and_drop[1]+64,y-drag_and_drop[2]+60)
+                nw:pos(x-drag_and_drop[1]+19,y-drag_and_drop[2]+17)
+                ne:pos(x-drag_and_drop[1]+64,y-drag_and_drop[2]+17)
+                circle:pos(x-drag_and_drop[1]+22,y-drag_and_drop[2]+14)
+                circle2:pos(x-drag_and_drop[1]-8,y-drag_and_drop[2]-27)
+                labels:pos(x-drag_and_drop[1]-22,y-drag_and_drop[2]-18)
+                return true
+            end
+        elseif type == 1 then
+            if (x-x_pos-45)^2 + (y-y_pos-45)^2 < 2025 then
+                drag_and_drop = {x-x_pos,y-y_pos}
+                return true
+            end
+        elseif type == 2 then
+            if drag_and_drop then
+                x_pos,y_pos = x-drag_and_drop[1],y-drag_and_drop[2]
+                _defaults.x_pos = x_pos
+                _defaults.y_pos = y_pos
+                config.save(_defaults)
+                drag_and_drop = nil
+                return true
+            end
+        end
+    end)
 end
 
-function calc_standard_angle(Px, Py, Mx, My)
-
-	local angle = 0
-	local Px = tonumber(Px)
-	local Py = tonumber(Py)
-	local Mx = tonumber(Mx)
-	local My = tonumber(My)
-	
-	local PM = (Px - Mx) / (Py - My)
-	local PM_angle = math.atan(PM) * 180/math.pi
-
-	if (Px > Mx) and (Py > My) then
-		
-		angle = PM_angle 
-	
-	elseif (Px > Mx) and (Py < My) then
-		
-		angle = 180 + PM_angle 
-	
-	elseif (Px < Mx) and (Py < My) then
-	
-		angle = 180 + PM_angle
-	
-	elseif (Px < Mx) and (Py > My) then
-	
-		angle = 360 + PM_angle 
-	
-	elseif (Px == Mx) and (Py < My) then
-		angle = 0
-	elseif (Px > Mx) and (Py == My) then
-		angle = 90
-	elseif (Px == Mx) and (Py > My) then
-		angle = 180
-	elseif (Px < Mx) and (Py == My) then
-		angle = 270
-	end
-	
-	if angle ~= nil then 
-		return angle:round(1)
-	end
-
-end
-
-function angle_to_direction(angle)
-
-	local angle = tonumber(angle)
-	local direction = ''
-	
-	if (angle <= 11.25) and (angle >= 0) then
-		direction = 'N'
-	elseif angle <= 360 and angle > (11.25 * 31) then
-		direction = 'N'
-	elseif angle <= (11.25 * 3) and angle > 11.25 then
-		direction = 'NNE'
-	elseif angle <= (11.25 * 5) and angle > (11.25 * 3) then
-		direction = 'NE'
-	elseif angle <= (11.25 * 7) and angle > (11.25 * 5) then
-		direction = 'NEE'
-	elseif angle <= (11.25 * 9) and angle > (11.25 * 7) then
-		direction = 'E'
-	elseif angle <= (11.25 * 11) and angle > (11.25 * 9) then
-		direction = 'SEE'
-	elseif angle <= (11.25 * 13) and angle > (11.25 * 11) then
-		direction = 'SE'
-	elseif angle <= (11.25 * 15) and angle > (11.25 * 13) then
-		direction = 'SSE'
-	elseif angle <= (11.25 * 17) and angle > (11.25 * 15) then
-		direction = 'S'
-	elseif angle <= (11.25 * 19) and angle > (11.25 * 17) then
-		direction = 'SSW'
-	elseif angle <= (11.25 * 21) and angle > (11.25 * 19) then
-		direction = 'SW'
-	elseif angle <= (11.25 * 23) and angle > (11.25 * 21) then
-		direction = 'SWW'
-	elseif angle <= (11.25 * 25) and angle > (11.25 * 23) then
-		direction = 'W'
-	elseif angle <= (11.25 * 27) and angle > (11.25 * 25) then
-		direction = 'NWW'
-	elseif angle <= (11.25 * 29) and angle > (11.25 * 27) then
-		direction = 'NW'
-	elseif angle <= (11.25 * 31) and angle > (11.25 * 29) then
-		direction = 'NNW'
-	end
-	
-	return tostring(direction)	
-
-end
-
-function calc_behind(Mfacing, Px, Py, Mx, My)
-	
-	local Px = tonumber(Px)
-	local Py = tonumber(Py)
-	local Mx = tonumber(Mx)
-	local My = tonumber(My)
-	
-	local Mfacing = (Mfacing * 180/math.pi):round(2)
-		
-	local SA_Angle = calc_standard_angle(Px, Py, Mx, My) - 90
-	if SA_Angle < 0 then
-		SA_Angle = 360 + SA_Angle
-	end
-	
-	if ((Mfacing - SA_Angle) <= 180) and ((Mfacing - SA_Angle) > 0)then
-		SA_Angle = 180 - (Mfacing - SA_Angle)
-	elseif (Mfacing - SA_Angle) > 180 then
-		SA_Angle = ((Mfacing - SA_Angle) - 180) * -1
-	elseif (Mfacing - SA_Angle) <= 0  then
-		SA_Angle = (180 + (Mfacing - SA_Angle)) * -1
-	end
-	
-	return SA_Angle:round(2)
-	
-end
-
-function is_sa(angle2) 
-	local sa = ''
-	if (angle2 >= 0) and (angle2 < 45) then
-		sa = 'OK'	
-	elseif (angle2 < 0) and (angle2 > -45) then
-		sa = 'OK'
-	else
-		sa = 'BAD'
-	end
-	
-	return sa
+do
+    local is_labels_visible = false
+    windower.register_event('job change', function(main_job_id,_,sub_job_id)
+        is_labels_visible = main_job_id == 21 or sub_job_id == 21
+        labels:visible(is_labels_visible and w:visible())
+    end)
+    
+    local player_index
+    if windower.ffxi.get_info().logged_in then
+        local player = windower.ffxi.get_player()
+        player_index = player.index
+        is_labels_visible = player.main_job_id == 21 or player.sub_job_id == 21
+    end
+    
+    windower.register_event('zone change', function()
+        player_index = windower.ffxi.get_player().index
+    end)
+    
+    windower.register_event('login', function()
+        player_index = windower.ffxi.get_player().index
+    end)
+    
+    local target = 0
+        
+    windower.register_event('target change', function(n)
+        target = n ~= player_index and n or 0
+        if target == 0 then
+            for i=1,#windower.text.saved_texts do
+                windower.text.saved_texts[i]:hide()
+            end
+        elseif not w:visible() then
+            for i=1,#windower.text.saved_texts do
+                windower.text.saved_texts[i]:show()
+            end
+            labels:visible(is_labels_visible)
+        end
+    end)
+    
+    local atan = math.atan
+    local pi = math.pi
+    local last45angle = 10
+    local last16angle
+    local direction = {
+        [0]=' N ', ' N ', 'NNE', 'N E', 'ENE', ' E ', 'ESE', 'S E', 'SSE', ' S ', 'SSW', 'S W', 'WSW', 
+        ' W ', 'WNW', 'N W', 'NNW', [-7]='SSW', [-6]='S W', [-5]='WSW', [-4]=' W ', [-3]='WNW', [-2]='N W', [-1]='NNW',
+    }
+    local arrow_map = {[0]=e,e,ne,n,nw,w,sw,s,se,e,sas}
+    
+    windower.register_event('prerender', function()
+        if target ~= 0 then
+            local player = windower.ffxi.get_mob_by_index(player_index)
+            if not player then 
+                target = 0 
+                return 
+            end
+            local mob = windower.ffxi.get_mob_by_index(target)
+            local x,y = player.x-mob.x,player.y-mob.y
+            local angle = atan(y/x)
+            if x < 0 then
+                angle = angle+pi
+            elseif y < 0 then
+                angle = angle+2*pi
+            end
+            local next45angle = math.ceil((angle+pi/8)/(pi/4))
+            if next45angle ~= last45angle then
+                if next45angle ~= nil and last45angle ~=nil then
+                    arrow_map[last45angle]:color(255,255,255)
+                    arrow_map[next45angle]:color(255,0,0)
+                    last45angle = next45angle
+                end
+            end
+            local heading = mob.facing
+            if heading < 0 then
+                heading = -heading
+            else
+                heading = 2*pi-heading
+            end
+            
+            heading = heading - angle
+            
+            local next16angle = math.ceil((heading+pi/16)/(pi/8))
+            if next16angle ~= last16angle then
+                sas:text(direction[next16angle])
+                last16angle = next16angle
+            end
+        end
+    end)
 end

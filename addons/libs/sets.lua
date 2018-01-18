@@ -3,11 +3,17 @@ A library providing sets as a data structure.
 ]]
 
 _libs = _libs or {}
-_libs.sets = true
-_libs.tables = _libs.tables or require('tables')
-_libs.functions = _libs.functions or require('functions')
+
+require('tables')
+require('functions')
+
+local table, functions = _libs.tables, _libs.functions
 
 set = {}
+
+local set = set
+
+_libs.sets = set
 
 _meta = _meta or {}
 _meta.S = {}
@@ -38,18 +44,6 @@ end
 function set.empty(s)
     return next(s) == nil
 end
-
-function set.length(s)
-    local count = 0
-
-    for _ in pairs(s) do
-        count = count + 1
-    end
-
-    return count
-end
-
-_meta.S.__len = set.length
 
 function set.flat(s)
     for el in pairs(s) do
@@ -218,7 +212,7 @@ function set.clear(s)
 end
 
 function set.copy(s, deep)
-    deep = deep or true
+    deep = deep ~= false and true
     local res = {}
 
     for el in pairs(s) do

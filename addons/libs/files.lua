@@ -2,11 +2,16 @@
 File handler.
 ]]
 
+_libs = _libs or {}
+
+require('strings')
+require('tables')
+
+local string, table = _libs.strings, _libs.tables
+
 local files = {}
 
-_libs = _libs or {}
 _libs.files = files
-_libs.strings = _libs.strings or require('strings')
 
 -- Create a new file object.
 function files.new(path, create)

@@ -37,7 +37,7 @@ config = require 'config'
 
 _addon.name = 'Organizer'
 _addon.author = 'Byrth, maintainer: Rooks'
-_addon.version = 0.150324
+_addon.version = 0.20150923
 _addon.commands = {'organizer','org'}
 
 _static = {
@@ -51,17 +51,7 @@ _static = {
         sack=6,
         case=7,
         wardrobe=8,
-    },
-    bag_commands = {
-        "dance3",
-        "bank",
-        "storage",
-        "sigh",
-        "locker",
-        "satchel",
-        "sack",
-        "case",
-        "wardrobe"
+        safe2=9
     }
 }
 
@@ -70,35 +60,64 @@ _global = {
     language_log = 'english_log',
 }
 
+_ignore_list = {}
+_retain = {}
+_valid_pull = {}
+_valid_dump = {}
+
 default_settings = {
-    dump_bags = {['Safe']=1,['Locker']=2,['Storage']=3},
-    bag_priority = {['Safe']=1,['Locker']=2,['Storage']=3,['Satchel']=4,['Sack']=5,['Case']=6,['Inventory']=7,['Wardrobe']=8},
+    dump_bags = {['Safe']=1,['Safe2']=2,['Locker']=3,['Storage']=4},
+    bag_priority = {['Safe']=1,['Safe2']=2,['Locker']=3,['Storage']=4,['Satchel']=5,['Sack']=6,['Case']=7,['Inventory']=8,['Wardrobe']=9},
     item_delay = 0,
+    ignore = {},
+    retain = {
+        ["moogle_slip_gear"]=false,
+        ["seals"]=false,
+        ["items"]=false,
+        ["slips"]=false
+    },
     auto_heal = false,
     default_file='default.lua',
     verbose=false,
 }
 
 _debugging = {
-    warnings = false, -- This mode gives warnings about impossible item movements.
+    debug = {
+        ['contains']=true,
+        ['command']=true,
+        ['find']=true,
+        ['find_all']=true,
+        ['items']=true,
+        ['move']=true,
+        ['settings']=true,
+        ['stacks']=true
+    },
+    debug_log = 'data\\organizer-debug.log',
+    enabled = false,
+    warnings = false, -- This mode gives warnings about impossible item movements and crash conditions.
 }
+
+debug_log = files.new(_debugging.debug_log)
 
 function s_to_bag(str)
     if not str and tostring(str) then return end
     for i,v in pairs(res.bags) do
-        if v.en:lower() == str:lower() then
+        if v.en:lower():gsub(' ', '') == str:lower() then
             return v.id
         end
     end
 end
 
 windower.register_event('load',function()
+    debug_log:write('Organizer loaded at '..os.date()..'\n')
+
     if debugging then windower.debug('load') end
     options_load()
 end)
 
 function options_load( )
     if not windower.dir_exists(windower.addon_path..'data\\') then
+        org_debug("settings", "Creating data directory")
         windower.create_dir(windower.addon_path..'data\\')
         if not windower.dir_exists(windower.addon_path..'data\\') then
             org_error("unable to create data directory!")
@@ -107,6 +126,7 @@ function options_load( )
 
     for bag_name, bag_id in pairs(_static.bag_ids) do
         if not windower.dir_exists(windower.addon_path..'data\\'..bag_name) then
+            org_debug("settings", "Creating data directory for "..bag_name)
             windower.create_dir(windower.addon_path..'data\\'..bag_name)
             if not windower.dir_exists(windower.addon_path..'data\\'..bag_name) then
                 org_error("unable to create"..bag_name.."directory!")
@@ -114,7 +134,87 @@ function options_load( )
         end
     end
 
-    settings = config.load(default_settings)
+    -- We can't just do a:
+    --
+    -- settings = config.load('data\\settings.xml', default_settings)
+    --
+    -- because the config library will try to merge them, and it will
+    -- add back anything a user has removed (like items in bag_priority)
+
+    if windower.file_exists(windower.addon_path..'data\\settings.xml') then
+        org_debug("settings", "Loading settings from file")
+        settings = config.load('data\\settings.xml')
+    else
+        org_debug("settings", "Saving default settings to file")
+        settings = config.load('data\\settings.xml', default_settings)
+    end
+
+    -- Build the ignore list
+    if(settings.ignore) then
+        for bn,i_list in pairs(settings.ignore) do
+            bag_name = bn:lower()
+            _ignore_list[bag_name] = {}
+            for _,ignore_name in pairs(i_list) do
+                org_verbose("Adding "..ignore_name.." in the "..bag_name.." to the ignore list")
+                _ignore_list[bag_name][ignore_name] = 1
+            end
+        end
+    end
+
+    -- Build a hard-wired pull list
+    for bag_name,_ in pairs(settings.bag_priority) do
+         org_verbose("Adding "..bag_name.." to the pull list")
+        _valid_pull[s_to_bag(bag_name)] = 1
+    end
+
+    -- Build a hard-wired dump list
+    for bag_name,_ in pairs(settings.dump_bags) do
+         org_verbose("Adding "..bag_name.." to the push list")
+        _valid_dump[s_to_bag(bag_name)] = 1
+    end
+
+    -- Build the retain lists
+    if(settings.retain) then
+        if(settings.retain.moogle_slip_gear == true) then
+            org_verbose("Moogle slip gear set to retain")
+            slip_lists = require('slips')
+            for slip_id,slip_list in pairs(slip_lists.items) do
+                for item_id in slip_list:it() do
+                    _retain[item_id] = "moogle slip"
+                    org_debug("settings", "Adding ("..res.items[item_id].english..') to slip retain list')
+                end
+            end
+        end
+
+        if(settings.retain.seals == true) then
+            org_verbose("Seals set to retain")
+            seals = {1126,1127,2955,2956,2957}
+            for _,seal_id in pairs(seals) do
+                _retain[seal_id] = "seal"
+                org_debug("settings", "Adding ("..res.items[seal_id].english..') to slip retain list')
+            end
+        end
+
+        if(settings.retain.items == true) then
+            org_verbose("Non-equipment items set to retain")
+        end
+		
+        if(settings.retain.slips == true) then
+            org_verbose("Slips set to retain")
+            slips = {29312,29313,29314,29315,29316,29317,29318,29319,29320,29321,29322,29323,29324,29325,29326,29327,29328,29329,29330,29331,29332,29333,29334,29335,29336}
+            for _,slips_id in pairs(slips) do
+                _retain[slips_id] = "slips"
+                org_debug("settings", "Adding ("..res.items[slips_id].english..') to slip retain list')
+            end
+        end
+    end
+
+    -- Always allow inventory and wardrobe, obviously
+    _valid_dump[0] = 1
+    _valid_pull[0] = 1
+    _valid_dump[8] = 1
+    _valid_pull[8] = 1
+
 end
 
 
@@ -135,6 +235,9 @@ windower.register_event('addon command',function(...)
         bag = table.remove(inp,1):lower()
     end
 
+    org_debug("command", "Using '"..bag.."' as the bag target")
+
+
     file_name = table.concat(inp,' ')
     if string.length(file_name) == 0 then
         file_name = default_file_name()
@@ -143,30 +246,47 @@ windower.register_event('addon command',function(...)
     if file_name:sub(-4) ~= '.lua' then
         file_name = file_name..'.lua'
     end
+    org_debug("command", "Using '"..file_name.."' as the file name")
 
 
     if (command == 'g' or command == 'get') then
+        org_debug("command", "Calling get with file_name '"..file_name.."' and bag '"..bag.."'")
         get(thaw(file_name, bag))
     elseif (command == 't' or command == 'tidy') then
+        org_debug("command", "Calling tidy with file_name '"..file_name.."' and bag '"..bag.."'")
         tidy(thaw(file_name, bag))
     elseif (command == 'f' or command == 'freeze') then
 
+        org_debug("command", "Calling freeze command")
         local items = Items.new(windower.ffxi.get_items(),true)
+        local frozen = {}
         items[3] = nil -- Don't export temporary items
         if _static.bag_ids[bag] then
+            org_debug("command", "Bag: "..bag)
             freeze(file_name,bag,items)
         else
             for bag_id,item_list in items:it() do
-                freeze(file_name,res.bags[bag_id].english:lower(),items)
+                org_debug("command", "Bag ID: "..bag_id)
+                -- infinite loop protection
+                if(frozen[bag_id]) then
+                    org_warning("Tried to freeze ID #"..bag_id.." twice, aborting")
+                    return
+                end
+                frozen[bag_id] = 1
+                freeze(file_name,res.bags[bag_id].english:lower():gsub(' ', ''),items)
             end
         end
     elseif (command == 'o' or command == 'organize') then
-        organize(thaw(file_name, bag))        
+        org_debug("command", "Calling organize command")
+        organize(thaw(file_name, bag))
     end
 
     if settings.auto_heal and tostring(settings.auto_heal):lower() ~= 'false' then
+        org_debug("command", "Automatically healing")
         windower.send_command('input /heal')
     end
+
+    org_debug("command", "Organizer complete")
 
 end)
 
@@ -189,11 +309,11 @@ function get(goal_items,current_items)
                         else
                             count = count + 1
                         end
+                        simulate_item_delay()
                     else
                         -- Need to adapt this for stacking items somehow.
                         org_warning(res.items[item.id].english..' not found.')
                     end
-                    simulate_item_delay()
                 end
             end
         end
@@ -203,10 +323,21 @@ function get(goal_items,current_items)
 end
 
 function freeze(file_name,bag,items)
+    org_debug("command", "Entering freeze function with bag '"..bag.."'")
     local lua_export = T{}
+    local counter = 0
     for _,item_table in items[_static.bag_ids[bag]]:it() do
+        counter = counter + 1
+        if(counter > 80) then
+            org_warning("We hit an infinite loop in freeze()! ABORT.")
+            return
+        end
+        org_debug("command", "In freeze loop for bag '"..bag.."'")
+        org_debug("command", "Processing '"..item_table.log_name.."'")
+
         local temp_ext,augments = extdata.decode(item_table)
         if temp_ext.augments then
+            org_debug("command", "Got augments for '"..item_table.log_name.."'")
             augments = table.filter(temp_ext.augments,-functions.equals('none'))
         end
         lua_export:append({name = item_table.name,log_name=item_table.log_name,
@@ -217,19 +348,24 @@ function freeze(file_name,bag,items)
         org_verbose("Freezing "..tostring(bag)..".")
         local export_file = files.new('/data/'..bag..'/'..file_name,true)
         export_file:write('return '..lua_export:tovstring({'augments','log_name','name','id','count','extdata'}))
+    else
+        org_debug("command", "Got nothing, skipping '"..bag.."'")
     end
 end
 
 function tidy(goal_items,current_items,usable_bags)
+    org_debug("command", "Entering tidy()")
+    usable_bags = usable_bags or get_dump_bags()
     -- Move everything out of items[0] and into other inventories (defined by the passed table)
     if goal_items and goal_items[0] and goal_items[0]._info.n > 0 then
         current_items = current_items or Items.new()
         goal_items, current_items = clean_goal(goal_items,current_items)
         for index,item in current_items[0]:it() do
             if not goal_items[0]:contains(item,true) then
+                org_debug("command", "Putting away "..item.log_name)
                 current_items[0][index]:put_away(usable_bags)
+                simulate_item_delay()
             end
-            simulate_item_delay()
         end
     end
     return goal_items, current_items
@@ -238,19 +374,13 @@ end
 function organize(goal_items)
     org_message('Starting...')
     local current_items = Items.new()
-    local dump_bags = {}
-    for i,v in pairs(settings.dump_bags) do
-        if i and s_to_bag(i) then
-            dump_bags[tonumber(v)] = s_to_bag(i)
-        elseif i then
-            org_error('The bag name ("'..tostring(i)..'") in dump_bags entry #'..tostring(v)..' in the ../addons/organizer/data/settings.xml file is not valid.\nValid options are '..tostring(res.bags))
-            return
-        end
-    end
-    if current_items[0].n == 80 then
+    local dump_bags = get_dump_bags()
+
+    local inventory_max = windower.ffxi.get_bag_info(0).max
+    if current_items[0].n == inventory_max then
         tidy(goal_items,current_items,dump_bags)
     end
-    if current_items[0].n == 80 then
+    if current_items[0].n == inventory_max then
         org_error('Unable to make space, aborting!')
         return
     end
@@ -262,9 +392,13 @@ function organize(goal_items)
         goal_items, current_items = clean_goal(goal_items,current_items)
         goal_items, current_items = tidy(goal_items,current_items,dump_bags)
         remainder = incompletion_check(goal_items,remainder)
-        org_verbose(tostring(remainder)..' '..current_items[0]._info.n,1)
+        if(remainder) then
+            org_verbose("Remainder: "..tostring(remainder)..' Current: '..current_items[0]._info.n,1)
+        else
+            org_verbose("No remainder, so we found everything we were looking for!")
+        end
     end
-    goal_items, current_items = tidy(goal_items,current_items)
+    goal_items, current_items = tidy(goal_items,current_items,dump_bags)
     
     local count,failures = 0,T{}
     for bag_id,bag in goal_items:it() do
@@ -320,7 +454,7 @@ function thaw(file_name,bag)
         settings.default_file = settings.default_file..'.lua'
     end
     for i,v in pairs(_static.bag_ids) do
-        bags[i] = bags[i] and windower.file_exists(windower.addon_path..'data/'..i..'/'..file_name) and file_name or settings.default_file
+        bags[i] = bags[i] and windower.file_exists(windower.addon_path..'data/'..i..'/'..file_name) and file_name or default_file_name()
     end
     bags.temporary = nil
     local inv_structure = {}
@@ -350,22 +484,35 @@ end
 
 function org_message(msg,col)
     windower.add_to_chat(col or 8,'Organizer: '..msg)
+    flog(_debugging.debug_log, 'Organizer [MSG] '..msg)
 end
 
 function org_warning(msg)
     if _debugging.warnings then
         windower.add_to_chat(123,'Organizer: '..msg)
     end
+    flog(_debugging.debug_log, 'Organizer [WARN] '..msg)
 end
+
+function org_debug(level, msg)
+    if(_debugging.enabled) then
+        if (_debugging.debug[level]) then
+            flog(_debugging.debug_log, 'Organizer [DEBUG] ['..level..']: '..msg)
+        end
+    end
+end
+
 
 function org_error(msg)
     error('Organizer: '..msg)
+    flog(_debugging.debug_log, 'Organizer [ERROR] '..msg)
 end
 
 function org_verbose(msg,col)
     if tostring(settings.verbose):lower() ~= 'false' then
         windower.add_to_chat(col or 8,'Organizer: '..msg)
     end
+    flog(_debugging.debug_log, 'Organizer [VERBOSE] '..msg)
 end
 
 function default_file_name()
@@ -378,4 +525,17 @@ function simulate_item_delay()
     if settings.item_delay and settings.item_delay > 0 then
         coroutine.sleep(settings.item_delay)
     end
+end
+
+function get_dump_bags()
+    local dump_bags = {}
+    for i,v in pairs(settings.dump_bags) do
+        if i and s_to_bag(i) then
+            dump_bags[tonumber(v)] = s_to_bag(i)
+        elseif i then
+            org_error('The bag name ("'..tostring(i)..'") in dump_bags entry #'..tostring(v)..' in the ../addons/organizer/data/settings.xml file is not valid.\nValid options are '..tostring(res.bags))
+            return
+        end
+    end
+    return dump_bags
 end

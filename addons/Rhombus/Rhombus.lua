@@ -26,18 +26,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.--]]
 
 _addon.name = 'Rhombus'
 _addon.author = 'trv'
-_addon.version = '1.2.0'
+_addon.version = '1.2.1'
 
 config = require('config')
 texts = require('texts')
 res = require('resources')
+bit = require('bit')
 require 'tables'
 require('lists')
 require('sets')
 require('logger')
 require('defs')
 require('helper_functions')
-bit = require('bit')
 
 config.register(_defaults, function(settings_table)
     x_offset = settings_table.x_offset
@@ -69,7 +69,7 @@ function get_templates()
     local t_temp = L(res.spells:levels(function(t) return t[player_info.main_job] or t[player_info.sub_job] end):keyset())
     spells_template = loadfile(windower.addon_path .. 'data/spells_template.lua')
     if not spells_template then
-        error('No template for spells was found.')
+        print('No template for spells was found.')
         spells_template = t_temp
     else
         spells_template = spells_template()
@@ -79,7 +79,7 @@ function get_templates()
     t_temp = L(res.weapon_skills:keyset())
     ws_template = loadfile(windower.addon_path .. 'data/ws_template.lua')
     if not ws_template then
-        error('No template for weapon skills was found.')
+        print('No template for weapon skills was found.')
         ws_template = t_temp
     else
         ws_template = ws_template()
@@ -100,7 +100,7 @@ function get_templates()
     t_temp = L(res.job_abilities:prefix('/jobability'):keyset())
     ja_template = loadfile(windower.addon_path .. 'data/ja_template.lua')
     if not ja_template then
-        error('No template for job abilities was found.')
+        print('No template for job abilities was found.')
         ja_template = t_temp
     else
         ja_template = ja_template()
@@ -121,7 +121,7 @@ function get_templates()
     t_temp = L(res.job_abilities:prefix('/pet'):keyset())
     pet_command_template = loadfile(windower.addon_path .. 'data/pet_command_template.lua')
     if not pet_command_template then
-        error('No template for pet commands was found.')
+        print('No template for pet commands was found.')
         pet_command_template = t_temp
     else
         pet_command_template = pet_command_template()
@@ -149,7 +149,7 @@ function get_templates()
 end
 
 function menu_general_layout(t,t2,n)
-    available_category = S(t)
+    available_category = t
     if is_menu_open then
         if last_menu_open.type == n then
             is_menu_open = false
@@ -179,6 +179,7 @@ function menu_general_layout(t,t2,n)
                     end
                     build_a_menu(current_menu)
                 else
+                    close_a_menu()
                     current_menu = {}
                 end
             else
@@ -190,6 +191,7 @@ function menu_general_layout(t,t2,n)
                     last_menu_open.type = n
                     build_a_menu(current_menu)
                 else
+                    close_a_menu()
                     current_menu = {}
                 end
             end
@@ -214,6 +216,7 @@ function menu_general_layout(t,t2,n)
                 end
                 build_a_menu(current_menu)
             else
+                close_a_menu()
                 current_menu = {}
             end
         else
@@ -225,6 +228,7 @@ function menu_general_layout(t,t2,n)
                 last_menu_open.type = n
                 build_a_menu(current_menu)
             else
+                close_a_menu()
                 current_menu = {}
             end
         end
@@ -445,16 +449,16 @@ mouse_func = {
     [1] = function()
         active_buffs = S(windower.ffxi.get_player().buffs)
         number_of_jps = count_job_points()
-        menu_general_layout(setmetatable(windower.ffxi.get_spells(), _meta.S),spells_template,1)
+        menu_general_layout(windower.ffxi.get_spells(),spells_template,1)
     end,
     [2] = function()
-        menu_general_layout(windower.ffxi.get_abilities().weapon_skills,ws_template,2)
+        menu_general_layout(S(windower.ffxi.get_abilities().weapon_skills),ws_template,2)
     end,
     [3] = function()
-        menu_general_layout(remove_categories(windower.ffxi.get_abilities().job_abilities),ja_template,3)
+        menu_general_layout(S(remove_categories(windower.ffxi.get_abilities().job_abilities)),ja_template,3)
     end,
     [4] = function()
-        menu_general_layout(remove_categories(windower.ffxi.get_abilities().job_abilities),pet_command_template,4)
+        menu_general_layout(S(remove_categories(windower.ffxi.get_abilities().job_abilities)),pet_command_template,4)
     end,
 }
 
@@ -558,7 +562,7 @@ function format_response(n,p,bool)
 end
 
 windower.register_event('keyboard', function(dik, down, flags, blocked)
-    if dik == 42 and not (bit.band(flags,32) == 32) then
+    if dik == 42 and not bit.is_set(flags, 6) then
         is_shift_modified = down
     end
 end)
@@ -569,7 +573,7 @@ function determine_accessibility(spell,type) -- ability filter, slightly modifie
         if not available_category[spell.id] and not (spell.id == 503) then
             return false
         elseif (not spell_jobs[player_info.main_job] or not (spell_jobs[player_info.main_job] <= player_info.main_job_level or
-            (spell_jobs[player_info.main_job] == 100 and number_of_jps >= 100))) and
+            (spell_jobs[player_info.main_job] > 99 and number_of_jps >= spell_jobs[player_info.main_job]))) and
             (not spell_jobs[player_info.sub_job] or not (spell_jobs[player_info.sub_job] <= player_info.sub_job_level)) then
             return false
         elseif player_info.main_job == 20 and ((addendum_white[spell.id] and not active_buffs[401] and not active_buffs[416]) or

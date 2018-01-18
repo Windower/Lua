@@ -1,4 +1,4 @@
---Copyright (c) 2013, Byrthnoth
+--Copyright (c) 2013~2016, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -45,14 +45,18 @@ function equip_sets(swap_type,ts,...)
     local var_inps = {...}
     local val1 = var_inps[1]
     local val2 = var_inps[2]
-    table.reassign(_global,command_registry[ts] or {pretarget_cast_delay = 0,precast_cast_delay=0,cancel_spell = false})
+    table.reassign(_global,command_registry[ts] or {pretarget_cast_delay = 0,precast_cast_delay=0,cancel_spell = false, new_target=false,target_arrow={x=0,y=0,z=0}})
     _global.current_event = tostring(swap_type)
+    
+    if _global.current_event == 'precast' and val1 and val1.english and val1.english:find('Geo-') then
+        _global.target_arrow = initialize_arrow_offset(val1.target)
+    end
     
     windower.debug(tostring(swap_type)..' enter')
     if showphase or debugging.general then msg.debugging(8,windower.to_shift_jis(tostring(swap_type))..' enter') end
     
-    local cur_equip = table.reassign({},items.equipment)
-        
+    local cur_equip = table.reassign({},update_equipment())
+    
     table.reassign(equip_list,{})
     table.reassign(player.equipment,to_names_set(cur_equip))
     for i,v in pairs(slot_map) do
@@ -102,11 +106,41 @@ function equip_sets(swap_type,ts,...)
         user_pcall(swap_type,...)
     end
     
+--[[    local c
+    if type(swap_type) == 'function' then
+        c = coroutine.create(swap_type)
+    elseif swap_type == 'equip_command' then
+        equip(val1)
+    elseif type(swap_type) == 'string' and user_env[swap_type] and type(user_env[swap_type]) == 'function' then
+        c = coroutine.create(user_env[swap_type])
+    elseif type(swap_type) == 'string' and user_env[swap_type] then
+        msg.addon_msg(123,windower.to_shift_jis(tostring(str))..'() exists but is not a function')
+    end
+    
+    if c then
+        while coroutine.status(c) == 'suspended' do
+            local err, typ, val = coroutine.resume(c,unpack(var_inputs))
+            if not err then
+                error('\nGearSwap has detected an error in the user function '..tostring(swap_type)..':\n'..typ)
+            elseif typ then
+                if typ == 'sleep' and type(val) == 'number' and val >= 0 then
+                    -- coroutine slept
+                    err, typ, val = coroutine.schedule(c,val)
+                else
+                    -- Someone yielded or slept with a nonsensical argument.
+                    err, typ, val = coroutine.resume(c)
+                end
+            else
+                -- coroutine finished
+            end
+        end 
+    end]]
+    
     
     if type(swap_type) == 'string' and (swap_type == 'pretarget' or swap_type == 'filtered_action') then -- Target may just have been changed, so make the ind now.
         ts = command_registry:new_entry(val1)
-    elseif type(swap_type) == 'string' and swap_type == 'precast' and not command_registry[ts] and debugging.command_registry then
-        print_set(spell,'precast nil error')
+--    elseif type(swap_type) == 'string' and swap_type == 'precast' and not command_registry[ts] and debugging.command_registry then
+--        print_set(spell,'precast nil error') -- spell's scope changed to local
     end
     
     if player.race ~= 'Precomposed NPC' then
@@ -120,33 +154,41 @@ function equip_sets(swap_type,ts,...)
                 msg.debugging(i..' slot was not equipped because you are encumbered.')
             end
         end
-
-        -- Translates the equip_list from the player (i=slot name, v=item name) into a table with i=slot id and v={bag_id=0 or 8, slot=inventory slot}.
-        local equip_next,priorities = unpack_equip_list(equip_list)
-        equip_next = eliminate_redundant(cur_equip,equip_next) -- Eliminate the equip commands for items that are already equipped
+        
+        table.update(equip_list_history,equip_list)
+        
+        -- Attempts to identify the player-specified item in inventory
+        -- Starts with (i=slot name, v=item name) 
+        -- Ends with (i=slot id and v={bag_id=bag_id, slot=inventory slot}).
+        local equip_next,priorities = unpack_equip_list(equip_list,cur_equip)
         
         if (_settings.show_swaps and table.length(equip_next) > 0) or _settings.demo_mode then --and table.length(equip_next)>0 then
             local tempset = to_names_set(equip_next)
             print_set(tempset,tostring(swap_type))
         end
         
-        
-        if buffactive.charm or buffactive.KO then
+        if (buffactive.charm or player.charmed) or (player.status == 2 or player.status == 3) then -- dead or engaged dead statuses
             local failure_reason
-            if buffactive.charm then
+            if (buffactive.charm or player.charmed) then
                 failure_reason = 'Charmed'
-            elseif buffactive.KO then
+            elseif player.status == 2 or player.status == 3 then
                 failure_reason = 'KOed'
             end
             msg.debugging("Cannot change gear right now: "..tostring(failure_reason))
             logit('\n\n'..tostring(os.clock)..'(69) failure_reason: '..tostring(failure_reason))
         else
             local chunk_table = L{}
-            for eq_slot_id,_ in priorities:it() do
+            for eq_slot_id,priority in priorities:it() do
                 if equip_next[eq_slot_id] and not encumbrance_table[eq_slot_id] and not _settings.demo_mode then
-                    chunk_table:append(equip_piece(eq_slot_id,equip_next[eq_slot_id].bag_id,equip_next[eq_slot_id].slot))
+                    local minichunk = equip_piece(eq_slot_id,equip_next[eq_slot_id].bag_id,equip_next[eq_slot_id].slot)
+                    chunk_table:append(minichunk)
                 end
             end
+
+            if swap_type == 'midcast' and command_registry[ts] and command_registry[ts].proposed_packet and not _settings.demo_mode then
+                windower.packets.inject_outgoing(command_registry[ts].proposed_packet:byte(1),command_registry[ts].proposed_packet)
+            end
+
             if chunk_table.n >= 3 then
                 local big_chunk = string.char(0x51,0x24,0,0,chunk_table.n,0,0,0)
                 for i=1,chunk_table.n do
@@ -156,7 +198,8 @@ function equip_sets(swap_type,ts,...)
                 windower.packets.inject_outgoing(0x51,big_chunk)
             elseif chunk_table.n > 0 then
                 for i=1,chunk_table.n do
-                    windower.packets.inject_outgoing(0x50,string.char(0x50,4,0,0)..chunk_table[i])
+                    local chunk = string.char(0x50,4,0,0)..chunk_table[i]
+                    windower.packets.inject_outgoing(0x50,chunk)
                 end
             end
         end
@@ -191,7 +234,7 @@ function equip_sets_exit(swap_type,ts,val1)
         if swap_type == 'pretarget' then
             
             if command_registry[ts].cancel_spell then
-                msg.debugging("Action canceled ("..storedcommand..' '..spell.target.raw..")")
+                msg.debugging("Action canceled ("..storedcommand..' '..val1.target.raw..")")
                 storedcommand = nil
                 command_registry:delete_entry(ts)
                 return true
@@ -200,7 +243,11 @@ function equip_sets_exit(swap_type,ts,val1)
                 return true
             end
             
-            -- Compose a proposed packet for the given action (this should be possible after precast)
+            if command_registry[ts].new_target then
+                val1.target = command_registry[ts].new_target -- Switch target, if it is requested.
+            end
+            
+            -- Compose a proposed packet for the given action (this should be possible after pretarget)
             command_registry[ts].spell = val1
             if val1.target and val1.target.id and val1.target.index and val1.prefix and unify_prefix[val1.prefix] then
                 if val1.prefix == '/item' then
@@ -217,7 +264,7 @@ function equip_sets_exit(swap_type,ts,val1)
                     end
                 elseif outgoing_action_category_table[unify_prefix[val1.prefix]] then
                     if filter_precast(val1) then
-                        command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id,val1.target.index,outgoing_action_category_table[unify_prefix[val1.prefix]],val1.id)
+                        command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id,val1.target.index,outgoing_action_category_table[unify_prefix[val1.prefix]],val1.id,command_registry[ts].target_arrow)
                         if not command_registry[ts].proposed_packet then
                             command_registry:delete_entry(ts)
                             
@@ -227,7 +274,7 @@ function equip_sets_exit(swap_type,ts,val1)
                         end
                     end
                 else
-                    msg.debugging(8,"Hark, what weird prefix through yonder window breaks? "..tostring(spell.prefix))
+                    msg.debugging(8,"Hark, what weird prefix through yonder window breaks? "..tostring(val1.prefix))
                 end
             end
             
@@ -238,8 +285,8 @@ function equip_sets_exit(swap_type,ts,val1)
                 elseif not val1.target.name then
                 -- Spells with invalid pass_through_targs, like using <t> without a target
                     command_registry:delete_entry(ts)
-                    msg.debugging("Change target was used to pick an invalid target ("..storedcommand..' '..spell.target.raw..")")
-                    local ret = storedcommand..' '..spell.target.raw
+                    msg.debugging("Change target was used to pick an invalid target ("..storedcommand..' '..val1.target.raw..")")
+                    local ret = storedcommand..' '..val1.target.raw
                     storedcommand = nil
                     return ret
                 else
@@ -258,6 +305,10 @@ function equip_sets_exit(swap_type,ts,val1)
             end
 
         elseif swap_type == 'precast' then
+            -- Update the target_arrow
+            if val1.prefix ~= '/item' then
+                command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id,val1.target.index,outgoing_action_category_table[unify_prefix[val1.prefix]],val1.id,command_registry[ts].target_arrow)
+            end
             return precast_send_check(ts)
         elseif swap_type == 'filtered_action' and command_registry[ts] and command_registry[ts].cancel_spell then
             storedcommand = nil
@@ -378,70 +429,6 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function send_action(ts)
-    if command_registry[ts].proposed_packet then
-        cued_packet = ts
-        if not _settings.demo_mode then windower.packets.inject_outgoing(command_registry[ts].proposed_packet:byte(1),command_registry[ts].proposed_packet) end
-        command_registry[ts].midaction = true
-        equip_sets('midcast',ts,command_registry[ts].spell)
-        windower.send_command('input /assist <me>')
-    end
+    command_registry[ts].midaction = true
+    equip_sets('midcast',ts,command_registry[ts].spell)
 end
-
-
------------------------------------------------------------------------------------
---Name: outgoing chunk(id,original,modified,injected,blocked)
---Desc: Searches the outgoing chunks for a packet corresponding to /assist <me>.
---      If found, blocks that packet.
---Args:
----- id - ID of the current outgoing chunk
----- original - Original outgoing chunk from the buffer
----- modified - Outgoing chunk from the buffer after modification
-----      by other addons/plugins
----- injected - Boolean indicating whether or not the packet was injected
----- blocked - Boolean indicating whether or not the packet is currently blocked
------------------------------------------------------------------------------------
---Returns:
----- true if blocking the packet (/assist <me>)
------------------------------------------------------------------------------------
-windower.register_event('outgoing chunk',function(id,original,modified,injected,blocked)
-    windower.debug('outgoing chunk '..id)
-    if id == 0x1A then
-        cued_packet = nil
-        if not injected then
-            if original:unpack('H',0xB) == 12 and cued_packet and original:unpack('H',0x9) == player.index then
-                return true
-            end
-        end
-    elseif id == 0x100 then
-    -- Scrub the equipment array if a valid outgoing job change packet is sent.
-        local newmain = modified:byte(5)
-        if res.jobs[newmain] and newmain ~= 0 and newmain ~= player.main_job_id then
-            windower.debug('job change')
-            
-            command_registry = Command_Registry.new()
-            load_user_files(newmain)
-            
-            table.clear(not_sent_out_equip)
-            
-            for id,name in pairs(default_slot_map) do
-                if items.equipment[name].slot ~= empty then
-                    local bag = to_windower_api(res.bags[items.equipment[name].bag_id].english)
-                    items[bag][items.equipment[name].slot].status = 0
-                    items.equipment[name] = {slot=empty,bag_id=0}
-                end
-            end
-            player.main_job_id = newmain
-            update_job_names()
-        end
-    end
-    
-    
-    if gearswap_disabled then return end
-    
-    if id == 0x100 then
-        local newmain = modified:byte(5)
-        if res.jobs[newmain] and newmain ~= player.main_job_id then
-            command_enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet') -- enable all slots
-        end
-    end
-end)

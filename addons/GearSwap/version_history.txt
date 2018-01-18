@@ -1,4 +1,63 @@
 -------------------------------------------------
+GearSwap 0.930 - Fixed a problem with player[bag][item_name].count in the user environment.
+-------------------------------------------------
+GearSwap 0.929 - Adjusted the print_set function to give preference and order to slot name keys.
+-------------------------------------------------
+GearSwap 0.928 - Changed how the outgoing equipment chunks were parsed due to a changing understanding of how the windower packet events work.
+-------------------------------------------------
+GearSwap 0.927 - Sped up equipment handling and made Rare items ignore augments.
+-------------------------------------------------
+GearSwap 0.926 - Simplified the equipment handling and used 0x117 incoming.
+-------------------------------------------------
+GearSwap 0.925 - Fixed minor problem that arose with the previous version's implementation of the equip history.
+-------------------------------------------------
+GearSwap 0.924 - Fixed problems that arose when attempting to equip two of the same item in two different slots. Changed how player equipment is handled.
+-------------------------------------------------
+GearSwap 0.923 - Added augments to //gs validate sets.
+-------------------------------------------------
+GearSwap 0.922 - Changed how the reload event works so it no longer causes stack problems.
+-------------------------------------------------
+GearSwap 0.921 - Split a buff overwriting itself off into a separate event, buff_refresh, and adjusted documentation.
+-------------------------------------------------
+GearSwap 0.920 - Made file_unload fire on load commands and changed its argument to be the previous file name.
+-------------------------------------------------
+GearSwap 0.919 - Switched handling of buff_change to rely on 0x063 incoming v9, which includes the durations.
+-------------------------------------------------
+GearSwap 0.918 - Added player.buff_details and made it so buff_change triggers when buffs are overwritten.
+-------------------------------------------------
+GearSwap 0.917 - Added code to ignore already-equipped items when searching for items to equip.
+-------------------------------------------------
+GearSwap 0.916 - Added wardrobes 3 and 4.
+-------------------------------------------------
+GearSwap 0.915 - Added wardrobe2.
+-------------------------------------------------
+GearSwap 0.914 - Added /bstpet handling.
+-------------------------------------------------
+GearSwap 0.913 - Fixed japanese job point filter in filter_pretarget
+- Fixed command handling so filtered_action will be called for spells you haven't learned
+- Fixed pet_status_change so it will always be called (including in cases where the pet is dead)
+- Re-implemented pet.tp
+- Added player.base_str, player.add_str, and player.str, which is your total strength stat. Did this for all base stats as well as resistances and attack/defense. May not be reliable, but was requested.
+- Added spell.value, but there is no filter determining when it's meaningful or not. Mostly useful for COR rolls, which people should be able to filter out on their own.
+-------------------------------------------------
+GearSwap 0.912 - Added Geo- spell positioning.
+-------------------------------------------------
+GearSwap 0.911 - Removed dependence of Unbridled Wisdom spells on the respective buff.
+-------------------------------------------------
+GearSwap 0.910 - Fixed set_combine so it does not respect the disable_table and updated copyright statements.
+-------------------------------------------------
+GearSwap 0.908 - Fixed party.count failing to update in user_env. Added README.md file.
+-------------------------------------------------
+GearSwap 0.907 - Fixed a spell completion issue in aftercast caused by action packets that had no message.
+-------------------------------------------------
+GearSwap 0.906 - Added BLU magic spells and handled one aftercast that uses the 0x053 incoming packet.
+-------------------------------------------------
+GearSwap 0.904 - Adjusted party buff information to run off indices instead of names.
+-------------------------------------------------
+GearSwap 0.903 - Added buff information to the alliance/party structure.
+-------------------------------------------------
+GearSwap 0.902 - Changed action packet length.
+-------------------------------------------------
 GearSwap 0.901 - Modified add_to_chat handling throughout GearSwap so it would show up in a consistent log (the same one as mode 1)
 -------------------------------------------------
 GearSwap 0.900 - Adjusted GearSwap to be compatible with the new library behavior.

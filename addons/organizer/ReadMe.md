@@ -2,7 +2,7 @@
 
 A multi-purpose inventory management solution. Similar to GearCollector; uses packets.
 
-For the purpose of this addon, a `bag` is: "Safe", "Storage", "Locker", "Satchel", "Sack", "Case", "Wardrobe". 
+For the purpose of this addon, a `bag` is: "Safe", "Storage", "Locker", "Satchel", "Sack", "Case", "Wardrobe", "Safe 2". 
 
 For commands that use a filename, if one is not specified, it defaults to Name_JOB.lua, e.g., Rooks_PLD.lua
 For commands that specify a bag, if one is not specified, it defaults to all, and will cycle through all of them.
@@ -61,3 +61,29 @@ organize [bag] [filename]
 ```
 
 Thaws a frozen state specified by `filename` or **Name_ShortJob.lua** and `bag` or **all bags** and executes repeated Get and Tidy commands until a steady state is reached (aka. you have your gear). With no arguments, it will attempt to restore the entire thawed snapshot.
+
+### Gearswap integration
+Additionally, Organizer integrates with GearSwap. In your lua, just add this:
+
+```
+include('organizer-lib')
+```
+
+And then in your Mog House, after changing jobs:
+
+```
+//gs org
+```
+
+And it will fill your inventory with the items from your sets, and put everything else away (it does a very good job, even when there are space concerns, but it's not perfect. Make sure to do a "//gs validate" after!)
+
+Additionally, if you have extra items you want to bring along, simply define a table named `organizer_items` like so:
+
+```
+organizer_items = {
+    echos="Echo Drops",
+    shihei="Shihei",
+    orb="Macrocosmic Orb"
+}
+```
+

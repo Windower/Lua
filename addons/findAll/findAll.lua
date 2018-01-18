@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name    = 'findAll'
 _addon.author  = 'Zohno'
-_addon.version = '1.20150105'
+_addon.version = '1.20170501'
 _addon.commands = {'findall'}
 
 require('chat')
@@ -37,8 +37,8 @@ require('logger')
 require('sets')
 require('tables')
 require('strings')
+require('pack')
 
-json  = require('json')
 file  = require('files')
 slips = require('slips')
 config = require('config')
@@ -48,6 +48,7 @@ res = require('resources')
 defaults = {}
 defaults.Track = ''
 defaults.Tracker = {}
+defaults.KeyItemDisplay = true
 
 settings = config.load(defaults)
 
@@ -162,20 +163,38 @@ do
     end
 end
 
-zone_search            = true
+zone_search            = windower.ffxi.get_info().logged_in
 first_pass             = true
-time_out_offset        = 0
-next_sequence_offset   = 0
 item_names             = T{}
+key_item_names         = T{}
 global_storages        = T{}
-storages_path          = 'data/storages.json'
-storages_order         = L{'temporary', 'inventory', 'wardrobe', 'safe', 'storage', 'locker', 'satchel', 'sack', 'case'}
-storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14', 'slip 15', 'slip 16', 'slip 17', 'slip 18', 'slip 19', 'slip 20', 'slip 21'}
-merged_storages_orders = L{}:extend(storages_order):extend(storage_slips_order)
+storages_path          = 'data/'
+storages_order_tokens  = L{'temporary', 'inventory', 'wardrobe', 'wardrobe 2', 'safe', 'safe 2', 'storage', 'locker', 'satchel', 'sack', 'case'}
+-- This is to maintain sorting order. I don't know why this was done, but omitting this will sort the bags arbitrarily, which (I guess) was not intended
+storages_order         = S(res.bags:map(string.gsub-{' ', ''} .. string.lower .. table.get-{'english'})):sort(function(name1, name2)
+    local index1 = storages_order_tokens:find(name1)
+    local index2 = storages_order_tokens:find(name2)
 
-function search(query, export)
+    if not index1 and not index2 then
+        return name1 < name2
+    end
+
+    if not index1 then
+        return false
+    end
+
+    if not index2 then
+        return true
+    end
+
+    return index1 < index2
+end)
+storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14', 'slip 15', 'slip 16', 'slip 17', 'slip 18', 'slip 19', 'slip 20', 'slip 21', 'slip 22', 'slip 23', 'slip 24', 'slip 25'}
+merged_storages_orders = storages_order + storage_slips_order + L{'key items'}
+
+function search(query, export)    
+    update_global_storage()
     update()
-
     if query:length() == 0 then
         return
     end
@@ -202,18 +221,28 @@ function search(query, export)
     end
 
     local new_item_ids = S{}
+    local new_key_item_ids = S{}
 
     for character_name, storages in pairs(global_storages) do
         for storage_name, storage in pairs(storages) do
-            if storage_name ~= 'gil' then
+            if storage_name == 'key items' then
+                for id, quantity in pairs(storage) do
+                    id = tostring(id)
+
+                    if key_item_names[id] == nil then
+                        new_key_item_ids:add(id)
+                    end
+                end
+            elseif storage_name ~= 'gil' then
                 for id, quantity in pairs(storage) do
                     id = tostring(id)
 
                     if item_names[id] == nil then
-                        new_item_ids:add(tostring(id))
+                        new_item_ids:add(id)
                     end
                 end
             end
+            coroutine.yield()
         end
     end
 
@@ -227,8 +256,20 @@ function search(query, export)
         end
     end
 
-    local results_items = S{}
-    local terms_pattern = ''
+    for id,_ in pairs(new_key_item_ids) do
+        local key_item = res.key_items[tonumber(id)]
+	    if key_item then
+            key_item_names[id] = {
+                ['name'] = key_item.name,
+                ['long_name'] = key_item.name
+            }
+        end
+    end
+    
+
+    local results_items     = S{}
+    local results_key_items = S{}
+    local terms_pattern     = ''
 
     if terms ~= '' then
         terms_pattern = terms:escape():gsub('%a', function(char) return string.format("[%s%s]", char:lower(), char:upper()) end)
@@ -241,6 +282,14 @@ function search(query, export)
             results_items:add(id)
         end
     end
+    
+    if settings.KeyItemDisplay then
+          for id in pairs(key_item_names) do
+               if terms_pattern == '' or key_item_names[id].name:match(terms_pattern) then
+                    results_key_items:add(id)
+               end
+          end
+     end
 
     log('Searching: '..query:concat(' '))
 
@@ -266,7 +315,7 @@ function search(query, export)
     end
 
     local total_quantity = 0
-
+    
     for _, character_name in ipairs(sorted_names) do
         if (character_set:length() == 0 or character_set:contains(character_name)) and not character_filter:contains(character_name) then
             local storages = global_storages[character_name]
@@ -276,7 +325,27 @@ function search(query, export)
 
                 if storage_name~= 'gil' and storages[storage_name] ~= nil then
                     for id, quantity in pairs(storages[storage_name]) do
-                        if results_items:contains(id) then
+                        if storage_name == 'key items' and results_key_items:contains(id) then
+                            if terms_pattern ~= '' then
+                                total_quantity = total_quantity + quantity
+                                results:append(
+                                    (character_name..'/'..storage_name..':'):color(259)..' '..
+                                    key_item_names[id].name:gsub('('..terms_pattern..')', ('%1'):color(258))..
+                                    (quantity > 1 and ' '..('('..quantity..')'):color(259) or '')
+                                )
+                            else
+                                results:append(
+                                    (character_name..'/'..storage_name..':'):color(259)..' '..key_item_names[id].name..
+                                    (quantity > 1 and ' '..('('..quantity..')'):color(259) or '')
+                                )
+                            end
+
+                            if export_file ~= nil then
+                                export_file:write('"'..character_name..'";"'..storage_name..'";"'..key_item_names[id].name..'";"'..quantity..'"\n')
+                            end
+
+                            no_results = false
+                        elseif storage_name ~= 'key items' and results_items:contains(id) then
                             if terms_pattern ~= '' then
                                 total_quantity = total_quantity + quantity
                                 results:append(
@@ -306,6 +375,7 @@ function search(query, export)
                         log(result)
                     end
                 end
+                coroutine.yield()
             end
         end
     end
@@ -332,7 +402,7 @@ function search(query, export)
     end
 end
 
-function get_storages()
+function get_local_storage()
     local items    = windower.ffxi.get_items()
     local storages = {}
 
@@ -349,7 +419,6 @@ function get_storages()
             if type(data) == 'table' then
 				if data.id ~= 0 then
 					local id = tostring(data.id)
-
 					storages[storage_name][id] = (storages[storage_name][id] or 0) + data.count
 				end
 			end
@@ -366,8 +435,42 @@ function get_storages()
             storages[slip_name][tostring(id)] = 1
         end
     end
+    
+    local key_items= windower.ffxi.get_key_items()
+    
+    storages['key items'] = T{}
+    
+    for _, id in ipairs(key_items) do
+        storages['key items'][tostring(id)] = 1
+    end
 
     return storages
+end
+
+function encase_key(key)
+    if type(key) == 'number' then
+        return '['..tostring(key)..']'
+    elseif type(key) == 'string' then
+        return '["'..key..'"]'
+    else
+        return tostring(key)
+    end
+end
+
+function make_table(tab,tab_offset)
+    -- Won't work for circular references or keys containing double quotes
+    local offset = " ":rep(tab_offset)
+    local ret = "{\n"
+    for i,v in pairs(tab) do
+        ret = ret..offset..encase_key(i)..' = '
+        if type(v) == 'table' then
+            ret = ret..make_table(v,tab_offset+2)..',\n'
+        else
+            ret = ret..tostring(v)..',\n'
+        end
+    end
+    coroutine.yield()
+    return ret..offset..'}'
 end
 
 function update()
@@ -382,91 +485,69 @@ function update()
 	end
 
     local player_name   = windower.ffxi.get_player().name
-    local storages_file = file.new(storages_path)
+    local self_storage  = file.new(storages_path..'\\'..player_name..'.lua')
 
-    if not storages_file:exists() then
-        storages_file:create()
+    if not self_storage:exists() then
+        self_storage:create()
     end
+    
+	local local_storage = get_local_storage()
 
-    global_storages = json.read(storages_file)
-
-    if global_storages == nil then
-        global_storages = T{}
-    end
-
-	local temp_storages = get_storages()
-
-	if temp_storages then
-		global_storages[player_name] = temp_storages
+	if local_storage then
+		global_storages[player_name] = local_storage
 	else
 		return false
 	end
+    
+    self_storage:write('return '..make_table(local_storage,0)..'\n')
+    collectgarbage()
+    return true
+end
 
-    -- build json string
-    local characters_json = L{}
 
-    for character_name, storages in pairs(global_storages) do
-        local storages_json = L{}
-
-        for storage_name, storage in pairs(storages) do
-            if storage_name == 'gil' then
-                storages_json:append('"'..storage_name..'":'..storage)
-            elseif storage_name ~= 'temporary' then
-                local items_json = L{}
-
-                for id, quantity in pairs(storage) do
-                    items_json:append('"'..id..'":'..quantity)
-                end
-
-                storages_json:append('"'..storage_name..'":{'..items_json:concat(',')..'}')
+function update_global_storage()
+    local player_name   = windower.ffxi.get_player().name
+    
+    global_storages = T{} -- global_storages[server str][character_name str][inventory_name str][item_id num] = count num
+    
+    for _,f in pairs(windower.get_dir(windower.addon_path.."\\"..storages_path)) do
+        if f:sub(-4) == '.lua' and f:sub(1,-5) ~= player_name then
+            local success,result = pcall(dofile,windower.addon_path..'\\'..storages_path..'\\'..f)
+            if success then
+                global_storages[f:sub(1,-5)] = result
+            else
+                warning('Unable to retrieve updated item storage for %s.':format(f:sub(1,-5)))
             end
         end
-
-        characters_json:append('"'..character_name..'":{'..storages_json:concat(',')..'}')
+        coroutine.yield()
     end
-
-    storages_file:write('{'..characters_json:concat(',\n')..'}')
-
-    collectgarbage()
-
-    return true
 end
 
 windower.register_event('load', update:cond(function() return windower.ffxi.get_info().logged_in end))
 
 windower.register_event('incoming chunk', function(id,original,modified,injected,blocked)
-    local seq = original:byte(4)*256+original:byte(3)
-	if (next_sequence and seq + next_sequence_offset >= next_sequence) or (time_out and seq + time_out_offset >= time_out) then
-        zone_search = true
+    local seq = original:unpack('H',3)
+	if (next_sequence and seq == next_sequence) and zone_search then
 		update()
-		next_sequence = nil
-        time_out = nil
-        sequence_offset = 0
+        next_sequence = nil
 	end
 
-	if id == 0x00A then -- First packet of a new zone
+	if id == 0x00B then -- Last packet of an old zone
+        zone_search = false
+    elseif id == 0x00A then -- First packet of a new zone, redundant because someone could theoretically load findAll between the two
 		zone_search = false
-        time_out = seq+33
-        if time_out < time_out%0x100 then
-            time_out_offset = 256
-        end
-
---	elseif id == 0x01D then
+	elseif id == 0x01D and not zone_search then
 	-- This packet indicates that the temporary item structure should be copied over to
 	-- the real item structure, accessed with get_items(). Thus we wait one packet and
 	-- then trigger an update.
---        zone_search = true
---		next_sequence = seq+128
---        if next_sequence < next_sequence%0x100 then
---            next_sequence_offset = 256
---        end
+        zone_search = true
+		next_sequence = (seq+22)%0x10000 -- 128 packets is about 1 minute. 22 packets is about 10 seconds.
     elseif (id == 0x1E or id == 0x1F or id == 0x20) and zone_search then
     -- Inventory Finished packets aren't sent for trades and such, so this is more
     -- of a catch-all approach. There is a subtantial delay to avoid spam writing.
-        next_sequence = seq+128
-        if next_sequence < next_sequence%0x100 then
-            next_sequence_offset = 256
-        end
+    -- The idea is that if you're getting a stream of incoming item packets (like you're gear swapping in an intense fight),
+    -- then it will keep putting off triggering the update until you're not.
+        next_sequence = (seq+22)%0x10000
 	end
 end)
 

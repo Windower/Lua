@@ -2,6 +2,9 @@
     A library to facilitate text primitive creation and manipulation.
 ]]
 
+local table = require('table')
+local math = require('math')
+
 local texts = {}
 local meta = {}
 
@@ -80,17 +83,16 @@ default_settings.text.stroke.blue = 0
 math.randomseed(os.clock())
 
 local amend
-amend = function(settings, text)
-    for key, val in pairs(text) do
-        local sval = settings[key]
-        if sval == nil then
+amend = function(settings, defaults)
+    for key, val in pairs(defaults) do
+        if type(val) == 'table' then
+            settings[key] = amend(settings[key] or {}, val)
+        elseif settings[key] == nil then
             settings[key] = val
-        else
-            if type(sval) == 'table' and type(val) == 'table' then
-                amend(sval, val)
-            end
         end
     end
+
+    return settings
 end
 
 local call_events = function(t, event, ...)
@@ -122,7 +124,7 @@ local apply_settings = function(_, t, settings)
     texts.visible(t, meta[t].status.visible)
     texts.stroke_width(t, settings.text.stroke.width)
     texts.stroke_color(t, settings.text.stroke.red, settings.text.stroke.green, settings.text.stroke.blue)
-    texts.stroke_transparency(t, settings.text.stroke.alpha)
+    texts.stroke_alpha(t, settings.text.stroke.alpha)
 
     call_events(t, 'reload')
 end
@@ -176,10 +178,11 @@ function texts.new(str, settings, root_settings)
                 nil
     end
 
-    t = {}
+    local t = {}
     local m = {}
     meta[t] = m
     m.name = (_addon and _addon.name or 'text') .. '_gensym_' .. tostring(t):sub(8) .. '_%.8X':format(16^8 * math.random()):sub(3)
+    t._name = m.name
     m.settings = settings or {}
     m.status = m.status or {visible = false, text = {}}
     m.root_settings = root_settings
@@ -450,14 +453,12 @@ function texts.alpha(t, alpha)
 end
 
 -- Sets/returns text transparency. Based on percentage values, with 1 being fully transparent, while 0 is fully opaque.
-function texts.transparency(t, alpha)
-    if not alpha then
+function texts.transparency(t, transparency)
+    if not transparency then
         return 1 - meta[t].settings.text.alpha/255
     end
-
-    alpha = math.floor(255*(1-alpha))
-    windower.text.set_color(meta[t].name, alpha, meta[t].settings.text.red, meta[t].settings.text.green, meta[t].settings.text.blue)
-    meta[t].settings.text.alpha = alpha
+    
+    texts.alpha(t,math.floor(255*(1-transparency)))
 end
 
 function texts.right_justified(t, right)
@@ -527,19 +528,17 @@ function texts.bg_alpha(t, alpha)
 end
 
 -- Sets/returns background transparency. Based on percentage values, with 1 being fully transparent, while 0 is fully opaque.
-function texts.bg_transparency(t, alpha)
-    if not alpha then
+function texts.bg_transparency(t, transparency)
+    if not transparency then
         return 1 - meta[t].settings.bg.alpha/255
     end
-
-    alpha = math.floor(255*(1-alpha))
-    windower.text.set_bg_color(meta[t].name, alpha, meta[t].settings.bg.red, meta[t].settings.bg.green, meta[t].settings.bg.blue)
-    meta[t].settings.bg.alpha = alpha
+    
+    texts.bg_alpha(t, math.floor(255*(1-transparency)))
 end
 
 function texts.stroke_width(t, width)
     if not width then
-        return meta[t].settings.stroke.width
+        return meta[t].settings.text.stroke.width
     end
 
     windower.text.set_stroke_width(meta[t].name, width)
@@ -557,12 +556,19 @@ function texts.stroke_color(t, red, green, blue)
     meta[t].settings.text.stroke.blue = blue
 end
 
-function texts.stroke_transparency(t, alpha)
+function texts.stroke_transparency(t, transparency)
+    if not transparency then
+        return 1 - meta[t].settings.text.stroke.alpha/255
+    end
+    
+    texts.stroke_alpha(t,math.floor(255 * (1 - transparency)))
+end
+
+function texts.stroke_alpha(t, alpha)
     if not alpha then
-        return 1 - meta[t].settings.stroke.alpha/255
+        return meta[t].settings.text.stroke.alpha
     end
 
-    alpha = math.floor(255 * (1 - alpha))
     windower.text.set_stroke_color(meta[t].name, alpha, meta[t].settings.text.stroke.red, meta[t].settings.text.stroke.green, meta[t].settings.text.stroke.blue)
     meta[t].settings.text.stroke.alpha = alpha
 end

@@ -1,6 +1,6 @@
 **Author:**  Cairthenn<br>
-**Version:**  1.0<br>
-**Date:** Oct. 27, 2013<br>
+**Version:**  1.1<br>
+**Date:** Nov. 11, 2015<br>
 
 # DressUp #
 

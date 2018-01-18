@@ -182,10 +182,12 @@ data.incoming[0x062] = {name='Skills Update',       description='Packet that sho
 data.incoming[0x063] = {name='Set Update',          description='Frequently sent packet during battle that updates specific types of job information, like currently available/set automaton equipment and currently set BLU spells.'}
 data.incoming[0x065] = {name='Repositioning',       description='Moves your character. Seems to be functionally idential to the Spawn packet'}
 data.incoming[0x067] = {name='Pet Info',            description='Updates information about whether or not you have a pet and the TP, HP, etc. of the pet if appropriate.'}
+data.incoming[0x068] = {name='Pet Status',          description='Updates information about whether or not you have a pet and the TP, HP, etc. of the pet if appropriate.'}
 data.incoming[0x06F] = {name='Self Synth Result',   description='Results of an attempted synthesis process by yourself.'}
 data.incoming[0x070] = {name='Others Synth Result', description='Results of an attempted synthesis process by others.'}
 data.incoming[0x071] = {name='Campaign Map Info',   description='Populates the Campaign map.'}
 data.incoming[0x075] = {name='Unity Start',         description='Creates the timer and glowing fence that accompanies Unity fights.'}
+data.incoming[0x076] = {name='Party Buffs',         description='Packet updated every time a party member\'s buffs change.'}
 data.incoming[0x078] = {name='Proposal',            description='Carries proposal information from a /propose or /nominate command.'}
 data.incoming[0x079] = {name='Proposal Update',     description='Proposal update following a /vote command.'}
 data.incoming[0x082] = {name='Guild Buy Response',  description='Buy an item from a guild.'}
@@ -198,8 +200,10 @@ data.incoming[0x08D] = {name='Job Points',          description='Contains all jo
 data.incoming[0x0A0] = {name='Party Map Marker',    description='Marks where players are on your map.'}
 data.incoming[0x0AA] = {name='Spell List',          description='Packet that shows the spells that you know.'}
 data.incoming[0x0AC] = {name='Ability List',        description='Packet that shows your current abilities and traits.'}
+data.incoming[0x0AE] = {name='Mount List',          description='Packet that shows your current mounts.'}
 data.incoming[0x0B4] = {name='Seek AnonResp',       description='Server response sent after you put up party or anon flag.'}
 data.incoming[0x0B5] = {name='Help Desk Open',      description='Sent when you open the Help Desk submenu.'}
+data.incoming[0x0BF] = {name='Reservation Response',description='Sent to inform the client about the status of entry to an instanced area.'}
 data.incoming[0x0C8] = {name='Party Struct Update', description='Updates all party member info in one struct. No player vital data (HP/MP/TP) or names are sent here.'}
 data.incoming[0x0C9] = {name='Show Equip',          description='Shows another player your equipment after using the Check command.'}
 data.incoming[0x0CA] = {name='Bazaar Message',      description='Shows another players bazaar message after using the Check command or sets your own on zoning.'}

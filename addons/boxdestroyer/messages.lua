@@ -1,59 +1,61 @@
-messages = {}
-messages[100] = {equal=8051, failure=8043, first_even_odd=8047, first_multiple=8053, greater=8050, greater_less=8042, less=8049, range=8048, second_even_odd=8046, second_multiple=8052, success=8045}
-messages[101] = {equal=7493, failure=7485, first_even_odd=7489, first_multiple=7495, greater=7492, greater_less=7484, less=7491, range=7490, second_even_odd=7488, second_multiple=7494, success=7487}
-messages[102] = {equal=7910, failure=7902, first_even_odd=7906, first_multiple=7912, greater=7909, greater_less=7901, less=7908, range=7907, second_even_odd=7905, second_multiple=7911, success=7904}
-messages[103] = {equal=8077, failure=8069, first_even_odd=8073, first_multiple=8079, greater=8076, greater_less=8068, less=8075, range=8074, second_even_odd=8072, second_multiple=8078, success=8071}
-messages[104] = {equal=8642, failure=8634, first_even_odd=8638, first_multiple=8644, greater=8641, greater_less=8633, less=8640, range=8639, second_even_odd=8637, second_multiple=8643, success=8636}
-messages[105] = {equal=7693, failure=7685, first_even_odd=7689, first_multiple=7695, greater=7692, greater_less=7684, less=7691, range=7690, second_even_odd=7688, second_multiple=7694, success=7687}
-messages[106] = {equal=8067, failure=8059, first_even_odd=8063, first_multiple=8069, greater=8066, greater_less=8058, less=8065, range=8064, second_even_odd=8062, second_multiple=8068, success=8061}
-messages[107] = {equal=7528, failure=7520, first_even_odd=7524, first_multiple=7530, greater=7527, greater_less=7519, less=7526, range=7525, second_even_odd=7523, second_multiple=7529, success=7522}
-messages[108] = {equal=7605, failure=7597, first_even_odd=7601, first_multiple=7607, greater=7604, greater_less=7596, less=7603, range=7602, second_even_odd=7600, second_multiple=7606, success=7599}
-messages[109] = {equal=8460, failure=8452, first_even_odd=8456, first_multiple=8462, greater=8459, greater_less=8451, less=8458, range=8457, second_even_odd=8455, second_multiple=8461, success=8454}
-messages[110] = {equal=7584, failure=7576, first_even_odd=7580, first_multiple=7586, greater=7583, greater_less=7575, less=7582, range=7581, second_even_odd=7579, second_multiple=7585, success=7578}
-messages[111] = {equal=8561, failure=8553, first_even_odd=8557, first_multiple=8563, greater=8560, greater_less=8552, less=8559, range=8558, second_even_odd=8556, second_multiple=8562, success=8555}
-messages[112] = {equal=8076, failure=8068, first_even_odd=8072, first_multiple=8078, greater=8075, greater_less=8067, less=8074, range=8073, second_even_odd=8071, second_multiple=8077, success=8070}
-messages[113] = {equal=7924, failure=7916, first_even_odd=7920, first_multiple=7926, greater=7923, greater_less=7915, less=7922, range=7921, second_even_odd=7919, second_multiple=7925, success=7918}
-messages[114] = {equal=7770, failure=7762, first_even_odd=7766, first_multiple=7772, greater=7769, greater_less=7761, less=7768, range=7767, second_even_odd=7765, second_multiple=7771, success=7764}
-messages[115] = {equal=7866, failure=7858, first_even_odd=7862, first_multiple=7868, greater=7865, greater_less=7857, less=7864, range=7863, second_even_odd=7861, second_multiple=7867, success=7860}
-messages[116] = {equal=7562, failure=7554, first_even_odd=7558, first_multiple=7564, greater=7561, greater_less=7553, less=7560, range=7559, second_even_odd=7557, second_multiple=7563, success=7556}
-messages[117] = {equal=7561, failure=7553, first_even_odd=7557, first_multiple=7563, greater=7560, greater_less=7552, less=7559, range=7558, second_even_odd=7556, second_multiple=7562, success=7555}
-messages[118] = {equal=8103, failure=8095, first_even_odd=8099, first_multiple=8105, greater=8102, greater_less=8094, less=8101, range=8100, second_even_odd=8098, second_multiple=8104, success=8097}
-messages[119] = {equal=8340, failure=8332, first_even_odd=8336, first_multiple=8342, greater=8339, greater_less=8331, less=8338, range=8337, second_even_odd=8335, second_multiple=8341, success=8334}
-messages[120] = {equal=7500, failure=7492, first_even_odd=7496, first_multiple=7502, greater=7499, greater_less=7491, less=7498, range=7497, second_even_odd=7495, second_multiple=7501, success=7494}
-messages[121] = {equal=8088, failure=8080, first_even_odd=8084, first_multiple=8090, greater=8087, greater_less=8079, less=8086, range=8085, second_even_odd=8083, second_multiple=8089, success=8082}
-messages[122] = {equal=7430, failure=7422, first_even_odd=7426, first_multiple=7432, greater=7429, greater_less=7421, less=7428, range=7427, second_even_odd=7425, second_multiple=7431, success=7424}
-messages[123] = {equal=7871, failure=7863, first_even_odd=7867, first_multiple=7873, greater=7870, greater_less=7862, less=7869, range=7868, second_even_odd=7866, second_multiple=7872, success=7865}
-messages[124] = {equal=7822, failure=7814, first_even_odd=7818, first_multiple=7824, greater=7821, greater_less=7813, less=7820, range=7819, second_even_odd=7817, second_multiple=7823, success=7816}
-messages[125] = {equal=7632, failure=7624, first_even_odd=7628, first_multiple=7634, greater=7631, greater_less=7623, less=7630, range=7629, second_even_odd=7627, second_multiple=7633, success=7626}
-messages[126] = {equal=8055, failure=8047, first_even_odd=8051, first_multiple=8057, greater=8054, greater_less=8046, less=8053, range=8052, second_even_odd=8050, second_multiple=8056, success=8049}
-messages[127] = {equal=7252, failure=7244, first_even_odd=7248, first_multiple=7254, greater=7251, greater_less=7243, less=7250, range=7249, second_even_odd=7247, second_multiple=7253, success=7246}
-messages[128] = {equal=7407, failure=7399, first_even_odd=7403, first_multiple=7409, greater=7406, greater_less=7398, less=7405, range=7404, second_even_odd=7402, second_multiple=7408, success=7401}
-messages[130] = {equal=7565, failure=7557, first_even_odd=7561, first_multiple=7567, greater=7564, greater_less=7556, less=7563, range=7562, second_even_odd=7560, second_multiple=7566, success=7559}
-messages[153] = {equal=11391, failure=11383, first_even_odd=11387, first_multiple=11393, greater=11390, greater_less=11382, less=11389, range=11388, second_even_odd=11386, second_multiple=11392, success=11385}
-messages[158] = {equal=7377, failure=7369, first_even_odd=7373, first_multiple=7379, greater=7376, greater_less=7368, less=7375, range=7374, second_even_odd=7372, second_multiple=7378, success=7371}
-messages[159] = {equal=8440, failure=8432, first_even_odd=8436, first_multiple=8442, greater=8439, greater_less=8431, less=8438, range=8437, second_even_odd=8435, second_multiple=8441, success=8434}
-messages[160] = {equal=7404, failure=7396, first_even_odd=7400, first_multiple=7406, greater=7403, greater_less=7395, less=7402, range=7401, second_even_odd=7399, second_multiple=7405, success=7398}
-messages[166] = {equal=10574, failure=10566, first_even_odd=10570, first_multiple=10576, greater=10573, greater_less=10565, less=10572, range=10571, second_even_odd=10569, second_multiple=10575, success=10568}
-messages[167] = {equal=10588, failure=10580, first_even_odd=10584, first_multiple=10590, greater=10587, greater_less=10579, less=10586, range=10585, second_even_odd=10583, second_multiple=10589, success=10582}
-messages[169] = {equal=7534, failure=7526, first_even_odd=7530, first_multiple=7536, greater=7533, greater_less=7525, less=7532, range=7531, second_even_odd=7529, second_multiple=7535, success=7528}
-messages[172] = {equal=7408, failure=7400, first_even_odd=7404, first_multiple=7410, greater=7407, greater_less=7399, less=7406, range=7405, second_even_odd=7403, second_multiple=7409, success=7402}
-messages[173] = {equal=10513, failure=10505, first_even_odd=10509, first_multiple=10515, greater=10512, greater_less=10504, less=10511, range=10510, second_even_odd=10508, second_multiple=10514, success=10507}
-messages[174] = {equal=11390, failure=11382, first_even_odd=11386, first_multiple=11392, greater=11389, greater_less=11381, less=11388, range=11387, second_even_odd=11385, second_multiple=11391, success=11384}
-messages[176] = {equal=7599, failure=7591, first_even_odd=7595, first_multiple=7601, greater=7598, greater_less=7590, less=7597, range=7596, second_even_odd=7594, second_multiple=7600, success=7593}
-messages[177] = {equal=11219, failure=11211, first_even_odd=11215, first_multiple=11221, greater=11218, greater_less=11210, less=11217, range=11216, second_even_odd=11214, second_multiple=11220, success=11213}
-messages[178] = {equal=11395, failure=11387, first_even_odd=11391, first_multiple=11397, greater=11394, greater_less=11386, less=11393, range=11392, second_even_odd=11390, second_multiple=11396, success=11389}
-messages[190] = {equal=8253, failure=8245, first_even_odd=8249, first_multiple=8255, greater=8252, greater_less=8244, less=8251, range=8250, second_even_odd=8248, second_multiple=8254, success=8247}
-messages[191] = {equal=8368, failure=8360, first_even_odd=8364, first_multiple=8370, greater=8367, greater_less=8359, less=8366, range=8365, second_even_odd=8363, second_multiple=8369, success=8362}
-messages[192] = {equal=7409, failure=7401, first_even_odd=7405, first_multiple=7411, greater=7408, greater_less=7400, less=7407, range=7406, second_even_odd=7404, second_multiple=7410, success=7403}
-messages[193] = {equal=8380, failure=8372, first_even_odd=8376, first_multiple=8382, greater=8379, greater_less=8371, less=8378, range=8377, second_even_odd=8375, second_multiple=8381, success=8374}
-messages[194] = {equal=8265, failure=8257, first_even_odd=8261, first_multiple=8267, greater=8264, greater_less=8256, less=8263, range=8262, second_even_odd=8260, second_multiple=8266, success=8259}
-messages[195] = {equal=7588, failure=7580, first_even_odd=7584, first_multiple=7590, greater=7587, greater_less=7579, less=7586, range=7585, second_even_odd=7583, second_multiple=7589, success=7582}
-messages[196] = {equal=8300, failure=8292, first_even_odd=8296, first_multiple=8302, greater=8299, greater_less=8291, less=8298, range=8297, second_even_odd=8295, second_multiple=8301, success=8294}
-messages[197] = {equal=7350, failure=7342, first_even_odd=7346, first_multiple=7352, greater=7349, greater_less=7341, less=7348, range=7347, second_even_odd=7345, second_multiple=7351, success=7344}
-messages[198] = {equal=8271, failure=8263, first_even_odd=8267, first_multiple=8273, greater=8270, greater_less=8262, less=8269, range=8268, second_even_odd=8266, second_multiple=8272, success=8265}
-messages[200] = {equal=7522, failure=7514, first_even_odd=7518, first_multiple=7524, greater=7521, greater_less=7513, less=7520, range=7519, second_even_odd=7517, second_multiple=7523, success=7516}
-messages[204] = {equal=7510, failure=7502, first_even_odd=7506, first_multiple=7512, greater=7509, greater_less=7501, less=7508, range=7507, second_even_odd=7505, second_multiple=7511, success=7504}
-messages[205] = {equal=11482, failure=11474, first_even_odd=11478, first_multiple=11484, greater=11481, greater_less=11473, less=11480, range=11479, second_even_odd=11477, second_multiple=11483, success=11476}
-messages[208] = {equal=8279, failure=8271, first_even_odd=8275, first_multiple=8281, greater=8278, greater_less=8270, less=8277, range=8276, second_even_odd=8274, second_multiple=8280, success=8273}
-messages[212] = {equal=10612, failure=10604, first_even_odd=10608, first_multiple=10614, greater=10611, greater_less=10603, less=10610, range=10609, second_even_odd=10607, second_multiple=10613, success=10606}
-messages[213] = {equal=10443, failure=10435, first_even_odd=10439, first_multiple=10445, greater=10442, greater_less=10434, less=10441, range=10440, second_even_odd=10438, second_multiple=10444, success=10437}
+messages = { -- These dialogue IDs match "You were unable to enter a combination" for the associated zone IDs
+    [100] = 8057,
+    [101] = 7503,
+    [102] = 7908,
+    [103] = 8083,
+    [104] = 8648,
+    [105] = 7699,
+    [106] = 8073,
+    [107] = 7534,
+    [108] = 7603,
+    [109] = 8466,
+    [110] = 7590,
+    [111] = 8567,
+    [112] = 8169,
+    [113] = 7926,
+    [114] = 7768,
+    [115] = 7864,
+    [116] = 7560,
+    [117] = 7567,
+    [118] = 8109,
+    [119] = 8346,
+    [120] = 7506,
+    [121] = 8086,
+    [122] = 7432,
+    [123] = 7869,
+    [124] = 7820,
+    [125] = 7630,
+    [126] = 8053,
+    [127] = 7349,
+    [128] = 7504,
+    [130] = 7567,
+    [153] = 11393,
+    [158] = 7379,
+    [159] = 8442,
+    [160] = 7406,
+    [166] = 10576,
+    [167] = 10590,
+    [169] = 7536,
+    [172] = 7410,
+    [173] = 10515,
+    [174] = 11392,
+    [176] = 7601,
+    [177] = 11216,
+    [178] = 11397,
+    [190] = 8250,
+    [191] = 8370,
+    [192] = 7406,
+    [193] = 8382,
+    [194] = 8262,
+    [195] = 7593,
+    [196] = 8302,
+    [197] = 7347,
+    [198] = 8268,
+    [200] = 7524,
+    [204] = 7512,
+    [205] = 11479,
+    [208] = 8281,
+    [212] = 10636,
+    [213] = 10445,
+}
+offsets = {greater_less=1, failure=2, success=4, second_even_odd=5, first_even_odd=6, range=7, less=8, greater=9, equal=10, second_multiple=11, first_multiple=12}

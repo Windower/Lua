@@ -1,4 +1,4 @@
---Copyright (c) 2013, Byrthnoth
+--Copyright (c) 2013~2016, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -72,6 +72,24 @@ function cancel_spell(boolean)
     end
 end
 
+function move_spell_target(position_table)
+    if _global.current_event ~= 'precast' then
+        error('\nGearSwap: move_spell_target() is only valid in the precast function', 2)
+        return
+    end
+    
+    if type(position_table) == 'table' and type(position_table.x or position_table.X) == 'number' and
+        type(position_table.y or position_table.Y) == 'number' and
+        type(position_table.z or positino_table.Z) == 'number' then
+        _global.target_arrow.x = position_table.x or position_table.X
+        _global.target_arrow.y = position_table.y or position_table.Y
+        _global.target_arrow.z = position_table.z or position_table.Z
+        print_set(_global.target_arrow)
+    else
+        error('\nGearSwap: move_spell_target() was passed an invalid value ('..tostring(position_table)..'). Should be a table with x, y, and z keys (offset from target)', 2)
+    end
+end
+
 function change_target(name)
     if _global.current_event ~= 'pretarget' then
         error('\nGearSwap: change_target() is only valid in the pretarget function', 2)
@@ -79,7 +97,7 @@ function change_target(name)
     end
     if name and type(name)=='string' then
         if valid_target(name) then
-            _,spell.target = valid_target(name)
+            _,_global.new_target = valid_target(name)
         else
             error('\nGearSwap: change_target() was passed an invalid value ('..tostring(name)..'). (must be a valid target)', 2)
         end
@@ -102,12 +120,12 @@ end
 
 -- Combines the provided gear sets into a new set.  Returns the result.
 function set_combine(...)
-    return set_merge({}, ...)
+    return set_merge(false,{}, ...)
 end
 
 -- Combines the provided gear sets into the equip_list set.
 function equip(...)
-    set_merge(equip_list, ...)
+    set_merge(true,equip_list, ...)
 end
 
 function disable(...)
@@ -178,34 +196,48 @@ function print_set(set,title)
         else
             error('\nGearSwap: print_set error, set is not a table.', 2)
         end
-    elseif table.length(set) == 0 then
+    end
+    if table.length(set) == 0 then
         if title then
             msg.add_to_chat(1,'------------------'.. windower.to_shift_jis(tostring(title))..' -- Empty Table -----------------')
         else
             msg.add_to_chat(1,'-------------------------- Empty Table -------------------------')
         end
         return
-    end
-    
-    if title then
+    elseif title then
         msg.add_to_chat(1,'------------------------- '..windower.to_shift_jis(tostring(title))..' -------------------------')
     else
         msg.add_to_chat(1,'----------------------------------------------------------------')
     end
-    if #set == table.length(set) then
-        for i,v in ipairs(set) do
-            if type(v) == 'table' and v.name then
-                msg.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v.name))..' (Adv.)')
-            else
-                msg.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v)))
+    local function print_element(key,value)
+        if type(value) == 'table' and value.name then
+            msg.add_to_chat(8,windower.to_shift_jis(tostring(key))..' '..windower.to_shift_jis(tostring(value.name))..' (Adv.)')
+        else
+            msg.add_to_chat(8,windower.to_shift_jis(tostring(key))..' '..windower.to_shift_jis(tostring(value)))
+        end
+    end
+    local function cmp_key(key,tab)
+        for k in pairs(tab) do
+            if k:lower() == key:lower() then
+                return k
             end
         end
-    else
-        for i,v in pairs(set) do
-            if type(v) == 'table' and v.name then
-                msg.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v.name))..' (Adv.)')
-            else
-                msg.add_to_chat(8,windower.to_shift_jis(tostring(i))..' '..windower.to_shift_jis(tostring(v)))
+    end
+    
+    if #set == table.length(set) then -- If it is a list (keyed by continuous whole number starting at 1), then print it out in order
+        for key,value in ipairs(set) do
+            print_element(key,value)
+        end
+    else -- Otherwise, try to print out the gear in order and then everything else.
+        for _,key in ipairs({'main','sub','ranged','range','ammo','head','neck','lear','ear1','learring','left_ear','rear','ear2','rearring','right_ear','body','hands','lring','ring1','left_ring','rring','ring2','right_ring','back','waist','legs','feet'}) do
+            local k = cmp_key(key,set)
+            if k then
+                print_element(k,set[k])
+            end
+        end
+        for key,value in pairs(set) do
+            if not slot_map[key] then
+                print_element(key,set[key])
             end
         end
     end
@@ -270,9 +302,10 @@ function include_user(str, load_include_in_this_table)
         error('\nGearSwap: include() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)
     end
     
-    if T{'bit','socket','mime'}:contains(str:lower()) then
-        return _G[str:lower()]
-    elseif T{'pack'}:contains(str:lower()) then
+    str = str:lower()
+    if type(package.loaded[str]) == 'table' then
+        return package.loaded[str]
+    elseif T{'pack'}:contains(str) then
         return
     end
     
@@ -366,7 +399,25 @@ function add_to_chat_user(num,str)
 end
 
 
+function user_sleep(delay)
+    if not delay then
+        error('\nGearSwap: coroutine.sleep() not passed a delay value', 2)
+    elseif type(delay) ~= 'number' or delay < 0 then
+        error('\nGearSwap: coroutine.sleep() was passed an invalid value ('..tostring(delay)..'). (must be a number >= 0)', 2)
+    else
+        coroutine.yield('sleep',delay)
+    end
+end
+
+function user_yield()
+    coroutine.yield('yield')
+end
+
+
 -- Define the user windower functions.
 user_windower = {register_event = register_event_user, raw_register_event = raw_register_event_user,
     unregister_event = unregister_event_user, send_command = send_cmd_user,add_to_chat=add_to_chat_user}
+user_coroutine = coroutine
+user_coroutine.sleep = user_sleep
+user_coroutine.yield = user_yield
 setmetatable(user_windower,{__index=windower})

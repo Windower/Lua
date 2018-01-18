@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'Translate'
-_addon.version = '0.150201'
+_addon.version = '0.150811'
 _addon.author = 'Byrth'
 _addon.commands = {'trans','translate'}
 
@@ -202,7 +202,7 @@ windower.register_event('incoming chunk',function(id,orgi,modi,is_injected,is_bl
         
         if not out_text then return end
         
-        if show_original then windower.add_to_chat(8,modi:sub(9,0x18):unpack('z',1)..'[Original]: '..out_text) end
+        if show_original then windower.add_to_chat(8,modi:sub(9,0x18):unpack('z',1)..'[Original]: '..modi:unpack('z',0x19)) end
         while #out_text > 0 do
             local boundary = get_boundary_length(out_text,150)
             local len = math.ceil((boundary+1+24)/2) -- Make sure there is at least one nul after the string

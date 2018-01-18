@@ -1,4 +1,4 @@
---Copyright (c) 2013, Krizz
+--Copyright © 2017, Krizz
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -27,11 +27,12 @@
 
 _addon.name = 'THTracker'
 _addon.author = 'Krizz'
-_addon.version = 1.0
+_addon.version = 1.1
 _addon.commands = {'thtracker', 'th'}
 
 config = require 'config'
 texts = require 'texts'
+require('logger')
 
 defaults = {}
 defaults.pos = {}
@@ -50,7 +51,7 @@ defaults.bg.blue = 30
 
 settings = config.load(defaults)
 
-th = texts.new(settings)
+th = texts.new('No current mob', settings)
 
 windower.register_event('addon command', function(command, ...)
     command = command and command:lower()
@@ -61,33 +62,45 @@ windower.register_event('addon command', function(command, ...)
         if posx and posy then
             th:pos(posx, posy)
         end
-
     elseif command == "hide" then
         th:hide()
-
     elseif command == 'show' then
         th:show()
-
     else
         print('th help : Shows help message')
         print('th pos <x> <y> : Positions the list')
         print('th hide : Hides the box')
         print('th show : Shows the box')
-
     end
 end)
 
 windower.register_event('incoming text', function(original, new, color)
-    local name, count = original:match('Additional effect: Treasure Hunter effectiveness against the (.*) increases to (%d+).')
-    if name and count then
-        mob = name
-        th:text(' '..name..'\n TH: '..count);
-        th:show()
-    end
+	original = original:strip_format()
+	local name, count = original:match('Additional effect: Treasure Hunter effectiveness against[%s%a%a%a]- (.*) increases to (%d+).')
+	
+	if name and count then
+		name = name.gsub(name, "the ", "")
+		mob = name
+		th:text(' '..name..'\n TH: '..count);
+		th:show()
+	end
 
-    name = original:match('%w+ defeats the (.*).')
-    if name and mob == name then
-        th:text('')
-        th:hide()
-    end
+	local deadmob = original:match('%w+ defeats[%s%a%a%a]- (.*).')
+	
+	if deadmob then
+		deadmob = deadmob.gsub(deadmob, "the ", "")
+	end
+	
+	if deadmob == mob then
+		
+		th:text('No current mob')
+		th:hide()
+		mob = nil
+	end
+
+end)
+
+windower.register_event('zone change', function()
+	th:text('No current mob')
+	th:hide()
 end)

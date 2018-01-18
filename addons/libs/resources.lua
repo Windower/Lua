@@ -3,12 +3,14 @@
 ]]
 
 _libs = _libs or {}
-_libs.resources = true
-_libs.functions = _libs.functions or require('functions')
-_libs.tables = _libs.tables or require('tables')
-_libs.strings = _libs.strings or require('strings')
-_libs.files = _libs.files or require('files')
-_libs.xml = _libs.xml or require('xml')
+
+require('functions')
+require('tables')
+require('strings')
+
+local functions, table, string = _libs.functions, _libs.tables, _libs.strings
+local files = require('files')
+local xml = require('xml')
 
 local fns = {}
 
@@ -28,6 +30,8 @@ local resources = setmetatable({}, {__index = function(t, k)
         return t[k]
     end
 end})
+
+_libs.resources = resources
 
 local redict = {
     name = language_string,
@@ -63,6 +67,8 @@ function resource_group(r, fn, attr)
     return setmetatable(res, resource_mt)
 end
 
+resource_mt.__class = 'Resource'
+
 resource_mt.__index = function(t, k)
     local res = slots[t] and slots[t]:contains(k) and resource_group:endapply(k)
 
@@ -75,7 +81,7 @@ resource_mt.__index = function(t, k)
 
     return res
 end
-resource_mt.__class = 'Resource'
+
 resource_mt.__tostring = function(t)
     return '{' .. t:map(table.get:endapply('name')):concat(', ') .. '}'
 end

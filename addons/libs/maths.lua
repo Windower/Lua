@@ -3,8 +3,15 @@
 ]]
 
 _libs = _libs or {}
-_libs.maths = true
-_libs.functions = _libs.functions or require('functions')
+
+require('functions')
+
+local functions = _libs.functions
+local string = require('string')
+
+local math = require('math')
+
+_libs.maths = math
 
 _raw = _raw or {}
 _raw.math = setmetatable(_raw.math or {}, {__index = math})

@@ -3,6 +3,30 @@
 Provides a chat/console interface for moving items around between bags. Optionally also automatically fetches items into the main inventory before item usage (both regular usage and Ninjutsu tools).
 
 ### Commands
+```
+itemizer delay <delay>
+```
+
+Sets the delay for pulling items into your inventory to 'delay'. (Default 0.5)
+
+```
+itemizer autoitems (shortened: ai)
+```
+
+Toggles the auto-pulling of items from bags if not in your inventory. (Default: True)
+
+```
+itemizer autoninjatools (shortened: ant)
+```
+
+Toggles the auto-pulling of ninja tools from bags when not in your bag. Prioritizes specific tools then moves to universal unless the next command is used to set the tools to only use universal tools for specific spells. (Default: True)
+
+```
+itemizer useuniversaltools <spell> (shortened: uut)
+```
+
+Toggles the use of only universal tools for `spell`. Does not use :ichi or :ni suffixes. (Default: False for all spells)  
+For Example:  itemiser uut katon
 
 ```
 get <item> [bag] [count]

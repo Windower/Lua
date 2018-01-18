@@ -1,4 +1,4 @@
---[[Copyright © 2014, Byrth,smd111
+--[[Copyright © 2014-2016, smd111
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -25,71 +25,83 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.]]
 
 _addon.name = 'latentchecker'
-_addon.author = 'Byrth,smd111'
+_addon.author = 'smd111'
 _addon.command = 'latentchecker'
 _addon.commands = {'lc'}
-_addon.version = '1.0'
+_addon.version = '1.1'
 
 extdata = require 'extdata'
 res = require 'resources'
 bag = 'Satchel'
 bag_id = 5
-unequip = false
-function check_space()
-    for i,v in pairs(res.bags) do
-        if v.access == "everywhere" and v.en ~= "inventory" and windower.ffxi.get_items(v.id).max ~= windower.ffxi.get_items(v.id).count then
-            bag = v.en:lower():gsub("^%l", string.upper)
-            bag_id = i
-            break
-        end
+
+function validate_bag(id)
+    local bag_info = windower.ffxi.get_bag_info(id)
+    if bag_info.enabled and bag_info.max > bag_info.count then
+        return true
     end
-end
-function find_item(target_item)
-    if windower.ffxi.get_items(bag_id).max == windower.ffxi.get_items(bag_id).count then
-        check_space()
-    end
-    for i,v in pairs(windower.ffxi.get_items().inventory) do
-        if type(v) == 'table' and v.id and res.items[v.id] and (res.items[v.id].en:lower() == target_item:lower() or res.items[v.id].enl:lower() == target_item:lower()) then
-            print('found weapon '..target_item)
-            windower.packets.inject_outgoing(0x29,string.char(0x29,6,0,0,1,0,0,0,0,bag_id,i,0x52))
-            coroutine.sleep(2)
-            print('weapon skills done = '..extdata.decode(windower.ffxi.get_items().inventory[i]).ws_points)
-            coroutine.sleep(2)
-            get_back_item(target_item)
-            break
-        end
-    end
-end
-function get_back_item(target_item)
-    if windower.ffxi.get_items(0).max == windower.ffxi.get_items(0).count then
-        error('Inventory became full while running.\nStoping.')
-        return
-    end
-    for i,v in pairs(windower.ffxi.get_items()[bag:lower()]) do
-        if type(v) =='table' and v.id and res.items[v.id] and (res.items[v.id].en:lower() == target_item:lower() or res.items[v.id].enl:lower() == target_item:lower()) then
-            windower.packets.inject_outgoing(0x29,string.char(0x29,6,0,0,1,0,0,0,bag_id,0,i,0x52))
-            break
-        end
-    end
+    return false
 end
 
-windower.register_event('addon command', function(command, ...)
-    command = command
-    local trial_weapons = {"axe of trials","gun of trials","sword of trials","knuckles of trials","spear of trials","scythe of trials","sapara of trials",
-    "bow of trials","club of trials","pole of trials","pick of trials","dagger of trials","tachi of trials","kodachi of trials","sturdy axe","burning fists",
-    "werebuster","mage's staff","vorpal sword","swordbreaker","brave blade","death sickle","double axe","dancing dagger","killer bow","windslicer","sasuke katana",
-    "radiant lance","scepter staff","wightslayer","quicksilver","inferno claws","main gauche","elder staff"}
-    if command == 'run' then
-        print('starting')
-        if unequip then
-            windower.ffxi.set_equip(0, 0, 0)
+function check_space()
+    if validate_bag(bag_id) then
+        return bag_id
+    else
+        for i=5,8 do
+            if validate_bag(i) then
+                bag_id = i -- Update bag ID to be the bag that will work
+                return bag_id
+            end
         end
-        for i,v in pairs(trial_weapons) do
-            find_item(v)
-        end
-        print('done')
     end
-    if command == 'unequip' then
-        unequip = not unequip
+    return false
+end
+
+function match_item(target_item,m)
+    return type(m) == 'table' and m.id and res.items[m.id] and (res.items[m.id].en:lower() == target_item:lower() or res.items[m.id].enl:lower() == target_item:lower())
+end
+
+
+windower.register_event('addon command', function(command, ...)
+    local trial_weapons = {"axe of trials","gun of trials","sword of trials","knuckles of trials","spear of trials","scythe of trials","sapara of trials",
+        "bow of trials","club of trials","pole of trials","pick of trials","dagger of trials","tachi of trials","kodachi of trials","sturdy axe","burning fists",
+        "werebuster","mage's staff","vorpal sword","swordbreaker","brave blade","death sickle","double axe","dancing dagger","killer bow","windslicer",
+        "sasuke katana","radiant lance","scepter staff","wightslayer","quicksilver","inferno claws","main gauche","elder staff","destroyers","senjuinrikio",
+        "heart snatcher","subduer","dissector","expunger","morgenstern","gravedigger","rampager","coffinmaker","gonzo-shizunori","retributor","michishiba","thyrsusstab",
+        "trial wand","trial blade"}
+    if command == 'run' then
+        windower.add_to_chat(121,'latentchecker: Starting...')
+        windower.ffxi.set_equip(0, 0, 0) -- Remove main/sub weapons
+        windower.ffxi.set_equip(0, 2, 0) -- Remove ranged weapons
+        coroutine.sleep(1.2)
+        for _,target_item in pairs(trial_weapons) do
+            if not check_space() then
+                windower.add_to_chat(123,'latentchecker: not able to swap item. No available space found in bags.')
+                return
+            end
+            
+            for n,m in pairs(windower.ffxi.get_items(0)) do -- Iterate over inventory
+                if match_item(target_item,m) then
+                    windower.ffxi.put_item(bag_id,n)
+                    coroutine.sleep(1.2)
+                    windower.add_to_chat(55,'latentchecker: '..res.items[m.id].en..' has '..tostring(extdata.decode(windower.ffxi.get_items(0,n)).ws_points)..' WS points')
+                    coroutine.sleep(1.2)
+                    
+                    if not validate_bag(0) then
+                        windower.add_to_chat(123,'latentchecker: Inventory became full while running.\nlatentchecker: Stopping.')
+                        return
+                    end
+                    for j,k in pairs(windower.ffxi.get_items(bag_id)) do
+                        if match_item(target_item,k) then
+                            windower.ffxi.get_item(bag_id,j)
+                            break
+                        end
+                    end
+                end
+            end
+        end
+        windower.add_to_chat(121,'latentchecker: Done! Remember to re-dress yourself!')
+    else
+        print('latentchecker: My only valid command is "run", which will reset your TP.')
     end
 end)

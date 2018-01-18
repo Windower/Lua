@@ -3,13 +3,17 @@
 ]]
 
 _libs = _libs or {}
-_libs.queues = true
-_libs.tables = _libs.tables or require('tables')
+
+require('tables')
+
+local table = _libs.tables
+
+local queue = {}
+
+_libs.queues = queue
 
 _raw = _raw or {}
 _raw.table = _raw.table or {}
-
-local queue = {}
 
 _meta = _meta or {}
 _meta.Q = {}
@@ -90,7 +94,7 @@ function queue.remove(q, i)
 end
 
 function queue.it(q)
-    local key = q.front
+    local key = q.front - 1
     return function()
         key = key + 1
         return rawget(q.data, key), key
@@ -148,7 +152,7 @@ end
 _meta.Q.__tostring = queue.tostring
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

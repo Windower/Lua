@@ -84,6 +84,8 @@ function addText(name, abtype, abil, dMob, dangerous)
         tracking:append(' Blue: '..dMob..'%')
     elseif name == 'devastates' then
         tracking:append(' Fiend devastated by: '..dMob)
+    elseif name == 'victory' then
+        tracking:append(' Key to Victory: '..dMob)
     else
         tracking:append(' '..name)
     end

@@ -34,31 +34,138 @@ validabils = {}
 
 -- Constants used in the rest of the addon.
 
--- List of valid prefixes to be interpreted. The values currently have no use.
+-- List of valid prefixes to be interpreted with the resources. The values currently have no use.
 command_list = {['ja']='job_abilities',['jobability']='job_abilities',['so']='spells',['song']='spells',['ma']='spells',['magic']='spells',['nin']='spells',['ninjutsu']='spells',
 	['ra']='Ranged Attack',['range']='Ranged Attack',['throw']='Ranged Attack',['shoot']='Ranged Attack',['monsterskill']='monster_abilities',['ms']='monster_abilities',
-	['ws']='weapon_skills',['weaponskill']='weapon_skills',['item']='Ability',['pet']='job_abilities'}
+	['ws']='weapon_skills',['weaponskill']='weapon_skills',['item']='Ability',['pet']='job_abilities',['mo']='mounts',['mount']='mounts'}
     
 in_game_res_commands = {['ja']='/ja',['jobability']='/ja',['pet']='/ja',
     ['so']='/ma',['song']='/ma',['ma']='/ma',['magic']='/ma',['nin']='/ma',['ninjutsu']='/ma',
     ['monsterskill']='/ms',['ms']='/ms',['ws']='/ws',['weaponskill']='/ws',
-	['ra']='/ra',['range']='/ra',['throw']='/ra',['shoot']='/ra'}
+	['ra']='/ra',['range']='/ra',['throw']='/ra',['shoot']='/ra',['mount']='/mo',['mo']='/mo'}
 
 -- List of other commands that might use name completion.
-command2_list = {['kick']=true,['assist']=true,['alliancecmd']=T{'kick','add','leader','breakup','leave','looter'},['partycmd']=T{'kick','add','leader','breakup','leave','looter'},
-	['acmd']=T{'kick','add','leader','breakup','leave','looter'},['pcmd']=T{'kick','add','leader','breakup','leave','looter'},
-	['wave']=T{'motion'},['poke']=T{'motion'},['dance']=T{'motion'},['dance1']=T{'motion'},['dance2']=T{'motion'},['dance3']=T{'motion'},['dance4']=T{'motion'},['amazed']=T{'motion'},
-	['angry']=T{'motion'},['bell']=T{'motion'},['bellsw']=T{'motion'},['blush']=T{'motion'},['bow']=T{'motion'},['cheer']=T{'motion'},['clap']=T{'motion'},['comfort']=T{'motion'},['cry']=T{'motion'},
-	['disgusted']=T{'motion'},['doze']=T{'motion'},['doubt']=T{'motion'},['huh']=T{'motion'},['farewell']=T{'motion'},['goodbye']=T{'motion'},['fume']=T{'motion'},['grin']=T{'motion'},['hurray']=T{'motion'},
-	['joy']=T{'motion'},['kneel']=T{'motion'},['laugh']=T{'motion'},['muted']=T{'motion'},['kneel']=T{'motion'},['laugh']=T{'motion'},['no']=T{'motion'},['nod']=T{'motion'},['yes']=T{'motion'},
-	['panic']=T{'motion'},['point']=T{'motion'},['praise']=T{'motion'},['psych']=T{'motion'},['salute']=T{'motion'},['shocked']=T{'motion'},['sigh']=T{'motion'},['sit']=T{'motion'},['slap']=T{'motion'},
-	['smile']=T{'motion'},['stagger']=T{'motion'},['stare']=T{'motion'},['sulk']=T{'motion'},['surprised']=T{'motion'},['think']=T{'motion'},['toss']=T{'motion'},['upset']=T{'motion'},['welcome']=T{'motion'},
-	['check']=true,['c']=true,['checkparam']=true,['breaklinkshell']=true,['target']=true,['ta']=true,['ra']=true,['targetnpc']=true,['follow']=true}
+local No_targets = {['Player']=false,['Enemy']=false,['Party']=false,['Ally']=false,['NPC']=false,['Self']=false,['Corpse']=false}
+local All_targets = {['Player']=true,['Enemy']=true,['Party']=true,['Ally']=true,['NPC']=true,['Self']=true,['Corpse']=true}
+local PC_targets = {['Player']=true,['Enemy']=false,['Party']=true,['Ally']=true,['NPC']=false,['Self']=true,['Corpse']=true}
+local Party_targets = {['Player']=false,['Enemy']=false,['Party']=true,['Ally']=false,['NPC']=false,['Self']=true,['Corpse']=true}
+local Alliance_targets = {['Player']=false,['Enemy']=false,['Party']=false,['Ally']=true,['NPC']=false,['Self']=true,['Corpse']=true}
+local BST_targets = {['Player']=true,['Enemy']=false,['Party']=false,['Ally']=false,['NPC']=false,['Self']=true,['Corpse']=false}
+
+local function new_cmd_entry(default_targets,subcommands)
+    local rettab = table.reassign({},default_targets)
+    if subcommands then
+        rettab.args = subcommands
+    end
+    return rettab
+end
+
+local emote_table = new_cmd_entry(All_targets,{motion=true})
+
+command2_list = {
+    --['kick']=true, --Is this actually a command?
+    ['assist']=All_targets,
+    ['alliancecmd']=new_cmd_entry(No_targets,{
+            kick=Alliance_targets,
+            add=PC_targets,
+            leader=Alliance_targets,
+            breakup=true,
+            leave=true,
+            looter=Alliance_targets}),
+    ['partycmd']=new_cmd_entry(No_targets,{
+            kick=Party_targets,
+            add=PC_targets,
+            leader=Party_targets,
+            breakup=true,
+            leave=true,
+            looter=Party_targets}),
+    ['acmd']=new_cmd_entry(No_targets,{
+            kick=Alliance_targets,
+            add=PC_targets,
+            leader=Alliance_targets,
+            breakup=true,
+            leave=true,
+            looter=Alliance_targets}),
+    ['pcmd']=new_cmd_entry(No_targets,{
+            kick=Party_targets,
+            add=PC_targets,
+            leader=Party_targets,
+            breakup=true,
+            leave=true,
+            looter=Party_targets}),
+	['wave']=emote_table,
+    ['poke']=emote_table,
+    ['dance']=emote_table,
+    ['dance1']=emote_table,
+    ['dance2']=emote_table,
+    ['dance3']=emote_table,
+    ['dance4']=emote_table,
+    ['amazed']=emote_table,
+	['angry']=emote_table,
+    ['bell']=emote_table,
+    ['bellsw']=emote_table,
+    ['blush']=emote_table,
+    ['bow']=emote_table,
+    ['cheer']=emote_table,
+    ['clap']=emote_table,
+    ['comfort']=emote_table,
+    ['cry']=emote_table,
+	['disgusted']=emote_table,
+    ['doze']=emote_table,
+    ['doubt']=emote_table,
+    ['huh']=emote_table,
+    ['farewell']=emote_table,
+    ['goodbye']=emote_table,
+    ['fume']=emote_table,
+    ['grin']=emote_table,
+    ['hurray']=emote_table,
+	['joy']=emote_table,
+    ['kneel']=emote_table,
+    ['laugh']=emote_table,
+    ['muted']=emote_table,
+    ['kneel']=emote_table,
+    ['laugh']=emote_table,
+    ['no']=emote_table,
+    ['nod']=emote_table,
+    ['yes']=emote_table,
+	['panic']=emote_table,
+    ['point']=emote_table,
+    ['praise']=emote_table,
+    ['psych']=emote_table,
+    ['salute']=emote_table,
+    ['shocked']=emote_table,
+    ['sigh']=emote_table,
+    ['sit']=emote_table,
+    ['slap']=emote_table,
+	['smile']=emote_table,
+    ['stagger']=emote_table,
+    ['stare']=emote_table,
+    ['sulk']=emote_table,
+    ['surprised']=emote_table,
+    ['think']=emote_table,
+    ['toss']=emote_table,
+    ['upset']=emote_table,
+    ['welcome']=emote_table,
+	['check']=new_cmd_entry(PC_targets),
+    ['c']=new_cmd_entry(PC_targets),
+    ['checkparam']=new_cmd_entry({['Player']=false,['Enemy']=false,['Party']=false,['Ally']=false,['NPC']=false,['Self']=true,['Corpse']=false},{}), -- Blank table forces it into the second processing stream, which lets it default to <me>
+    ['target']=new_cmd_entry(PC_targets),
+    ['ta']=new_cmd_entry(PC_targets),
+    ['ra']=new_cmd_entry({['Player']=false,['Enemy']=true,['Party']=false,['Ally']=false,['NPC']=false,['Self']=false,['Corpse']=false}),
+    ['follow']=new_cmd_entry(All_targets),
+    ['recruit']=new_cmd_entry(PC_targets),
+    ['rec']=new_cmd_entry(PC_targets),
+    ['retr']=new_cmd_entry(Party_targets,{all=No_targets}),
+    ['returntrust']=new_cmd_entry(Party_targets,{all=No_targets}),
+    ['refa']=new_cmd_entry(Party_targets,{all=No_targets}),
+    ['returnfaith']=new_cmd_entry(Party_targets,{all=No_targets}),
+    ['bstpet']=new_cmd_entry(No_targets,{['1']=BST_targets,['2']=BST_targets,['3']=BST_targets,['4']=BST_targets,['5']=BST_targets,['6']=BST_targets,['7']=BST_targets}),
+    }
 	
-unhandled_list = {['p']=true,['s']=true,['sh']=true,['yell']=true,['echo']=true,['t']=true,['l']=true}
+unhandled_list = {['p']=true,['s']=true,['sh']=true,['yell']=true,['echo']=true,['t']=true,['l']=true,['breaklinkshell']=true}
 
 -- List of commands to be ignored
-ignore_list = {['equip']=true,['raw']=true,['fish']=true,['dig']=true,['range']=true,['map']=true,['hide']=true,['attackoff']=true,['quest']=true}
+ignore_list = {['equip']=true,['raw']=true,['fish']=true,['dig']=true,['range']=true,['map']=true,['hide']=true,['jump']=true,['attackoff']=true,['quest']=true,['recruitlist']=true,['rlist']=true,['statustimer']=true}
 
 -- Targets to ignore and just pass through
 pass_through_targs = T{'<t>','<me>','<ft>','<scan>','<bt>','<lastst>','<r>','<pet>','<p0>','<p1>','<p2>','<p3>','<p4>',
@@ -102,3 +209,4 @@ validabils_it('spells')
 validabils_it('job_abilities')
 validabils_it('weapon_skills')
 validabils_it('monster_abilities')
+validabils_it('mounts')

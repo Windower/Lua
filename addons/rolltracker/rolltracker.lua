@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'RollTracker'
-_addon.version = '1.3.0.0'
+_addon.version = '1.6.0.0'
 _addon.author = 'Balloon'
 _addon.command = 'rolltracker'
 
@@ -64,12 +64,13 @@ end)
 
 --This is done because GearSwap swaps out too fast, and sometimes things aren't reported in memory.
 --Therefore, we store it within rolltracker so we can do the check locally.
-windower.register_event('outgoing chunk', function(id,data)
-    if id == 0x050 then
-        local packet = packets.parse('outgoing', data)
-        local slot = windower.ffxi.get_items(packet['Bag'])[packet['Item Index']]
-        gearTable[packet['Equip Slot']] = slot ~= nil and slot.id or 0
-    end
+--  Parsing:
+windower.register_event('incoming chunk', function(id, data) 
+     if id == 0x050 then
+        local packet = packets.parse('incoming', data)
+        local slot = windower.ffxi.get_items(packet['Inventory Bag'])[packet['Inventory Index']]
+        gearTable[packet['Equipment Slot']] = slot ~= nil and slot.id or 0
+     end
 end)
 
 function getGear(slot)
@@ -98,7 +99,7 @@ windower.register_event('load', function()
     }
     local rollInfoTemp = {
         -- Okay, this goes 1-11 boost, Bust effect, Effect, Lucky, +1 Phantom Roll Effect, Bonus Equipment and Effect,
-        ['Chaos'] = {6,8,9,25,11,13,16,3,17,19,31,"-4", '% Attack!', 4, 3},
+        ['Chaos'] = {64,80,96,256,112,128,160,32,176,192,320,"-9.76", '% Attack!', 4, 32},--/1024 
         ['Fighter\'s'] = {2,2,3,4,12,5,6,7,1,9,18,'-4','% Double-Attack!', 5, 1},
         ['Wizard\'s'] = {4,6,8,10,25,12,14,17,2,20,30, "-10", ' MAB', 5, 2},
         ['Evoker\'s'] = {1,1,1,1,3,2,2,2,1,3,4,'-1', ' Refresh!',5, 1},
@@ -107,26 +108,28 @@ windower.register_event('load', function()
         ['Hunter\'s'] = {10,13,15,40,18,20,25,5,27,30,50,'-?', ' Accuracy Bonus',4, 5},
         ['Magus\'s'] = {5,20,6,8,9,3,10,13,14,15,25,'-8',' Magic Defense Bonus',2, 2},
         ['Healer\'s'] = {3,4,12,5,6,7,1,8,9,10,16,'-4','% Cure Potency',3, 1},
-        ['Drachen'] = {10,13,15,40,18,20,25,5,28,30,50,'-8',' Pet: Accuracy Bonus',4, 5},
+        ['Drachen'] = {10,13,15,40,18,20,25,5,28,30,50,'-15',' Pet: Accuracy Bonus',4, 5},
         ['Choral'] = {8,42,11,15,19,4,23,27,31,35,50,'+25', '- Spell Interruption Rate',2, 0},
         ['Monk\'s'] = {8,10,32,12,14,15,4,20,22,24,40,'-?', ' Subtle Blow', 3, 4},
         ['Beast'] = {6,8,9,25,11,13,16,3,17,19,31,'-10', '% Pet: Attack Bonus',4, 3},
         ['Samurai'] = {7,32,10,12,14,4,16,20,22,24,40,'-10',' Store TP Bonus',2, 4},
         ['Warlock\'s'] = {2,3,4,12,5,6,7,1,8,9,15,'-5',' Magic Accuracy Bonus',4, 1},
         ['Puppet'] = {5,8,35,11,14,18,2,22,26,30,40,'-8',' Pet: Magic Attack Bonus',3, 3},
-        ['Gallant\'s'] = {4,5,15,6,7,8,3,9,10,11,20,'-10','% Defense Bonus', 3, 2.4},
+        ['Gallant\'s'] = {48,60,200,72,88,104,32,120,140,160,240,'-11.72','% Defense Bonus', 3, 24},--/1024
         ['Dancer\'s'] = {3,4,12,5,6,7,1,8,9,10,16,'-4',' Regen',3, 2},
         ['Bolter\'s'] = {0.3,0.3,0.8,0.4,0.4,0.5,0.5,0.6,0.2,0.7,1.0,'-8','% Movement Speed',3, 0.2},
-        ['Caster\'s'] = {6,15,7,8,9,10,5,11,12,13,20,'-10','% Fast Cast',2, 3,{7,11140,10}},
-        ['Tactician\'s'] = {10,10,10,10,30,10,10,0,20,20,40,'-10',' Regain',5, 2, {5, 11100, 10}},
+        ['Caster\'s'] = {6,15,7,8,9,10,5,11,12,13,20,'-10','% Fast Cast',2, 3,{7, 11140, 27269, 27269, 10}},
+        ['Tactician\'s'] = {10,10,10,10,30,10,10,0,20,20,40,'-10',' Regain',5, 2, {5, 11100, 26930, 26931, 10}},
         ['Miser\'s'] = {30,50,70,90,200,110,20,130,150,170,250,'0',' Save TP',5, 15},
         ['Ninja'] = {4,5,5,14,6,7,9,2,10,11,18,'-10',' Evasion Bonus',4, 2},
         ['Scholar\'s'] = {'?','?','?','?','?','?','?','?','?','?','?','?',' Conserve MP',2, 0},
-        ['Allies\''] = {6,7,17,9,11,13,15,17,17,5,17,'?','% Skillchain Damage',3, 1,{6,11120, 5}},
+        ['Allies\''] = {6,7,17,9,11,13,15,17,17,5,17,'?','% Skillchain Damage',3, 1,{6,11120, 27084, 27085, 5}},
         ['Companion\'s'] = {{4,20},{20, 50},{6,20},{8, 20},{10,30},{12,30},{14,30},{16,40},{18, 40}, {3,10},{30, 70},'-?',' Pet: Regen/Regain',2, {1,5}},
         ['Avenger\'s'] = {'?','?','?','?','?','?','?','?','?','?','?','?',' Counter Rate',4, 0},
-        ['Blitzer\'s'] = {2,3.4,4.5,11.3,5.3,6.4,7.2,8.3,1.5,10.2,12.1,'-?', '% Attack delay reduction',4, 1, {4,11080, 5}},
-        ['Courser\'s'] = {'?','?','?','?','?','?','?','?','?','?','?','?',' Snapshot',3, 0}
+        ['Blitzer\'s'] = {2,3.4,4.5,11.3,5.3,6.4,7.2,8.3,1.5,10.2,12.1,'-?', '% Attack delay reduction',4, 1, {4,11080, 26772, 26773, 5}},
+        ['Courser\'s'] = {'?','?','?','?','?','?','?','?','?','?','?','?',' Snapshot',3, 0}, --11160, 27443, 27444
+        ['Runeist\'s'] = {'?','?','?','?','?','?','?','?','?','?','?','?',' Magic Evasion',4, 0},
+        ['Naturalist\'s'] = {6,7,15,8,9,10,5,11,12,13,20,'-5','% Enhancing Magic Duration',3, 1}
     }
 
     rollInfo = {}
@@ -222,7 +225,6 @@ function RollEffect(rollid, rollnum)
         return
     end
 
-
     --There's gotta be a better way to do this.
     local rollName = rollInfo[rollid][1]
     local rollVal = rollInfo[rollid][rollnum]
@@ -230,6 +232,7 @@ function RollEffect(rollid, rollnum)
     if lastRoll ~= rollid then 
         lastRoll = rollid
         ringBonus = false
+        gearBonus = false
     end
 
     --I'm handling one roll a bit odd, so I need to deal with it seperately.
@@ -237,7 +240,11 @@ function RollEffect(rollid, rollnum)
     if rollName == "Companion\'s" then
         local hpVal = rollVal[1]
         local tpVal = rollVal[2]
-        if gearTable[13] == 28548 or gearTable[14]== 28548 or ringBonus then
+        if gearTable[9] == 26038 or ringBonus then
+            hpVal =  hpVal + (rollInfo[rollid][16][1]*7)
+            tpVal = tpVal  + (rollInfo[rollid][16][2]*7)
+            ringBonus = true
+        elseif gearTable[13] == 28548 or gearTable[14]== 28548 or ringBonus then
             hpVal =  hpVal + (rollInfo[rollid][16][1]*5)
             tpVal = tpVal  + (rollInfo[rollid][16][2]*5)
             ringBonus = true
@@ -251,7 +258,10 @@ function RollEffect(rollid, rollnum)
 
     --If there's no Roll Val can't add to it
     if rollVal ~= '?' then
-        if gearTable[13] == 28548 or gearTable[14] == 28548 or ringBonus then
+        if gearTable[9] == 26038 or ringBonus then
+            rollVal = rollVal + (rollInfo[rollid][16]*7)
+            ringBonus = true
+        elseif gearTable[13] == 28548 or gearTable[14] == 28548 or ringBonus then
             rollVal = rollVal + (rollInfo[rollid][16]*5)
             ringBonus = true
         elseif gearTable[13] == 28547 or gearTable[14] == 28547 or ringBonus then
@@ -259,14 +269,31 @@ function RollEffect(rollid, rollnum)
             ringBonus = true
         end
     end
+
+    --Handle Emp +2, 109 and 119 gear bonus
+    if(rollInfo[rollid][17] ~= nil) then
+        local bonusVal = gearTable[rollInfo[rollid][17][1]] == rollInfo[rollid][17][2] or gearTable[rollInfo[rollid][17][1]] == rollInfo[rollid][17][3] or gearTable[rollInfo[rollid][17][1]] ==  rollInfo[rollid][17][4] and rollInfo[rollid][17][5] or 0
+       if gearBonus == true then
+          rollVal = rollVal + rollInfo[rollid][17][5]
+        else
+          gearBonus = true
+          rollVal = rollVal + bonusVal
+        end
+  end
+  
     -- Convert Bolters to Movement Speed based on 5.0 being 100%
     if(rollName == "Bolter\'s") then
         rollVal = '%.0f':format(100*((5+rollVal) / 5 - 1))
     end
-
-    if(rollInfo[rollid][17] ~= nil) then
-        local bonusVal = gearTable[rollInfo[rollid][17][1]] == rollInfo[rollid][17][2] and rollInfo[rollid][17][3] or 0 
-        rollVal = rollVal + bonusVal
+    
+    --Convert Chaos to % with 2 decimials
+    if(rollName == "Chaos") then
+        rollVal = '%.2f':format(rollVal/1024 * 100)
+    end
+    
+    --Convert Gallant's to % with 2 decimials
+    if(rollName == "Gallant\'s") then
+        rollVal = '%.2f':format(rollVal/1024 * 100)
     end
 
     return rollVal..rollInfo[rollid][14]

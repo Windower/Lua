@@ -45,6 +45,7 @@ party_three_keys = S{'a20', 'a21', 'a22', 'a23', 'a24', 'a25'}
 seeking_information={}
 macro_order=T{nil,L{},nil,L{},L{}}
 mouse_map2=T{}
+buff_map={{{},{}},{{},{}},{{},{}},{{},{}},{{},{}},{{},{}},}
 vacancies={0,0,0}
 
 help_text = [[Nostrum command list.
@@ -87,8 +88,171 @@ font_widths={
     ['˹I˼']=23,['˹II˼']=31,
 }
 
-xml_to_lua={
-	["cure"]="Cure",
+tracked_buffs = {
+    {
+        [42] = 'regen',
+        [233] = 'regen',
+        [539] = 'regen',
+        [43] = 'regen',-- = 'refresh',
+        [234] = 'regen',-- = 'refresh',
+        [541] = 'regen',-- = 'refresh',
+        [228] = 'embrava',
+        [580] = 'haste',
+        [33] = 'haste',
+        [40] = 'protect',
+        [41] = 'shell',
+        [113] = 'reraise',
+        [600] = 'roll',
+        [310] = 'roll',
+        [314] = 'roll',
+        [318] = 'roll',
+        [322] = 'roll',
+        [326] = 'roll',
+        [334] = 'roll',
+        [315] = 'roll',
+        [319] = 'roll',
+        [323] = 'roll',
+        [327] = 'roll',
+        [331] = 'roll',
+        [312] = 'roll',
+        [316] = 'roll',
+        [320] = 'roll',
+        [324] = 'roll',
+        [328] = 'roll',
+        [332] = 'roll',
+        [581] = 'haste',
+        [188] = 'sublimation',
+        [187] = 'sublimation',
+        [336] = 'roll',
+        [265] = 'haste',
+        [339] = 'roll',
+        [338] = 'roll',
+        [337] = 'roll',
+        [313] = 'roll',
+        [317] = 'roll',
+        [321] = 'roll',
+        [325] = 'roll',
+        [329] = 'roll',
+        [333] = 'roll',
+        [335] = 'roll',
+        [330] = 'roll',
+        [311] = 'roll',
+        [193] = 'song',
+        [197] = 'song',
+        [201] = 'song',
+        [205] = 'song',
+        [209] = 'song',
+        [213] = 'song',
+        [221] = 'song',
+        [198] = 'song',
+        [202] = 'song',
+        [206] = 'song',
+        [210] = 'song',
+        [214] = 'song',
+        [218] = 'song',
+        [222] = 'song',
+        [195] = 'song',
+        [199] = 'song',
+        [203] = 'song',
+        [207] = 'song',
+        [211] = 'song',
+        [215] = 'song',
+        [219] = 'song',
+        [196] = 'song',
+        [200] = 'song',
+        [208] = 'song',
+        [212] = 'song',
+        [216] = 'song',
+        [220] = 'song',
+        [223] = 'song',
+    },
+    {
+        [194] = 'song',
+        [16] = 'amnesia',
+        [17] = 'charm',
+        [11] = 'bind',
+        [12] = 'weight',
+        [13] = 'slow',
+        [14] = 'charm',
+        [565] = 'slow',
+        [567] = 'weight',
+        [15] = 'doom',
+        [149] = 'defdown',
+        [558] = 'defdown',
+        [2] = 'sleep',
+        [19] = 'sleep',
+        [26] = 'weakness',
+        [1] = 'weakness',
+    }
+}
+
+for k, v in pairs(tracked_buffs[1]) do
+    tracked_buffs[1][k] = windower.windower_path .. 'addons/Nostrum/icons/' .. v .. '.png'
+end
+for k, v in pairs(tracked_buffs[2]) do
+    tracked_buffs[2][k] = windower.windower_path .. 'addons/Nostrum/icons/' .. v .. '.png'
+end
+
+tracked_buffs[2][540] = windower.windower_path .. "\\plugins\\icons\\spells\\00293.png"
+tracked_buffs[2][3] = windower.windower_path .. "\\plugins\\icons\\spells\\00293.png"
+tracked_buffs[2][4] = windower.windower_path .. "\\plugins\\icons\\spells\\00289.png"
+tracked_buffs[2][5] = windower.windower_path .. "\\plugins\\icons\\spells\\00295.png"
+tracked_buffs[2][6] = windower.windower_path .. "\\plugins\\icons\\spells\\00290.png"
+tracked_buffs[2][7] = windower.windower_path .. "\\plugins\\icons\\spells\\00291.png"
+tracked_buffs[2][8] = windower.windower_path .. "\\plugins\\icons\\spells\\00293.png"
+tracked_buffs[2][9] = windower.windower_path .. "\\plugins\\icons\\spells\\00292.png"
+tracked_buffs[2][15] = windower.windower_path .. "\\plugins\\icons\\spells\\00293.png"
+tracked_buffs[2][566] = windower.windower_path .. "\\plugins\\icons\\spells\\00289.png"
+
+color_over_texture = {
+    [43] = {255, 255, 100, 255},
+    [234] = {255, 255, 100, 255},
+    [541] = {255, 255, 100, 255},
+    [310] = {255, 208, 132, 124}, --'Fighter\'s Roll',
+    [314] = {255, 210, 179, 160}, --'Warlock\'s Roll',
+    [318] = {255, 250, 192, 220}, --'Beast Roll',
+    [322] = {255, 162, 206, 172}, --'Ninja Roll',
+    [326] = {255, 230, 233, 122}, --'Corsair\'s Roll',
+    [334] = {255, 162, 157, 189}, --'Tactician\'s Roll',
+    [315] = {255, 193, 165, 193}, --'Rogue\'s Roll',
+    [319] = {255, 97, 92, 83}, --'Choral Roll',
+    [327] = {255, 205, 125, 200}, --'Puppet Roll',
+    [316] = {255, 250, 250, 218}, --'Gallant\'s Roll',
+    [320] = {255, 197, 159, 184}, --'Hunter\'s Roll',
+    [324] = {255, 141, 202, 141}, --'Evoker\'s Roll',
+    [328] = {255, 0, 151, 255}, --'Dancer\'s Roll',
+    [332] = {255, 198, 158, 160}, --'Courser\'s Roll',
+    [581] = {255, 0, 255, 0}, --'Flurry',
+    [336] = {255, 217, 196, 213}, --'Miser\'s Roll',
+    [265] = {255, 0, 255, 0}, --'Flurry',
+    [338] = {255, 236, 252, 245}, --'Avenger\'s Roll',
+    [337] = {255, 120, 152, 179}, --'Companion\'s Roll',
+    [313] = {255, 182, 166, 195}, --'Wizard\'s Roll',
+    [317] = {255, 202, 66, 1}, --'Chaos Roll',
+    [321] = {255, 225, 162, 117}, --'Samurai Roll',
+    [325] = {255, 119, 164, 207}, --'Magus\'s Roll',
+    [329] = {255, 255, 217, 179}, --'Scholar\'s Roll',
+    [333] = {255, 240, 227, 179}, --'Blitzer\'s Roll',
+    [311] = {255, 145, 197, 207}, --'Monk\'s Roll',
+    [193] = {255, 51, 51, 102}, --'Lullaby'
+    [197] = {255, 204, 204, 0}, --'Minne',
+    [201] = {255, 0, 204, 0}, --'Mambo',
+    [221] = {255, 102, 153, 153}, --'Dirge',
+    [198] = {255, 204, 51, 51}, --'Minuet',
+    [214] = {255, 0, 153, 204}, --'March',
+    [218] = {255, 248, 224, 152}, --'Hymnus',
+    [222] = {255, 153, 204, 204}, --'Scherzo',
+    [195] = {255, 0, 102, 204}, --'Paeon',
+    [199] = {255, 153, 51, 204}, --'Madrigal',
+    [215] = {255, 153, 131, 102}, --'Etude',
+    [196] = {255, 0, 153, 0}, --'Ballad',
+    [200] = {255, 184, 243, 189}, --'Prelude',
+    [216] = {255, 153, 102, 0}, --'Carol',
+    [220] = {255, 255, 102, 102}, --'Sirvente',
+}
+
+xml_to_lua = {
+    ["cure"]="Cure",
     ["cureii"]="Cure II",
     ["cureiii"]="Cure III",
     ["cureiv"]="Cure IV",
@@ -145,7 +309,7 @@ xml_to_lua={
 }
 
 prefix={
-    ["Blindna"]='/ja',
+    ["Blindna"]='/ma',
     ["Poisona"]='/ma',
     ["Cure III"]='/ma',
     ["Curaga V"]='/ma',
@@ -332,7 +496,7 @@ options={
         ["Stona"]="spells\\00291.png",
         ["Cursna"]="spells\\00292.png",
         ["Haste"]="spells\\00057.png",
-        ["Hasteii"]="spells\\00358.png",
+        ["Haste II"]="spells\\00358.png",
         ["Flurry"]="spells\\00056.png",
         ["Flurry II"]="spells\\00357.png",
         ["Protect"]="spells\\00043.png",

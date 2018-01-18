@@ -128,6 +128,17 @@ Show all the items stored on "omega".
 
 ## Changelog
 
+### v1.20170501
+* **add**: Added a setting to stop the display of keyitems. Maybe someone will add a command toggle for it later?
+
+### v1.20170405
+* **fix**: Adjusted the conditions for updating the shared storages.json to make it more robust.
+* **add**: Added key item tracking.
+
+### v1.20150521
+* **fix**: Fixed after May 2015 FFXI update
+* **change**: Future proofed the addon to be less prone to breaks
+
 ### v1.20140328
 * **change**: Changed the inventory structure refresh rate using packets.
 * **add**: IPC usage to track changes across simultaneously active accounts.

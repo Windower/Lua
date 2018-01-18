@@ -1,6 +1,6 @@
 _addon.name = 'Itemizer'
 _addon.author = 'Ihina'
-_addon.version = '3.0.1.1'
+_addon.version = '3.0.1.3'
 _addon.command = 'itemizer'
 
 require('luau')
@@ -9,12 +9,43 @@ defaults = {}
 defaults.AutoNinjaTools = true
 defaults.AutoItems = true
 defaults.Delay = 0.5
+defaults.version                       = "3.0.1.1"
+defaults.UseUniversalTools = {}
+
+defaults.UseUniversalTools.Katon       = false
+defaults.UseUniversalTools.Hyoton      = false
+defaults.UseUniversalTools.Huton       = false
+defaults.UseUniversalTools.Doton       = false
+defaults.UseUniversalTools.Raiton      = false
+defaults.UseUniversalTools.Suiton      = false
+defaults.UseUniversalTools.Utsusemi    = false
+defaults.UseUniversalTools.Jubaku      = false
+defaults.UseUniversalTools.Hojo        = false
+defaults.UseUniversalTools.Kurayami    = false
+defaults.UseUniversalTools.Dokumori    = false
+defaults.UseUniversalTools.Tonko       = false
+defaults.UseUniversalTools.Monomi      = false
+defaults.UseUniversalTools.Aisha       = false
+defaults.UseUniversalTools.Yurin       = false
+defaults.UseUniversalTools.Myoshu      = false
+defaults.UseUniversalTools.Migawari    = false
+defaults.UseUniversalTools.Kakka       = false
+defaults.UseUniversalTools.Gekka       = false
+defaults.UseUniversalTools.Yain        = false
 
 settings = config.load(defaults)
-
-bag_ids = res.bags:key_map(string.lower .. table.get-{'english'} .. table.get+{res.bags}):map(table.get-{'id'})
+bag_ids = res.bags:key_map(string.gsub-{' ', ''} .. string.lower .. table.get-{'english'} .. table.get+{res.bags}):map(table.get-{'id'})
 -- Remove temporary bag, because items cannot be moved from/to there, as such it's irrelevant to Itemizer
 bag_ids.temporary = nil
+
+--Added this function for first load on new version. Because of the newly added features that weren't there before.
+windower.register_event("load", function()
+    if settings.version == "3.0.1.1" then
+        windower.add_to_chat(207,"Itemizer v3.0.1.2: New features added. (use //itemizer help to find out about them)")
+        settings.version = "3.0.1.2"
+        settings:save() 
+    end
+end)
 
 find_items = function(ids, bag, limit)
     local res = S{}
@@ -48,6 +79,43 @@ find_items = function(ids, bag, limit)
     return res, found
 end
 
+windower.register_event("addon command", function(command, arg2, ...)
+    if command == 'help' then
+        local helptext = [[Itemizer - Command List:')
+  1. Delay <delay> - Sets the time delay.
+  2. Autoninjatools - toggles Automatically getting ninja tools (Shortened ant)
+  3. Autoitems - Toggles automatically getting items from bags (shortened ai)
+  4. Useuniversaltool <spell> - toggles using universal ninja tools for <spell> (shortened uut)
+     i.e. uut katon  - will toggle katon either true or false depending on your setting
+     all defaulted false.
+  5. help --Shows this menu.]]
+        for _, line in ipairs(helptext:split('\n')) do
+            windower.add_to_chat(207, line)
+        end
+    elseif command:lower() == "delay" and arg2 ~= nil then
+        if type(arg2) == 'number' then
+            settings.delay = arg2
+            settings:save()
+        else
+            error('The delay must be a number')
+        end
+    elseif T{'autoninjatools','ant'}:contains(command:lower()) then
+        settings.AutoNinjaTools = not settings.AutoNinjaTools
+        settings:save()
+    elseif T{'autoitems','ai'}:contains(command:lower()) then
+        settings.AutoItems = not settings.AutoItems
+        settings:save()
+    elseif T{'useuniversaltool','uut'}:contains(command:lower()) then
+        if settings.UseUniversalTools[arg2:ucfirst()] ~= nil then
+            settings.UseUniversalTools[arg2:ucfirst()] = not settings.UseUniversalTools[arg2:ucfirst()]
+            settings:save()
+        else
+            error('Argument 2 must be a ninjutsu spell (sans :ichi or :ni) i.e. uut katon')
+        end
+    end
+end)
+        
+
 windower.register_event('unhandled command', function(command, ...)
     local args = L{...}:map(string.lower)
 
@@ -71,7 +139,7 @@ windower.register_event('unhandled command', function(command, ...)
         local specified_bag = rawget(bag_ids, bag)
         if specified_bag then
             if not windower.ffxi.get_bag_info(specified_bag).enabled then
-                error('%s currently not enabled':format(res.bags[source_bag].name))
+                error('%s currently not enabled':format(res.bags[specified_bag].name))
                 return
             end
 
@@ -142,6 +210,8 @@ spec_tools = T{
     Myoshu      = 2642,
     Migawari    = 2970,
     Kakka       = 2644,
+    Gekka       = 8803,
+    Yain        = 8804
 }
 gen_tools = T{
     Katon       = 2971,
@@ -162,6 +232,8 @@ gen_tools = T{
     Myoshu      = 2972,
     Migawari    = 2972,
     Kakka       = 2972,
+    Gekka       = 2972,
+    Yain        = 2972
 }
 
 active = S{}
@@ -236,7 +308,11 @@ windower.register_event('outgoing text', function()
             end
 
             if name then
-                return reschedule(text, {spec_tools[name], windower.ffxi.get_player().main_job == 'NIN' and gen_tools[name] or nil})
+                if settings.UseUniversalTools[name] == false or windower.ffxi.get_player().main_job ~= 'NIN' then
+                    return reschedule(text, {spec_tools[name], windower.ffxi.get_player().main_job == 'NIN' and gen_tools[name] or nil})
+                else
+                    return reschedule(text, {windower.ffxi.get_player().main_job == 'NIN' and gen_tools[name] or nil})
+                end
             end
 
         -- Item usage
@@ -252,7 +328,7 @@ windower.register_event('outgoing text', function()
 
                     if bag == 'inventory' then
                         inventory_items:add(item.id)
-                    elseif bag == 'wardrobe' then
+                    elseif S{'wardrobe','wardrobe2','wardrobe3','wardrobe4'}:contains(bag) then
                         wardrobe_items:add(item.id)
                     end
                 end

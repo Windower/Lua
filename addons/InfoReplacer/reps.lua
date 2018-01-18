@@ -126,7 +126,7 @@ return T{
     zone            = function() return res.zones[windower.ffxi.get_info().zone].english end,
     zone_id         = function() return windower.ffxi.get_info().zone end,
     logged_in       = function() return windower.ffxi.get_info().logged_in end,
-    weather         = function() return res.weathers[windower.ffxi.get_info().weather].english end,
+    weather         = function() return res.weather[windower.ffxi.get_info().weather].english end,
     weather_id      = function() return windower.ffxi.get_info().weather end,
     weather_element = function() return res.elements[res.weathers[windower.ffxi.get_info().weather].element].english end,
     language        = function() return windower.ffxi.get_info().language end,

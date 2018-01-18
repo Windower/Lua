@@ -37,6 +37,7 @@ chars = require('chat.chars')
 require('logger')
 require('tables')
 require('sets')
+require('lists')
 
 config = require('config')
 
@@ -86,19 +87,13 @@ constants = {
 }
 
 lead_bytes = S{0x1E, 0x1F, 0xF7, 0xEF, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x7F}
-lead_byte_class = '[' .. lead_bytes:map(string.char):concat() .. ']'
-newline_regex = '(?<!' .. lead_byte_class .. ')[' .. string.char(0x07, 0x0A) .. ']'
+newline_pattern = '[' .. string.char(0x07, 0x0A) .. ']'
 
 defaults = {}
 defaults.color  = 201
 defaults.format = '[${time}]'
 
 settings = config.load(defaults)
--- Remove after a while
-if settings.color == 508 then
-    settings.color = 201
-    config.save(settings)
-end
 
 function make_timestamp(format)
     return os.date((format:gsub('%${([%l%d_]+)}', constants)))
@@ -112,13 +107,34 @@ windower.register_event('incoming text', function(original, modified, mode, newm
     if mode == 151 or mode == 150 then
         newmode = 151
     else
-        -- Split by newline
-        local lines = L(windower.regex.split(modified, newline_regex))
-        -- Insert spaces in NPC text
-        if mode == 190 then
-            for i = 2, lines.n do
-                lines[i] = string.char(0x81, 0x40)..lines[i]
+        local lines = L{}
+
+        -- Split by newline, if applicable
+        if modified:match(newline_pattern) then
+            local split = modified:split(newline_pattern, 0, true, false)
+            lines:append(split[1])
+
+            for i = 2, split.n, 2 do
+                local last = lines:last()[-1]
+                if last and lead_bytes:contains(last:byte()) then
+                    lines[-1] = '%s%s%s':format(lines[-1], split[i], split[i+1])
+                else
+                    lines:append(split[i + 1])
+                end
             end
+
+            if lines:last() == '' then
+                lines:remove(lines.n)
+            end
+
+            -- Insert spaces in NPC text
+            if mode == 190 then
+                for i = 2, lines.n do
+                    lines[i] = string.char(0x81, 0x40) .. lines[i]
+                end
+            end
+        else
+            lines:append(modified)
         end
 
         -- Append the colored timestamp before every line and concatenate them again by a newline
@@ -130,9 +146,9 @@ windower.register_event('incoming text', function(original, modified, mode, newm
     return modified, newmode
 end)
 
-windower.register_event('addon command', function(...)
-    local cmd  = (...) and (...):lower()
-    local args = {select(2, ...)}
+windower.register_event('addon command', function(cmd, ...)
+    cmd = cmd and cmd:lower() or 'help'
+    local args = {...}
 
     if cmd == 'format' then
         if not args[1] then

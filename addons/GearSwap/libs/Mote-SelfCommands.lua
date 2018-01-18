@@ -170,7 +170,7 @@ end
 -- Handle cycling backwards through the options list of a state var.
 -- User command format: gs c cycleback [field]
 function handle_cycleback(cmdParams)
-    cmdParms[2] = 'reverse'
+    cmdParams[2] = 'reverse'
     handle_cycle(cmdParams)
 end
 
