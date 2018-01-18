@@ -123,10 +123,10 @@ end
 -- event callback functions
 
 function check_incoming_chunk(id, original, modified, injected, blocked)
-    if messages[zone_id] then
-        if id == 0x0A then
-            zone_id = original:unpack('H', 49)
-        elseif id == 0x0B then
+    if id == 0x0A then
+        zone_id = original:unpack('H', 49)
+    elseif messages[zone_id] then
+        if id == 0x0B then
             box = {}
         elseif id == 0x2A then
             local box_id = original:unpack('I', 5)
