@@ -38,8 +38,7 @@ texts = require('texts')
 local GIL_ITEM_ID = 0xFFFF
 local CUTSCENE_STATUS_ID = 4
 local SCROLL_LOCK_KEY = 70
-local MAX_TIME_AFTER_STARTING = 180
-local STOP_DOWNLOADING_PACKET = 0x0041
+local INVENTORY_FINISH_PACKET = 0x1D
 
 hideKey = SCROLL_LOCK_KEY
 is_hidden_by_cutscene = false
@@ -131,7 +130,7 @@ windower.register_event('remove item', function(_bag, _slot, id, _count)
 end)
 
 windower.register_event('incoming chunk',function(id,_org,_modi,_is_injected,_is_blocked)
-    if (is_during_login_time() and id == STOP_DOWNLOADING_PACKET) then
+    if (id == INVENTORY_FINISH_PACKET) then
         update_gil()
     end
 end)
@@ -148,10 +147,6 @@ end)
 windower.register_event('keyboard', function(dik, down, _flags, _blocked)
     toggle_display_if_hide_key_is_pressed(dik, down)
 end)
-
-function is_during_login_time()
-    return os.time() - start_time < MAX_TIME_AFTER_STARTING
-end
 
 function initialize()
     local windower_settings = windower.get_windower_settings()
