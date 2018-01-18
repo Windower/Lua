@@ -38,6 +38,8 @@ texts = require('texts')
 local GIL_ITEM_ID = 0xFFFF
 local CUTSCENE_STATUS_ID = 4
 local SCROLL_LOCK_KEY = 70
+local MAX_TIME_AFTER_STARTING = 180
+local STOP_DOWNLOADING_PACKET = 0x0041
 
 hideKey = SCROLL_LOCK_KEY
 is_hidden_by_cutscene = false
@@ -96,6 +98,7 @@ settings.gilImage.draggable = false
 settings.gilImage.repeatable = {}
 settings.gilImage.repeatable.x = 1
 settings.gilImage.repeatable.y = 1
+local start_time = 0
 
 gil_image = images.new(settings.gilImage)
 gil_text = texts.new(settings.gilText)
@@ -112,18 +115,25 @@ end)
 
 windower.register_event('login', function()
     initialize()
+    start_time = os.time()
 end)
 
 windower.register_event('logout', function(...)
     hide()
 end)
 
-windower.register_event('add item', function(...)
+windower.register_event('add item', function(_bag, _slot, id, _count)
     update_gil_if_item_id_matches(id)
 end)
 
-windower.register_event('remove item', function(bag, slot, id, count)
+windower.register_event('remove item', function(_bag, _slot, id, _count)
     update_gil_if_item_id_matches(id)
+end)
+
+windower.register_event('incoming chunk',function(id,_org,_modi,_is_injected,_is_blocked)
+    if (is_during_login_time() and id == STOP_DOWNLOADING_PACKET) then
+        update_gil()
+    end
 end)
 
 windower.register_event('incoming text', function(original, ...)
@@ -135,9 +145,13 @@ windower.register_event('status change', function(new_status_id)
     toggle_display_if_cutscene(is_cutscene_playing)
 end)
 
-windower.register_event('keyboard', function(dik, down, flags, blocked)
+windower.register_event('keyboard', function(dik, down, _flags, _blocked)
     toggle_display_if_hide_key_is_pressed(dik, down)
 end)
+
+function is_during_login_time()
+    return os.time() - start_time < MAX_TIME_AFTER_STARTING
+end
 
 function initialize()
     local windower_settings = windower.get_windower_settings()
