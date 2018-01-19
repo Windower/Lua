@@ -51,6 +51,10 @@ local ui = require('ui')
 local player = require('player')
 local xivbar = require('variables')
 
+local is_hidden_by_key = false
+local is_hidden_by_cutscene = false
+hideKey = settings.HideKey
+
 -- initialize addon
 function initialize()
     ui:load(theme_options)
@@ -92,13 +96,17 @@ function update_bar(bar, text, width, current, pp, flag)
             local x = old_width
 
             if old_width < new_width then
-                x = old_width + math.ceil((new_width - old_width) * 0.1)
+                x = old_width + math.ceil(((new_width - old_width) * 0.1))
 
-                x = math.min(x, theme_options.bar_width)
+                if x > theme_options.bar_width then
+                    x = theme_options.bar_width
+                end
             elseif old_width > new_width then
-                x = old_width - math.ceil((old_width - new_width) * 0.1)
+                x = old_width - math.ceil(((old_width - new_width) * 0.1))
 
-                x = math.max(x, 0)
+                if x < 0 then
+                    x = 0
+                end
             end
 
             if flag == 1 then
@@ -210,11 +218,23 @@ windower.register_event('prerender', function()
 end)
 
 windower.register_event('status change', function(new_status_id)
-    if xivbar.hide_bars == false and (new_status_id == 4) then
+    if (xivbar.hide_bars == false) and (new_status_id == 4) and (is_hidden_by_key == false) then
         xivbar.hide_bars = true
+        is_hidden_by_cutscene = true
         hide()
-    elseif xivbar.hide_bars and new_status_id ~= 4 then
+    elseif (xivbar.hide_bars == true) and (new_status_id ~= 4) and (is_hidden_by_key == false) then
         xivbar.hide_bars = false
+        is_hidden_by_cutscene = false
         show()
     end
+end)
+
+windower.register_event('keyboard', function(dik, flags, blocked)
+  if (dik == hideKey) and (flags == true) and (is_hidden_by_key == true) and (is_hidden_by_cutscene == false) then
+    is_hidden_by_key = false
+    show()
+  elseif (dik == hideKey) and (flags == true) and (is_hidden_by_key == false) and (is_hidden_by_cutscene == false) then
+    is_hidden_by_key = true
+    hide()
+  end
 end)

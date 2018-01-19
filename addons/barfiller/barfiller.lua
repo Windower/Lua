@@ -28,7 +28,7 @@
 
 _addon.name = 'BarFiller'
 _addon.author = 'Morath'
-_addon.version = '0.2.5'
+_addon.version = '0.2.6'
 _addon.commands = {'bf','barfiller'}
 _addon.language = 'english'
 
@@ -44,6 +44,35 @@ require('statics')
 
 settings = config.load(defaults)
 config.save(settings)
+settings.Images.Background.Texture = {}
+settings.Images.Background.Texture.Path = windower.addon_path..'bar_bg.png'
+settings.Images.Background.Texture.Fit = true
+settings.Images.Background.Size = {}
+settings.Images.Background.Size.Height = 5
+settings.Images.Background.Size.Width = 472
+settings.Images.Background.Draggable = false
+settings.Images.Background.Repeatable = {}
+settings.Images.Background.Repeatable.X = 1
+settings.Images.Background.Repeatable.Y = 1
+settings.Images.Foreground.Texture = {}
+settings.Images.Foreground.Texture.Path = windower.addon_path..'bar_fg.png'
+settings.Images.Foreground.Texture.Fit = false
+settings.Images.Foreground.Size = {}
+settings.Images.Foreground.Size.Height = 5
+settings.Images.Foreground.Size.Width = 1
+settings.Images.Foreground.Draggable = false
+settings.Images.Foreground.Repeatable = {}
+settings.Images.Foreground.Repeatable.X = 1
+settings.Images.Foreground.Repeatable.Y = 1
+settings.Images.RestedBonus.Texture = {}
+settings.Images.RestedBonus.Texture.Path = windower.addon_path..'moon.png'
+settings.Images.RestedBonus.Texture.Fit = true
+settings.Images.RestedBonus.Size = {}
+settings.Images.RestedBonus.Size.Height = 32
+settings.Images.RestedBonus.Size.Width = 32
+settings.Images.RestedBonus.Repeatable = {}
+settings.Images.RestedBonus.Repeatable.X = 1
+settings.Images.RestedBonus.Repeatable.Y = 1
 
 background_image   = images.new(settings.Images.Background)
 foreground_image   = images.new(settings.Images.Foreground)
@@ -54,6 +83,10 @@ exp_text = texts.new(settings.Texts.Exp)
 debug = false
 ready = false
 chunk_update = false
+
+local is_hidden_by_key = false
+local is_hidden_by_cutscene = false
+local hideKey = settings.HideKey
 
 windower.register_event('load',function()
     if windower.ffxi.get_info().logged_in then
@@ -109,39 +142,71 @@ end)
 
 windower.register_event('prerender',function()
     if ready and chunk_update then
-        local old_width = foreground_image:width()
-        local new_width = calc_new_width()
-
-        -- Thanks to Iryoku for the logic on smooth animations
-        if new_width ~= nil and new_width > 0 then
-            if old_width < new_width then
-                local last_update = 0
-                local x = old_width + math.ceil(((new_width - old_width) * 0.1))
-                foreground_image:size(x, settings.Images.Foreground.Size.Height)
-                if debug then print(old_width, x, new_width) end
-
-                local now = os.clock()
-                if now - last_update > 0.5 then
-                    update_strings()
-                    last_update = now
-                end
-            elseif old_width >= new_width then
-                foreground_image:size(new_width, settings.Images.Foreground.Size.Height)
-                chunk_update = false
-                if debug then print(chunk_update) end
-            end
-        end
+        update_strings()
+        update_bar()
     end
 end)
 
 windower.register_event('level up', function(level)
     update_strings()
+    update_bar()
 end)
 
 windower.register_event('level down', function(level)
     update_strings()
+    update_bar()
+end)
+
+windower.register_event('job change', function(main_job_id,main_job_level,sub_job_id,sub_job_level)
+    update_strings()
+    update_bar()
 end)
 
 windower.register_event('zone change', function(new_id,old_id)
+    update_strings()
+    update_bar()
     mog_house()
 end)
+
+windower.register_event('status change', function(new_status_id)
+    if is_hidden_by_cutscene == false and (new_status_id == 4) and (is_hidden_by_key == false) then
+        is_hidden_by_cutscene = true
+        background_image:hide()
+        foreground_image:hide()
+        rested_bonus_image:hide()
+        exp_text:hide()
+    elseif is_hidden_by_cutscene and new_status_id ~= 4 and (is_hidden_by_key == false) then
+        is_hidden_by_cutscene = false
+        background_image:show()
+        foreground_image:show()
+        exp_text:show()
+        mog_house()
+    end
+end)
+
+windower.register_event('keyboard', function(dik, flags, blocked)
+  if dik == hideKey and flags == true and (is_hidden_by_key == true) and (is_hidden_by_cutscene == false) then
+    is_hidden_by_key = false
+    background_image:show()
+    foreground_image:show()
+    exp_text:show()
+    mog_house()
+  elseif dik == hideKey and flags == true and (is_hidden_by_key == false) and (is_hidden_by_cutscene == false) then
+    is_hidden_by_key = true
+    background_image:hide()
+    foreground_image:hide()
+    rested_bonus_image:hide()
+    exp_text:hide()
+  end
+end)
+
+function comma_value(amount)
+  local formatted = amount
+  while true do
+    formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
+    if (k==0) then
+      break
+    end
+  end
+  return formatted
+end

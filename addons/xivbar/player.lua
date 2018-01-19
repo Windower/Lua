@@ -36,7 +36,15 @@ player.current_mp = 0
 player.current_tp = 0
 
 function player:calculate_tpp()
-    self.tpp = math.min(self.current_tp / 10, 100)
+    self.tpp = self.current_tp
+
+    if self.current_tp ~= 0 then
+        self.tpp = self.current_tp / 10
+
+        if self.tpp > 100 then
+            self.tpp = 100
+        end
+    end
 end
 
 return player
