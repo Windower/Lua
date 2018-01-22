@@ -34,15 +34,20 @@ _addon.language = 'English'
 config = require('config')
 images = require('images')
 texts = require('texts')
+packets = require('packets')
 
-local GIL_ITEM_ID = 0xFFFF
+local GIL_ITEM_ID = 65535
 local CUTSCENE_STATUS_ID = 4
 local SCROLL_LOCK_KEY = 70
 local INVENTORY_FINISH_PACKET = 0x1D
+local TREASURE_FIND_ITEM_PACKET = 0xD2
+local LOGIN_ZONE_PACKET = 0x0A
+local ITEM_UPDATE_PACKET = 0x20
+local ITEM_MODIFY_PACKET = 0x1F
 
-hideKey = SCROLL_LOCK_KEY
-is_hidden_by_cutscene = false
-is_hidden_by_key = false
+local hideKey = SCROLL_LOCK_KEY
+local is_hidden_by_cutscene = false
+local is_hidden_by_key = false
 
 defaults = {}
 defaults.hideKey = SCROLL_LOCK_KEY
@@ -97,13 +102,19 @@ settings.gilImage.draggable = false
 settings.gilImage.repeatable = {}
 settings.gilImage.repeatable.x = 1
 settings.gilImage.repeatable.y = 1
-local start_time = 0
 
-gil_image = images.new(settings.gilImage)
-gil_text = texts.new(settings.gilText)
+local gil_image = images.new(settings.gilImage)
+local gil_text = texts.new(settings.gilText)
+local inventory_loaded = false
+local ready = false
 
 config.register(settings, function(settings)
     hideKey = settings.hideKey
+    local windower_settings = windower.get_windower_settings()
+    local xRes = windower_settings.ui_x_res
+    local yRes = windower_settings.ui_y_res
+    gil_image:pos(xRes + settings.gilText.pos.x + 1,
+        yRes + settings.gilText.pos.y - (settings.gilImage.size.height/6))
 end)
 
 windower.register_event('load',function()
@@ -112,31 +123,35 @@ windower.register_event('load',function()
     end
 end)
 
-windower.register_event('login', function()
-    initialize()
-    start_time = os.time()
+windower.register_event('login',function()
+    gil_text:text('Loading...')
 end)
 
 windower.register_event('logout', function(...)
+    inventory_loaded = false
     hide()
 end)
 
-windower.register_event('add item', function(_bag, _slot, id, _count)
-    update_gil_if_item_id_matches(id)
+windower.register_event('add item', function(_bag,_index,id,...)
+    if (id == GIL_ITEM_ID) then ready = true end
 end)
 
-windower.register_event('remove item', function(_bag, _slot, id, _count)
-    update_gil_if_item_id_matches(id)
+windower.register_event('remove item', function(_bag,_index,id,...)
+    if (id == GIL_ITEM_ID) then ready = true end
 end)
 
-windower.register_event('incoming chunk',function(id,_org,_modi,_is_injected,_is_blocked)
-    if (id == INVENTORY_FINISH_PACKET) then
-        update_gil()
+windower.register_event('incoming chunk',function(id,org,_modi,_is_injected,_is_blocked)
+    if (id == LOGIN_ZONE_PACKET) then
+        inventory_loaded = false
+    elseif (id == TREASURE_FIND_ITEM_PACKET) then
+        ready_if_valid_treasure_packet(org)
+    elseif (id == ITEM_UPDATE_PACKET) then
+        update_if_valid_item_packet(org)
+    elseif (id == INVENTORY_FINISH_PACKET) then
+        refresh_gil()
+    elseif (id == ITEM_MODIFY_PACKET) then
+        update_if_valid_item_packet(org)
     end
-end)
-
-windower.register_event('incoming text', function(original, ...)
-    update_gil_if_string_contains_gil(original)
 end)
 
 windower.register_event('status change', function(new_status_id)
@@ -148,26 +163,31 @@ windower.register_event('keyboard', function(dik, down, _flags, _blocked)
     toggle_display_if_hide_key_is_pressed(dik, down)
 end)
 
+function ready_if_valid_treasure_packet(packet_data)
+    local p = packets.parse('incoming',packet_data)
+    if (p.Count > 0) then ready = true end
+end
+
+function update_if_valid_item_packet(packet_data)
+    local p = packets.parse('incoming',packet_data)
+    if (p.Item == GIL_ITEM_ID and p.Count >= 0) then
+        update_gil()
+    end
+end
+
+function refresh_gil()
+    if (ready and inventory_loaded) then
+        update_gil()
+        ready = false
+    elseif (not inventory_loaded) then
+        initialize()
+    end
+end
+
 function initialize()
-    local windower_settings = windower.get_windower_settings()
-    local xRes = windower_settings.ui_x_res
-    local yRes = windower_settings.ui_y_res
+    inventory_loaded = true
     update_gil()
-    gil_image:pos(xRes + settings.gilText.pos.x + 1,
-        yRes + settings.gilText.pos.y - (settings.gilImage.size.height/6))
-    show()
-end
-
-function update_gil_if_item_id_matches(id)
-    if (id == GIL_ITEM_ID) then
-        update_gil()
-    end
-end
-
-function update_gil_if_string_contains_gil(input_string)
-    if (string.match(input_string,"gil")) then
-        update_gil()
-    end
+    if not is_hidden_by_key and not is_hidden_by_cutscene then show() end
 end
 
 function update_gil()
@@ -189,9 +209,7 @@ function comma_value(amount)
     local formatted = tostring(amount)
     while true do
         formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-        if (k==0) then
-            break
-        end
+        if (k==0) then break end
     end
     return formatted
 end
