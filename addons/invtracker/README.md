@@ -12,5 +12,4 @@ This addon displays a grid detailing empty and filled inventory slots, similar t
 6. Press Insert in FFXI again to close the windower console
 
 ## Issues:
-1. You may need to change zones or log out from you character and enter again in order to have the addon display properly if loaded manually.
-2. There is no way to get the inventory sort order, so all items in the grid will be ordered by status and item count.
+1. There is no way to get the inventory sort order, so all items in the grid will be ordered by status and item count.
