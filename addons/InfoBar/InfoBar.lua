@@ -1,4 +1,4 @@
---[[Copyright © 2017, Kenshi
+--[[Copyright © 2018, Kenshi
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -65,7 +65,7 @@ local infobar = {}
 infobar.new_line = '\n'
 
 windower.register_event('load',function()
-    db = sqlite3.open(windower.addon_path..'\database.db')
+    db = sqlite3.open(windower.addon_path..'/database.db')
     notesdb = sqlite3.open(windower.addon_path..'/notes.db')
     notesdb:exec('CREATE TABLE IF NOT EXISTS notes(name TEXT primary key, note TEXT)')
     if not windower.ffxi.get_info().logged_in then return end
@@ -78,33 +78,13 @@ windower.register_event('unload',function()
     notesdb:close()
 end)
 
-function getDegrees()
-    local target = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t') or windower.ffxi.get_mob_by_target('me')
-    local target_heading = V{}.from_radian(target.facing)
-    local angleInDegrees = (math.atan2(target_heading[1], target_heading[2]) * (180 / math.pi))
-    local Degrees = angleInDegrees % 360
-    return math.floor(Degrees)
+function getDegrees(value)
+    return math.round(360 / math.tau * value)
 end
 
-function DegreesToDirection(Degrees)
-    local direction = (Degrees <= 11.25 and Degrees >= 0 and 'N') or
-        (Degrees <= 360 and Degrees > (11.25 * 31) and 'N') or
-        (Degrees <= (11.25 * 3) and Degrees > 11.25 and 'NNE') or
-        (Degrees <= (11.25 * 5) and Degrees > (11.25 * 3) and 'NE') or
-        (Degrees <= (11.25 * 7) and Degrees > (11.25 * 5) and 'NEE') or
-        (Degrees <= (11.25 * 9) and Degrees > (11.25 * 7) and 'E') or
-        (Degrees <= (11.25 * 11) and Degrees > (11.25 * 9) and 'SEE') or
-        (Degrees <= (11.25 * 13) and Degrees > (11.25 * 11) and 'SE') or
-        (Degrees <= (11.25 * 15) and Degrees > (11.25 * 13) and 'SSE') or
-        (Degrees <= (11.25 * 17) and Degrees > (11.25 * 15) and 'S') or
-        (Degrees <= (11.25 * 19) and Degrees > (11.25 * 17) and 'SSW') or
-        (Degrees <= (11.25 * 21) and Degrees > (11.25 * 19) and 'SW') or
-        (Degrees <= (11.25 * 23) and Degrees > (11.25 * 21) and 'SWW') or
-        (Degrees <= (11.25 * 25) and Degrees > (11.25 * 23) and 'W') or
-        (Degrees <= (11.25 * 27) and Degrees > (11.25 * 25) and 'NWW') or
-        (Degrees <= (11.25 * 29) and Degrees > (11.25 * 27) and 'NW') or
-        (Degrees <= (11.25 * 31) and Degrees > (11.25 * 29) and 'NNW')
-	return direction
+local dir_sets = L{'W', 'WNW', 'NW', 'NNW', 'N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W'}
+function DegreesToDirection(val)
+    return dir_sets[math.round((val + math.pi) / math.pi * 8) + 1]
 end
 
 function get_db(target, zones, level)
@@ -213,7 +193,7 @@ end
 windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blocked)
     if id == 0xB then
         zoning_bool = true
-    elseif id == 0xA and zoning_bool then
+    elseif id == 0xA then
         zoning_bool = false
     end
 end)
@@ -235,8 +215,8 @@ windower.register_event('prerender', function()
     infobar.x = string.format('%0.3f', pos.x)
     infobar.y = string.format('%0.3f', pos.y)
     infobar.z = string.format('%0.3f', pos.z)
-    infobar.facing = tostring(getDegrees())..'°'
-    infobar.facing_dir = DegreesToDirection(getDegrees())
+    infobar.facing = tostring(getDegrees(pos.facing))..'°'
+    infobar.facing_dir = DegreesToDirection(pos.facing)
     
     box:update(infobar)
     box:show()
