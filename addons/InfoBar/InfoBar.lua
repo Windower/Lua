@@ -106,7 +106,7 @@ function get_db(target, zones, level)
                 MOB_infobar.spawntime = spawntime or ''
                 if isaggressive == 1 then
                     MOB_infobar.isagressive = 'A'
-                    if (level - tonumber(levelmax)) <= 10 then
+                    if levelmax and (level - tonumber(levelmax)) <= 10 then
                         box:bold(true)
                     else
                         box:bold(false)
@@ -117,14 +117,17 @@ function get_db(target, zones, level)
                 MOB_infobar.islinking = islinking == 1 and 'L' or 'NL'
                 MOB_infobar.isnm = isnm == 1 and 'NM' or 'No NM'
                 MOB_infobar.isfishing = isfishing == 1 and 'F' or 'NF'
-                MOB_infobar.detect = (sight == 1 and 'S' or '')..
-                    (sight == 1 and sound == 1 and ',H' or sound == 1 and 'H' or '')..
-                    ((sight == 1 or sound == 1) and magic == 1 and ',M' or magic == 1 and 'M' or '')..
-                    ((sight == 1 or sound == 1 or magic == 1) and lowhp == 1 and ',HP' or lowhp == 1 and 'HP' or '')..
-                    ((sight == 1 or sound == 1 or magic == 1 and lowhp == 1) and healing == 1 and ',R' or healing == 1 and 'R' or '')..
-                    ((sight == 1 or sound == 1 or magic == 1 and lowhp == 1 and healing == 1) and ts == 1 and ',TS' or ts == 1 and 'TS' or '')..
-                    ((sight == 1 or sound == 1 or magic == 1 and lowhp == 1 and healing == 1 and ts == 1) and th == 1 and ',TH' or th == 1 and 'TH' or '')..
-                    ((sight == 1 or sound == 1 or magic == 1 and lowhp == 1 and healing == 1 and ts == 1 and th == 1) and scent == 1 and ',Sc' or scent == 1 and 'Sc' or '')
+                local detect = L{
+                    sight == 1 and 'S' or '',
+                    sound == 1 and 'H' or '',
+                    magic == 1 and 'M' or '',
+                    lowhp == 1 and 'HP' or '',
+                    healing == 1 and 'R' or '',
+                    ts == 1 and 'TS' or '',
+                    th == 1 and 'TH' or '',
+                    scent == 1 and 'Sc' or '',
+                }
+                MOB_infobar.detect = detect:filter(-''):concat(',')
             else
                 box:bold(false)
                 for i,v in pairs(MOB_infobar) do
