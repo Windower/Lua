@@ -261,6 +261,13 @@
     <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
+    <name>InfoBar</name>
+    <author>Kenshi</author>
+    <description>Displays a configurable bar showing information on your targets.</description>
+    <bugtracker>https://github.com/KenshiDRK/Lua/issues</bugtracker>
+    <support>https://www.ffxiah.com/player/Ragnarok/Kenshi</support>
+  </addon>
+  <addon>
     <name>InfoReplacer</name>
     <author>Cair</author>
     <description>Replaces outgoing text prefixed by % with respective game information.</description>
