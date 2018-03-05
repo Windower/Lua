@@ -310,6 +310,13 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
+    <name>Lookup</name>
+    <author>Karuberu</author>
+    <description>Lookup website information from an in-game command. Accepts auto-translate text and selectors like "&lt;t&gt;". Opens in a browser window.</description>
+    <bugtracker>https://github.com/Karuberu/Lua/issues</bugtracker>
+    <support>https://github.com/Karuberu/Lua/issues</support>
+  </addon>
+  <addon>
     <name>Lottery</name>
     <author>Arcon</author>
     <description>Automatically passes an item on all accounts if lotted by another.</description>

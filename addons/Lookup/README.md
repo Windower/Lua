@@ -5,16 +5,32 @@ The default search is performed with the following command:
 ```
 //lookup "Search Term"
 ```
-This will open up the search in your default browser.
+Alternatively, the shorthand `lu` can be used:
+```
+//lu "Search Term"
+```
+
+Running this command will open up the search in your default browser.
 
 The search term can be plain text, auto-translate text, or one of the available [selectors](#selectors). If the search term contains a space, it must be surrounded in quotes (this does not apply to selectors).
 
-The available search sites are [FFXIclopedia](http://ffxiclopedia.wikia.com/), [BGWiki](http://www.bg-wiki.com), [FFXIAH](http://www.ffxiah.com), [FFXIDB](http://www.ffxidb.com), and [Google](http://www.google.com).
+The default search sites are [FFXIclopedia](http://ffxiclopedia.wikia.com/), [BGWiki](http://www.bg-wiki.com), [FFXIAH](http://www.ffxiah.com), [FFXIDB](http://www.ffxidb.com), and [Google](http://www.google.com). See the [site command](#site) for how to add additional sites.
 
 See the [commands](#commands) section for a list of all available commands.
 
 ## Selectors
 Selectors can be used in place of plain text search terms. They are very useful for quickly getting information about something in the environment or a recently obtained item.
+
+The following selectors are accepted by this addon:
+
+| Selector | Replacement |
+|----------|-------------|
+| `<job>`<br>`<mjob>` | The current player's main job. |
+| `<sjob>` | The current player's subjob. |
+| `<zone>` | The current area/zone. |
+| `<item>` | The last item placed in the player's inventory, including items moved from other bags. |
+
+The selectors found in [Windower's documentation](https://github.com/Windower/Lua/wiki/FFXI-Functions#windowerffxiget_mob_by_targettarget) are also accepted. Some of the more useful selectors are listed below, for convenience:
 
 | Selector | Replacement |
 |----------|-------------|
@@ -23,10 +39,6 @@ Selectors can be used in place of plain text search terms. They are very useful 
 | `<pet>` | The name of the current player's pet. |
 | `<me>` | The current player's name. |
 | `<r>` | The name of the player that last sent a tell to you. |
-| `<job>` | The current player's main job. |
-| `<subjob>`<br>`<sj>` | The current player's subjob. |
-| `<area>`<br>`<zone>` | The current area/zone. |
-| `<item>`<br>`<lastitem>` | The last item placed in the player's inventory, including items moved from other bags. |
 
 ## Commands
 ```
@@ -34,11 +46,46 @@ Selectors can be used in place of plain text search terms. They are very useful 
 ```
 Searches for the term on the default site. The default site is set to "ffxiclopedia" initially, but can be changed with the "default" command.
 
+Alternatively, the shorthand `lu` can be used:
+```
+//lu "Search Term"
+```
+
 #### Default
 ```
 //lookup default "site"
 ```
 Sets the default site to search with. Saved in the global settings (not character-specific).
+
+```
+//lookup default player "site"
+```
+```
+//lookup default p "site"
+```
+Saves the default site only for the current player.
+
+#### Site
+```
+//lookup site "site" search "http://www.example.com/search?q=${term}"
+```
+Adds or modifies the site lookup capability.
+
+The second argument, `"site"` is the site that you're modifying. For example, specifying `"ffxiclopedia"` would modify the settings for `ffxiclopedia` searches. New sites can also be added this way.
+
+The third argument, `search`, can be substituted for `zone` or `item` if the site supports zone or item ids in its url.
+
+The last argument is the url of the search. The `${term}` in the url will be substituted for the search term when a lookup is performed.
+
+```
+//lookup site "site" remove
+```
+Removes all lookup capability for the specified site (`"site"`).
+
+```
+//lookup site "site" search remove
+```
+Removes the `search` lookup capability for the specified site (`"site"`). The `search` argument can also be substituted for `zone` or `item`.
 
 #### FFXIclopedia
 ```
