@@ -261,6 +261,13 @@
     <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
+    <name>InfoBar</name>
+    <author>Kenshi</author>
+    <description>Displays a configurable bar showing information on your targets.</description>
+    <bugtracker>https://github.com/KenshiDRK/Lua/issues</bugtracker>
+    <support>https://www.ffxiah.com/player/Ragnarok/Kenshi</support>
+  </addon>
+  <addon>
     <name>InfoReplacer</name>
     <author>Cair</author>
     <description>Replaces outgoing text prefixed by % with respective game information.</description>
@@ -301,6 +308,13 @@
     <description>Logs the chat log to a file.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+  </addon>
+  <addon>
+    <name>Lookup</name>
+    <author>Karuberu</author>
+    <description>Lookup website information from an in-game command. Accepts auto-translate text and selectors like "&lt;t&gt;". Opens in a browser window.</description>
+    <bugtracker>https://github.com/Karuberu/Lua/issues</bugtracker>
+    <support>https://github.com/Karuberu/Lua/issues</support>
   </addon>
   <addon>
     <name>Lottery</name>
