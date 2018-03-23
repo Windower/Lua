@@ -1,4 +1,4 @@
-##SpellBook
+#SpellBook
 
 This addon helps you find missing spells. You can search by job and level,
 or by category.
