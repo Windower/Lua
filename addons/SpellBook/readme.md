@@ -1,9 +1,9 @@
-#SpellBook
+# SpellBook
 
 This addon helps you find missing spells. You can search by job and level,
 or by category.
 
-##Usage
+## Usage
 
 ```
 Find missing spells for current jobs and level:
@@ -15,6 +15,6 @@ Find missing spells for current jobs and level:
 Categories: whitemagic|blackmagic|songs|ninjustu|summoning|bluemagic|geomancy|trusts|all (Trusts are not included in all)
 ```
 
-##Credits
+## Credits
 
 Inspired by the SpellCheck addon by Zubis
