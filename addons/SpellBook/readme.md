@@ -16,4 +16,5 @@ Categories: whitemagic|blackmagic|songs|ninjustu|summoning|bluemagic|geomancy|tr
 ```
 
 ##Credits
+
 Inspired by the SpellCheck addon by Zubis
