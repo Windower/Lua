@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'Debuffed'
 _addon.author = 'Auk'
-_addon.version = '1.0.0.1'
+_addon.version = '1.0.0.2'
 _addon.commands = {'dbf','debuffed'}
 
 config = require('config')
@@ -41,6 +41,7 @@ require('logger')
 defaults = {}
 defaults.interval = .1
 defaults.mode = 'blacklist'
+defaults.timers = true
 defaults.whitelist = S{}
 defaults.blacklist = S{}
 
@@ -83,7 +84,7 @@ function update_box()
                 local name = res.spells[spell[1]].name
                 
                 if settings.mode == 'whitelist' and settings.whitelist:contains(name) or settings.mode == 'blacklist' and not settings.blacklist:contains(name) then
-                    if debuffs[spell[1]].duration > 0 then
+                    if settings.timers and debuffs[spell[1]].duration > 0 then
                         lines:append("%s: %.0f":format(name, math.max(0, spell[2] - os.clock())))
                     else
                         lines:append(name)
@@ -224,6 +225,10 @@ windower.register_event('addon command', function(command1, command2, ...)
         end
         log('Changed to %s mode.':format(settings.mode))
         settings:save()
+    elseif command1 == 't' or command1 == 'timers' then
+        settings.timers = not settings.timers
+        log('Timer display %s.':format(settings.timers and 'enabled' or 'disabled'))
+        settings:save()
     elseif command1 == 'i' or command1 == 'interval' then
         settings.interval = tonumber(command2) or .1
         log('Refresh interval set to %s seconds.':format(settings.interval))
@@ -248,6 +253,7 @@ windower.register_event('addon command', function(command1, command2, ...)
     else
         print('%s (v%s)':format(_addon.name, _addon.version))
         print('    \\cs(255,255,255)mode\\cr - Switches between blacklist and whitelist mode (default: blacklist)')
+        print('    \\cs(255,255,255)timers\\cr - Toggles display of debuff timers (default: true)')
         print('    \\cs(255,255,255)interval <value>\\cr - Allows you to change the refresh interval (default: 0.1)')
         print('    \\cs(255,255,255)blacklist|whitelist add|remove <name>\\cr - Adds or removes the spell <name> to the specified list')
     end

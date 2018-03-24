@@ -8,6 +8,10 @@ An addon that tracks and displays debuffs on your current target. Filters are av
 
 This will switch between blacklist and whitelist mode for debuff filtering.
 
+`//debuffed timers`
+
+This toggles the display of timers for debuffs.
+
 `//debuffed interval <value>`
 
 This allows you to adjust the refresh interval for the textbox. It will be updated every \<value\> number of seconds.
@@ -21,6 +25,7 @@ This adds or removes the spell \<name\> to the specified filter.
 The following abbreviations are available for addon commands:
 * `debuffed` to `dbf`
 * `mode` to `m`
+* `timers` to `t`
 * `interval` to `i`
 * `blacklist` to `b` or `blist` or `black`
 * `whitelist` to `w` or `wlist` or `white`
