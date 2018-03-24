@@ -14,7 +14,7 @@ spell_types = {
     songs=      { type = 'BardSong', readable = 'Bard songs' },
     ninjutsu=   { type = 'Ninjutsu', readable = 'Ninjutsu' },
     summoning=  { type = 'SummonerPact', readable = 'Summoning spells' },
-    bluemagic=  { type = 'BlueMagic',  readable = 'Blue Magic spels' },
+    bluemagic=  { type = 'BlueMagic',  readable = 'Blue Magic spells' },
     geomancy=   { type = 'Geomancy', readable = 'Geomancy spells' },
     trusts=     { type = 'Trust', readable = 'Trusts'},
     all=        { type = 'all', readable = 'spells of all types'}
