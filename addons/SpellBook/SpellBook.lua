@@ -1,7 +1,7 @@
 _addon.name     = 'SpellBook'
 _addon.author   = 'SigilBaram'
 _addon.version  = '0.0.1'
-_addon.command  = 'sb'
+_addon.command  = 'spellbook'
 
 require('sets')
 require('tables')
