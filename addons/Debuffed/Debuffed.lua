@@ -1,5 +1,5 @@
 --[[
-Copyright (c) 2018, Auk
+Copyright © 2018, Auk
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -10,14 +10,14 @@ modification, are permitted provided that the following conditions are met:
     * Redistributions in binary form must reproduce the above copyright
     notice, this list of conditions and the following disclaimer in the
     documentation and/or other materials provided with the distribution.
-    * Neither the name of <addon name> nor the
+    * Neither the name of Debuffed nor the
     names of its contributors may be used to endorse or promote products
     derived from this software without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
+DISCLAIMED. IN NO EVENT SHALL Auk BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -72,53 +72,56 @@ frame_time = 0
 debuffed_mobs = {}
 
 function update_box()
-    local current_string = ''
+    local lines = L{}
     local target = windower.ffxi.get_mob_by_target('t')
-    local count = 0
 
     if target and target.valid_target and (target.claim_id ~= 0 or target.spawn_type == 16) then
         local data = debuffed_mobs[target.id]
         
         if data then
-            current_string = 'Debuffed ['..target.name..']\n'
             for effect, spell in pairs(data) do
-                local name = debuffs[spell[1]].name
+                local name = res.spells[spell[1]].name
                 
                 if settings.mode == 'whitelist' and settings.whitelist:contains(name) or settings.mode == 'blacklist' and not settings.blacklist:contains(name) then
                     if debuffs[spell[1]].duration > 0 then
-                        current_string = current_string..'\n'..name
-                        current_string = current_string..': '..string.format('%.0f', math.max(0, spell[2] - os.clock()))
+                        lines:append("%s: %.0f":format(name, math.max(0, spell[2] - os.clock())))
                     else
-                        current_string = current_string..'\n'..name
+                        lines:append(name)
                     end
-                    count = count + 1
                 end
             end
         end
+        
+        if lines:length() == 0 then
+            box.current_string = ''
+        else
+            box.current_string = 'Debuffed [' .. target.name .. ']\n\n' .. lines:concat('\n')
+        end
     end
-    box.current_string = count > 0 and current_string or ''
 end
 
 function handle_overwrites(target, new, t)
-    if debuffed_mobs[target] then
-        for effect, spell in pairs(debuffed_mobs[target]) do
-            local old = debuffs[spell[1]].overwrites
-            
-            -- Check if there isn't a higher priority debuff active
-            if #old > 0 then
-                for _, v in ipairs(old) do
-                    if new == v then
-                        return false
-                    end
+    if not debuffed_mobs[target] then
+        return true
+    end
+    
+    for effect, spell in pairs(debuffed_mobs[target]) do
+        local old = debuffs[spell[1]].overwrites
+        
+        -- Check if there isn't a higher priority debuff active
+        if #old > 0 then
+            for _, v in ipairs(old) do
+                if new == v then
+                    return false
                 end
             end
-            
-            -- Check if a lower priority debuff is being overwritten
-            if #t > 0 then
-                for _, v in ipairs(t) do
-                    if spell[1] == v then
-                        debuffed_mobs[target][effect] = nil
-                    end
+        end
+        
+        -- Check if a lower priority debuff is being overwritten
+        if #t > 0 then
+            for _, v in ipairs(t) do
+                if spell[1] == v then
+                    debuffed_mobs[target][effect] = nil
                 end
             end
         end
@@ -142,27 +145,28 @@ function apply_debuff(target, effect, spell)
 end
 
 function inc_action(act)
-    if act.category == 4 then
+    if act.category ~= 4 then
+        return
+    end
         
-        -- Damaging spells
-        if S{2,252}:contains(act.targets[1].actions[1].message) then
-            local target = act.targets[1].id
-            local spell = act.param
-            
-            if debuffs[spell] then
-                local effect = debuffs[spell].effect
-                apply_debuff(target, effect, spell)
-            end
-            
-        -- Non-damaging spells
-        elseif S{236,237,268,271}:contains(act.targets[1].actions[1].message) then
-            local effect = act.targets[1].actions[1].param
-            local target = act.targets[1].id
-            local spell = act.param
-            
-            if debuffs[spell] and debuffs[spell].effect == effect then
-                apply_debuff(target, effect, spell)
-            end
+    -- Damaging spells
+    if S{2,252}:contains(act.targets[1].actions[1].message) then
+        local target = act.targets[1].id
+        local spell = act.param
+        
+        if debuffs[spell] then
+            local effect = debuffs[spell].effect
+            apply_debuff(target, effect, spell)
+        end
+        
+    -- Non-damaging spells
+    elseif S{236,237,268,271}:contains(act.targets[1].actions[1].message) then
+        local effect = act.targets[1].actions[1].param
+        local target = act.targets[1].id
+        local spell = act.param
+        
+        if debuffs[spell] and debuffs[spell].effect == effect then
+            apply_debuff(target, effect, spell)
         end
     end
 end
