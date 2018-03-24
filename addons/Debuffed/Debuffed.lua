@@ -82,10 +82,11 @@ function update_box()
         if data then
             for effect, spell in pairs(data) do
                 local name = res.spells[spell[1]].name
+                local remains = math.max(0, spell[2] - os.clock())
                 
                 if settings.mode == 'whitelist' and settings.whitelist:contains(name) or settings.mode == 'blacklist' and not settings.blacklist:contains(name) then
-                    if settings.timers and debuffs[spell[1]].duration > 0 then
-                        lines:append("%s: %.0f":format(name, math.max(0, spell[2] - os.clock())))
+                    if settings.timers and remains > 0 then
+                        lines:append("%s: %.0f":format(name, remains))
                     else
                         lines:append(name)
                     end
