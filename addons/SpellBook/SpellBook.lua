@@ -6,6 +6,7 @@ _addon.command  = 'sb'
 require('sets')
 require('tables')
 res = require('resources')
+require('Exceptions') -- Import invalid spell set
 
 spell_types = {
     whitemagic= { type = 'WhiteMagic', readable = 'White Magic spells' },
@@ -54,7 +55,7 @@ windower.register_event( 'addon command', function ( command, ... )
         else
             spells_by_type( spell_types[command:lower()], true )
         end
-    elseif jobs[command:lower()] then
+    elseif jobs[command:upper()] then
         local job = jobs[command:upper()]
         local level = args[1] or player.jobs[res.jobs[job].ens]
         if level == 'all' then
@@ -126,10 +127,12 @@ end
 function spells_by_type(spell_type, learnable)
     local missing_spells = T{}
     local player_spells = windower.ffxi.get_spells()
+    local spell_count = 0
 
     for spell_id,spell in pairs(res.spells) do
-        if ((spell_type.type == 'all' and spell.type ~= 'Trust') or spell.type == spell_type.type) and next(spell.levels) ~= nill and not player_spells[spell_id] and (is_learnable(spell) or not learnable) then
+        if ((spell_type.type == 'all' and spell.type ~= 'Trust') or spell.type == spell_type.type) and next(spell.levels) ~= nill and not player_spells[spell_id] and (is_learnable(spell) or not learnable) and not spell_exceptions[spell_id] then
             missing_spells:append(format_spell(spell))
+            spell_count = spell_count + 1
         end
     end
 
@@ -144,6 +147,7 @@ function spells_by_type(spell_type, learnable)
         for _,spell in ipairs(missing_spells) do
             windower.add_to_chat( 7, spell)
         end
+        windower.add_to_chat( 7, 'List Complete. You are missing ' .. tostring(spell_count) .. ' ' .. spell_type.readable .. '.')
     else
         if learnable then
             windower.add_to_chat( 7, 'Congratulations! You know all currently learnable ' .. spell_type.readable .. '.')
@@ -158,14 +162,16 @@ end
 function spells_by_job(job, level_cap)
     local missing_spells = T{}
     local player_spells = windower.ffxi.get_spells()
+    local spell_count = 0
 
     level_cap = level_cap or 1500
 
     for spell_id,spell in pairs(res.spells) do
         local spell_level = spell.levels[job]
-        if spell_level and spell_level <= tonumber(level_cap) and spell.type ~= 'Trust' and not player_spells[spell_id] then
+        if spell_level and spell_level <= tonumber(level_cap) and spell.type ~= 'Trust' and not player_spells[spell_id] and not spell_exceptions[spell_id] then
             missing_spells[spell_level] = missing_spells[spell_level] or T{}
             missing_spells[spell_level]:append(spell.en)
+            spell_count = spell_count + 1
         end
     end
 
@@ -178,6 +184,7 @@ function spells_by_job(job, level_cap)
                 windower.add_to_chat( 7, level .. ': ' .. missing_spells[level]:concat(', ') )
             end
         end
+        windower.add_to_chat( 7, 'List Complete. You are missing ' .. tostring(spell_count) .. ' ' .. res.jobs[job].en .. ' spells.')
     else
         if level_cap >= 1500 then
             windower.add_to_chat( 7, 'Congratulations! You know all spells for ' .. res.jobs[job].en .. '.')
@@ -192,6 +199,7 @@ function spells_by_current()
     local missing_spells = T{}
     local player = windower.ffxi.get_player()
     local player_spells = windower.ffxi.get_spells()
+    local spell_count = 0
 
     for spell_id,spell in pairs(res.spells) do
         local main_level = spell.levels[player.main_job_id]
@@ -211,8 +219,9 @@ function spells_by_current()
             spell_level = spell_level or main_level or sub_level
         end
 
-        if spell_level and spell.type ~= 'Trust' and not player_spells[spell_id] then
+        if spell_level and spell.type ~= 'Trust' and not player_spells[spell_id] and not spell_exceptions[spell_id] then
             missing_spells:append(format_spell(spell))
+            spell_count = spell_count + 1
         end
     end
 
@@ -223,6 +232,7 @@ function spells_by_current()
         for _,spell in ipairs(missing_spells) do
             windower.add_to_chat( 7, spell )
         end
+        windower.add_to_chat( 7, 'List Complete. You are missing ' .. tostring(spell_count) .. ' spells for ' .. player.main_job:lower() .. tostring(player.main_job_level) ..'/' .. player.sub_job:lower() .. tostring(player.sub_job_level) ..'.')
     else
         windower.add_to_chat( 7, 'Congratulations! You know all spells for ' .. player.main_job:lower() .. tostring(player.main_job_level) ..'/' .. player.sub_job:lower() .. tostring(player.sub_job_level) ..'.')
     end
