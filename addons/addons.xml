@@ -697,4 +697,11 @@
     <bugtracker>https://github.com/Snapsmojo/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Fenrir/Snaps</support>
   </addon>
+  <addon>
+    <name>Debuffed</name>
+    <author>Auk</author>
+    <description>Tracks and displays debuffs on your current target.</description>
+    <bugtracker>https://github.com/aukon/Lua/issues</bugtracker>
+    <support>https://discord.gg/b275nMv</support>
+  </addon>
 </addons>
