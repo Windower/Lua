@@ -1,3 +1,5 @@
+-- This set lists spell IDs that cannot be learned by player, so that they are
+-- excluded by SpellBook.
 spell_exceptions = {
     [31] = true, -- Banish IV
     [40] = true, -- Banishga III
@@ -20,6 +22,9 @@ spell_exceptions = {
     [355] = true, -- Tonko: San
     [416] = true, -- Cactuar Fugue
     [407] = true, -- Chocobo Hum
+
+    -- The following spells have the same name as other spells,
+    -- but have different IDs.
     [363] = true, -- Sleepga
     [364] = true, -- Sleepga II
 }
