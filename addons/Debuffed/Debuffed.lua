@@ -32,7 +32,6 @@ _addon.version = '1.0.0.2'
 _addon.commands = {'dbf','debuffed'}
 
 config = require('config')
-debuffs = require('debuffs')
 packets = require('packets')
 res = require('resources')
 texts = require('texts')
@@ -102,17 +101,27 @@ function update_box()
     end
 end
 
+function convert_overwrites(spell)
+    local str = res.spells[spell].overwrites
+    local t = {}
+    
+    if str then
+        str:gsub("[0-9]+",function(s) table.insert(t, tonumber(s)) end) 
+    end
+    return L(t)
+end
+
 function handle_overwrites(target, new, t)
     if not debuffed_mobs[target] then
         return true
     end
     
     for effect, spell in pairs(debuffed_mobs[target]) do
-        local old = debuffs[spell[1]].overwrites
+        local old = convert_overwrites(spell[1])
         
         -- Check if there isn't a higher priority debuff active
-        if #old > 0 then
-            for _, v in ipairs(old) do
+        if old:length() > 0 then
+            for _,v in ipairs(old) do
                 if new == v then
                     return false
                 end
@@ -120,8 +129,8 @@ function handle_overwrites(target, new, t)
         end
         
         -- Check if a lower priority debuff is being overwritten
-        if #t > 0 then
-            for _, v in ipairs(t) do
+        if t:length() > 0 then
+            for _,v in ipairs(t) do
                 if spell[1] == v then
                     debuffed_mobs[target][effect] = nil
                 end
@@ -135,39 +144,39 @@ function apply_debuff(target, effect, spell)
     if not debuffed_mobs[target] then
         debuffed_mobs[target] = {}
     end
-
+    
     -- Check overwrite conditions
-    local overwrites = debuffs[spell].overwrites
+    local overwrites = convert_overwrites(spell)
     if not handle_overwrites(target, spell, overwrites) then
         return
     end
     
     -- Create timer
-    debuffed_mobs[target][effect] = {spell, os.clock() + debuffs[spell].duration}
+    debuffed_mobs[target][effect] = {spell, os.clock() + res.spells[spell].duration}
 end
 
 function inc_action(act)
     if act.category ~= 4 then
         return
     end
-        
+    
     -- Damaging spells
     if S{2,252}:contains(act.targets[1].actions[1].message) then
         local target = act.targets[1].id
         local spell = act.param
-        
-        if debuffs[spell] then
-            local effect = debuffs[spell].effect
+        local effect = res.spells[spell].status
+
+        if effect then
             apply_debuff(target, effect, spell)
         end
         
     -- Non-damaging spells
     elseif S{236,237,268,271}:contains(act.targets[1].actions[1].message) then
-        local effect = act.targets[1].actions[1].param
         local target = act.targets[1].id
+        local effect = act.targets[1].actions[1].param
         local spell = act.param
         
-        if debuffs[spell] and debuffs[spell].effect == effect then
+        if res.spells[spell].status and res.spells[spell].status == effect then
             apply_debuff(target, effect, spell)
         end
     end
