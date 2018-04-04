@@ -92,12 +92,12 @@ function update_box()
                 end
             end
         end
-        
-        if lines:length() == 0 then
-            box.current_string = ''
-        else
-            box.current_string = 'Debuffed [' .. target.name .. ']\n\n' .. lines:concat('\n')
-        end
+    end
+    
+    if lines:length() == 0 then
+        box.current_string = ''
+    else
+        box.current_string = 'Debuffed [' .. target.name .. ']\n\n' .. lines:concat('\n')
     end
 end
 
