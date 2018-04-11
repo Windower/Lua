@@ -3,7 +3,6 @@ _addon.author   = 'SigilBaram'
 _addon.version  = '0.0.1'
 _addon.commands  = {'spellbook','spbk'}
 
-require('sets')
 require('tables')
 res = require('resources')
 
@@ -91,7 +90,7 @@ function display_help()
     windower.add_to_chat(7, '//spbk <main|sub> [<level|all>] -- Show missing spells for current main or sub job. Defaults to the job\'s current level.')
     windower.add_to_chat(7, '//spbk <job> [<level|all>] -- Show missings spells for specified job and level. Defaults to the job\'s level.')
     windower.add_to_chat(7, '//spbk <category> [all] -- Show learnable spells by category. Limited to spells which are learnable, unless all is added after the category.')
-    windower.add_to_chat(7, 'Categories: whitemagic|blackmagic|songs|ninjustu|summoning|bluemagic|geomancy|trusts|all (Trusts are not included in all)')
+    windower.add_to_chat(7, 'Categories: whitemagic, blackmagic, songs, ninjustu, summoning, bluemagic, geomancy, trusts, all (Trusts are not included in all)')
 end
 
 --[[

@@ -11,7 +11,7 @@ or by category.
 //spbk <main|sub> [<level|all>] -- Show missing spells for current main or sub job. Defaults to the job's current level.
 //spbk <job> [<level|all>] -- Show missings spells for specified job and level. Defaults to the job's level.
 //spbk <category> [all]-- Show learnable spells by category. Limited to spells which are learnable, unless all is added after the category.
-Categories: whitemagic|blackmagic|songs|ninjustu|summoning|bluemagic|geomancy|trusts|all (Trusts are not included in all)
+Categories: whitemagic, blackmagic, songs, ninjustu, summoning, bluemagic, geomancy, trusts, all (Trusts are not included in all)
 ```
 
 ## Credits
