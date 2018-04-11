@@ -47,14 +47,14 @@ windower.register_event('addon command', function (command, ...)
         else
             invalid_input()
         end
-    elseif spell_types[command:lower()] then
+    elseif spell_types[command] then
         if args[1] == 'all' then
-            spells_by_type(spell_types[command:lower()], false)
+            spells_by_type(spell_types[command], false)
         else
-            spells_by_type(spell_types[command:lower()], true)
+            spells_by_type(spell_types[command], true)
         end
-    elseif jobs[command:upper()] then
-        local job = jobs[command:upper()]
+    elseif jobs[command] then
+        local job = jobs[command]
         local level = args[1] or player.jobs[res.jobs[job].ens]
         if level == 'all' then
             level = 1500
@@ -72,7 +72,7 @@ reading in user input.
 function build_job_list()
     local jobs = {}
     for id,val in pairs(res.jobs) do
-        jobs[val.ens] = id
+        jobs[val.ens:lower()] = id
     end
     return jobs
 end
