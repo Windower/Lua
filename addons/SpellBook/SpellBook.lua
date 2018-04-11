@@ -30,7 +30,12 @@ windower.register_event('addon command', function (command, ...)
     elseif command == nil or command == 'current' then
         spells_by_current()
     elseif command == 'main' then
-        local level = args[1] or player.main_job_level
+        local level = player.main_job_level
+        local job_points = player.job_points[player.main_job:lower()].jp_spent
+        if job_points > 99 then
+            level = job_points
+        end
+        level = args[1] or level
         if level == 'all' then
             level = 1500
         end
