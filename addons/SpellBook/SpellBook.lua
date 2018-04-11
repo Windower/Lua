@@ -211,19 +211,25 @@ function spells_by_job(job, level_cap)
     end
 
     if next(missing_spells) ~= nil then
-        windower.add_to_chat(7,
-            string.format('Showing missing spells for %s up to level %s.',
-            res.jobs[job].en, level_cap))
+        if level_cap > 99 then
+            windower.add_to_chat(7,
+                string.format('Showing missing spells for %s up to level %s.',
+                res.jobs[job].en, level_cap))
+        else
+            windower.add_to_chat(7,
+                string.format('Showing missing spells for %s up to %sjp.',
+                res.jobs[job].en, level_cap))
+        end
 
         for level=1,level_cap do
             if missing_spells[level] then
                 missing_spells[level]:sort()
-                if level <= 99 then
-                    windower.add_to_chat(7,
-                        level .. ': ' .. missing_spells[level]:concat(', '))
-                else
+                if level > 99 then
                     windower.add_to_chat(7,
                         level .. 'jp: ' .. missing_spells[level]:concat(', '))
+                else
+                    windower.add_to_chat(7,
+                        level .. ': ' .. missing_spells[level]:concat(', '))
                 end
             end
         end
@@ -235,9 +241,17 @@ function spells_by_job(job, level_cap)
                 'Congratulations! You know all spells for ' ..
                 res.jobs[job].en .. '.')
         else
-            windower.add_to_chat(7,
-                'Congratulations! You know all spells for ' ..
-                res.jobs[job].en .. ' up to ' .. tostring(level_cap) .. '.')
+            if level_cap > 99 then
+                windower.add_to_chat(7,
+                    'Congratulations! You know all spells for ' ..
+                    res.jobs[job].en .. ' up to ' ..
+                    tostring(level_cap) .. 'jp.')
+            else
+                windower.add_to_chat(7,
+                    'Congratulations! You know all spells for ' ..
+                    res.jobs[job].en .. ' up to level ' ..
+                    tostring(level_cap) .. '.')
+            end
         end
     end
 end
