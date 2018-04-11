@@ -12,6 +12,7 @@ or by category.
 //spbk <job> [<level|all>] -- Show missings spells for specified job and level. Defaults to the job's level.
 //spbk <category> [all]-- Show learnable spells by category. Limited to spells which are learnable, unless all is added after the category.
 Categories: whitemagic, blackmagic, songs, ninjustu, summoning, bluemagic, geomancy, trusts, all (Trusts are not included in all)
+Note: A limit on spent job points can be specified for spells learned from Gifts by entering a level of 100-1500. Spells are never given as Gifts for less than 100 jp.
 ```
 
 ## Credits
