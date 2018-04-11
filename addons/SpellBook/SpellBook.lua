@@ -6,7 +6,6 @@ _addon.commands  = {'spellbook','spbk'}
 require('sets')
 require('tables')
 res = require('resources')
-require('Exceptions')  -- Import unlearnable spell set, until it's in resources.
 
 spell_types = {
     whitemagic= { type = 'WhiteMagic', readable = 'White Magic spells' },
@@ -137,7 +136,7 @@ Show missing spells of a given type. If learnable is true, then the
 results will be limited to spells for which the player has a job at a
 level required to learn the spell.
 --]]
-function spells_by_type(spell_type, learnable)
+function spells_by_type(spell_type, learnable_only)
     local missing_spells = T{}
     local player_spells = windower.ffxi.get_spells()
     local spell_count = 0
@@ -146,14 +145,14 @@ function spells_by_type(spell_type, learnable)
         if ((spell_type.type == 'all' and spell.type ~= 'Trust') or
             spell.type == spell_type.type) and next(spell.levels) ~= nill and
             not player_spells[spell_id] and (is_learnable(spell) or
-            not learnable) and not spell_exceptions[spell_id] then
+            not learnable_only) and not spell.unlearnable then
 
             missing_spells:append(format_spell(spell))
             spell_count = spell_count + 1
         end
     end
 
-    if learnable then
+    if learnable_only then
         windower.add_to_chat(7, 'Showing learnable ' ..
             spell_type.readable .. '.')
     else
@@ -166,11 +165,18 @@ function spells_by_type(spell_type, learnable)
         for _,spell in ipairs(missing_spells) do
             windower.add_to_chat(7, spell)
         end
-        windower.add_to_chat(7,
-            'List Complete. You are missing ' ..
-            tostring(spell_count) .. ' ' .. spell_type.readable .. '.')
+        if learnable_only then
+            windower.add_to_chat(7,
+                'List Complete. You are missing ' ..
+                tostring(spell_count) .. ' learnable ' ..
+                spell_type.readable .. '.')
+        else
+            windower.add_to_chat(7,
+                'List Complete. You are missing ' ..
+                tostring(spell_count) .. ' ' .. spell_type.readable .. '.')
+        end
     else
-        if learnable then
+        if learnable_only then
             windower.add_to_chat(7,
                 'Congratulations! You know all currently learnable ' ..
                 spell_type.readable .. '.')
@@ -196,7 +202,7 @@ function spells_by_job(job, level_cap)
         local spell_level = spell.levels[job]
         if spell_level and spell_level <= level_cap and
             spell.type ~= 'Trust' and not player_spells[spell_id] and
-            not spell_exceptions[spell_id] then
+            not spell.unlearnable then
 
             missing_spells[spell_level] = missing_spells[spell_level] or T{}
             missing_spells[spell_level]:append(spell.en)
@@ -272,7 +278,7 @@ function spells_by_current()
         end
 
         if spell_level and spell.type ~= 'Trust' and
-            not player_spells[spell_id] and not spell_exceptions[spell_id] then
+            not player_spells[spell_id] and not spell.unlearnable then
 
             missing_spells:append(format_spell(spell))
             spell_count = spell_count + 1
