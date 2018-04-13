@@ -1,0 +1,26 @@
+<?xml version="1.1" ?>
+<settings>
+	<global>
+		<war>store tp|double attack|triple attack|quadruple attack||weapon skill damage</war>
+		<mnk>store tp|double attack|triple attack|quadruple attack||martial arts|subtle blow</mnk>
+		<whm>cure potency|cure potency ii|fast cast|cure spellcasting time||enmity|healing magic casting time|divine benison||damage taken|physical damage taken|magic damage taken</whm>
+		<blm>magic attack bonus|magic burst damage|magic burst damage ii||int|magic accuracy|magic damage||fast cast|elemental magic casting time</blm>
+		<thf>store tp|double attack|triple attack|quadruple attack||dual wield</thf>
+		<pld>enmity|damage taken|physical damage taken|magic damage taken||spell inturruption rate|pharanx|cure potency|fastcast</pld>
+		<drk>store tp|double attack|triple attack|quadruple attack||weapon skill damage</drk>
+		<bst>pet: double attack|pet: magic attack bonus|pet: damage taken</bst>
+		<brd>all songs|song effect duration|fast cast|song spellcasting time</brd>
+		<rng>store tp|snapshot|rapid shot|weapon skill damage</rng>
+		<sam>store tp|double attack|triple attack|quadruple attack||weapon skill damage</sam>
+		<nin>store tp|double attack|triple attack|quadruple attack||subtle blow</nin>
+		<drg>store tp|double attack|triple attack|quadruple attack||weapon skill damage</drg>
+		<smn>blood pact delay|blood pact delay ii|blood pact damage||avatar perpetuation cost|pet: magic attack bonus|pet: str|pet: double attack</smn>
+		<blu>store tp|double attack|triple attack|quadruple attack||critical hit rate|critical hit damage|weapon skill damage||fast cast|magic attack bonus|magic accuracy|cure potency</blu>
+		<cor>store tp|snapshot|rapid shot|fast cast|cure potency||magic accuracy|magic attack bonus|magic damage|weapon skill damage</cor>
+		<pup>pet: hp|pet: damage taken|pet: regen|martial arts||store tp|double attack|triple attack|quadruple attack</pup>
+		<dnc>store tp|double attack|triple attack|quadruple attack||</dnc>
+		<sch>magic attack bonus|magic burst damage|magic burst damage ii||magic accuracy|magic damage|fast cast|elemental magic casting time||cure potency|enh mag eff dur|enhancing magic effect duration</sch>
+		<geo>pet: regen|pet: damage taken|indicolure effect duration|indi eff dur||fast cast|magic evasion</geo>
+		<run>enmity|damage taken|physical damage taken|magic damage taken||spell inturruption rate|pharanx|inquartata|fastcast</run>
+	</global>
+</settings>
