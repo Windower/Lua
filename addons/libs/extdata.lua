@@ -619,7 +619,7 @@ augment_values = {
         [0x483] = {{stat="Phys. dmg. taken", offset=1,multiplier=-2,percent=true}},
         [0x484] = {{stat="Magic dmg. taken", offset=1,multiplier=-2,percent=true}},
         [0x485] = {{stat="Spell interruption rate down", offset=1,multiplier=-2,percent=true}},
-        [0x486] = {{stat="Occ. inc. resist. to stat. ailements", offset=1,multiplier=2}},
+        [0x486] = {{stat="Occ. inc. resist. to stat. ailments", offset=1,multiplier=2}},
         
         [0x4E0] = {{stat="Enh. Mag. eff. dur. ", offset=1}},
         [0x4E1] = {{stat="Helix eff. dur. ", offset=1}},
