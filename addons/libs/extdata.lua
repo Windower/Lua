@@ -612,6 +612,14 @@ augment_values = {
         [0x436] = {{stat="Sniper Shot:DMG:", offset=1,multiplier=5,percent=true}},
         [0x437] = {{stat="Detonator:DMG:", offset=1,multiplier=5,percent=true}},
         [0x438] = {{stat="Weapon Skill:DMG:", offset=1,multiplier=5,percent=true}},
+
+        [0x480] = {{stat="DEF", offset=1,multiplier=10}},
+        [0x481] = {{stat="Evasion", offset=1,multiplier=3}},
+        [0x482] = {{stat="Mag. Evasion", offset=1,multiplier=3}},
+        [0x483] = {{stat="Phys. dmg. taken", offset=1,multiplier=-2,percent=true}},
+        [0x484] = {{stat="Magic dmg. taken", offset=1,multiplier=-2,percent=true}},
+        [0x485] = {{stat="Spell interruption rate down", offset=1,multiplier=-2,percent=true}},
+        [0x486] = {{stat="Occ. inc. resist. to stat. ailements", offset=1,multiplier=2}},
         
         [0x4E0] = {{stat="Enh. Mag. eff. dur. ", offset=1}},
         [0x4E1] = {{stat="Helix eff. dur. ", offset=1}},
