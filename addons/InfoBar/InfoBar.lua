@@ -90,6 +90,7 @@ end
 function get_db(target, zones, level)
     local query = 'SELECT * FROM "monster" WHERE name = "'..target..'" AND zone = "'..zones..'"'
     local MOB_infobar = {}
+    box:bold(false)
 
     if db:isopen() and query then
         for id,name,family,job,zone,isaggressive,islinking,isnm,isfishing,levelmin,levelmax,sight,sound,magic,lowhp,healing,ts,th,scent,weakness,resistances,immunities,drops,stolen,spawn,spawntime in db:urows(query) do
@@ -108,8 +109,6 @@ function get_db(target, zones, level)
                     MOB_infobar.isagressive = 'A'
                     if levelmax and (level - tonumber(levelmax)) <= 10 then
                         box:bold(true)
-                    else
-                        box:bold(false)
                     end
                 else
                     MOB_infobar.isagressive = 'NA'
@@ -128,17 +127,7 @@ function get_db(target, zones, level)
                     scent == 1 and 'Sc' or '',
                 }
                 MOB_infobar.detect = detect:filter(-''):concat(',')
-            else
-                box:bold(false)
-                for i,v in pairs(MOB_infobar) do
-                    v = ''
-                end
             end
-        end
-    else
-        box:bold(false)
-        for i,v in pairs(MOB_infobar) do
-            v = ''
         end
     end
     box:update(MOB_infobar)
