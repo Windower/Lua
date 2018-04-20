@@ -90,7 +90,7 @@ end
 function get_db(target, zones, level)
     local query = 'SELECT * FROM "monster" WHERE name = "'..target..'" AND zone = "'..zones..'"'
     local MOB_infobar = {}
-    
+
     if db:isopen() and query then
         for id,name,family,job,zone,isaggressive,islinking,isnm,isfishing,levelmin,levelmax,sight,sound,magic,lowhp,healing,ts,th,scent,weakness,resistances,immunities,drops,stolen,spawn,spawntime in db:urows(query) do
             if name == target and zone == zones then
@@ -145,9 +145,10 @@ function get_db(target, zones, level)
 end
 
 function get_notes(target)
-    local query = 'SELECT * FROM "notes" WHERE name = "'..target..'"'
-    if notesdb:isopen() and query then
-        for name, note in notesdb:urows(query) do
+    local statement = notesdb:prepare('SELECT * FROM "notes" WHERE name = ?;')
+    if notesdb:isopen() and statement then
+        statement:bind(1, target)
+        for name, note in statement:urows(query, { target }) do
             if name == target then
                 return note or nil
             end
@@ -203,16 +204,16 @@ end)
 
 windower.register_event('prerender', function()
     local info = windower.ffxi.get_info()
-    
+
     if not info.logged_in or not windower.ffxi.get_player() or zoning_bool then
         box:hide()
         return
     end
-    
+
     infobar.game_moon = res.moon_phases[info.moon_phase].name
     infobar.game_moon_pct = info.moon..'%'
     infobar.zone_name = res.zones[info.zone].name
-    
+
     local pos = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t') or windower.ffxi.get_mob_by_target('me')
     if not pos then return end
     infobar.x = string.format('%0.3f', pos.x)
@@ -220,7 +221,7 @@ windower.register_event('prerender', function()
     infobar.z = string.format('%0.3f', pos.z)
     infobar.facing = tostring(getDegrees(pos.facing))..'°'
     infobar.facing_dir = DegreesToDirection(pos.facing)
-    
+
     box:update(infobar)
     box:show()
 end)
