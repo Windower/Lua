@@ -81,10 +81,12 @@ windower.register_event('addon command', function (command, ...)
     end
 end)
 
---[[
-Builds a list of jobs with short name as the key and id as the value, for
-reading in user input.
---]]
+--------------------------------------------------------------------------------
+--Name: build_job_list
+--------------------------------------------------------------------------------
+--Returns:
+---- (table) list of jobs with short name as the key and id as the value
+--------------------------------------------------------------------------------
 function build_job_list()
     local jobs = {}
     for id,val in pairs(res.jobs) do
@@ -93,12 +95,18 @@ function build_job_list()
     return jobs
 end
 
--- Display an error message for invalid input.
+--------------------------------------------------------------------------------
+--Name: invalid_input
+---- Display an error message for invalid input.
+--------------------------------------------------------------------------------
 function invalid_input()
     windower.add_to_chat(7, 'Invalid input. See //spbk help.')
 end
 
+--------------------------------------------------------------------------------
+--Name: display_help
 -- Display help text for the addon.
+--------------------------------------------------------------------------------
 function display_help()
     windower.add_to_chat(7, _addon.name .. ' version ' .. _addon.version)
     windower.add_to_chat(7, '//spbk help -- show this help text')
@@ -110,10 +118,15 @@ function display_help()
     windower.add_to_chat(7, 'Note: A limit on spent job points can be specified for spells learned from Gifts by entering a level of 100-1500. Spells are never given as Gifts for less than 100 jp.')
 end
 
---[[
-Returns true if the player has any jobs which is high enough level to learn
-the given spell.
---]]
+--------------------------------------------------------------------------------
+--Name: is_learnable
+--Args:
+---- player (table): player object from windower.ffxi.get_player()
+---- spell (table): a spell from resources.spells
+--------------------------------------------------------------------------------
+--Returns:
+---- (bool) true if player has a job that is high enough level to learn spell
+--------------------------------------------------------------------------------
 function is_learnable(player, spell)
     local player_levels = player.jobs
     for job,level in pairs(spell.levels) do
@@ -124,10 +137,16 @@ function is_learnable(player, spell)
     return false
 end
 
---[[
-Formats a spell as the spell's name followed by a list of jobs and levels
-which would qualify to learn that spell.
---]]
+--------------------------------------------------------------------------------
+--Name: format_spell
+-- Formats a spell as the spell's name followed by a list of jobs and levels
+-- which would qualify to learn that spell.
+--Args:
+---- spell (table): a spell from resources.spells
+--------------------------------------------------------------------------------
+--Returns:
+---- (string) the formatted string
+--------------------------------------------------------------------------------
 function format_spell(spell)
     local format
 
@@ -154,11 +173,15 @@ function format_spell(spell)
     return string.format('%-20s %s', spell.english, format)
 end
 
---[[
-Show missing spells of a given type. If learnable is true, then the
-results will be limited to spells for which the player has a job at a
-level required to learn the spell.
---]]
+--------------------------------------------------------------------------------
+--Name: spells_by_type
+-- List spells of a given type, i.e. white magic.
+--Args:
+---- player (T): player object from windower.ffxi.get_player()
+---- spell_type (table): one of the types from spell_types global
+---- learnable_only (bool): if true then the output is limited to spell for
+----     which the player has a job that is high enough level
+--------------------------------------------------------------------------------
 function spells_by_type(player, spell_type, learnable_only)
     local missing_spells = T{}
     local player_spells = windower.ffxi.get_spells()
@@ -210,10 +233,13 @@ function spells_by_type(player, spell_type, learnable_only)
     end
 end
 
---[[
-List unkown spells for a specific job (by id), up to an optional level.
-If no level_cap is given then the maximum is used.
---]]
+--------------------------------------------------------------------------------
+--Name: spells_by_job
+-- List unknown spells by job.
+--Args:
+---- job (int): the job's id
+---- level_cap (int): the max level/jp required by listed spells
+--------------------------------------------------------------------------------
 function spells_by_job(job, level_cap)
     local missing_spells = T{}
     local player_spells = windower.ffxi.get_spells()
@@ -280,7 +306,12 @@ function spells_by_job(job, level_cap)
     end
 end
 
+--------------------------------------------------------------------------------
+--Name: spells_by_current
 -- Show missing spells for the current main and sub jobs.
+--Args:
+---- player (T): player object from windower.ffxi.get_player()
+--------------------------------------------------------------------------------
 function spells_by_current(player)
     local missing_spells = T{}
     local player_spells = windower.ffxi.get_spells()
