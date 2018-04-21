@@ -20,7 +20,6 @@ spell_types = {
 
 windower.register_event('addon command', function (command, ...)
     local args = L{...}
-    local player = windower.ffxi.get_player()
     local jobs = build_job_list()
 
     command = command and command:lower()
@@ -28,8 +27,10 @@ windower.register_event('addon command', function (command, ...)
     if command == 'help' then
         display_help()
     elseif command == nil or command == 'current' then
+        local player = windower.ffxi.get_player()
         spells_by_current(player)
     elseif command == 'main' then
+        local player = windower.ffxi.get_player()
         local level = player.main_job_level
         local job_points = player.job_points[player.main_job:lower()].jp_spent
         if job_points > 99 then
@@ -46,6 +47,7 @@ windower.register_event('addon command', function (command, ...)
             invalid_input()
         end
     elseif command == 'sub' then
+        local player = windower.ffxi.get_player()
         local level = args[1] or player.sub_job_level
         if level == 'all' then
             level = 1500
@@ -58,14 +60,17 @@ windower.register_event('addon command', function (command, ...)
         end
     elseif spell_types[command] then
         if args[1] == 'all' then
+            local player = windower.ffxi.get_player()
             spells_by_type(player, spell_types[command], false)
         elseif args[1] == nil then
+            local player = windower.ffxi.get_player()
             spells_by_type(player, spell_types[command], true)
         else
             invalid_input()
         end
     elseif jobs[command] then
         local job = jobs[command]
+        local player = windower.ffxi.get_player()
         local level = args[1] or player.jobs[res.jobs[job].english_short]
         if level == 'all' then
             level = 1500
