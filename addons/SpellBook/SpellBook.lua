@@ -114,13 +114,14 @@ end
 --------------------------------------------------------------------------------
 function display_help()
     windower.add_to_chat(7, _addon.name .. ' version ' .. _addon.version)
-    windower.add_to_chat(7, '//spbk help -- show this help text')
-    windower.add_to_chat(7, '//spbk [current] -- Shows learnable spells based on current main and sub job and level.')
-    windower.add_to_chat(7, '//spbk <main|sub> [<level|all>] -- Show missing spells for current main or sub job. Defaults to the job\'s current level.')
-    windower.add_to_chat(7, '//spbk <job> [<level|all>] -- Show missings spells for specified job and level. Defaults to the job\'s level.')
+    windower.add_to_chat(7, 'Spent jp can be specified for spells learned from Gifts by entering a value of 100-1500.')
+    windower.add_to_chat(7, 'Spells are never given as Gifts for less than 100 jp and values under 100 are treated as level.')
+    windower.add_to_chat(7, '//spbk help -- Show this help text.')
+    windower.add_to_chat(7, '//spbk [current] -- Show learnable spells based on current main and sub job and level/jp.')
+    windower.add_to_chat(7, '//spbk <main|sub> [<level|spent jp|all>] -- Show missing spells for current main or sub job. Defaults to the job\'s current level/jp.')
+    windower.add_to_chat(7, '//spbk <job> [<level|spent jp|all>] -- Show missings spells for specified job and level. Defaults to the job\'s level/jp.')
     windower.add_to_chat(7, '//spbk <category> [all] -- Show learnable spells by category. Limited to spells which are learnable, unless all is added after the category.')
     windower.add_to_chat(7, 'Categories: whitemagic, blackmagic, songs, ninjustu, summoning, bluemagic, geomancy, trusts, all (Trusts are not included in all)')
-    windower.add_to_chat(7, 'Note: A limit on spent job points can be specified for spells learned from Gifts by entering a level of 100-1500. Spells are never given as Gifts for less than 100 jp.')
 end
 
 --------------------------------------------------------------------------------
