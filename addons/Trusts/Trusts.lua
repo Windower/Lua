@@ -23,7 +23,7 @@ function command(arg1,arg2)
     elseif S{'save','s'}[arg1] then
         save_set(arg2)
     elseif S{'check','c'}[arg1] then
-        untrusted()
+        check_learned()
     else
         call_set(settings.sets[arg1] and arg1 or 'default')
     end
@@ -136,7 +136,7 @@ windower.register_event('action', function(act)
         end
     end
 end)
-function untrusted()
+function check_learned()
 learned = {}
     for i,v in ipairs(trusts) do
         if windower.ffxi.get_spells()[v.id] == false and not v.en:endswith('(UC)') then
