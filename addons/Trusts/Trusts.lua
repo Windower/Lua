@@ -6,7 +6,6 @@ res,config,math=require('resources'),require('config'),require('math')
 settings=config.load('data/settings.xml')
 _addon.language=settings.language
 lang={['english']='en',['japanese']='ja'}[string.lower(settings.language)]
-
 function command(arg1,arg2)
     if not cap then
         for i,v in pairs(windower.ffxi.get_key_items()) do
@@ -17,16 +16,18 @@ function command(arg1,arg2)
             return true;
         end
     end
-    if S{'l','load'}:contains(arg1) then
-        call_set(arg2 or 'default')
-    elseif S{'r','rand'}:contains(arg1) then
+    if S{'rand','r'}:contains(arg1) then
         call_set('rand')
-    elseif S{'s','save'}:contains(arg1) then
-        save_set(arg2)
-    elseif S{'c','check'}:contains(arg1) then
-        untrusted()
     elseif S{'refa','retr'}:contains(arg1) then
         windower.send_command('input /refa all')
+    elseif S{'save','s'}:contains(arg1) then
+        save_set(arg2)
+    elseif S{'check','c'}:contains(arg1) then
+        untrusted()
+    elseif settings.sets[arg1] then
+        call_set(arg1)
+    else
+        call_set('default')
     end
 end
 windower.register_event('addon command', command)
