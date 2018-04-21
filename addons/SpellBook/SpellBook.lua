@@ -28,7 +28,7 @@ windower.register_event('addon command', function (command, ...)
     if command == 'help' then
         display_help()
     elseif command == nil or command == 'current' then
-        spells_by_current()
+        spells_by_current(player)
     elseif command == 'main' then
         local level = player.main_job_level
         local job_points = player.job_points[player.main_job:lower()].jp_spent
@@ -58,15 +58,15 @@ windower.register_event('addon command', function (command, ...)
         end
     elseif spell_types[command] then
         if args[1] == 'all' then
-            spells_by_type(spell_types[command], false)
+            spells_by_type(player, spell_types[command], false)
         elseif args[1] == nil then
-            spells_by_type(spell_types[command], true)
+            spells_by_type(player, spell_types[command], true)
         else
             invalid_input()
         end
     elseif jobs[command] then
         local job = jobs[command]
-        local level = args[1] or player.jobs[res.jobs[job].ens]
+        local level = args[1] or player.jobs[res.jobs[job].english_short]
         if level == 'all' then
             level = 1500
         end
@@ -88,7 +88,7 @@ reading in user input.
 function build_job_list()
     local jobs = {}
     for id,val in pairs(res.jobs) do
-        jobs[val.ens:lower()] = id
+        jobs[val.english_short:lower()] = id
     end
     return jobs
 end
@@ -114,10 +114,10 @@ end
 Returns true if the player has any jobs which is high enough level to learn
 the given spell.
 --]]
-function is_learnable(spell)
-    local player_levels = windower.ffxi.get_player().jobs
+function is_learnable(player, spell)
+    local player_levels = player.jobs
     for job,level in pairs(spell.levels) do
-        if player_levels[res.jobs[job].ens] >= level then
+        if player_levels[res.jobs[job].english_short] >= level then
             return true
         end
     end
@@ -140,10 +140,10 @@ function format_spell(spell)
         jobs:sort()
         for _,job_id in ipairs(jobs) do
             if spell.levels[job_id] <= 99 then
-                levels:append(res.jobs[job_id].ens .. ' Lv.' ..
+                levels:append(res.jobs[job_id].english_short .. ' Lv.' ..
                     tostring(spell.levels[job_id]))
             else
-                levels:append(res.jobs[job_id].ens .. ' Jp.' ..
+                levels:append(res.jobs[job_id].english_short .. ' Jp.' ..
                     tostring(spell.levels[job_id]))
             end
         end
@@ -151,7 +151,7 @@ function format_spell(spell)
     else
         format = ' ( Trust )'
     end
-    return string.format('%-20s %s', spell.en, format)
+    return string.format('%-20s %s', spell.english, format)
 end
 
 --[[
@@ -159,15 +159,15 @@ Show missing spells of a given type. If learnable is true, then the
 results will be limited to spells for which the player has a job at a
 level required to learn the spell.
 --]]
-function spells_by_type(spell_type, learnable_only)
+function spells_by_type(player, spell_type, learnable_only)
     local missing_spells = T{}
     local player_spells = windower.ffxi.get_spells()
     local spell_count = 0
 
     for spell_id,spell in pairs(res.spells) do
         if ((spell_type.type == 'all' and spell.type ~= 'Trust') or
-            spell.type == spell_type.type) and next(spell.levels) ~= nill and
-            not player_spells[spell_id] and (is_learnable(spell) or
+            spell.type == spell_type.type) and not spell.levels:empty() and
+            not player_spells[spell_id] and (is_learnable(player, spell) or
             not learnable_only) and not spell.unlearnable then
 
             missing_spells:append(format_spell(spell))
@@ -183,7 +183,7 @@ function spells_by_type(spell_type, learnable_only)
             spell_type.readable))
     end
 
-    if next(missing_spells) ~= nil then
+    if not missing_spells:empty() then
         missing_spells:sort()
         for _,spell in ipairs(missing_spells) do
             windower.add_to_chat(7, spell)
@@ -226,12 +226,12 @@ function spells_by_job(job, level_cap)
             not spell.unlearnable then
 
             missing_spells[spell_level] = missing_spells[spell_level] or T{}
-            missing_spells[spell_level]:append(spell.en)
+            missing_spells[spell_level]:append(spell.english)
             spell_count = spell_count + 1
         end
     end
 
-    if next(missing_spells) ~= nil then
+    if not missing_spells:empty() then
         if level_cap > 99 then
             windower.add_to_chat(7, string.format(
                 'Showing missing spells for %s up to %d spent job points.',
@@ -281,9 +281,8 @@ function spells_by_job(job, level_cap)
 end
 
 -- Show missing spells for the current main and sub jobs.
-function spells_by_current()
+function spells_by_current(player)
     local missing_spells = T{}
-    local player = windower.ffxi.get_player()
     local player_spells = windower.ffxi.get_spells()
     local spell_count = 0
 
@@ -326,7 +325,7 @@ function spells_by_current()
         end
     end
 
-    if next(missing_spells) ~= nil then
+    if not missing_spells:empty() then
         if main_job_jp > 0 then
             windower.add_to_chat(7, string.format('Showing learnable spells for %s%d with %d spent job points and %s%d.',
                 player.main_job, player.main_job_level,
