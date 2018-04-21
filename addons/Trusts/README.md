@@ -1,14 +1,14 @@
 # Trusts
 - English available. 
-- //tru [setname] 
+- //tru [setname]
   - data/settings.xml でユーザー定義したフェイスを順に呼び出す
-- //tru save [setname]
+- //tru save [setname] OR //tru s [setname]
   - 現在呼び出し中のフェイスをセットに保存
-- //tru rand
+- //tru rand OR //tru r
   - フェイスおみくじ。PT枠上限までランダムで呼び出す
-- //tru refa
-  - 全てのフェイスを戻す。/refa allと同じ
-- //tru check
+- //tru refa OR //tru retr
+  - 全てのフェイスを戻す。/refa all, /retr allと同じ
+- //tru check OR //tru c
   - 未習得フェイスを表示
 ## data/settings.xml
   - `auto` : 登録フェイスを全て自動で呼び出すか、1体ごとに1ポチするか定義
