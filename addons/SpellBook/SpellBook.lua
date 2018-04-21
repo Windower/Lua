@@ -22,11 +22,11 @@ windower.register_event('addon command', function (command, ...)
     local args = L{...}
     local jobs = build_job_list()
 
-    command = command and command:lower()
+    command = command and command:lower() or 'current'
 
     if command == 'help' then
         display_help()
-    elseif command == nil or command == 'current' then
+    elseif command == 'current' then
         local player = windower.ffxi.get_player()
         spells_by_current(player)
     elseif command == 'main' then
