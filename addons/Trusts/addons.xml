@@ -698,9 +698,9 @@
     <support>http://www.ffxiah.com/player/Fenrir/Snaps</support>
   </addon>
   <addon>
-    <name>Checkparam</name>
+    <name>Trusts</name>
     <author>Centurio a.k.a. from20020516</author>
-    <description>Displays the total of property of current equipments.</description>
+    <description>Call trusts you saved.</description>
     <bugtracker>https://github.com/from20020516/Lua/issues</bugtracker>
     <support>https://twitter.com/from20020516</support>
   </addon>
