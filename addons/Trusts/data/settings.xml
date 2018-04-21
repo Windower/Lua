@@ -18,7 +18,18 @@
                 <4>コルモル</4>
                 <5>ミリ・アリアポー</5>
             </sample>
+            <sample2>
+                <1>AAEV</1>
+                <2>Sylvie (UC)</2>
+                <3>Qultada</3>
+                <4>Koru-Moru</4>
+                <5>Cherukiki</5>
+            </sample2>
         </sets>
-        <wait>3</wait>
+        <wait>
+            <aftercast>3</aftercast>
+            <retr>1.5</retr>
+            <retrall>3</retrall>
+        </wait>
     </global>
 </settings>

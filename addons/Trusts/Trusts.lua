@@ -16,18 +16,16 @@ function command(arg1,arg2)
             return true;
         end
     end
-    if S{'rand','r'}:contains(arg1) then
+    if S{'rand','r'}[arg1] then
         call_set('rand')
-    elseif S{'refa','retr'}:contains(arg1) then
-        windower.send_command('input /refa all')
-    elseif S{'save','s'}:contains(arg1) then
+    elseif S{'retr','refa'}[arg1] then
+        windower.send_command('input /retr all')
+    elseif S{'save','s'}[arg1] then
         save_set(arg2)
-    elseif S{'check','c'}:contains(arg1) then
+    elseif S{'check','c'}[arg1] then
         untrusted()
-    elseif settings.sets[arg1] then
-        call_set(arg1)
     else
-        call_set('default')
+        call_set(settings.sets[arg1] and arg1 or 'default')
     end
 end
 windower.register_event('addon command', command)
@@ -67,14 +65,13 @@ function call_trust()
     end
 end
 function call_set(set)
-Q,invalid={},{}
+Q,invalid,time={},{},false
     if set == 'rand' then
         math.randomseed(os.clock())
         local party,npcs,pcs = unpack(check_exist())
         if cap == npcs then
-            windower.send_command('input /refa all')
-            calls = npcs
-            coroutine.sleep(3)
+            windower.send_command('input /retr all')
+            calls,time = npcs,os.clock()
         else
             calls = math.min(cap-npcs,6-npcs-pcs)
         end
@@ -89,7 +86,7 @@ Q,invalid={},{}
         until #Q == calls or #invalid == #trusts
     elseif settings.sets[set] then
         local party,npcs,pcs = unpack(check_exist())
-        local refa = npcs
+        local retr = npcs
         for i=1,cap do
             if settings.sets[set][tostring(i)] then
                 local entity,pos = trusts:with(lang,settings.sets[set][tostring(i)]),i+pcs-1
@@ -105,36 +102,37 @@ Q,invalid={},{}
                         local recasts = math.floor(windower.ffxi.get_spell_recasts()[entity.id]/6)/10
                         windower.add_to_chat(208,_addon.name..': '..entity.en..' needs '..recasts..' secs break.')
                         if windower.ffxi.get_party()['p'..pos] then
-                            party[windower.ffxi.get_party()['p'..pos].name],refa = nil,refa-1
+                            party[windower.ffxi.get_party()['p'..pos].name],retr = nil,retr-1
                         end
                     end
                 else
-                    party[entity.name],refa = nil,refa-1
+                    party[entity.name],retr = nil,retr-1
                     if settings.auto then
                         windower.add_to_chat(208,_addon.name..': '..entity.en..' already exists.')
                     end
                 end
             end
         end
+        time = os.clock()
         for name,v in pairs(party) do
-            if refa == npcs then
-                windower.send_command('input /refa all')
-                coroutine.sleep(3)
+            if retr == npcs then
+                windower.send_command('input /retr all')
                 break;
             else
-                windower.send_command('input /refa '..name)
+                windower.send_command('input /retr '..name)
+                coroutine.sleep(settings.wait.retr)
             end
-            coroutine.sleep(1.5)
         end
     end
-    call_trust()
+    time = time and math.max(0,settings.wait.retrall+time-os.clock()) or 0
+    coroutine.schedule(call_trust,time)
 end
 windower.register_event('action', function(act)
     if settings.auto and act.actor_id == windower.ffxi.get_player().id and Q and #Q > 0 then
         if act.category == 4 and act.param == table.remove(Q,1).id then
-            coroutine.schedule(call_trust,settings.wait)
+            coroutine.schedule(call_trust,settings.wait.aftercast)
         elseif act.category == 8 and act.param == 28787 and act.targets[1].actions[1].param == Q[1].id then
-            coroutine.schedule(call_trust,settings.wait)
+            coroutine.schedule(call_trust,settings.wait.aftercast)
         end
     end
 end)
