@@ -760,6 +760,8 @@ augment_values = {
         [0x5AF] = {{stat='Enhances "Rayke" effect', offset=0,multiplier=0}},
         [0x5B0] = {{stat='Enhances "Inspire" effect', offset=0,multiplier=0}},
         [0x5B1] = {{stat='Enhances "Sleight of Sword" effect', offset=0,multiplier=0}},
+
+        [0x5C0] = {{stat="Parrying rate", offset=1,percent=true}},
         
         [0x600] = {{stat="Backhand Blow:DMG:", offset=1,multiplier=5,percent=true}},
         [0x601] = {{stat="Spinning Attack:DMG:", offset=1,multiplier=5,percent=true}},
