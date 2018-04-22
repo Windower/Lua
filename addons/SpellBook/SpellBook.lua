@@ -48,6 +48,10 @@ windower.register_event('addon command', function (command, ...)
         end
     elseif command == 'sub' then
         local player = windower.ffxi.get_player()
+        if not player.sub_job then
+            windower.add_to_chat(7, "You don't have a subjob equipped.")
+            return
+        end
         local level = args[1] or player.sub_job_level
         if level == 'all' then
             level = 1500
@@ -195,7 +199,7 @@ function spells_by_type(player, spell_type, learnable_only)
 
     for spell_id,spell in pairs(res.spells) do
         if ((spell_type.type == 'all' and spell.type ~= 'Trust') or
-            spell.type == spell_type.type) and not spell.levels:empty() and
+            spell.type == spell_type.type) and not table.empty(spell.levels) and
             not player_spells[spell_id] and (is_learnable(player, spell) or
             not learnable_only) and not spell.unlearnable then
 
@@ -364,28 +368,50 @@ function spells_by_current(player)
 
     if not missing_spells:empty() then
         if main_job_jp > 0 then
-            windower.add_to_chat(7, string.format('Showing learnable spells for %s%d with %d spent job points and %s%d.',
-                player.main_job, player.main_job_level,
-                player.job_points[player.main_job:lower()].jp_spent,
-                player.sub_job, player.sub_job_level))
+            if player.sub_job then
+                windower.add_to_chat(7, string.format('Showing learnable spells for %s%d with %d spent job points and %s%d.',
+                    player.main_job, player.main_job_level,
+                    player.job_points[player.main_job:lower()].jp_spent,
+                    player.sub_job, player.sub_job_level))
+            else
+                windower.add_to_chat(7, string.format('Showing learnable spells for %s%d with %d spent job points.',
+                    player.main_job, player.main_job_level,
+                    player.job_points[player.main_job:lower()].jp_spent))
+            end
         else
-            windower.add_to_chat(7, string.format('Showing learnable spells for %s%d/%s%d.',
-                player.main_job, player.main_job_level,
-                player.sub_job, player.sub_job_level))
+            if player.sub_job then
+                windower.add_to_chat(7, string.format('Showing learnable spells for %s%d/%s%d.',
+                    player.main_job, player.main_job_level,
+                    player.sub_job, player.sub_job_level))
+            else
+                windower.add_to_chat(7, string.format('Showing learnable spells for %s%d.',
+                    player.main_job, player.main_job_level))
+            end
         end
 
         missing_spells:sort()
         for _,spell in ipairs(missing_spells) do
             windower.add_to_chat(7, spell)
         end
-        windower.add_to_chat(7, string.format('List Complete. You are missing %d learnable spells for %s%d/%s%d.',
-            spell_count,
-            player.main_job, player.main_job_level,
-            player.sub_job, player.sub_job_level))
+        if player.sub_job then
+            windower.add_to_chat(7, string.format('List Complete. You are missing %d learnable spells for %s%d/%s%d.',
+                spell_count,
+                player.main_job, player.main_job_level,
+                player.sub_job, player.sub_job_level))
+        else
+            windower.add_to_chat(7, string.format('List Complete. You are missing %d learnable spells for %s%d.',
+                spell_count,
+                player.main_job, player.main_job_level))
+        end
     else
-        windower.add_to_chat(7,  string.format('Congratulations! You know all learnable spells for %s%d/%s%d!',
-            player.main_job, player.main_job_level,
-            player.sub_job, player.sub_job_level))
+        if player.sub_job then
+            windower.add_to_chat(7,  string.format('Congratulations! You know all learnable spells for %s%d/%s%d!',
+                player.main_job, player.main_job_level,
+                player.sub_job, player.sub_job_level))
+        else
+            windower.add_to_chat(7,  string.format('Congratulations! You know all learnable spells for %s%d!',
+                player.main_job, player.main_job_level))
+        end
     end
 end
 
