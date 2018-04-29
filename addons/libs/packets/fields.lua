@@ -1720,7 +1720,7 @@ func.incoming[0x028].action_base = L{
     {ctype='bit[6]',            label='Stagger'},                               -- 02:5
     {ctype='bit[17]',           label='Param'},                                 -- 03:3
     {ctype='bit[10]',           label='Message'},                               -- 06:2
-    {ctype='bit[31]',           label='_unknown'},                              -- 07:4
+    {ctype='bit[31]',           label='_unknown'},                              -- 07:4 --Message Modifier? If you get a complete (Resist!) this is set to 2 otherwise a regular Resist is 0.
 }
 
 func.incoming[0x028].add_effect_base = L{
