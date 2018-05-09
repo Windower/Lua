@@ -491,6 +491,7 @@
     <name>Scoreboard</name>
     <author>Suji</author>
     <description>Basic in-game damage parser. It displays live DPS and works even when chat filters are enabled.</description>
+
     <bugtracker>https://github.com/jerryhebert/Lua/issues</bugtracker>
     <support>https://discord.gg/b275nMv</support>
   </addon>
@@ -528,6 +529,13 @@
     <description>Sends commands between windower instances using IPC.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>https://discord.gg/b275nMv</support>
+  </addon>
+  <addon>
+	  <name>SkillUp</name>
+	  <author>Iminiillusions of Asura</author>
+	  <description>An easy skill up bot for self target magic types.</description>
+	  <bugtracker>https://www.github.com/Windower/Lua/issues</bugtracker>
+	  <support>https://github.com/Iminiillusions/Windower4-Addons/issues</support>
   </addon>
   <addon>
     <name>SpeedChecker</name>
