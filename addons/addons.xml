@@ -531,11 +531,11 @@
     <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
-	  <name>SkillUp</name>
-	  <author>Iminiillusions of Asura</author>
-	  <description>An easy skill up bot for self target magic types.</description>
-	  <bugtracker>https://www.github.com/Windower/Lua/issues</bugtracker>
-	  <support>https://github.com/Iminiillusions/Windower4-Addons/issues</support>
+    <name>SkillUp</name>
+    <author>Iminiillusions of Asura</author>
+    <description>An easy skill up bot for self target magic types.</description>
+    <bugtracker>https://www.github.com/Windower/Lua/issues</bugtracker>
+    <support>https://github.com/Iminiillusions/Windower4-Addons/issues</support>
   </addon>
   <addon>
     <name>SpeedChecker</name>
