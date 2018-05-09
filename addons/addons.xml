@@ -442,8 +442,7 @@
     <name>Remember</name>
     <author>Byrth</author>
     <description>Should request spawn packets for players / mobile NPCs that failed to spawn.</description>
-    <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>Respond</name>
@@ -453,8 +452,7 @@
     <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
-    <name>Rhombus</name>
-    <description>Creates a highly customizable, click-able, on-screen menu.</description>
+    <name>Rhombus</name>    <description>Creates a highly customizable, click-able, on-screen menu.</description>
     <author>trv</author>
     <support>https://discord.gg/b275nMv</support>
     <bugtracker>https://github.com/trv6/Lua/issues</bugtracker>
@@ -528,6 +526,13 @@
     <description>Sends commands between windower instances using IPC.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>https://discord.gg/b275nMv</support>
+  </addon>
+  <addon>
+    <name>SkillUp</name>
+    <author>Iminiillusions of Asura</author>
+    <description>An easy skill up bot for self target magic types.</description>
+    <bugtracker>https://www.github.com/Windower/Lua/issues</bugtracker>
+    <support>https://github.com/Iminiillusions/Windower4-Addons/issues</support>
   </addon>
   <addon>
     <name>SpeedChecker</name>
