@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.931 - Added support to exporting with custom file names. 
+-------------------------------------------------
 GearSwap 0.930 - Fixed a problem with player[bag][item_name].count in the user environment.
 -------------------------------------------------
 GearSwap 0.929 - Adjusted the print_set function to give preference and order to slot name keys.
