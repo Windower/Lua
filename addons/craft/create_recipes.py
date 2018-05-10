@@ -2,7 +2,19 @@ import urllib2
 from bs4 import BeautifulSoup
 from slpp import slpp as lua
 import os
+import platform
 
+
+hdr = {
+    'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
+    'Accept-Encoding': 'none',
+    'Accept-Language': 'en-US,en;q=0.8',
+    'Connection': 'keep-alive',
+}
+
+sphere = None
 
 def get_recipe(row):
     crystals = [
@@ -40,35 +52,54 @@ def get_recipe(row):
                 ingredients.append(english)
         else:
             ingredients.append(english)
-    return name, crystal, ingredients
+    return [(name, crystal, ingredients)]
 
 def get_sphere_recipe(row):
-    c, i, r = [
-        td for td in row.findAll('td')
+    spheres = [
+        'Liquefaction Sphere',
+        'Transfixion Sphere',
+        'Detonation Sphere',
+        'Impaction Sphere',
+        'Induration Sphere',
+        'Reverberation Sphere',
+        'Scission Sphere',
+        'Compression Sphere',
     ]
-    name = str(r.findAll('a')[0]['title'])
+    global sphere
+    cells = [td for td in row.findAll('td')]
+    if len(cells) > 4:
+        rare_ex, rare, ex, c, s = cells[:5]
+        if str(s.findAll('a')[0]['title']) in spheres:
+            sphere = str(s.findAll('a')[0]['title'])
+    else:
+        rare_ex, rare, ex, c = cells[:4]
+    recipes = []
     crystal = str(c.findAll('img')[0]['alt']).rstrip(' icon.png')
-    ingredients = [str(i.findAll('a')[0]['title'])]
-    return name, crystal, ingredients
+    ingredients = []
+    for cell in cells[:3]:
+        for a in cell.findAll('a'):
+            recipes.append((sphere, crystal, [str(a['title'])]))
+    return recipes
 
 def get_recipes_from_rows(rows, spheres=False):
     recipes = {}
     for row in rows:
         if spheres:
-            name, crystal, ingredients = get_sphere_recipe(row)
+            subrecipes = get_sphere_recipe(row)
         else:
-            name, crystal, ingredients = get_recipe(row)
-        while name in recipes.keys():
-            if name[-1].isdigit():
-                name = name[:-2] + (" %d" % (int(name[-1]) + 1))
-            else:
-                name = name + " 2"
-        recipes[name] = [crystal, ingredients]
+            subrecipes = get_recipe(row)
+        for (name, crystal, ingredients) in subrecipes:
+            while name in recipes.keys():
+                if name[-1].isdigit():
+                    name = name[:-2] + (" %d" % (int(name[-1]) + 1))
+                else:
+                    name = name + " 2"
+            recipes[name] = [crystal, ingredients]
     return recipes
 
 def get_recipes_from_soup(soup, spheres=False):
-    string = "Sphere Results" if spheres else "Synthesis Information"
-    count = 3 if spheres else 4
+    string = "Sphere Obtained" if spheres else "Synthesis Information"
+    lengths = [4, 5, 6, 7] if spheres else [4]
     subtables = [
         descendant.parent.parent.parent
         for descendant in soup.descendants
@@ -80,13 +111,16 @@ def get_recipes_from_soup(soup, spheres=False):
             row
             for row in subtable.children
             if (hasattr(row, 'findAll') and
-                len(row.findAll('td')) == count)
+                len(row.findAll('td')) in lengths)
         ]
         rows.extend(children)
     return get_recipes_from_rows(rows, spheres)
 
 def get_items_dictionary():
-    path = 'C:\\Program Files (x86)\\Windower4\\res\\items.lua'
+    if platform.system() == 'Windows':
+        path = 'C:\\Program Files (x86)\\Windower4\\res\\items.lua'
+    else:
+        path = os.path.join(os.path.expanduser("~"), 'Resources/lua/items.lua')
     with open(path) as fd:
         data = fd.read().replace('return', '', 1)
         return lua.decode(data)
@@ -108,6 +142,14 @@ def get_items():
         'broken mithran rod' : 483,
         'broken tarutaru rod' : 484,
         "broken lu shang's rod" : 489,
+        'fire emblem card' : 9764,
+        'ice emblem card' : 9765,
+        'wind emblem card' : 9766,
+        'earth emblem card' : 9767,
+        'lightning emblem card': 9768,
+        'water emblem card' : 9769,
+        'light emblem card': 9770,
+        'dark emblem card': 9771,
     }
     items = get_items_dictionary()
     inverted = {}
@@ -171,7 +213,11 @@ def get_recipes(craft, spheres=False):
     base = "https://www.bg-wiki.com/bg/"
     name = "%s.html" % craft
     if not os.path.exists(name):
-        page = urllib2.urlopen(base + craft).read()
+        req = urllib2.Request(base + craft, headers=hdr)
+        try:
+            page = urllib2.urlopen(req).read()
+        except urllib2.HTTPError, e:
+            return
         with open(name, 'w') as fd:
             fd.write(page)
     with open(name, 'r') as fd:
