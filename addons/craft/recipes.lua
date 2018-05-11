@@ -1073,13 +1073,6 @@ return {
             "Scintillant Ingot",
         },
     },
-    ["Amored Ring"] = {
-        ["crystal"] = "Wind Crystal",
-        ["ingredients"] = {
-            "Tgh. Dhal. Lth.",
-            "Leather Ring",
-        },
-    },
     ["Amphiptere Leather"] = {
         ["crystal"] = "Dark Crystal",
         ["ingredients"] = {
@@ -1956,6 +1949,13 @@ return {
             "Taurus Horn",
             "Taurus Horn",
             "Shagreen File",
+        },
+    },
+    ["Armored Ring"] = {
+        ["crystal"] = "Wind Crystal",
+        ["ingredients"] = {
+            "Tgh. Dhal. Lth.",
+            "Leather Ring",
         },
     },
     ["Army Biscuit"] = {
@@ -6239,7 +6239,7 @@ return {
         },
     },
     ["Bronze Leggings 2"] = {
-        ["crystal"] = "Fire Crystal",
+        ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
             "Bronze Sheet",
             "Bronze Sheet",
@@ -8372,13 +8372,13 @@ return {
     ["Compression Sphere"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Colorful Hair",
+            "Demon Pen",
         },
     },
     ["Compression Sphere 2"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Demon Pen",
+            "Tonberry Board",
         },
     },
     ["Compression Sphere 3"] = {
@@ -8390,7 +8390,13 @@ return {
     ["Compression Sphere 4"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Tonberry Board",
+            "Colorful Hair",
+        },
+    },
+    ["Compression Sphere 5"] = {
+        ["crystal"] = "Wind Crystal",
+        ["ingredients"] = {
+            "Dark Card",
         },
     },
     ["Console"] = {
@@ -8975,6 +8981,14 @@ return {
             "San d'Or. Flour",
             "Gold Lobster",
             "Distilled Water",
+        },
+    },
+    ["Crayfish Ball 3"] = {
+        ["crystal"] = "Earth Crystal",
+        ["ingredients"] = {
+            "San d'Or. Flour",
+            "Distilled Water",
+            "Istakoz",
         },
     },
     ["Cream Puff"] = {
@@ -10652,13 +10666,31 @@ return {
     ["Detonation Sphere"] = {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
-            "Fetich Legs",
+            "Shoalweed",
         },
     },
     ["Detonation Sphere 2"] = {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
-            "Shoalweed",
+            "Fetich Legs",
+        },
+    },
+    ["Detonation Sphere 3"] = {
+        ["crystal"] = "Wind Crystal",
+        ["ingredients"] = {
+            "Soiled Letter",
+        },
+    },
+    ["Detonation Sphere 4"] = {
+        ["crystal"] = "Wind Crystal",
+        ["ingredients"] = {
+            "Beryl Memosphere",
+        },
+    },
+    ["Detonation Sphere 5"] = {
+        ["crystal"] = "Wind Crystal",
+        ["ingredients"] = {
+            "Wind Card",
         },
     },
     ["Devotee's Mitts"] = {
@@ -15459,8 +15491,7 @@ return {
         ["ingredients"] = {
             "Bronze Ingot",
             "Bronze Ingot",
-            "Ash Lumber",
-            "Grass Cloth",
+            "Maple Lumber",
         },
     },
     ["Hatzoaar Sword"] = {
@@ -17117,33 +17148,33 @@ return {
         },
     },
     ["Impaction Sphere"] = {
-        ["crystal"] = "Wind Crystal",
-        ["ingredients"] = {
-            "Ancient Papyrus",
-        },
-    },
-    ["Impaction Sphere 2"] = {
-        ["crystal"] = "Wind Crystal",
-        ["ingredients"] = {
-            "Beryl Memosphere",
-        },
-    },
-    ["Impaction Sphere 3"] = {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
             "Frayed Arrow",
         },
     },
-    ["Impaction Sphere 4"] = {
+    ["Impaction Sphere 2"] = {
+        ["crystal"] = "Wind Crystal",
+        ["ingredients"] = {
+            "Ancient Papyrus",
+        },
+    },
+    ["Impaction Sphere 3"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Star Spinel",
         },
     },
-    ["Impaction Sphere 5"] = {
+    ["Impaction Sphere 4"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Test Answers",
+        },
+    },
+    ["Impaction Sphere 5"] = {
+        ["crystal"] = "Wind Crystal",
+        ["ingredients"] = {
+            "Lightning Card",
         },
     },
     ["Imperial Cermet"] = {
@@ -17231,7 +17262,7 @@ return {
     ["Induration Sphere"] = {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
-            "Exoray Mold",
+            "Rusty Key",
         },
     },
     ["Induration Sphere 2"] = {
@@ -17243,10 +17274,16 @@ return {
     ["Induration Sphere 3"] = {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
-            "Rusty Key",
+            "Exoray Mold",
         },
     },
     ["Induration Sphere 4"] = {
+        ["crystal"] = "Lightng. Crystal",
+        ["ingredients"] = {
+            "Ice Card",
+        },
+    },
+    ["Induration Sphere 5"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Teal Memosphere",
@@ -19256,7 +19293,7 @@ return {
             "Distilled Water",
         },
     },
-    ["Leucos Voulge"] = {
+    ["Leucous Voulge"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
             "Holly Lumber",
@@ -19565,13 +19602,13 @@ return {
     ["Liquefaction Sphere"] = {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
-            "Ancient Salt",
+            "Bomb Coal",
         },
     },
     ["Liquefaction Sphere 2"] = {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
-            "Bomb Coal",
+            "Ancient Salt",
         },
     },
     ["Liquefaction Sphere 3"] = {
@@ -19584,6 +19621,12 @@ return {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
             "Rusty Medal",
+        },
+    },
+    ["Liquefaction Sphere 5"] = {
+        ["crystal"] = "Lightng. Crystal",
+        ["ingredients"] = {
+            "Fire Card",
         },
     },
     ["Lithic Wyvern Scale"] = {
@@ -22204,8 +22247,8 @@ return {
     ["Mythril Grip"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
-            "Silver Ingot",
-            "Silver Ingot",
+            "Mythril Ingot",
+            "Mythril Ingot",
             "Mandrel",
         },
     },
@@ -23994,6 +24037,12 @@ return {
             "Gold Lobster",
         },
     },
+    ["Peeled Lobster 2"] = {
+        ["crystal"] = "Wind Crystal",
+        ["ingredients"] = {
+            "Istakoz",
+        },
+    },
     ["Peiste Belt"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
@@ -24625,7 +24674,6 @@ return {
     ["Plastron"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
-            "Iron Sheet",
             "Darksteel Sheet",
             "Darksteel Sheet",
             "Darksteel Chain",
@@ -24633,6 +24681,7 @@ return {
             "Tiger Leather",
             "Tiger Leather",
             "Kunwu Iron",
+            "Kunwu Sheet",
         },
     },
     ["Plate Leggings"] = {
@@ -25679,16 +25728,6 @@ return {
             "Rune Staff",
         },
     },
-    ["Raetic Staff 2"] = {
-        ["crystal"] = "Fire Crystal",
-        ["ingredients"] = {
-            "Fulfillment Crystal",
-            "Cypress Lumber",
-            "Cypress Lumber",
-            "Cypress Lumber",
-            "Rune Staff",
-        },
-    },
     ["Rainbow Cape"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
@@ -26532,16 +26571,22 @@ return {
     ["Reverberation Sphere 2"] = {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
-            "Desert Venom",
+            "Fetich Torso",
         },
     },
     ["Reverberation Sphere 3"] = {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
-            "Fetich Torso",
+            "Desert Venom",
         },
     },
     ["Reverberation Sphere 4"] = {
+        ["crystal"] = "Lightng. Crystal",
+        ["ingredients"] = {
+            "Water Card",
+        },
+    },
+    ["Reverberation Sphere 5"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Indigo Memosphere",
@@ -28062,27 +28107,33 @@ return {
         },
     },
     ["Scission Sphere"] = {
-        ["crystal"] = "Wind Crystal",
+        ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
-            "Elshimo Marble",
+            "Scorpion Stinger",
         },
     },
     ["Scission Sphere 2"] = {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
-            "Fetich Head",
+            "Magicked Steel",
         },
     },
     ["Scission Sphere 3"] = {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
-            "Magicked Steel",
+            "Fetich Head",
         },
     },
     ["Scission Sphere 4"] = {
-        ["crystal"] = "Lightng. Crystal",
+        ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Scorpion Stinger",
+            "Elshimo Marble",
+        },
+    },
+    ["Scission Sphere 5"] = {
+        ["crystal"] = "Wind Crystal",
+        ["ingredients"] = {
+            "Earth Card",
         },
     },
     ["Scope"] = {
@@ -32782,7 +32833,7 @@ return {
     ["Transfixion Sphere"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Bruised Starfruit",
+            "Lucky Egg",
         },
     },
     ["Transfixion Sphere 2"] = {
@@ -32794,13 +32845,19 @@ return {
     ["Transfixion Sphere 3"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Lucky Egg",
+            "White Memosphere",
         },
     },
     ["Transfixion Sphere 4"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "White Memosphere",
+            "Bruised Starfruit",
+        },
+    },
+    ["Transfixion Sphere 5"] = {
+        ["crystal"] = "Wind Crystal",
+        ["ingredients"] = {
+            "Light Card",
         },
     },
     ["Translucent Rock"] = {
@@ -33269,7 +33326,7 @@ return {
             "Scintillant Ingot",
         },
     },
-    ["Ugol Solerets"] = {
+    ["Ugol Sollerets"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
             "P. Brass Sheet",
