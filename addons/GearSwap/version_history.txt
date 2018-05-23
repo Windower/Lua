@@ -1,4 +1,6 @@
 -------------------------------------------------
+GearSwap 0.932 - Fixed bug that prevented gearswap from identifying items by their bag when worn. 
+-------------------------------------------------
 GearSwap 0.931 - Added support to exporting with custom file names. 
 -------------------------------------------------
 GearSwap 0.930 - Fixed a problem with player[bag][item_name].count in the user environment.
