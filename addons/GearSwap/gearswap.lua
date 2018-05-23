@@ -285,7 +285,7 @@ function incoming_chunk(id,data,modified,injected,blocked)
             refresh_globals()
             next_packet_events.globals_update = data:unpack('H',3)
         end
-        if next_packet_events.pet_status_change and not gearswap_disable then
+        if next_packet_events.pet_status_change and not gearswap_disabled then
             equip_sets('pet_status_change',nil,next_packet_events.pet_status_change.newstatus,next_packet_events.pet_status_change.oldstatus)
             next_packet_events.pet_status_change = nil
         end
