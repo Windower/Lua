@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name     = 'Mount Muzzle'
 _addon.author   = 'Sjshovan (Apogee) sjshovan@gmail.com'
-_addon.version  = '0.9.1'
+_addon.version  = '0.9.2'
 _addon.commands = {'mountmuzzle', 'muzzle', 'mm'}
 
 local _logger = require('logger')
@@ -64,10 +64,10 @@ local help = {
         buildHelpSeperator('=', 23),
         buildHelpTitle('Types'),
         buildHelpSeperator('=', 23),
-        buildHelpTypeEntry(ucFirst(muzzles.silent.name), 'No Music (Default)'),
-        buildHelpTypeEntry(ucFirst(muzzles.normal.name), 'Original Music'),
-        buildHelpTypeEntry(ucFirst(muzzles.choco.name), 'Chocobo Music'),
-        buildHelpTypeEntry(ucFirst(muzzles.zone.name), 'Current Zone Music'),
+        buildHelpTypeEntry(ucFirst(muzzles.silent.name), muzzles.silent.description),
+        buildHelpTypeEntry(ucFirst(muzzles.normal.name), muzzles.normal.description),
+        buildHelpTypeEntry(ucFirst(muzzles.choco.name), muzzles.choco.description),
+        buildHelpTypeEntry(ucFirst(muzzles.zone.name), muzzles.zone.description),
         buildHelpSeperator('=', 23),
     },
 }
@@ -119,18 +119,18 @@ function injectMuzzleMusic()
 end
 
 function handleInjectionNeeds() 
-	if needs_inject and playerIsMounted() then
-		injectMuzzleMusic()
-		needs_inject = false;
+    if needs_inject and playerIsMounted() then
+        injectMuzzleMusic()
+        needs_inject = false;
     end
 end
 
 function playerIsMounted()
-	local _player = windower.ffxi.get_player()
-	if _player then
-		return mounted or _player.status == player.statuses.mounted
-	end
-	return false 
+    local _player = windower.ffxi.get_player()
+    if _player then
+        return mounted or _player.status == player.statuses.mounted
+    end
+    return false 
 end
 
 windower.register_event('login', requestInject)
@@ -138,7 +138,13 @@ windower.register_event('load', requestInject)
 windower.register_event('zone change', requestInject)
 
 windower.register_event('addon command', function(command, ...)
-    local command = command:lower()
+    if command then
+        local command = command:lower()
+    else 
+        display_help(help.commands)
+        return
+    end
+    
     local command_args = {...}
 
     local respond = false
@@ -188,11 +194,11 @@ windower.register_event('addon command', function(command, ...)
         )
     end
 
-	handleInjectionNeeds()
+    handleInjectionNeeds()
 end)
 
 windower.register_event('outgoing chunk', function(id, data)
-	if id == packets.outbound.action.id then
+    if id == packets.outbound.action.id then
         local packet = _packets.parse('outgoing', data)
         if packet.Category == packets.outbound.action.categories.mount then
             mounted = true
@@ -202,12 +208,15 @@ windower.register_event('outgoing chunk', function(id, data)
     end
 end)
 
-windower.register_event('incoming chunk', function(id, data)   
-	if id == packets.inbound.music_change.id and playerIsMounted() then
-		local packet = _packets.parse('incoming', data)	
-		packet['Song ID'] = resolveCurrentMuzzle().song
-		return _packets.build(packet)
-	end
+windower.register_event('incoming chunk', function(id, data)
+    if id == packets.inbound.music_change.id and playerIsMounted() then
+        local packet = _packets.parse('incoming', data)
+
+        if packet['BGM Type'] == music.types.mount then
+            packet['Song ID'] = resolveCurrentMuzzle().song
+            return _packets.build(packet)
+        end
+    end
     
     handleInjectionNeeds()
 end)

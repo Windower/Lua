@@ -39,18 +39,14 @@ packets = {
                 mount = 0x1A,
                 unmount = 0x12
             },
-            params = {
-                mount = 0x04,
-                unmount = 0x00
-            }
         }
     },
 }
 
 player = {
-	statuses = {
-		mounted = 85
-	}
+    statuses = {
+        mounted = 85
+    }
 }
 
 music = {
@@ -78,21 +74,21 @@ muzzles = {
     silent = {
         name = 'silent',
         song = music.songs.silent,
-        description = ''
+        description = 'No Music (Default)'
     },
     normal = {
         name = 'normal',
         song = music.songs.normal,
-        description = ''
+        description = 'Original Music'
     },
     choco = {
         name = 'choco',
         song = music.songs.choco,
-        description = ''
+        description = 'Chocobo Music'
     },
     zone = {
         name = 'zone',
         song = music.songs.zone,
-        description = ''
+        description = 'Current Zone Music'
     }
 }
