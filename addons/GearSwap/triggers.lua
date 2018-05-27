@@ -96,7 +96,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
                 end
                 return line
             end
-                        
+            
             if unified_prefix == '/ma' then
                 r_line = copy_entry(res.spells[validabils[language][unified_prefix][abil]])
                 storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
@@ -135,7 +135,10 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
                     
                     if spell.prefix == '/item' then
                         -- Item use packet handling here
-                        if find_usable_item(spell.id,true) then
+                        if spell.target.spawn_type == 2 then
+                            --0x36 packet
+                            command_registry[ts].proposed_packet = assemble_menu_item_packet(spell.target.id,spell.target.index,spell.id)
+                        elseif find_usable_item(spell.id,true) then
                             --0x37 packet
                             command_registry[ts].proposed_packet = assemble_use_item_packet(spell.target.id,spell.target.index,spell.id)
                         else
