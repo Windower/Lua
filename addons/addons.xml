@@ -697,4 +697,11 @@
     <bugtracker>https://github.com/Snapsmojo/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Fenrir/Snaps</support>
   </addon>
+  <addon>
+    <name>Trusts</name>
+    <author>Centurio a.k.a. from20020516</author>
+    <description>Save/Summon Trust set.</description>
+    <bugtracker>https://github.com/from20020516/Lua/issues</bugtracker>
+    <support>https://twitter.com/from20020516</support>
+  </addon>
 </addons>
