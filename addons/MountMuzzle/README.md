@@ -1,5 +1,5 @@
 **Author:** [Sjshovan (Apogee)](https://github.com/Ap0gee)  
-**Version:** v0.9.2  
+**Version:** v0.9.3  
 
 
 # Mount Muzzle
@@ -30,7 +30,7 @@ ___
 2. Click on `Releases`. 
 3. Click on the `Source code (zip)` link within the latest release to download.
 4. Extract the zipped folder to `Windower4/addons/`.
-5. Rename the folder to remove the version tag (`-v0.9.2`). The folder should be named `MountMuzzle`.
+5. Rename the folder to remove the version tag (`-v0.9.3`). The folder should be named `MountMuzzle`.
  
 ___
 ### Usage
@@ -112,6 +112,14 @@ ___
 
 ___
 ### Change Log
+
+**v0.9.3** - 5/31/2018
+- **Remove:** Removed /data/settings.xml file.
+- **Update:** licences now display correct author name.
+- **Update:** README refactored  in attempt to meet merge criteria.
+- **Update:** helpers.lua now requires only colors from constants.lua.
+- **Update:** constants.lua now returns table of globals for modular support.
+- **Update:** mountmuzzle.lua refactored in attempt to meet merge criteria.
 
 **v0.9.2** - 5/24/2018
 - **Fix:** Zone music gets silenced if player enters reive on mount with zone muzzle selected.
