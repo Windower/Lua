@@ -116,7 +116,7 @@ ___
 **v0.9.3** - 5/31/2018
 - **Remove:** Removed /data/settings.xml file.
 - **Update:** licences now display correct author name.
-- **Update:** README refactored  in attempt to meet merge criteria.
+- **Update:** README refactored in attempt to meet merge criteria.
 - **Update:** helpers.lua now requires only colors from constants.lua.
 - **Update:** constants.lua now returns table of globals for modular support.
 - **Update:** mountmuzzle.lua refactored in attempt to meet merge criteria.
