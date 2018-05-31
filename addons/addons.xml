@@ -697,4 +697,11 @@
     <bugtracker>https://github.com/Snapsmojo/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Fenrir/Snaps</support>
   </addon>
+  <addon>
+    <name>Checkparam</name>
+    <author>Centurio a.k.a. from20020516</author>
+    <description>Displays the total of property of target player's current equipments.</description>
+    <bugtracker>https://github.com/from20020516/Lua/issues</bugtracker>
+    <support>https://twitter.com/from20020516</support>
+  </addon>
 </addons>
