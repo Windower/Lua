@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.]]
 
 _addon.name = 'Checkparam'
 _addon.author = 'from20020516'
-_addon.version = '1.1'
+_addon.version = '1.2'
 _addon.commands = {'cp','checkparam'}
 
 require('logger')
@@ -37,7 +37,6 @@ config = require('config')
 packets = require('packets')
 
 defaults = {
-  NON = 'fast cast',
   WAR = 'store tp|double attack|triple attack|quadruple attack|weapon skill damage',
   MNK = 'store tp|double attack|triple attack|quadruple attack|martial arts|subtle blow',
   WHM = 'cure potency|cure potency ii|fast cast|cure spellcasting time|enmity|healing magic casting time|divine benison|damage taken|physical damage taken|magic damage taken',
@@ -60,11 +59,30 @@ defaults = {
   SCH = 'magic attack bonus|magic burst damage|magic burst damage ii|magic accuracy|magic damage|fast cast|elemental magic casting time|cure potency|enh mag eff dur|enhancing magic effect duration',
   GEO = 'pet: regen|pet: damage taken|indicolure effect duration|indi eff dur|fast cast|magic evasion',
   RUN = 'enmity|damage taken|physical damage taken|magic damage taken|spell inturruption rate|pharanx|inquartata|fastcast',
+  levelfilter = 99,
   debugmode = false,
 }
 settings = config.load(defaults)
 
 tbl = {}
+
+windower.register_event('addon command',function(arg)
+  if arg == 'debugmode' then
+    settings.debugmode = not settings.debugmode
+    settings:save('all')
+  else
+    for i=0,#res.slots do
+      local slot = windower.regex.replace(string.lower(res.slots[i].en),' ','_')
+      local gear_set = windower.ffxi.get_items().equipment
+      local gear = windower.ffxi.get_items(gear_set[slot..'_bag'],gear_set[slot])
+      if gear_set[slot] > 0 then
+        get_text(gear.id,gear.extdata)
+      end
+    end
+    local my = windower.ffxi.get_player()
+    show_results(my.name,my.main_job,my.sub_job)
+  end
+end)
 
 windower.register_event('incoming chunk',function(id,data)
   if id == 0x0C9 then
@@ -78,11 +96,18 @@ windower.register_event('incoming chunk',function(id,data)
           get_text(p['Item '..i],p['ExtData '..i])
         end
       end
-    elseif p['Type'] == 1 then --metadata
+    elseif p['Type'] == 1 then
       local t = windower.ffxi.get_mob_by_id(p['Target ID'])
       local mjob = res.jobs[p['Main Job']].ens
       local sjob = res.jobs[p['Sub Job']].ens
-      show_results(t.name,mjob,sjob)
+      if p['Main Job Level'] >= settings.levelfilter then
+        show_results(t.name,mjob,sjob)
+      else
+        tbl = {}
+        if mjob == 'NON' then
+          error('The target is in /anon state.')
+        end
+      end
     end
   end
 end)
@@ -112,6 +137,8 @@ function get_text(id,data)
       log(id,res.items[id].english,stats[1],stats[2],tbl[stats[1]])
     end
   end
+  tbl.sets = tbl.sets or {}
+  table.insert(tbl.sets,id)
 end
 
 function split_text(id,text,arg)
@@ -119,7 +146,7 @@ function split_text(id,text,arg)
     local key = windower.regex.replace(string.lower(key),'(\\"|\\.|\\s$)','')
     local key = integrate[key] or key
     local key = arg and arg..key or key
-    tbl[key] = tonumber(value) + (tbl[key] or 0)
+    tbl[key] = tonumber(value)+(tbl[key] or 0)
     if settings.debugmode then
       log(id,res.items[id].english,key,value,tbl[key])
     end
@@ -127,24 +154,29 @@ function split_text(id,text,arg)
 end
 
 function show_results(name,mjob,sjob)
+  local count = {}
+  for key,value in pairs(combination) do
+    for _,id in pairs(tbl.sets) do
+      if value.item[id] then
+        count[key] = (count[key] or 0)+1
+      end
+    end
+    if count[key] and count[key] > 1 then
+      for stat,multi in pairs(value.stats) do
+        tbl[stat] = (tbl[stat] or 0)+multi*math.min((count[key]+value.type),5)
+      end
+    end
+  end
   local stats = settings[mjob]
   local head = '<'..mjob..'/'..sjob..'>'
   windower.add_to_chat(160,string.color(name,1,160)..': '..string.color(head,160,160))
-  if mjob == 'NON' then
-    notice('Unknown job because /anon state. instead display <NON>.')
-  end
   for index,key in ipairs(windower.regex.split(stats,'[|]')) do
     local value = tbl[string.lower(key)]
     local color = {value and 1 or 160,value and 166 or 160}
     windower.add_to_chat(160,' ['..string.color(key,color[1],160)..'] '..string.color(tostring(value),color[2],160))
   end
   tbl = {}
-  collectgarbage()
 end
-
-windower.register_event('load',function()
-  print('Checkparam: Activate with in-game /check command.')
-end)
 
 integrate = {
   --[[integrate same property.information needed for development. @from20020516]]
@@ -165,6 +197,8 @@ integrate = {
   ['magatkbns'] = 'magic attack bonus',
   ['mag atk bonus'] = 'magic attack bonus',
   ['mag acc'] = 'magic accuracy',
+  ['m acc'] = 'magic accuracy',
+  ['r acc'] = 'ranged accuracy',
   ['magic burst dmg'] = 'magic burst damage',
   ['mag dmg'] = 'magic damage',
   ['crithit rate'] = 'critical hit rate',
@@ -183,7 +217,7 @@ enhanced = {
   [11000] = 'fast cast+3', --Swith Cape
   [11001] = 'fast cast+4', --Swith Cape +1
   [11037] = 'stoneskin+10', --Earthcry Earring
-  [11051] = 'increases resistance to all status ailments+5', ----Hearty Earring
+  [11051] = 'increases resistance to all status ailments+5', --Hearty Earring
   [11544] = 'fast cast+1', --Veela Cape
   [11602] = 'martial arts+10', --Cirque Necklace
   [11603] = 'dual wield+3', --Charis Necklace
@@ -231,4 +265,41 @@ enhanced = {
   [28619] = 'cursna+15', --Mending Cape
   [28631] = 'elemental siphon+30', --Conveyance Cape
   [28637] = 'fast cast+7', --Lifestream Cape
+}
+combination={
+  ['af']={item=S{
+    23040,23041,23042,23043,23044,23045,23046,23047,23048,23049,23050,23051,23052,23053,23055,23056,23057,23058,23059,23060,23061,23062,
+    23107,23108,23109,23110,23111,23112,23113,23114,23115,23116,23117,23118,23119,23120,23122,23123,23124,23125,23126,23127,23128,23129,
+    23174,23175,23176,23177,23178,23179,23180,23181,23182,23183,23184,23185,23186,23187,23189,23190,23191,23192,23193,23194,23195,23196,
+    23241,23242,23243,23244,23245,23246,23247,23248,23249,23250,23251,23252,23253,23254,23256,23257,23258,23259,23260,23261,23262,23263,
+    23308,23309,23310,23311,23312,23313,23314,23315,23316,23317,23318,23319,23320,23321,23323,23324,23325,23326,23327,23328,23329,23330,
+    23375,23376,23377,23378,23379,23380,23381,23382,23383,23384,23385,23386,23387,23388,23390,23391,23392,23393,23394,23395,23396,23397,
+    23442,23443,23444,23445,23446,23447,23448,23449,23450,23451,23452,23453,23454,23455,23457,23458,23459,23460,23461,23462,23463,23464,
+    23509,23510,23511,23512,23513,23514,23515,23516,23517,23518,23519,23520,23521,23522,23524,23525,23526,23527,23528,23529,23530,23531,
+    23576,23577,23578,23579,23580,23581,23582,23583,23584,23585,23586,23587,23588,23589,23591,23592,23593,23594,23595,23596,23597,23598,
+    23643,23644,23645,23646,23647,23648,23649,23650,23651,23652,23653,23654,23655,23656,23658,23659,23660,23661,23662,23663,23664,23665,
+    26085,26191},stats={['accuracy']=15,['magic accuracy']=15,['ranged accuracy']=15},type=-1},
+  ['af_smn']={item=S{23054,23121,23188,23255,23322,23389,23456,23523,23590,23657,26342},
+    stats={['pet: accuracy']=15,['pet: magic accuracy']=15,['pet: ranged accuracy']=15},type=-1},
+  ['adhemar']={item=S{25614,25687,27118,27303,27474},stats={['critical hit rate']=2},type=0},
+  ['amalric']={item=S{25616,25689,27120,27305,27476},stats={['magic attack bonus']=10},type=0},
+  ['apogee']={item=S{26677,26853,27029,27205,27381},stats={['blood pact damage']=2},type=0},
+  ['argosy']={item=S{26673,26849,27025,27201,27377},stats={['double attack']=2},type=0},
+  ['emicho']={item=S{25610,25683,27114,27299,27470},stats={['double attack']=2},type=0},
+  ['carmine']={item=S{26679,26855,27031,27207,27383},stats={['accuracy']=10},type=0},
+  ['kaykaus']={item=S{25618,25691,27122,27307,27478},stats={['cure potency ii']=2},type=0},
+  ['lustratio']={item=S{26669,26845,27021,27197,27373},stats={['weapon skill damage']=2},type=0},
+  ['rao']={item=S{26675,26851,27027,27203,27379},stats={['matial arts']=2},type=0},
+  ['ryuo']={item=S{25612,25685,27116,27301,27472},stats={['attack']=10},type=0},
+  ['souveran']={item=S{26671,26847,27023,27199,27375},stats={['damage taken']=2},type=0},
+  ['ayanmo']={item=S{25572,25795,25833,25884,25951},stats={['str']=8,['vit']=8,['mnd']=8},type=-1},
+  ['flamma']={item=S{25569,25797,25835,25886,25953},stats={['str']=8,['dex']=8,['vit']=8},type=-1},
+  ['mallquis']={item=S{25571,25799,25837,25888,25955},stats={['vit']=8,['int']=8,['mnd']=8},type=-1},
+  ['Mummu']={item=S{25570,25798,25836,25887,25954},stats={['dex']=8,['agi']=8,['chr']=8},type=-1},
+  ['tali\'ah']={item=S{25573,25796,25834,25885,25952},stats={['vit']=8,['dex']=8,['chr']=8},type=-1},
+  ['Hizamaru']={item=S{25576,25792,25830,25881,25948},stats={['counter']=2},type=-1},
+  ['Inyanga']={item=S{25577,25793,25831,25882,25949},stats={['refresh']=1},type=-1},
+  ['jhakri']={item=S{25578,25794,25832,25883,25950},stats={['fast cast']=3},type=-1},
+  ['meghanada']={item=S{25575,25791,25829,25880,25947},stats={['regen']=3},type=-1},
+  ['Sulevia\'s']={item=S{25574,25790,25828,25879,25946},stats={['subtle blow']=5},type=-1},
 }
