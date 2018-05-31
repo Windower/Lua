@@ -17,7 +17,7 @@ modification, are permitted provided that the following conditions are met:
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL Patrick Finnigan BE LIABLE FOR ANY
+DISCLAIMED. IN NO EVENT SHALL Sjshovan (Apogee) BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -28,13 +28,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name     = 'Mount Muzzle'
 _addon.author   = 'Sjshovan (Apogee) sjshovan@gmail.com'
-_addon.version  = '0.9.2'
+_addon.version  = '0.9.3'
 _addon.commands = {'mountmuzzle', 'muzzle', 'mm'}
 
 local _logger = require('logger')
 local _config  = require('config')
 local _packets = require('packets')
 
+require("constants")
 require('helpers')
 
 local mounted = false
@@ -64,10 +65,10 @@ local help = {
         buildHelpSeperator('=', 23),
         buildHelpTitle('Types'),
         buildHelpSeperator('=', 23),
-        buildHelpTypeEntry(ucFirst(muzzles.silent.name), muzzles.silent.description),
-        buildHelpTypeEntry(ucFirst(muzzles.normal.name), muzzles.normal.description),
-        buildHelpTypeEntry(ucFirst(muzzles.choco.name), muzzles.choco.description),
-        buildHelpTypeEntry(ucFirst(muzzles.zone.name), muzzles.zone.description),
+        buildHelpTypeEntry(muzzles.silent.name:ucfirst(), muzzles.silent.description),
+        buildHelpTypeEntry(muzzles.normal.name:ucfirst(), muzzles.normal.description),
+        buildHelpTypeEntry(muzzles.choco.name:ucfirst(), muzzles.choco.description),
+        buildHelpTypeEntry(muzzles.zone.name:ucfirst(), muzzles.zone.description),
         buildHelpSeperator('=', 23),
     },
 }
@@ -109,19 +110,16 @@ function requestInject()
 end
 
 function injectMuzzleMusic()
-    windower.packets.inject_incoming(
-        packets.inbound.music_change.id,
-        'IHH':pack(packets.inbound.music_change.id,
-            music.types.mount,
-            resolveCurrentMuzzle().song
-        )
-    )
+    _packets.inject(_packets.new('incoming', packets.inbound.music_change.id, {
+        ['BGM Type'] = music.types.mount,
+        ['Song ID'] = resolveCurrentMuzzle().song,
+    }))
 end
 
 function handleInjectionNeeds() 
     if needs_inject and playerIsMounted() then
         injectMuzzleMusic()
-        needs_inject = false;
+        needs_inject = false; 
     end
 end
 
@@ -139,7 +137,7 @@ windower.register_event('zone change', requestInject)
 
 windower.register_event('addon command', function(command, ...)
     if command then
-        local command = command:lower()
+        command = command:lower()
     else 
         display_help(help.commands)
         return
@@ -165,12 +163,12 @@ windower.register_event('addon command', function(command, ...)
         else
             needs_inject = true
             setMuzzle(muzzle)
-            response_message = 'Updated current muzzle to %s.':format(ucFirst(muzzle):color(colors.secondary))
+            response_message = 'Updated current muzzle to %s.':format(muzzle:ucfirst():color(colors.secondary))
         end
 
     elseif command == 'get' then
         respond = true
-        response_message = 'Current muzzle is %s.':format(ucFirst(getMuzzle()):color(colors.secondary))
+        response_message = 'Current muzzle is %s.':format(getMuzzle():ucfirst():color(colors.secondary))
 
     elseif command == 'default' then
         respond = true

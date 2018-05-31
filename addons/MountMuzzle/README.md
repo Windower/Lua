@@ -35,12 +35,11 @@ ___
 ___
 ### Usage
 
-**Manually load** the addon by using one of the following commands:
+Manually load the addon by using one of the following commands:
     
     //lua load mountmuzzle  
     //lua l mountmuzzle
-    
-**Automatically load** this addon by adding `lua load mountmuzzle` or `lua l mountmuzzle` to the bottom of your `Windower4/scripts/init.txt` file.
+
 ___    
 ### Commands
 
@@ -100,7 +99,7 @@ Reloads the Mount Muzzle addon. Below are the equivalent ways of calling the com
 ___
 ### Support
 **Having Issues with this addon?**
-* Please let me know [here.](https://github.com/Ap0gee/MountMuzzle/issues/new)
+* Please let me know [here](https://github.com/Ap0gee/MountMuzzle/issues/new).
   
 **Have something to say?**
 * Send me some feedback here: <sjshovan@gmail.com>
