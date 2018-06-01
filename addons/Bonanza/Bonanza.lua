@@ -65,8 +65,22 @@ windower.register_event('addon command',function(...)
         math.random() --shuffle rand
         cmd[i] = tonumber(cmd[i]) and cmd[i]*1 or cmd[i]
     end
-
-    if cmd[1] == 'judge' then
+    if not cmd[1] or cmd[1] == 'help' then
+        local chat = windower.add_to_chat
+        local color = string.color
+        chat(1,'Bonanza - Command List:')
+        chat(207,'//bonanza '..color('<number> [number] ...',166))
+        chat(160,' purchase specified marble(s).')
+        chat(207,'//bonanza '..color('random',166))
+        chat(160,' purchase up to 10 marbles with at random.')
+        chat(207,'//bonanza '..color('sequence <number>',166))
+        chat(160,' purchase up to 10 marbles with consecutive number.')
+        chat(160,' e.g. '..color('15250',166)..' then buying '..color('15250',166)..' to '..color('15259',166)..'.')
+        chat(207,'//bonanza '..color('last <number>',166))
+        chat(160,' purchase up to 10 random marbles with tail of specified 0-9.')
+        local zero = color('0',166)
+        chat(160,' e.g. '..zero..' then buying 2224'..zero..', 6231'..zero..', 4586'..zero..'...')
+    elseif cmd[1] == 'judge' then
         windower.chat.input('/smes')
     elseif count == 0 then
         error('you have already '..marble.limit..' marbles.')
