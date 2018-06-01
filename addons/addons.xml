@@ -699,8 +699,8 @@
   </addon>
   <addon>
     <name>Bonanza</name>
-    <author>Centurio a.k.a. from20020516</author>
-    <description>Judge your Bonanza Marble.</description>
+    <author>Centurio a.k.a from20020516</author>
+    <description>Purchace and Judge Bonanza Marbles.</description>
     <bugtracker>https://github.com/from20020516/Lua/issues</bugtracker>
     <support>https://twitter.com/from20020516</support>
   </addon>
