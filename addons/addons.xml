@@ -711,4 +711,11 @@
     <bugtracker>https://github.com/from20020516/Lua/issues</bugtracker>
     <support>https://twitter.com/from20020516</support>
   </addon>
+  <addon>
+    <name>Trusts</name>
+    <author>Centurio a.k.a from20020516</author>
+    <description>Save and Summon Trust sets.</description>
+    <bugtracker>https://github.com/from20020516/Lua/issues</bugtracker>
+    <support>https://twitter.com/from20020516</support>
+  </addon>
 </addons>
