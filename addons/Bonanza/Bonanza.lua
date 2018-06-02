@@ -117,39 +117,41 @@ function talk_moogle()
 end
 
 windower.register_event('incoming chunk',function(id,data)
-    --got a marble.
-    local p = packets.parse('incoming',data)
-    if id == 0x020 and hide_ui and p['Item'] == marble.id and p['Bag'] == 0 then
-        local item = windower.ffxi.get_items(0,p['Index'])
-        if extdata.decode(item).number == decides[1] then
-            hide_ui = false
-            table.remove(decides,1)
-            talk_moogle()
-        end
-    --responced to talk.
-    elseif id == 0x034 and hide_ui and p['NPC'] == moogle.id then
-        if moogle.distance > 36 then
-            error('not close enough to Bonanza Moogle.')
-        elseif marble.price > windower.ffxi.get_items().gil then
-            error('not have enough gils.')
-        else
-            local packet = packets.new('outgoing',0x05B)
-            local i = decides[1]
-            log('Purchase a Bonanza Marble #'..string.format('%05s',i))
-            --packet part 1
-                packet['Target']=moogle.id
-                packet['Option Index']=2+i%256*256
-                packet['Target Index']=moogle.index
-                packet['Automated Message']=true
-                packet['_unknown1']=(i-i%256)/256
-                packet['Zone']=p['Zone']
-                packet['Menu ID']=p['Menu ID']
-            packets.inject(packet)
-            --packet part 2
-                packet['Option Index']=3
-                packet['Automated Message']=false
-            packets.inject(packet)
-            return true; --hide ui
+    if S{0x020,0x034}[id] and hide_ui then
+        --got a marble.
+        local p = packets.parse('incoming',data)
+        if id == 0x020 and p['Item'] == marble.id and p['Bag'] == 0 then
+            local item = windower.ffxi.get_items(0,p['Index'])
+            if extdata.decode(item).number == decides[1] then
+                hide_ui = false
+                table.remove(decides,1)
+                talk_moogle()
+            end
+        --responced to talk.
+        elseif id == 0x034 and p['NPC'] == moogle.id then
+            if moogle.distance > 36 then
+                error('not close enough to Bonanza Moogle.')
+            elseif marble.price > windower.ffxi.get_items().gil then
+                error('not have enough gils.')
+            else
+                local packet = packets.new('outgoing',0x05B)
+                local i = decides[1]
+                log('Purchase a Bonanza Marble #'..string.format('%05s',i))
+                --packet part 1
+                    packet['Target']=moogle.id
+                    packet['Option Index']=2+i%256*256
+                    packet['Target Index']=moogle.index
+                    packet['Automated Message']=true
+                    packet['_unknown1']=(i-i%256)/256
+                    packet['Zone']=p['Zone']
+                    packet['Menu ID']=p['Menu ID']
+                packets.inject(packet)
+                --packet part 2
+                    packet['Option Index']=3
+                    packet['Automated Message']=false
+                packets.inject(packet)
+                return true; --hide ui
+            end
         end
     end
 end)
