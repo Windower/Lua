@@ -719,6 +719,13 @@
     <support>https://twitter.com/from20020516</support>
   </addon>
   <addon>
+    <name>Trusts</name>
+    <author>Centurio aka from20020516</author>
+    <description>Save and Summon trust sets.</description>
+    <bugtracker>https://github.com/from20020516/Lua/issues</bugtracker>
+    <support>https://twitter.com/from20020516</support>
+  </addon>
+  <addon>
     <name>MyHome</name>
     <author>Centurio aka from20020516</author>
     <description>Automatically choose and use warp spell or item.</description>

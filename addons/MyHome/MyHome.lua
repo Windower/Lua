@@ -55,7 +55,7 @@ function search_item()
         local item = item_array[stats.id]
         local set_equip = windower.ffxi.set_equip
         if item then
-            ext = extdata.decode(item)
+            local ext = extdata.decode(item)
             local enchant = ext.type == 'Enchanted Equipment'
             local recast = enchant and ext.charges_remaining > 0 and math.max(ext.next_use_time+18000-os.time(),0)
             local usable = recast and recast == 0
