@@ -305,7 +305,7 @@ augment_values = {
         [0x15E] = {{stat="Occ. maximizes magic accuracy ", offset=1,percent=true}},
         [0x15F] = {{stat="Occ. quickens spellcasting ", offset=1,percent=true}},
         [0x160] = {{stat="Occ. grants dmg. bonus based on TP ", offset=1,percent=true}},
-        [0x161] = {{stat="TP Bonus ", offset=1, multiplier=5}},
+        [0x161] = {{stat="TP Bonus ", offset=1, multiplier=50}},
         [0x162] = {{stat="Quadruple Attack ", offset=1}},
 
         [0x164] = {{stat='Potency of "Cure" effect received', offset=1, percent=true}},
