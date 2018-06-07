@@ -31,10 +31,7 @@ local function get_limits()
         level = player.sub_job_level
     end
         
-    local jobpointsspent = 0
-    for k, v in pairs(player.job_points.blu) do
-        jobpointsspent = jobpointsspent + (v^2 + v)/2
-    end
+    local jobpointsspent = player.job_points.blu.jp_spent
     if jobpointsspent >= 1200 then
         gifts = 2
     elseif jobpointsspent >= 100 then
@@ -168,7 +165,7 @@ end
 
 return spelllist
 
---Copyright © 2015, Anissa
+--Copyright Â© 2015, Anissa
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
