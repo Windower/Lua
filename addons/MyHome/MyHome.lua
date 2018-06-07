@@ -80,15 +80,18 @@ function search_item()
                 break;
             end
         else
-            log(stats[lang],false)
+            log('You don\'t have '..stats[lang]..'.')
         end
     end
 end
 
 windower.register_event('addon command',function()
     local player = windower.ffxi.get_player()
-    if S{player.main_job_id,player.sub_job_id}[4] then --BLM
-        local spell = {japanese='デジョンII',english='"Warp II"'}
+    local get_spells = windower.ffxi.get_spells()
+    local spell = S{player.main_job_id,player.sub_job_id}[4]
+        and (get_spells[261] and {japanese='デジョン',english='"Warp"'}
+        or get_spells[262] and {japanese='デジョンII',english='"Warp II"'})
+    if spell then
         windower.chat.input('/ma '..windower.to_shift_jis(spell[lang])..' <me>')
     else
         search_item()
