@@ -305,7 +305,7 @@ augment_values = {
         [0x15E] = {{stat="Occ. maximizes magic accuracy ", offset=1,percent=true}},
         [0x15F] = {{stat="Occ. quickens spellcasting ", offset=1,percent=true}},
         [0x160] = {{stat="Occ. grants dmg. bonus based on TP ", offset=1,percent=true}},
-        [0x161] = {{stat="TP Bonus ", offset=1, multiplier=5}},
+        [0x161] = {{stat="TP Bonus ", offset=1, multiplier=50}},
         [0x162] = {{stat="Quadruple Attack ", offset=1}},
 
         [0x164] = {{stat='Potency of "Cure" effect received', offset=1, percent=true}},
@@ -612,6 +612,14 @@ augment_values = {
         [0x436] = {{stat="Sniper Shot:DMG:", offset=1,multiplier=5,percent=true}},
         [0x437] = {{stat="Detonator:DMG:", offset=1,multiplier=5,percent=true}},
         [0x438] = {{stat="Weapon Skill:DMG:", offset=1,multiplier=5,percent=true}},
+
+        [0x480] = {{stat="DEF", offset=1,multiplier=10}},
+        [0x481] = {{stat="Evasion", offset=1,multiplier=3}},
+        [0x482] = {{stat="Mag. Evasion", offset=1,multiplier=3}},
+        [0x483] = {{stat="Phys. dmg. taken", offset=1,multiplier=-2,percent=true}},
+        [0x484] = {{stat="Magic dmg. taken", offset=1,multiplier=-2,percent=true}},
+        [0x485] = {{stat="Spell interruption rate down", offset=1,multiplier=-2,percent=true}},
+        [0x486] = {{stat="Occ. inc. resist. to stat. ailments", offset=1,multiplier=2}},
         
         [0x4E0] = {{stat="Enh. Mag. eff. dur. ", offset=1}},
         [0x4E1] = {{stat="Helix eff. dur. ", offset=1}},
@@ -752,6 +760,8 @@ augment_values = {
         [0x5AF] = {{stat='Enhances "Rayke" effect', offset=0,multiplier=0}},
         [0x5B0] = {{stat='Enhances "Inspire" effect', offset=0,multiplier=0}},
         [0x5B1] = {{stat='Enhances "Sleight of Sword" effect', offset=0,multiplier=0}},
+
+        [0x5C0] = {{stat="Parrying rate", offset=1,percent=true}},
         
         [0x600] = {{stat="Backhand Blow:DMG:", offset=1,multiplier=5,percent=true}},
         [0x601] = {{stat="Spinning Attack:DMG:", offset=1,multiplier=5,percent=true}},
