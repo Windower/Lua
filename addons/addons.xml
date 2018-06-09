@@ -551,6 +551,13 @@
     <support>http://www.ffxiah.com/player/Asura/Zubis</support>
   </addon>
   <addon>
+    <name>SpellBook</name>
+    <author>Sigil Baram (Ravlyn@Asura)</author>
+    <description>List unknown spells by job or category. Can also limit results by level or spent jp required by the spell.</description>
+    <bugtracker>https://github.com/sigilbaram/SpellBook/issues</support>
+    <support>https://discord.gg/b275nMv</support>
+  </addon>
+  <addon>
     <name>StaggerTrack</name>
     <author>Nitrous (Shiva)</author>
     <description>Catches voidwatch weakness messages and prints them to a textbox in case you miss them in the battle spam.</description>
