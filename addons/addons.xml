@@ -739,4 +739,11 @@
     <bugtracker>https://github.com/from20020516/Lua/issues</bugtracker>
     <support>https://twitter.com/from20020516</support>
   </addon>
+  <addon>
+    <name>Debuffed</name>
+    <author>Auk</author>
+    <description>Tracks and displays debuffs on your current target.</description>
+    <bugtracker>https://github.com/aukon/Lua/issues</bugtracker>
+    <support>https://discord.gg/b275nMv</support>
+  </addon>
 </addons>
