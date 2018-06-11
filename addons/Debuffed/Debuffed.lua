@@ -101,23 +101,13 @@ function update_box()
     end
 end
 
-function convert_overwrites(spell)
-    local str = res.spells[spell].overwrites
-    local t = {}
-    
-    if str then
-        str:gsub("[0-9]+",function(s) table.insert(t, tonumber(s)) end) 
-    end
-    return L(t)
-end
-
 function handle_overwrites(target, new, t)
     if not debuffed_mobs[target] then
         return true
     end
     
     for effect, spell in pairs(debuffed_mobs[target]) do
-        local old = convert_overwrites(spell[1])
+        local old = res.spells[spell[1]].overwrites
         
         -- Check if there isn't a higher priority debuff active
         if old:length() > 0 then
@@ -146,7 +136,7 @@ function apply_debuff(target, effect, spell)
     end
     
     -- Check overwrite conditions
-    local overwrites = convert_overwrites(spell)
+    local overwrites = res.spells[spell].overwrites
     if not handle_overwrites(target, spell, overwrites) then
         return
     end
@@ -155,8 +145,22 @@ function apply_debuff(target, effect, spell)
     debuffed_mobs[target][effect] = {spell, os.clock() + res.spells[spell].duration}
 end
 
+function handle_shot(target)
+    if not debuffed_mobs[target] or not debuffed_mobs[target][134] then
+        return true
+    end
+    
+    local current = debuffed_mobs[target][134][1]
+    if current < 26 then
+        debuffed_mobs[target][134][1] = current + 1
+    end
+end
+
 function inc_action(act)
     if act.category ~= 4 then
+        if act.category == 6 and act.param == 131 then
+            handle_shot(act.targets[1].id)
+        end
         return
     end
     
