@@ -29,6 +29,7 @@ _addon.name = 'Tab'
 _addon.author = 'from20020516'
 _addon.version = '1.0'
 
+require('sets')
 st = false
 x_pressed = false
 
@@ -37,11 +38,11 @@ windower.register_event('keyboard',function(dik,pressed,flags,blocked)
     if not windower.chat.is_open() then
         if dik == 45 then
             x_pressed = pressed
-        elseif dik == 15 and not st then --Tab
+        elseif dik == 15 and pressed and not st then --Tab
             st = x_pressed and '<stpc>' or '<stnpc>'
             windower.chat.input('/ta '..st)
             return true; --tab input blocking. it's probably broken..
-        elseif dik == 1 or dik == 28 then --Esc or Enter
+        elseif S{1,28}[dik] and pressed then --Esc or Enter
             st = false
         end
     end
