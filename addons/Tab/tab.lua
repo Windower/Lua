@@ -29,25 +29,20 @@ _addon.name = 'Tab'
 _addon.author = 'from20020516'
 _addon.version = '1.0'
 
-key_flags={}
+st = false
+x_pressed = false
 
 --replace input tab. validated in Japanese keyboard. please let me know if problems occur with the English keyboard.
-windower.register_event('keyboard',function(dik,flags,blocked)
-    key_flags[dik] = flags
-    if flags and not windower.chat.is_open(true) then
-        if dik == 15 and not st then --Tab
-            st = key_flags[45] and '<stpc>' or '<stnpc>' --X
+windower.register_event('keyboard',function(dik,pressed,flags,blocked)
+    if not windower.chat.is_open() then
+        if dik == 45 then
+            x_pressed = pressed
+        elseif dik == 15 and not st then --Tab
+            st = x_pressed and '<stpc>' or '<stnpc>'
             windower.chat.input('/ta '..st)
             return true; --tab input blocking. it's probably broken..
         elseif dik == 1 or dik == 28 then --Esc or Enter
             st = false
         end
-    end
-end)
-
---block error message.
-windower.register_event('incoming text',function(original,modified,original_mode)
-    if original_mode == 123 and st then
-        return true; --error message blocking when target doesn't exists.
     end
 end)
