@@ -37,7 +37,7 @@ x_pressed = false
 windower.register_event('keyboard',function(dik,pressed,flags,blocked)
     if dik == 45 then
         x_pressed = pressed
-    elseif not windower.chat.is_open(true) then
+    elseif not windower.chat.is_open() then
         if dik == 15 and pressed and not st then --Tab
             st = x_pressed and '<stpc>' or '<stnpc>'
             windower.chat.input('/ta '..st)

@@ -740,18 +740,17 @@
     <support>https://twitter.com/from20020516</support>
   </addon>
   <addon>
-<<<<<<< HEAD
-    <name>Tab</name>
-    <author>Centurio aka from20020516</author>
-    <description>Simple addon Replace Tab key input to &lt;stnpc&gt; or X+Tab to &lt;stpc&gt;. </description>
-    <bugtracker>https://github.com/from20020516/Lua/issues</bugtracker>
-    <support>https://twitter.com/from20020516</support>
-=======
     <name>Debuffed</name>
     <author>Auk</author>
     <description>Tracks and displays debuffs on your current target.</description>
     <bugtracker>https://github.com/aukon/Lua/issues</bugtracker>
     <support>https://discord.gg/b275nMv</support>
->>>>>>> upstream/dev
+  </addon>
+  <addon>
+    <name>Tab</name>
+    <author>Centurio aka from20020516</author>
+    <description>Simple addon Replace Tab key input to &lt;stnpc&gt; or X+Tab to &lt;stpc&gt;. </description>
+    <bugtracker>https://github.com/from20020516/Lua/issues</bugtracker>
+    <support>https://twitter.com/from20020516</support>
   </addon>
 </addons>
