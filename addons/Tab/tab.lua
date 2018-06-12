@@ -35,10 +35,10 @@ x_pressed = false
 
 --replace input tab. validated in Japanese keyboard. please let me know if problems occur with the English keyboard.
 windower.register_event('keyboard',function(dik,pressed,flags,blocked)
-    if not windower.chat.is_open() then
-        if dik == 45 then
-            x_pressed = pressed
-        elseif dik == 15 and pressed and not st then --Tab
+    if dik == 45 then
+        x_pressed = pressed
+    elseif not windower.chat.is_open(true) then
+        if dik == 15 and pressed and not st then --Tab
             st = x_pressed and '<stpc>' or '<stnpc>'
             windower.chat.input('/ta '..st)
             return true; --tab input blocking. it's probably broken..
