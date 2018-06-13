@@ -2,6 +2,7 @@
 
 - //tru save `<setname>` : Save trusts in current party.
 - //tru `<setname>` : Calls trusts you saved.
+- //tru list : Lists your saved sets.
 - //tru random : What's your fortune today?
 - //tru check : List of unlearned trusts. gotta catch 'em all!
 
@@ -14,6 +15,8 @@
   - 呼び出し先と"同枠"のフェイスは戻す
     - 既にPTにいる場合は戻さない = 倒れたフェイスの補充が可能
     - リキャストが不足している場合は戻さない
+- //tru list
+  - 保存したセットを一覧表示します。
 - //tru random
   - フェイスガチャ。PT枠上限までランダムで召喚
 - //tru check
