@@ -554,7 +554,7 @@
     <name>SpellBook</name>
     <author>Sigil Baram (Ravlyn@Asura)</author>
     <description>List unknown spells by job or category. Can also limit results by level or spent jp required by the spell.</description>
-    <bugtracker>https://github.com/sigilbaram/SpellBook/issues</support>
+    <bugtracker>https://github.com/sigilbaram/SpellBook/issues</bugtracker>
     <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
