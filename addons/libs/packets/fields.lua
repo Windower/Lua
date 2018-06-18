@@ -265,7 +265,7 @@ local enums = {
 }
 
 local e = function(t, val)
-    return enums[t][val] or 'Unknown value for \'%s\': %i':format(t, val)
+    return enums[t][val] or 'Unknown value for \'%s\': %s':format(t, tostring(val))
 end
 
 --[[
