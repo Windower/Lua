@@ -551,6 +551,13 @@
     <support>http://www.ffxiah.com/player/Asura/Zubis</support>
   </addon>
   <addon>
+    <name>SpellBook</name>
+    <author>Sigil Baram (Ravlyn@Asura)</author>
+    <description>List unknown spells by job or category. Can also limit results by level or spent jp required by the spell.</description>
+    <bugtracker>https://github.com/sigilbaram/SpellBook/issues</bugtracker>
+    <support>https://discord.gg/b275nMv</support>
+  </addon>
+  <addon>
     <name>StaggerTrack</name>
     <author>Nitrous (Shiva)</author>
     <description>Catches voidwatch weakness messages and prints them to a textbox in case you miss them in the battle spam.</description>
@@ -729,6 +736,20 @@
     <name>MyHome</name>
     <author>Centurio aka from20020516</author>
     <description>Automatically choose and use warp spell or item.</description>
+    <bugtracker>https://github.com/from20020516/Lua/issues</bugtracker>
+    <support>https://twitter.com/from20020516</support>
+  </addon>
+  <addon>
+    <name>Debuffed</name>
+    <author>Auk</author>
+    <description>Tracks and displays debuffs on your current target.</description>
+    <bugtracker>https://github.com/aukon/Lua/issues</bugtracker>
+    <support>https://discord.gg/b275nMv</support>
+  </addon>
+  <addon>
+    <name>Tab</name>
+    <author>Centurio aka from20020516</author>
+    <description>Simple addon Replace Tab key input to &lt;stnpc&gt; or X+Tab to &lt;stpc&gt;. </description>
     <bugtracker>https://github.com/from20020516/Lua/issues</bugtracker>
     <support>https://twitter.com/from20020516</support>
   </addon>

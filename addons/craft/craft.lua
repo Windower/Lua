@@ -100,13 +100,13 @@ local support_npcs = {
 
 local exceptions = {
     ['Geo Crystal'] = 6509,
-    ['Fire Card'] : 9764,
-    ['Ice Card'] : 9765,
-    ['Wind Card'] : 9766,
-    ['Earth Card'] : 9767,
-    ['Water Card'] : 9769,
-    ['Light Card']: 9770,
-    ['Dark Card']: 9771,
+    ['Fire Card'] = 9764,
+    ['Ice Card'] = 9765,
+    ['Wind Card'] = 9766,
+    ['Earth Card'] = 9767,
+    ['Water Card'] = 9769,
+    ['Light Card'] = 9770,
+    ['Dark Card'] = 9771,
 }
 
 local clusters = {
