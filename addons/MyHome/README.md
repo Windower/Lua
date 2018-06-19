@@ -4,9 +4,11 @@
 
 ### Command
 - `//mh` OR `//warp`
+
+
 - Priorities are:
-    1. Warp <me> - require learned and main job or sub job BLM.
-    2. Warp II <me>
+    1. Warp <me\> - require learned and main job or sub job BLM.
+    2. Warp II <me\>
     3. Warp Ring - search inventory and wardrobes.
     4. Warp Cudgel
     5. Instant Warp - search inventory.
