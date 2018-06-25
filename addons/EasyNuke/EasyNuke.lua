@@ -1,0 +1,207 @@
+--[[
+Copyright © 2018, FaceDesk Linkshell
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+* Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.
+* Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.
+* Neither the name of findAll nor the
+names of its contributors may be used to endorse or promote products
+derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL FaceDesk Linkshell, or it's members, BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+]]
+
+_addon.name    = 'EasyNuke'
+_addon.author  = 'FaceDesk Linkshell'
+_addon.version = '1.0.2'
+_addon.command = "ez"
+
+require('chat')
+require('lists')
+require('logger')
+require('sets')
+require('tables')
+require('strings')
+require('pack')
+
+file  = require('files')
+config = require('config')
+texts = require('texts')
+res = require('resources')
+
+local defaults = T{}
+defaults.current_element = "fire"
+defaults.target_mode = "t"
+settings = config.load(defaults)
+
+current_element = "fire"
+target_mode = "t"
+
+elements = T{"fire","wind","thunder","light","ice","water","earth","dark"}
+elements_dark = T{"ice","water","earth","dark"}
+elements_light = T{"fire","wind","thunder","light"}
+elements_index = 1
+other_modes = T{"fire","wind","thunder","light","ice","water","earth","dark","drain","aspir","absorb","cure"}
+
+targets = T{"t","bt","stnpc"}
+targets_index = 1
+
+spell_tables = {}
+spell_tables["fire"] = T{"Fire","Fire II","Fire III","Fire IV","Fire V","Fire VI",}
+spell_tables["fire"]["ga"] = T{"Firaga","Firaga II","Firaga III","Firaja",}
+spell_tables["fire"]["ra"] = T{"Fira","Fira II","Fira III"}
+spell_tables["earth"] = T{"Stone","Stone II","Stone III","Stone IV","Stone V","Stone VI",}
+spell_tables["earth"]["ga"] = T{"Stonega","Stonega II","Stonega III","Stoneja",}
+spell_tables["earth"]["ra"] = T{"Stonera","Stonera II","Stonera III"}
+spell_tables["wind"] = T{"Aero","Aero II","Aero III","Aero IV","Aero V","Aero VI",}
+spell_tables["wind"]["ga"] = T{"Aeroga","Aeroga II","Aeroga III","Aeroja",}
+spell_tables["wind"]["ra"] = T{"Aerora","Aerora II","Aerora III"}
+spell_tables["water"] = T{"Water","Water II","Water III","Water IV","Water V","Water VI",}
+spell_tables["water"]["ga"] = T{"Waterga","Waterga II","Waterga III","Waterja",}
+spell_tables["water"]["ra"] = T{"Watera","Watera II","Watera III"}
+spell_tables["ice"] = T{"Blizzard","Blizzard II","Blizzard III","Blizzard IV","Blizzard V","Blizzard VI",}
+spell_tables["ice"]["ga"] = T{"Blizzaga","Blizzaga II","Blizzaga III","Blizzaja",}
+spell_tables["ice"]["ra"] = T{"Blizzara","Blizzara II","Blizzara III"}
+spell_tables["thunder"] = T{"Thunder","Thunder II","Thunder III","Thunder IV","Thunder V","Thunder VI",}
+spell_tables["thunder"]["ga"] = T{"Thundaga","Thundaga II","Thundaga III","Thundaja",}
+spell_tables["thunder"]["ra"] = T{"Thundara","Thundara II","Thundara III"}
+spell_tables["light"] = T{"Banish","Banish II","Holy","Banish III",}
+spell_tables["light"]["ga"] = T{"Banishga","Banishga II"}
+spell_tables["dark"] = T{"Impact"}
+spell_tables["dark"]["ga"] = T{"Comet"}
+spell_tables["cure"] = T{"Cure","Cure II","Cure III","Cure IV","Cure V","Cure VI"}
+spell_tables["cure"]["ga"] = T{"Curaga","Curaga II","Curaga III","Curaga IV","Curaga V",}
+spell_tables["cure"]["ra"] = T{"Cura","Cura II","Cura III"} 
+spell_tables["drain"] = T{"Aspir","Aspir II","Aspir III","Drain","Drain II","Drain III"}
+spell_tables["absorb"] = T{"Absorb-Acc","Absorb-TP","Absorb-Attri","Absorb-STR","Absorb-DEX","Absorb-VIT","Absorb-AGI","Absorb-INT","Absorb-MND","Absorb-CHR"}
+
+function find_index ()
+		if current_element == "fire" then elements_index = 1 end
+		if current_element == "wind" then elements_index = 2 end
+		if current_element == "thunder" then elements_index = 3 end
+		if current_element == "light" then elements_index = 4 end
+		if current_element == "ice" then elements_index = 5 end
+		if current_element == "water" then elements_index = 6 end
+		if current_element == "earth" then elements_index = 7 end
+		if current_element == "dark" then elements_index = 8 end
+end
+
+windower.register_event('addon command', function (command, arg)
+
+	if command == 'boom' then
+		if arg == nil then arg = 1 end
+		arg = tonumber(arg)
+		if arg > #spell_tables[current_element] then windower.send_command("@input /echo Invalid Spell. Try again.") return end
+		local current_spell_table = spell_tables[current_element]
+		windower.send_command("@input /ma "..current_spell_table[arg].." <"..target_mode..">")
+	end
+	
+	if command == "boomga" then
+		if arg == nil then arg = 1 end
+		arg = tonumber(arg)
+		if arg > #spell_tables[current_element]["ga"] then windower.send_command("@input /echo Invalid Spell. Try again.") return end
+		local current_spell_table = spell_tables[current_element]["ga"]
+		windower.send_command("@input /ma "..current_spell_table[arg].." <"..target_mode..">")
+	end
+	
+	if command == "boomra" then
+		if arg == nil then arg = 1 end
+		arg = tonumber(arg)
+		if arg > #spell_tables[current_element]["ra"] then windower.send_command("@input /echo Invalid Spell. Try again.") return end
+		local current_spell_table = spell_tables[current_element]["ra"]
+		windower.send_command("@input /ma "..current_spell_table[arg].." <"..target_mode..">")
+	end
+	
+	if command == "target" then
+		if arg then
+			arg = string.lower(arg)
+			target_mode = arg
+			windower.send_command("@input /echo Target mode is now: "..target_mode)
+		else targets_index = targets_index + 1
+		if targets_index > 3 then targets_index = 1 end
+		target_mode = targets[targets_index]
+		windower.send_command("@input /echo Target Mode is now: "..target_mode)
+		end
+	end
+	
+	if command == "element" then
+		arg = string.lower(arg)
+		if elements:contains(arg) then
+			current_element = arg
+			windower.send_command("@input /echo Element Mode is now: "..string.ucfirst(current_element))
+		elseif other_modes:contains(arg) then
+			current_element = arg
+			windower.send_command("@input /echo Element Mode is now: "..string.ucfirst(current_element))
+		else windower.send_command("@input /echo Invalid element")
+		end
+	end
+	
+	if command == "cycle" then
+		arg = string.lower(arg)
+		if arg == nil then
+			find_index()
+			elements_index = elements_index + 1
+			if elements_index > 8 then elements_index = 1 end
+			current_element = tostring(elements[elements_index])
+			windower.send_command("@input /echo Element Mode is now: "..string.ucfirst(current_element))
+		elseif arg == "back" then
+			find_index()
+			elements_index = elements_index - 1
+			if elements_index < 1 then elements_index = 8 end
+			current_element = elements[elements_index]
+			windower.send_command("@input /echo Element Mode is now: "..string.ucfirst(current_element))
+		elseif arg == "dark" then
+			find_index()
+			elements_index = elements_index + 1
+			if elements_index < 5 then elements_index = 5 end
+			if elements_index > 8 then elements_index = 5 end
+			current_element = elements[elements_index]
+			windower.send_command("@input /echo Element Mode is now: "..string.ucfirst(current_element))
+		elseif arg == "light" then
+			find_index()
+			elements_index = elements_index + 1
+			if elements_index > 4 then elements_index = 1 end
+			current_element = elements[elements_index]
+			windower.send_command("@input /echo Element Mode is now: "..string.ucfirst(current_element))
+		elseif arg == "fusion" then
+			if current_element ~= "fire" and current_element ~= "light" then current_element = "fire"
+			elseif current_element == "fire" then current_element = "light"
+			elseif current_element == "light" then current_element = "fire"
+			end
+		elseif arg == "distortion" or arg == "dist" or arg == "d" then
+			if current_element ~= "ice" and current_element ~= "water" then current_element = "ice"
+			elseif current_element == "ice" then current_element = "water"
+			elseif current_element == "water" then current_element = "ice"
+			end
+		elseif arg == "gravitation" or arg == "grav" or arg == "g" then
+			if current_element ~= "earth" and current_element ~= "dark" then current_element = "earth"
+			elseif current_element == "earth" then current_element = "dark"
+			elseif current_element == "dark" then current_element = "earth"
+			end
+		elseif arg == "fragmentation" or arg == "frag" or arg == "f" then
+			if current_element ~= "thunder" and current_element ~= "wind" then current_element = "thunder"
+			elseif current_element == "thunder" then current_element = "wind"
+			elseif current_element == "wind" then current_element = "thunder"
+			end
+		end
+	end
+		
+	if command == "showcurrent" then
+		windower.send_command("@input /echo ----- Element Mode: "..string.ucfirst(current_element).." --- Target Mode: < "..target_mode.." > -----")
+	end
+end)
