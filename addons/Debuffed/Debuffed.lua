@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'Debuffed'
 _addon.author = 'Auk'
-_addon.version = '1.0.0.2'
+_addon.version = '1.0.0.3'
 _addon.commands = {'dbf','debuffed'}
 
 config = require('config')
@@ -107,10 +107,10 @@ function handle_overwrites(target, new, t)
     end
     
     for effect, spell in pairs(debuffed_mobs[target]) do
-        local old = res.spells[spell[1]].overwrites
+        local old = res.spells[spell[1]].overwrites or {}
         
         -- Check if there isn't a higher priority debuff active
-        if old:length() > 0 then
+        if table.length(old) > 0 then
             for _,v in ipairs(old) do
                 if new == v then
                     return false
@@ -119,7 +119,7 @@ function handle_overwrites(target, new, t)
         end
         
         -- Check if a lower priority debuff is being overwritten
-        if t:length() > 0 then
+        if table.length(t) > 0 then
             for _,v in ipairs(t) do
                 if spell[1] == v then
                     debuffed_mobs[target][effect] = nil
@@ -136,13 +136,13 @@ function apply_debuff(target, effect, spell)
     end
     
     -- Check overwrite conditions
-    local overwrites = res.spells[spell].overwrites
+    local overwrites = res.spells[spell].overwrites or {}
     if not handle_overwrites(target, spell, overwrites) then
         return
     end
     
     -- Create timer
-    debuffed_mobs[target][effect] = {spell, os.clock() + res.spells[spell].duration}
+    debuffed_mobs[target][effect] = {spell, os.clock() + res.spells[spell].duration or 0}
 end
 
 function handle_shot(target)
