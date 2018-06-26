@@ -184,12 +184,20 @@ windower.register_event('addon command', function (command, arg)
             arg = string.lower(arg)
         end
         if arg == nil then
-            elements_index = indices[current_element]
-            elements_index = elements_index % 8 + 1
+            if not elements:contains(current_element) then
+                elements_index = 1
+            else
+                elements_index = indices[current_element]
+                elements_index = elements_index % 8 + 1
+            end
             current_element = elements[elements_index]
         elseif arg == "back" then
-            elements_index = indices[current_element]
-            elements_index = elements_index - 1
+            if not elements:contains(current_element) then
+                elements_index = 1
+            else
+                elements_index = indices[current_element]
+                elements_index = elements_index - 1
+            end
             if elements_index < 1 then
                 elements_index = 8
             end
@@ -197,7 +205,7 @@ windower.register_event('addon command', function (command, arg)
         elseif arg == "dark" then
             if not elements_dark:contains(current_element) then
                 elements_index = 1
-            else    
+            else
                 elements_index = elements_index % 4 + 1
             end
                 current_element = elements_dark[elements_index]
