@@ -10,7 +10,7 @@ notice, this list of conditions and the following disclaimer.
 * Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
 documentation and/or other materials provided with the distribution.
-* Neither the name of findAll nor the
+* Neither the name of EasyNuke nor the
 names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name    = 'EasyNuke'
 _addon.author  = 'FaceDesk Linkshell'
-_addon.version = '1.0.2'
+_addon.version = '1.0.3'
 _addon.command = "ez"
 
 require('chat')
@@ -56,7 +56,7 @@ elements = T{"fire","wind","thunder","light","ice","water","earth","dark"}
 elements_dark = T{"ice","water","earth","dark"}
 elements_light = T{"fire","wind","thunder","light"}
 elements_index = 1
-other_modes = T{"fire","wind","thunder","light","ice","water","earth","dark","drain","aspir","absorb","cure"}
+other_modes = S{"drain","aspir","absorb","cure"}
 
 targets = T{"t","bt","stnpc"}
 targets_index = 1
@@ -88,120 +88,117 @@ spell_tables["cure"] = T{"Cure","Cure II","Cure III","Cure IV","Cure V","Cure VI
 spell_tables["cure"]["ga"] = T{"Curaga","Curaga II","Curaga III","Curaga IV","Curaga V",}
 spell_tables["cure"]["ra"] = T{"Cura","Cura II","Cura III"} 
 spell_tables["drain"] = T{"Aspir","Aspir II","Aspir III","Drain","Drain II","Drain III"}
+spell_tables["drain"]["ga"] = spell_tables["drain"]
+spell_tables["drain"]["ra"] = spell_tables["drain"]
+spell_tables["aspir"] = spell_tables["drain"]
+spell_tables["aspir"]["ga"] = spell_tables["drain"]
+spell_tables["aspir"]["ra"] = spell_tables["drain"]
 spell_tables["absorb"] = T{"Absorb-Acc","Absorb-TP","Absorb-Attri","Absorb-STR","Absorb-DEX","Absorb-VIT","Absorb-AGI","Absorb-INT","Absorb-MND","Absorb-CHR"}
-
-function find_index ()
-		if current_element == "fire" then elements_index = 1 end
-		if current_element == "wind" then elements_index = 2 end
-		if current_element == "thunder" then elements_index = 3 end
-		if current_element == "light" then elements_index = 4 end
-		if current_element == "ice" then elements_index = 5 end
-		if current_element == "water" then elements_index = 6 end
-		if current_element == "earth" then elements_index = 7 end
-		if current_element == "dark" then elements_index = 8 end
-end
+spell_tables["absorb"]["ga"] = spell_tables["absorb"]
+spell_tables["absorb"]["ra"] = spell_tables["absorb"]
 
 windower.register_event('addon command', function (command, arg)
 
-	if command == 'boom' then
-		if arg == nil then arg = 1 end
-		arg = tonumber(arg)
-		if arg > #spell_tables[current_element] then windower.send_command("@input /echo Invalid Spell. Try again.") return end
-		local current_spell_table = spell_tables[current_element]
-		windower.send_command("@input /ma "..current_spell_table[arg].." <"..target_mode..">")
-	end
-	
-	if command == "boomga" then
-		if arg == nil then arg = 1 end
-		arg = tonumber(arg)
-		if arg > #spell_tables[current_element]["ga"] then windower.send_command("@input /echo Invalid Spell. Try again.") return end
-		local current_spell_table = spell_tables[current_element]["ga"]
-		windower.send_command("@input /ma "..current_spell_table[arg].." <"..target_mode..">")
-	end
-	
-	if command == "boomra" then
-		if arg == nil then arg = 1 end
-		arg = tonumber(arg)
-		if arg > #spell_tables[current_element]["ra"] then windower.send_command("@input /echo Invalid Spell. Try again.") return end
-		local current_spell_table = spell_tables[current_element]["ra"]
-		windower.send_command("@input /ma "..current_spell_table[arg].." <"..target_mode..">")
-	end
-	
-	if command == "target" then
-		if arg then
-			arg = string.lower(arg)
-			target_mode = arg
-			windower.send_command("@input /echo Target mode is now: "..target_mode)
-		else targets_index = targets_index + 1
-		if targets_index > 3 then targets_index = 1 end
-		target_mode = targets[targets_index]
-		windower.send_command("@input /echo Target Mode is now: "..target_mode)
-		end
-	end
-	
-	if command == "element" then
-		arg = string.lower(arg)
-		if elements:contains(arg) then
-			current_element = arg
-			windower.send_command("@input /echo Element Mode is now: "..string.ucfirst(current_element))
-		elseif other_modes:contains(arg) then
-			current_element = arg
-			windower.send_command("@input /echo Element Mode is now: "..string.ucfirst(current_element))
-		else windower.send_command("@input /echo Invalid element")
-		end
-	end
-	
-	if command == "cycle" then
-		arg = string.lower(arg)
-		if arg == nil then
-			find_index()
-			elements_index = elements_index + 1
-			if elements_index > 8 then elements_index = 1 end
-			current_element = tostring(elements[elements_index])
-			windower.send_command("@input /echo Element Mode is now: "..string.ucfirst(current_element))
-		elseif arg == "back" then
-			find_index()
-			elements_index = elements_index - 1
-			if elements_index < 1 then elements_index = 8 end
-			current_element = elements[elements_index]
-			windower.send_command("@input /echo Element Mode is now: "..string.ucfirst(current_element))
-		elseif arg == "dark" then
-			find_index()
-			elements_index = elements_index + 1
-			if elements_index < 5 then elements_index = 5 end
-			if elements_index > 8 then elements_index = 5 end
-			current_element = elements[elements_index]
-			windower.send_command("@input /echo Element Mode is now: "..string.ucfirst(current_element))
-		elseif arg == "light" then
-			find_index()
-			elements_index = elements_index + 1
-			if elements_index > 4 then elements_index = 1 end
-			current_element = elements[elements_index]
-			windower.send_command("@input /echo Element Mode is now: "..string.ucfirst(current_element))
-		elseif arg == "fusion" then
-			if current_element ~= "fire" and current_element ~= "light" then current_element = "fire"
-			elseif current_element == "fire" then current_element = "light"
-			elseif current_element == "light" then current_element = "fire"
-			end
-		elseif arg == "distortion" or arg == "dist" or arg == "d" then
-			if current_element ~= "ice" and current_element ~= "water" then current_element = "ice"
-			elseif current_element == "ice" then current_element = "water"
-			elseif current_element == "water" then current_element = "ice"
-			end
-		elseif arg == "gravitation" or arg == "grav" or arg == "g" then
-			if current_element ~= "earth" and current_element ~= "dark" then current_element = "earth"
-			elseif current_element == "earth" then current_element = "dark"
-			elseif current_element == "dark" then current_element = "earth"
-			end
-		elseif arg == "fragmentation" or arg == "frag" or arg == "f" then
-			if current_element ~= "thunder" and current_element ~= "wind" then current_element = "thunder"
-			elseif current_element == "thunder" then current_element = "wind"
-			elseif current_element == "wind" then current_element = "thunder"
-			end
-		end
-	end
-		
-	if command == "showcurrent" then
-		windower.send_command("@input /echo ----- Element Mode: "..string.ucfirst(current_element).." --- Target Mode: < "..target_mode.." > -----")
-	end
+    if command == "boom" or command == "nuke" then
+        local current_spell_table = spell_tables[current_element]
+        if arg == nil then arg = 1 end
+        arg = tonumber(arg)
+        if arg > #spell_tables[current_element] then 
+            windower.add_to_chat(206,"Invalid Spell. Try again.") return
+        end
+        windower.chat.input("/ma "..current_spell_table[arg].." <"..target_mode..">")
+        
+    elseif command == "boomga" or command == "bga" then
+        local current_spell_table = spell_tables[current_element]["ga"]
+        if arg == nil then arg = 1 end
+        arg = tonumber(arg)
+        if arg > #spell_tables[current_element]["ga"] or spell_tables[current_element]["ga"] == nil then 
+            windower.add_to_chat(206,"Invalid Spell. Try again.") return
+        end
+        windower.chat.input("/ma "..current_spell_table[arg].." <"..target_mode..">")
+        
+    elseif command == "boomra" or command == "bra" then
+        local current_spell_table = spell_tables[current_element]["ra"]
+        if arg == nil then arg = 1 end
+        arg = tonumber(arg)
+        if arg > #spell_tables[current_element]["ra"] or spell_tables[current_element]["ra"] == nil then
+            windower.add_to_chat(206,"Invalid Spell. Try again.") return
+        end
+        windower.chat.input("/ma "..current_spell_table[arg].." <"..target_mode..">")
+        
+    elseif command == "target" then
+        if arg then
+            arg = string.lower(arg)
+            target_mode = arg
+        else
+            targets_index = targets_index % 3 + 1
+            target_mode = targets[targets_index]    
+        end
+        windower.add_to_chat(206,"/echo Target Mode is now: "..target_mode)
+        
+    elseif command == "element" or command == "mode" then
+        arg = string.lower(arg)
+        if elements:contains(arg) or other_modes:contains(arg) then
+            current_element = arg
+            windower.add_to_chat(206,"/echo Element Mode is now: "..string.ucfirst(current_element))
+        else
+            windower.add_to_chat(206,"/echo Invalid element")
+        end
+        
+    elseif command == "cycle" then
+        if arg then
+            arg = string.lower(arg)
+        end
+        if arg == nil then 
+            elements_index = elements_index % 8 + 1
+            current_element = elements[elements_index]
+        elseif arg == "back" then
+            elements_index = elements_index - 1
+            if elements_index < 1 then
+                elements_index = 8
+            end
+            current_element = elements[elements_index]
+        elseif arg == "dark" then
+            elements_index = elements_index % 4 + 1
+            current_element = elements_dark[elements_index]
+        elseif arg == "light" then
+            elements_index = elements_index % 4 + 1
+            current_element = elements_light[elements_index]
+        elseif arg == "fusion" then
+            if current_element ~= "fire" and current_element ~= "light" then
+                current_element = "fire"
+            elseif current_element == "fire" then
+                current_element = "light"
+            elseif current_element == "light" then
+                current_element = "fire"
+            end
+        elseif arg == "distortion" or arg == "dist" then
+            if current_element ~= "ice" and current_element ~= "water" then
+                current_element = "ice"
+            elseif current_element == "ice" then
+                current_element = "water"
+            elseif current_element == "water" then
+                current_element = "ice"
+            end
+        elseif arg == "gravitation" or arg == "grav" then
+            if current_element ~= "earth" and current_element ~= "dark" then
+                current_element = "earth"
+            elseif current_element == "earth" then
+                current_element = "dark"
+            elseif current_element == "dark" then
+                current_element = "earth"
+            end
+        elseif arg == "fragmentation" or arg == "frag" then
+            if current_element ~= "thunder" and current_element ~= "wind" then
+                current_element = "thunder"
+            elseif current_element == "thunder" then
+                current_element = "wind"
+            elseif current_element == "wind" then
+                current_element = "thunder"
+            end
+        end
+        windower.add_to_chat(206, "Element Mode is now: "..string.ucfirst(current_element))
+    elseif command == "show" or command == "current" or command == "showcurrent" then
+        windower.add_to_chat(206, "----- Element Mode: "..string.ucfirst(current_element).." --- Target Mode: < "..target_mode.." > -----")
+    end
 end)
