@@ -34,9 +34,9 @@ cycle light
 cycle #
 * Cycles between the two elements of a T2 skillchain.
 ** Fusion: Fire, Light
-** Fragmentation, Frag, F: Thunder, Wind
-** Distortion, Dist, D: Ice, Water
-** Gravitation, Grav, G: Earth, Dark
+** Fragmentation, Frag: Thunder, Wind
+** Distortion, Dist: Ice, Water
+** Gravitation, Grav: Earth, Dark
 *** EX: //ez cycle dist <<<< If you were in Ice mode, will change you to Water mode. If you were in any other mode, will change you to Ice mode.
 *** Macro usage: /con ez cycle fragmentation
 
@@ -45,9 +45,9 @@ target #
 ** EX: //ez target bt <<<< Spells will be cast using <bt>.
 *** There are no failsafes for this. Any given argument will be accepted, even if it does not function as a targeting argument.
 *** If no argument is given, then will cycle through target modes in the following order: t, bt, stnpc
-** Macro usage: /con ez target #   OR   /con ez target
+** Macro usage: /con ez target   OR   /con ez target #
 
-showcurrent
+show, current or showcurrent
 * Echoes the current elemental and targeting modes in the chat log.
 ** EX: //ez showcurrent
 ** Macro usage: /con ez showcurrent
@@ -64,5 +64,5 @@ boomga #
 
 boomra #
 * Casts an area of effect nuke of tier#. GEO's -ra AOE nukes and WHM's Cura line
-** EX: //ez boomga 4 <<<< If in "ice" mode, and mode is "t", will cast Blizzaja on your current target.
-** Macro usage: /con ez boomga #
+** EX: //ez boomra 3 <<<< If in "ice" mode, and mode is "t", will cast Blizzara III on your current target. 
+** Macro usage: /con ez boomra #
