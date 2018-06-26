@@ -45,9 +45,9 @@ settings = config.load(defaults)
 current_element = "fire"
 target_mode = "t"
 
-elements = S{"fire","wind","thunder","light","ice","water","earth","dark"}
-elements_dark = S{"ice","water","earth","dark"}
-elements_light = S{"fire","wind","thunder","light"}
+elements = T{"fire","wind","thunder","light","ice","water","earth","dark"}
+elements_dark = T{"ice","water","earth","dark"}
+elements_light = T{"fire","wind","thunder","light"}
 elements_index = 1
 other_modes = S{"drain","aspir","absorb","cure"}
 
@@ -195,14 +195,14 @@ windower.register_event('addon command', function (command, arg)
             end
             current_element = elements[elements_index]
         elseif arg == "dark" then
-            if elements_light:contains(current_element) then
+            if not elements_dark:contains(current_element) then
                 elements_index = 1
             else    
                 elements_index = elements_index % 4 + 1
             end
                 current_element = elements_dark[elements_index]
         elseif arg == "light" then
-            if elements_dark:contains(current_element) then
+            if not elements_light:contains(current_element) then
                 elements_index = 1
             else
                 elements_index = elements_index % 4 + 1
