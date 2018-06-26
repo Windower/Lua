@@ -134,15 +134,15 @@ windower.register_event('addon command', function (command, arg)
             targets_index = targets_index % 3 + 1
             target_mode = targets[targets_index]    
         end
-        windower.add_to_chat(206,"/echo Target Mode is now: "..target_mode)
+        windower.add_to_chat(206,"Target Mode is now: "..target_mode)
         
     elseif command == "element" or command == "mode" then
         arg = string.lower(arg)
         if elements:contains(arg) or other_modes:contains(arg) then
             current_element = arg
-            windower.add_to_chat(206,"/echo Element Mode is now: "..string.ucfirst(current_element))
+            windower.add_to_chat(206,"Element Mode is now: "..string.ucfirst(current_element))
         else
-            windower.add_to_chat(206,"/echo Invalid element")
+            windower.add_to_chat(206,"Invalid element")
         end
         
     elseif command == "cycle" then
