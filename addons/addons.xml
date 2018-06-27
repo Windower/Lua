@@ -753,4 +753,11 @@
     <bugtracker>https://github.com/from20020516/Lua/issues</bugtracker>
     <support>https://twitter.com/from20020516</support>
   </addon>
+  <addon>
+    <name>EasyNuke</name>
+    <author>FaceDesk</author>
+    <description>Unified commands to handle single target and AOE nukes and cures, plus Drain/Aspir and Absorbs.</description>
+    <bugtracker>https://github.com/deadman80/Lua/issues</bugtracker>
+    <support>https://www.ffxiah.com/user/Nyarlko</support>
+  </addon>
 </addons>
