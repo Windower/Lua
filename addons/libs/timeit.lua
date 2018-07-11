@@ -2,9 +2,18 @@
 A library providing a timing feature.
 ]]
 
+_libs = _libs or {}
+
+require('functions')
+require('tables')
+
+local functions, table = _libs.functions, _libs.tables
+local string = require('string')
+local math = require('math')
+local logger = require('logger')
+
 local timeit = {}
 
-_libs = _libs or {}
 _libs.timeit = timeit
 
 -- Creates a new timer object.
@@ -39,10 +48,6 @@ end
 
 -- Returns the normalized time in seconds it took to perform the provided functions rep number of times, with the specified arguments.
 function timeit.benchmark(rep, ...)
-    _libs.functions = _libs.functions or require 'functions'
-    _libs.tables = _libs.tables or require 'tables'
-    _libs.logger = _libs.logger or require 'logger'
-
     local args = T{...}
     if type(rep) == 'function' then
         args:insert(1, rep)
@@ -103,7 +108,7 @@ end
 return timeit
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

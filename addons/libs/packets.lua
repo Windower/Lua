@@ -2,16 +2,20 @@
 A library to facilitate packet usage 
 ]]
 
+_libs = _libs or {}
+
+require('lists')
+require('maths')
+require('strings')
+require('functions')
+require('pack')
+
+local list, math, string, functions = _libs.lists, _libs.maths, _libs.strings
+local table = require('table')
+
 local packets = {}
 
-_libs = _libs or {}
 _libs.packets = packets
-_libs.lists = _libs.lists or require('lists')
-_libs.maths = _libs.maths or require('maths')
-_libs.strings = _libs.strings or require('strings')
-_libs.functions = _libs.functions or require('functions')
-
-require('pack')
 
 if not warning then
     warning = print+{_addon.name and '%s warning:':format(_addon.name) or 'Warning:'}

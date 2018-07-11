@@ -1,13 +1,15 @@
 -- Extdata lib first pass
 
 _libs = _libs or {}
-_libs.actions = true
-_libs.tables = _libs.tables or require 'tables'
-local res = require 'resources'
-_libs.strings = _libs.strings or require 'strings'
-_libs.functions = _libs.functions or require 'functions'
-require 'pack'
 
+require('tables')
+require('strings')
+require('functions')
+require('pack')
+
+local table, string, functions = _libs.tables, _libs.strings, _libs.functions
+local math = require('math')
+local res = require('resources')
 
 -- MASSIVE LOOKUP TABLES AND OTHER CONSTANTS
 
@@ -303,7 +305,7 @@ augment_values = {
         [0x15E] = {{stat="Occ. maximizes magic accuracy ", offset=1,percent=true}},
         [0x15F] = {{stat="Occ. quickens spellcasting ", offset=1,percent=true}},
         [0x160] = {{stat="Occ. grants dmg. bonus based on TP ", offset=1,percent=true}},
-        [0x161] = {{stat="TP Bonus ", offset=1, multiplier=5}},
+        [0x161] = {{stat="TP Bonus ", offset=1, multiplier=50}},
         [0x162] = {{stat="Quadruple Attack ", offset=1}},
 
         [0x164] = {{stat='Potency of "Cure" effect received', offset=1, percent=true}},
@@ -610,6 +612,14 @@ augment_values = {
         [0x436] = {{stat="Sniper Shot:DMG:", offset=1,multiplier=5,percent=true}},
         [0x437] = {{stat="Detonator:DMG:", offset=1,multiplier=5,percent=true}},
         [0x438] = {{stat="Weapon Skill:DMG:", offset=1,multiplier=5,percent=true}},
+
+        [0x480] = {{stat="DEF", offset=1,multiplier=10}},
+        [0x481] = {{stat="Evasion", offset=1,multiplier=3}},
+        [0x482] = {{stat="Mag. Evasion", offset=1,multiplier=3}},
+        [0x483] = {{stat="Phys. dmg. taken", offset=1,multiplier=-2,percent=true}},
+        [0x484] = {{stat="Magic dmg. taken", offset=1,multiplier=-2,percent=true}},
+        [0x485] = {{stat="Spell interruption rate down", offset=1,multiplier=-2,percent=true}},
+        [0x486] = {{stat="Occ. inc. resist. to stat. ailments", offset=1,multiplier=2}},
         
         [0x4E0] = {{stat="Enh. Mag. eff. dur. ", offset=1}},
         [0x4E1] = {{stat="Helix eff. dur. ", offset=1}},
@@ -750,6 +760,8 @@ augment_values = {
         [0x5AF] = {{stat='Enhances "Rayke" effect', offset=0,multiplier=0}},
         [0x5B0] = {{stat='Enhances "Inspire" effect', offset=0,multiplier=0}},
         [0x5B1] = {{stat='Enhances "Sleight of Sword" effect', offset=0,multiplier=0}},
+
+        [0x5C0] = {{stat="Parrying rate", offset=1,percent=true}},
         
         [0x600] = {{stat="Backhand Blow:DMG:", offset=1,multiplier=5,percent=true}},
         [0x601] = {{stat="Spinning Attack:DMG:", offset=1,multiplier=5,percent=true}},
@@ -1587,8 +1599,8 @@ function decode.Augmented(str)
     
     if flag_2%16/8 >= 1 then -- Crafting shields
         rettab.objective = str:byte(6)
-        local units = {30,40,50,100}
-        rettab.stage = math.min(1,math.max(4,str:byte(0x9)))
+        local units = {30,50,100,100}
+        rettab.stage = math.max(1,math.min(4,str:byte(0x9)))
         rettab.completion = str:unpack('H',7)/units[rettab.stage]
     elseif flag_2%64/32 >=1 then
         rettab.augment_system = 2
@@ -1969,7 +1981,9 @@ id_mapping = {
 -- ACTUAL EXTDATA LIB FUNCTIONS
     
 local extdata = {}
-    
+
+_libs.extdata = extdata
+
 function extdata.decode(tab)
     if not tab then error('extdata.decode was passed a nil value') end
     if not tab.id or not tonumber(tab.id) then

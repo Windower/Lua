@@ -2,21 +2,23 @@
     A collection of FFXI-specific chat/text functions and character/control database.
 ]]
 
+_libs = _libs or {}
+
+require('tables')
+require('sets')
+require('strings')
+
+local table, set, string = _libs.tables, _libs.sets, _libs.strings
+
 local chat = {}
 
-_libs = _libs or {}
-_libs.chat = chat
-_libs.tables = _libs.tables or require('tables')
-_libs.sets = _libs.sets or require('sets')
-_libs.strings = _libs.strings or require('strings')
-_libs.chat.colors = _libs.chat.colors or require('chat.colors')
-_libs.chat.controls = _libs.chat.controls or require('chat.controls')
+chat.colors = require('chat/colors')
+chat.controls = require('chat/controls')
 
--- Local functions
-local make_color
+_libs.chat = chat
 
 -- Returns a color from a given input.
-function make_color(col)
+local function make_color(col)
     if type(col) == 'number' then
         if col <= 0x000 or col == 0x100 or col == 0x101 or col > 0x1FF then
             warning('Invalid color number '..col..'. Only numbers between 1 and 511 permitted, except 256 and 257.')
@@ -103,7 +105,7 @@ chat.text_color_reset = '\\cr'
 return chat
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

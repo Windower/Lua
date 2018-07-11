@@ -2,6 +2,9 @@
     A library to facilitate image primitive creation and manipulation.
 ]]
 
+local table = require('table')
+local math = require('math')
+
 local images = {}
 local meta = {}
 
@@ -99,8 +102,8 @@ local apply_settings = function(_, t, settings)
     images.alpha(t, settings.color.alpha)
     images.color(t, settings.color.red, settings.color.green, settings.color.blue)
     images.size(t, settings.size.width, settings.size.height)
-    images.path(t, settings.texture.path)
     images.fit(t, settings.texture.fit)
+    images.path(t, settings.texture.path)
     images.repeat_xy(t, settings.repeatable.x, settings.repeatable.y)
     images.draggable(t, settings.draggable)
 
@@ -216,7 +219,7 @@ end
 
 function images.pos(t, x, y)
     local m = meta[t]
-    if not x then
+    if x == nil then
         return m.settings.pos.x, m.settings.pos.y
     end
 
@@ -226,7 +229,7 @@ function images.pos(t, x, y)
 end
 
 function images.pos_x(t, x)
-    if not x then
+    if x == nil then
         return meta[t].settings.pos.x
     end
 
@@ -234,7 +237,7 @@ function images.pos_x(t, x)
 end
 
 function images.pos_y(t, y)
-    if not y then
+    if y == nil then
         return meta[t].settings.pos.y
     end
 
@@ -243,7 +246,7 @@ end
 
 function images.size(t, width, height)
     local m = meta[t]
-    if not width then
+    if width == nil then
         return m.settings.size.width, m.settings.size.height
     end
 
@@ -253,7 +256,7 @@ function images.size(t, width, height)
 end
 
 function images.width(t, width)
-    if not width then
+    if width == nil then
         return meta[t].settings.size.width
     end
 
@@ -261,7 +264,7 @@ function images.width(t, width)
 end
 
 function images.height(t, height)
-    if not height then
+    if height == nil then
         return meta[t].settings.size.height
     end
 
@@ -269,7 +272,7 @@ function images.height(t, height)
 end
 
 function images.path(t, path)
-    if not path then
+    if path == nil then
         return meta[t].settings.texture.path
     end
 
@@ -278,7 +281,7 @@ function images.path(t, path)
 end
 
 function images.fit(t, fit)
-    if not fit then
+    if fit == nil then
         return meta[t].settings.texture.fit
     end
 
@@ -288,7 +291,7 @@ end
 
 function images.repeat_xy(t, x, y)
     local m = meta[t]
-    if not x then
+    if x == nil then
         return m.settings.repeatable.x, m.settings.repeatable.y
     end
 
@@ -298,7 +301,7 @@ function images.repeat_xy(t, x, y)
 end
 
 function images.draggable(t, drag)
-    if not drag then
+    if drag == nil then
         return meta[t].settings.draggable
     end
 
@@ -307,7 +310,7 @@ end
 
 function images.color(t, red, green, blue)
     local m = meta[t]
-    if not red then
+    if red == nil then
         return m.settings.color.red, m.settings.color.green, m.settings.color.blue
     end
 
@@ -319,7 +322,7 @@ end
 
 function images.alpha(t, alpha)
     local m = meta[t]
-    if not alpha then
+    if alpha == nil then
         return m.settings.color.alpha
     end
 
@@ -330,7 +333,7 @@ end
 -- Sets/returns image transparency. Based on percentage values, with 1 being fully transparent, while 0 is fully opaque.
 function images.transparency(t, alpha)
     local m = meta[t]
-    if not alpha then
+    if alpha == nil then
         return 1 - m.settings.color.alpha/255
     end
 

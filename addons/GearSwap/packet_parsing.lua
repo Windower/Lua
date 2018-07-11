@@ -456,7 +456,7 @@ parse.i[0x063] = function (data)
         for i=1,32 do
             local buff_id = data:unpack('H',i*2+7)
             if buff_id ~= 255 and buff_id ~= 0 then -- 255 is used for "no buff"
-                local t = data:unpack('I',i*4+0x45)/60+1439307535
+                local t = data:unpack('I',i*4+0x45)/60+501079520+1009810800
                 newbuffs[i] = setmetatable({
                     name=res.buffs[buff_id].name,
                     buff=copy_entry(res.buffs[buff_id]),
@@ -567,13 +567,14 @@ parse.i[0x063] = function (data)
 end
 
 parse.i[0x067] = function (data)
-    if data:byte(7)%128 == 4 and player.index == data:unpack('H',0x0D) then -- You are the owner
+    if player.index == data:unpack('H',0x0D) then -- You are the owner
         _ExtraData.pet.tp = data:unpack('H',0x11)
     end
 end
 
 parse.i[0x068] = function (data)
-    if data:byte(7)%128 == 4 and player.id == data:unpack('I',0x09) then -- You are the owner
+    
+    if player.index == data:unpack('H',0x07) then -- You are the owner
         _ExtraData.pet.tp = data:unpack('H',0x11)
     end
 end

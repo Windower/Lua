@@ -184,6 +184,11 @@ function equip_sets(swap_type,ts,...)
                     chunk_table:append(minichunk)
                 end
             end
+
+            if swap_type == 'midcast' and command_registry[ts] and command_registry[ts].proposed_packet and not _settings.demo_mode then
+                windower.packets.inject_outgoing(command_registry[ts].proposed_packet:byte(1),command_registry[ts].proposed_packet)
+            end
+
             if chunk_table.n >= 3 then
                 local big_chunk = string.char(0x51,0x24,0,0,chunk_table.n,0,0,0)
                 for i=1,chunk_table.n do
@@ -247,7 +252,10 @@ function equip_sets_exit(swap_type,ts,val1)
             if val1.target and val1.target.id and val1.target.index and val1.prefix and unify_prefix[val1.prefix] then
                 if val1.prefix == '/item' then
                     -- Item use packet handling here
-                    if find_usable_item(val1.id,true) then --val1.target.id == player.id then
+                    if val1.target.spawn_type == 2 then
+                        --0x36 packet
+                        command_registry[ts].proposed_packet = assemble_menu_item_packet(val1.target.id,val1.target.index,val1.id)
+                    elseif find_usable_item(val1.id,true) then --val1.target.id == player.id then
                         --0x37 packet
                         command_registry[ts].proposed_packet = assemble_use_item_packet(val1.target.id,val1.target.index,val1.id)
                     else
@@ -424,9 +432,6 @@ end
 ---- none
 -----------------------------------------------------------------------------------
 function send_action(ts)
-    if command_registry[ts].proposed_packet then
-        if not _settings.demo_mode then windower.packets.inject_outgoing(command_registry[ts].proposed_packet:byte(1),command_registry[ts].proposed_packet) end
-        command_registry[ts].midaction = true
-        equip_sets('midcast',ts,command_registry[ts].spell)
-    end
+    command_registry[ts].midaction = true
+    equip_sets('midcast',ts,command_registry[ts].spell)
 end

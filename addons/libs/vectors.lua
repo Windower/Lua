@@ -3,11 +3,15 @@ Vectors for operations in a d-dimensional space.
 ]]
 
 _libs = _libs or {}
-_libs.vectors = true
-_libs.tables = _libs.tables or require('tables')
-_libs.maths = _libs.maths or require('maths')
+
+require('tables')
+require('maths')
+
+local table, math = _libs.tables, _libs.maths
 
 vector = {}
+
+_libs.vectors = vector
 
 _meta = _meta or {}
 _meta.V = {}
