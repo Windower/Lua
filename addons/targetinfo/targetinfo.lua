@@ -1,6 +1,6 @@
 _addon.name = 'TargetInfo'
 _addon.author = 'Arcon'
-_addon.version = '1.0.1.1'
+_addon.version = '1.0.1.2'
 _addon.language = 'English'
 
 require('luau')
@@ -68,7 +68,7 @@ windower.register_event('prerender', function()
         local mobclaim = windower.ffxi.get_mob_by_id(mob.claim_id)
         local target = windower.ffxi.get_mob_by_index(mob.target_index)
         local info = {}
-        info.hex = mob.id % 0x1000
+        info.hex = mob.index
         info.full = mob.id
         local speed = (mob.status == 5 or mob.status == 85) and (100 * (mob.movement_speed / 4)):round(2) or (100 * (mob.movement_speed / 5 - 1)):round(2)
         info.speed = (
