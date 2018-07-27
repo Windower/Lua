@@ -1,5 +1,5 @@
 _addon.author = 'Arcon'
-_addon.version = '2.1.1.0'
+_addon.version = '2.1.1.1'
 _addon.language = 'English'
 _addon.command = 'yush'
 
@@ -156,7 +156,7 @@ windower.register_event('load', 'login', 'job change', 'logout', function()
     end
 
     if not file then
-        path = 'Binds'
+        path = 'binds.lua'
         file = loadfile(basepath .. path)
     end
 

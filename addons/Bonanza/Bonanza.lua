@@ -188,4 +188,5 @@ function scan_marbles()
             end
         end
     end
+    win_numbers = {}
 end
