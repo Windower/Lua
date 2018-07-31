@@ -317,9 +317,9 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                     skill = 'like level '..am.param_1..' ('..ratings_arr[am.param_2-63]..')'
                 end
             end
-            
+
             local outstr = (res.action_messages[am.message_id][language]
-                :gsub('$\123actor\125',color_it(actor.name or '',color_arr[actor.owner or actor.type]))
+                :gsub('$\123actor\125',color_it((actor.name or '') .. (actor.owner_name and '('..actor.owner_name..')') or "",color_arr[actor.owner or actor.type]))
                 :gsub('$\123status\125',status or '')
                 :gsub('$\123item\125',color_it(item or '',color_arr.itemcol))
                 :gsub('$\123target\125',color_it(target.name or '',color_arr[target.owner or target.type]))
