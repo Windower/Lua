@@ -241,7 +241,7 @@ function parse_action_packet(act)
                     :gsub('${weapon_skill}',color_it(act.action.weapon_skill or 'ERROR 114',color_arr.wscol))
                     :gsub('${abil}',m.simp_name or 'ERROR 115')
                     :gsub('${numb}',numb or 'ERROR 116')
-                    :gsub('${actor}',color_it((act.actor.name or 'ERROR 117' ) .. (act.actor.owner_name and '('..act.actor.owner_name..')') or "" ,color_arr[act.actor.owner or act.actor.type]))
+                    :gsub('${actor}',color_it((act.actor.name or 'ERROR 117' ) .. (act.actor.owner_name or "") ,color_arr[act.actor.owner or act.actor.type]))
                     :gsub('${target}',targ)
                     :gsub('${lb}','\7')
                     :gsub('${number}',act.action.number or m.param)
@@ -432,7 +432,7 @@ function player_info(id)
     
     if not filt then
         if player_table.is_npc then
-            if player_table.id%4096>2047 then
+            if player_table.index>1791 then
                 typ = 'other_pets'
                 filt = 'other_pets'
                 owner = 'other'
@@ -443,7 +443,7 @@ function player_info(id)
                             filt = 'my_pet'
                         end
                         owner = i
-                        owner_name = v.mob.name
+                        owner_name = showownernames and '(' .. v.mob.name .. ')'
                         break
                     elseif type(v) == 'table' and v.mob and v.mob.fellow_index and v.mob.fellow_index == player_table.index then
                         if i == 'p0' then
@@ -451,7 +451,7 @@ function player_info(id)
                             filt = 'my_fellow'
                         end
                         owner = i
-                        owner_name = v.mob.name
+                        owner_name = showownernames and '(' .. v.mob.name .. ')'
                         break
                     end
                 end
