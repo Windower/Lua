@@ -9,12 +9,3 @@ If you have rolled a lucky roll, it will also prompt you and automatically stop 
 To have the Lucky and Unlucky numbers of a roll displayed once per roll type //rolltracker luckyinfo
 
 Enjoy.
-
-
-
-
-
-
-
-
-
