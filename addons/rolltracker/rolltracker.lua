@@ -35,7 +35,7 @@ chars = require('chat.chars')
 packets = require('packets')
 
 defaults = {}
-defaults.autostop = true
+defaults.autostopper = true
 defaults.bust = 1
 defaults.effected = 1
 defaults.fold = 1
@@ -47,13 +47,14 @@ windower.register_event('addon command',function (...)
     cmd = {...}
     if cmd[1] ~= nil then
         if cmd[1]:lower() == "help" then
-            log('To toggle rolltracker from allowing/stopping rolls type: //rolltracker autostop')
-        elseif cmd[1]:lower() == "autostop" then
-            if settings.autostop then
-               settings.autostop = false
+            log('To toggle rolltracker from allowing/stopping rolls type: //rolltracker autostopper')
+            log('To toggle rolltracker from showing/hiding Lucky Info type: //rolltracker luckyinfo')
+        elseif cmd[1]:lower() == "autostopper" then
+            if settings.autostopper then
+               settings.autostopper = false
                log('Will no longer stop Double-UP on a Lucky Roll.')
             else
-               settings.autostop = true
+               settings.autostopper = true
                log('Will stop Double-UP on a Lucky Roll.')
             end
         elseif cmd[1]:lower() == "luckyinfo" then
@@ -71,7 +72,7 @@ end)
 
 --This is done because GearSwap swaps out too fast, and sometimes things aren't reported in memory.
 --Therefore, we store it within rolltracker so we can do the check locally.
-windower.register_event('incoming chunk', function(id, data) 
+windower.register_event('incoming chunk', function(id, data)
      if id == 0x050 then
         local packet = packets.parse('incoming', data)
         local slot = windower.ffxi.get_items(packet['Inventory Bag'])[packet['Inventory Index']]
@@ -89,7 +90,7 @@ end
 
 windower.register_event('load', function()
 
-    --We need a gear table, and we need to initialise it when we load 
+    --We need a gear table, and we need to initialise it when we load
     --So that if someone doesn't swap gear, at least it still works.
     gearTable = {
         [0]=getGear('main'),[1]=getGear('sub'),[2]=getGear('range'),[3]=getGear('ammo'),
@@ -145,7 +146,7 @@ windower.register_event('load', function()
     for key, val in pairs(rollInfoTemp) do
         rollInfo[res.job_abilities:with('english', key .. ' Roll').id] = {key, unpack(val)}
     end
-    
+
     settings = config.load(defaults)
 end)
 
@@ -177,11 +178,11 @@ windower.register_event('action', function(act)
         rollActor = act.actor_id
         local rollID = act.param
         local rollNum = act.targets[1].actions[1].param
-      
+
         -- anonymous function that checks if the player.id is in the targets without wrapping it in another layer of for loops.
-        if 
+        if
             function(act)
-                for i = 1, #act.targets do 
+                for i = 1, #act.targets do
                     if act.targets[i].id == player.id then
                         return true
                     end
@@ -194,7 +195,7 @@ windower.register_event('action', function(act)
             for partyMem in pairs(party) do
                 for effectedTarget = 1, #act.targets do
                     --if mob is nil then the party member is not in zone, will fire an error.
-                    if type(party[partyMem]) == 'table' and party[partyMem].mob and act.targets[effectedTarget].id == party[partyMem].mob.id then   
+                    if type(party[partyMem]) == 'table' and party[partyMem].mob and act.targets[effectedTarget].id == party[partyMem].mob.id then
                         rollMembers[effectedTarget] = partyColour[partyMem] .. party[partyMem].name .. chat.controls.reset
                     end
                 end
@@ -202,18 +203,18 @@ windower.register_event('action', function(act)
 
             local membersHit = table.concat(rollMembers, ', ')
             --fake 'ternary' assignment. if settings.effected is 1 then it'll show numbers, otherwise it won't.
-            local amountHit = settings.effected == 1 and '[' .. #rollMembers .. '] ' or ''            
+            local amountHit = settings.effected == 1 and '[' .. #rollMembers .. '] ' or ''
             local rollBonus = RollEffect(rollID, rollNum+1)
             local luckChat = ''
             isLucky = false
-            if rollNum == rollInfo[rollID][15] or rollNum == 11 then 
+            if rollNum == rollInfo[rollID][15] or rollNum == 11 then
                 isLucky = true
-                log('Lucky roll')
+                windower.add_to_chat(158,'Lucky roll!')
                 luckChat = string.char(31,158).." (Lucky!)"
-            elseif rollNum == rollInfo[rollID][16] then 
+            elseif rollNum == rollInfo[rollID][16] then
                 luckChat = string.char(31,167).." (Unlucky!)"
             end
-            
+
 
             if rollNum == 12 and #rollMembers > 0 then
                 windower.add_to_chat(1, string.char(31,167)..amountHit..'Bust! '..chat.controls.reset..chars.implies..' '..membersHit..' '..chars.implies..' ('..rollInfo[rollID][rollNum+1]..rollInfo[rollID][14]..')')
@@ -233,8 +234,8 @@ function RollEffect(rollid, rollnum)
     --There's gotta be a better way to do this.
     local rollName = rollInfo[rollid][1]
     local rollVal = rollInfo[rollid][rollnum]
-    
-    if lastRoll ~= rollid then 
+
+    if lastRoll ~= rollid then
         lastRoll = rollid
         rollPlusBonus = false
         gearBonus = false
@@ -259,7 +260,7 @@ function RollEffect(rollid, rollnum)
             tpVal = tpVal  + (rollInfo[rollid][17][2]*3)
             rollPlusBonus = true
         end
-        return "Pet:"..hpVal.." Regen".." +"..tpVal.." Regain" 
+        return "Pet:"..hpVal.." Regen".." +"..tpVal.." Regain"
     end
 
     --If there's no Roll Val can't add to it
@@ -297,12 +298,12 @@ function RollEffect(rollid, rollnum)
           rollVal = rollVal + bonusVal
         end
     end
-  
+
     -- Convert Bolter's to Movement Speed based on 5.0 being 100%
     if (rollName == "Bolter\'s") then
         rollVal = '%.0f':format(100*((5+rollVal) / 5 - 1))
     end
-    
+
     --Convert Beast/Chaos/Gallant's to % with 2 decimals
     if (rollName == "Chaos") or (rollName == "Gallant\'s") or (rollName == "Beast") then
         rollVal = '%.2f':format(rollVal/1024 * 100)
@@ -339,7 +340,7 @@ windower.register_event('outgoing text', function(original, modified)
     cleaned = windower.convert_auto_trans(original)
     modified = original
     if cleaned:match('/jobability \"?Double.*Up') or cleaned:match('/ja \"?Double.*Up') then
-        if isLucky and settings.autostop and rollActor == player.id then
+        if isLucky and settings.autostopper and rollActor == player.id then
             windower.add_to_chat(159,'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.')
             isLucky = false
             modified = ""
@@ -361,9 +362,9 @@ windower.register_event('outgoing text', function(original, modified)
             ranMultiple = true
             modified = ""
         end
-        
+
         return modified
     end
    return modified
-    
+
 end)
