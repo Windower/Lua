@@ -47,9 +47,9 @@ windower.register_event('addon command',function (...)
     cmd = {...}
     if cmd[1] ~= nil then
         if cmd[1]:lower() == "help" then
-            log('To toggle rolltracker from allowing/stopping rolls type: //rolltracker autostopper')
+            log('To toggle rolltracker from allowing/stopping rolls type: //rolltracker autostop')
             log('To toggle rolltracker from showing/hiding Lucky Info type: //rolltracker luckyinfo')
-        elseif cmd[1]:lower() == "autostopper" then
+        elseif cmd[1]:lower() == "autostop" then
             if settings.autostopper then
                settings.autostopper = false
                log('Will no longer stop Double-UP on a Lucky Roll.')
