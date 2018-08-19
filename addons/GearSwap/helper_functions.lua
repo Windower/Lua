@@ -496,7 +496,7 @@ function assemble_use_item_packet(target_id,target_index,item_id)
     outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
     outstr = outstr..string.char(0,0,0,0)
     outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
-    inventory_index,bag_id = find_usable_item(item_id,true)
+    inventory_index,bag_id = find_usable_item(item_id)
     if inventory_index then
         outstr = outstr..string.char(inventory_index%256)..string.char(0,bag_id,0,0,0)
     else
@@ -548,7 +548,7 @@ function assemble_menu_item_packet(target_id,target_index,...)
     -- Inventory Index for the one unit
     
     for i,v in pairs(counts) do
-        inventory_index,bag_id = find_usable_item(i,false)
+        inventory_index = find_inventory_item(i)
         if inventory_index then
             outstr = outstr..string.char(inventory_index%256)
         else
@@ -566,6 +566,24 @@ function assemble_menu_item_packet(target_id,target_index,...)
     return outstr
 end
 
+-----------------------------------------------------------------------------------
+--Name: find_inventory_item(item_id)
+--Desc: Finds a npc trade item in normal inventory. Assumes items array
+--      is accurate already.
+--Args:
+---- item_id - The resource line for the current item
+-----------------------------------------------------------------------------------
+--Returns:
+---- inventory_index - The item's use inventory index (if it exists)
+---- bag_id - The item's bag ID (if it exists)
+-----------------------------------------------------------------------------------
+function find_inventory_item(item_id)
+    for i,v in pairs(items.inventory) do
+        if type(v) == 'table' and v.id == item_id and v.status == 0 then
+            return i
+        end
+    end
+end
 
 -----------------------------------------------------------------------------------
 --Name: find_usable_item(item_id,bool)
@@ -573,16 +591,16 @@ end
 --      is accurate already.
 --Args:
 ---- item_id - The resource line for the current item
----- bool    - Indicates whether the item must show up in your control-I menu as usable
 -----------------------------------------------------------------------------------
 --Returns:
 ---- inventory_index - The item's use inventory index (if it exists)
 ---- bag_id - The item's bag ID (if it exists)
 -----------------------------------------------------------------------------------
-function find_usable_item(item_id,bool)
+
+function find_usable_item(item_id)
     for _,bag in ipairs(usable_item_bags) do
         for i,v in pairs(items[to_windower_bag_api(bag.en)]) do
-            if type(v) == 'table' and v.id == item_id and (v.status == 5 or v.status == 0) and (not bool or is_usable_item(v)) then
+            if type(v) == 'table' and v.id == item_id and is_usable_item(v,bag.id) then
                 return i, bag.id
             end
         end
@@ -594,13 +612,18 @@ end
 --Desc: Determines whether the item table belongs to a usable item.
 --Args:
 ---- i_tab - current item table
+---- bag_id - The item's bag ID
 -----------------------------------------------------------------------------------
 --Returns:
 ---- true or false to indicate whether the item is usable
 -----------------------------------------------------------------------------------
-function is_usable_item(i_tab)
+function is_usable_item(i_tab,bag_id)
     local ext = extdata.decode(i_tab)
-    if res.items[i_tab.id].type == 7 or (ext.type == 'Enchanted Equipment' and ext.usable) or res.items[i_tab.id].category == 'Usable' then return true end
+    if ext.type == 'Enchanted Equipment' and ext.usable then
+        return i_tab.status == 5
+    elseif i_tab.status == 0 and bag_id < 4 then
+        return true
+    end
     return false
 end
 
