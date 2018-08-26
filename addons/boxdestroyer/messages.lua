@@ -58,4 +58,4 @@ messages = { -- These dialogue IDs match "You were unable to enter a combination
     [212] = 10637,
     [213] = 10446,
 }
-offsets = {greater_less=1, failure=2, success=4, second_even_odd=5, first_even_odd=6, range=7, less=8, greater=9, equal=10, second_multiple=11, first_multiple=12}
+offsets = {greater_less=1, failure=2, success=4, second_even_odd=5, first_even_odd=6, range=7, less=8, greater=9, equal=10, second_multiple=11, first_multiple=12, tool_failure=13}
