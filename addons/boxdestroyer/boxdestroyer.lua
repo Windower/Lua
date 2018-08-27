@@ -355,9 +355,11 @@ function check_incoming_chunk(id, original, modified, injected, blocked)
             elseif get_id(zone_id,'less') == message_id then
                 -- Less is a range with 9 as the lower bound
                 if observed[box_id].thief_tools_active then
+                    box[box_id] = greater_less(box_id, true, math.max(9, param0-33) )
                     box[box_id] = greater_less(box_id, false, math.min(9+33,param0-7) )
                     observed[box_id].thief_tools_active = false
                 else
+                    box[box_id] = greater_less(box_id, true, math.max(9, param0-21) )
                     box[box_id] = greater_less(box_id, false, math.min(9+21,param0-4) )
                     observed[box_id].range = true
                 end
@@ -365,9 +367,11 @@ function check_incoming_chunk(id, original, modified, injected, blocked)
                 -- Greater is a range with 100 as the upper bound
                 if observed[box_id].thief_tools_active then
                     box[box_id] = greater_less(box_id, true, math.max(100-33,param0+7) )
+                    box[box_id] = greater_less(box_id, false, math.min(100,param0+33) )
                     observed[box_id].thief_tools_active = false
                 else
                     box[box_id] = greater_less(box_id, true, math.max(100-21,param0+4) )
+                    box[box_id] = greater_less(box_id, false, math.min(100,param0+21) )
                     observed[box_id].range = true
                 end
             elseif get_id(zone_id,'equal') == message_id then
