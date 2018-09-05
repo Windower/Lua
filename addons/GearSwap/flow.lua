@@ -252,15 +252,12 @@ function equip_sets_exit(swap_type,ts,val1)
             if val1.target and val1.target.id and val1.target.index and val1.prefix and unify_prefix[val1.prefix] then
                 if val1.prefix == '/item' then
                     -- Item use packet handling here
-                    if val1.target.spawn_type == 2 then
-                        --0x36 packet
+                    if bit.band(val1.target.spawn_type, 2) == 2 and find_inventory_item(val1.id) then
+                        -- 0x36 packet
                         command_registry[ts].proposed_packet = assemble_menu_item_packet(val1.target.id,val1.target.index,val1.id)
-                    elseif find_usable_item(val1.id,true) then --val1.target.id == player.id then
-                        --0x37 packet
+                    elseif find_usable_item(val1.id) then
+                        -- 0x37 packet
                         command_registry[ts].proposed_packet = assemble_use_item_packet(val1.target.id,val1.target.index,val1.id)
-                    else
-                        --0x36 packet
-                        command_registry[ts].proposed_packet = assemble_menu_item_packet(val1.target.id,val1.target.index,val1.id)
                     end
                     if not command_registry[ts].proposed_packet then
                         command_registry:delete_entry(ts)
