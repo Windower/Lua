@@ -77,7 +77,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
     if unified_prefix and temptarg and (validabils[language][unified_prefix][abil] or unified_prefix=='/ra') then
         if st_flag then
             st_flag = nil
-            return true
+            return modified
         elseif temp_mob_arr then
             refresh_globals()
             
