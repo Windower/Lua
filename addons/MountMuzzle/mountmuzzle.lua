@@ -102,10 +102,6 @@ function getMuzzle()
     return settings.muzzle
 end
 
-function getMuzzleNameFromAlias(alias)
-    return help.aliases.muzzles[alias]
-end
-
 function getPlayerBuffs() 
     return T(windower.ffxi.get_player().buffs)
 end
@@ -132,10 +128,6 @@ end
 
 function playerInReive()
     return getPlayerBuffs():contains(player.buffs.reiveMark)
-end
-
-function playerMounted()
-    return getPlayerBuffs()
 end
 
 function playerIsMounted()
@@ -179,20 +171,12 @@ function tryInject()
     handleInjectionNeeds()
 end
 
-windower.register_event('login', function() 
-    tryInject()
-end)
-
-windower.register_event('load', function() 
+windower.register_event('login', 'load', 'zone change', function() 
     tryInject()
 end)
 
 windower.register_event('unload', function() 
     injectMusic(music.types.mount, muzzles.zone.song)
-end)
-
-windower.register_event('zone change', function() 
-    tryInject()
 end)
 
 windower.register_event('addon command', function(command, ...)
@@ -214,7 +198,7 @@ windower.register_event('addon command', function(command, ...)
         respond = true
         
         local muzzle = tostring(command_args[1]):lower()
-        local from_alias = getMuzzleNameFromAlias(muzzle)
+        local from_alias = help.aliases.muzzles[muzzle]
         
         if (from_alias ~= nil) then
             muzzle = from_alias
