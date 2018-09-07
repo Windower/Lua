@@ -336,9 +336,9 @@
     <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
-    <name>MountMuzzle</name>
+    <name>Mount Muzzle</name>
     <author>Sjshovan (Apogee)</author>
-    <description>Allows the user to change or remove the default mount music.</description>
+    <description>Change or remove the default mount music.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>https://discord.gg/b275nMv</support>
   </addon>
