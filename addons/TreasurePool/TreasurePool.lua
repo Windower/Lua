@@ -126,6 +126,12 @@ windower.register_event('prerender', function()
     end
     for i = 0, 9 do
         if treasure[i] and treasure[i].item_id then
+            local item_name
+            if res.items[treasure[i].item_id] and res.items[treasure[i].item_id].name then --check if item is in 'resources'
+                item_name = res.items[treasure[i].item_id].name
+            else
+                item_name = 'NewItem#'..tostring(treasure[i].item_id)
+            end
             if goals[i] then
                 local diff = os.difftime(goals[i], os.time())
                 local timer = {}    
@@ -137,15 +143,15 @@ windower.register_event('prerender', function()
                     else
                         info['index' .. i] = (
                             diff < 60 and
-                                '\\cs(255,0,0)' .. res.items[treasure[i].item_id].name .. ' → ' .. timer[i]
+                                '\\cs(255,0,0)' .. item_name .. ' → ' .. timer[i]
                             or diff > 180 and
-                                '\\cs(0,255,0)' .. res.items[treasure[i].item_id].name .. ' → ' .. timer[i]
+                                '\\cs(0,255,0)' .. item_name .. ' → ' .. timer[i]
                             or
-                                '\\cs(255,128,0)' .. res.items[treasure[i].item_id].name .. ' → ' .. timer[i]) .. '\\cr'
+                                '\\cs(255,128,0)' .. item_name .. ' → ' .. timer[i]) .. '\\cr'
                     end
                 end
             else -- show item name in case the addon is loaded with items on tresure box
-                info['index' .. i] = res.items[treasure[i].item_id].name
+                info['index' .. i] = item_name
             end
             if lotter[i] and lot[i] then
                 if lotter[i] == ' ' then
