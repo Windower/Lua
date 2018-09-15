@@ -69,23 +69,7 @@ end
 
 resource_mt.__class = 'Resource'
 
-local dummy = function(id)
-    return setmetatable({
-        id = id,
-        en = '<new item ' .. tostring(id) .. '>',
-        enl = '<new item ' .. tostring(id) .. '>',
-        ens = '<new item ' .. tostring(id) .. '>',
-        ja = '<new item ' .. tostring(id) .. '>',
-        jal = '<new item ' .. tostring(id) .. '>',
-        jas = '<new item ' .. tostring(id) .. '>',
-    }, resource_entry_mt)
-end
-
 resource_mt.__index = function(t, k)
-    if type(k) == 'number' then
-        return dummy(k)
-    end
-
     local res = slots[t] and slots[t]:contains(k) and resource_group:endapply(k)
 
     if not res then
