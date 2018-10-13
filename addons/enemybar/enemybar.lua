@@ -82,6 +82,7 @@ settings = config.load(defaults)
 
 config.save(settings)
 
+
 local target_bar = bars.new(nil, settings.target_bar)
 local subtarget_bar = bars.new(nil, settings.subtarget_bar)
 
@@ -192,6 +193,8 @@ function  update_bar(bar, target)
       else
         bars.update_enmity(bar, nil)
       end
+
+      bars.update_status(bar, tracked_debuff[target.id])
 
       bars.set_name_color(bar, get_tint_by_target(target))
     else

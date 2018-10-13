@@ -87,7 +87,16 @@ function bars.initialize (o)
 			flags = {bold=true,draggable=false,right=true},
 			bg = {visible=false}
 		})
-	o.ttext = texts.new('> ${pc|(Target)}', {
+	o.atar = images.new({
+			pos = {x=0,y=0},
+			visible = true,
+			color = {alpha=o.color.alpha,red=o.color.red,green=o.color.green,blue=o.color.blue},
+			size = {width=12,height=12},
+			texture = {path=windower.addon_path.. 'attention.png',fit=true},
+			repeatable = {x=1,y=1},
+			draggable = false		
+		})
+	o.ttext = texts.new('${pc|(Target)}', {
 			pos = {x=0,y=0},
 			text = { size=o.font_size,font=o.font,stroke={width=2,alpha=180,red=50,green=50,blue=50}},
 			flags = {bold=true,draggable=false},
@@ -98,6 +107,14 @@ function bars.initialize (o)
 			text = { size=o.font_size*0.8,font=o.font,stroke={width=2,alpha=180,red=50,green=50,blue=50}},
 			flags = {bold=true,draggable=false,right=true},
 			bg = {visible=false}
+		})
+	o.tstat = images.new({
+			pos = {x=0,y=0},
+			visible = true,
+			size = {width=18,height=12},
+			texture = {path=windower.addon_path.. 'icons/sleep.png',fit=true},
+			repeatable = {x=1,y=1},
+			draggable = false		
 		})
     --windower.add_to_chat(1,'initialized: w:'..o.width)
 end
@@ -113,8 +130,10 @@ function bars.move (o,x,y)
 	--o.ntext:pos(x+math.floor(o.width/100), y+2+(14-o.font_size)/2)
 	o.ntext:pos(x+math.floor(o.width/100), y+3+(14-o.font_size)/4)
 	o.atext:pos(-(bars.x_res-(x+o.width-math.floor(o.width/100))),y-o.font_size+2)
-	o.ttext:pos(x+o.width+8,y-math.floor(o.font_size/2)+2)
+	o.atar:pos(x+o.width+8, y)
+	o.ttext:pos(x+o.width+24,y-math.floor(o.font_size/2)+2)
 	o.dtext:pos(-(bars.x_res-(x-20)),y-math.floor(o.font_size/2)+4)
+	o.tstat:pos(x+o.width + 4, y)
     --windower.add_to_chat(1,'moved: x:'..self.x..', y:'..self.y)
 end
 
@@ -136,7 +155,9 @@ function bars.hide (o)
 	o.rcap:hide()
 	o.ntext:hide()
 	o.atext:hide()
+	o.atar:hide()
 	o.ttext:hide()
+	o.tstat:hide()
 end
 
 function bars.set_value(o, v)
@@ -181,11 +202,51 @@ end
 function bars.update_enmity(o, name, color)
 	if name and o.show_target then
 		if color then
+			o.atar:color(color.red, color.green, color.blue)
 			o.ttext:color(color.red, color.green, color.blue)
 		end
 		o.ttext.pc = name
 		o.ttext:show()
+		o.atar:show()
 	else
 		o.ttext:hide()
+		o.atar:hide()
 	end
+end
+
+function bars.update_status(o, status)
+	if status then
+		for id,effect in pairs(status) do
+			if S{2,19}:contains(id) then
+				--sleep
+				o.tstat:path(windower.addon_path.. 'icons/sleep.png')
+				o.tstat:show()
+				o.atar:hide()
+				o.ttext:hide()
+				return
+			elseif id == 7 then
+				-- petrification
+				o.tstat:path(windower.addon_path.. 'icons/petrified.png')
+				o.tstat:show()
+				o.atar:hide()
+				o.ttext:hide()
+				return
+			elseif id == 11 then
+				--bind
+				o.tstat:path(windower.addon_path.. 'icons/bound.png')
+				o.tstat:show()
+				o.atar:hide()
+				o.ttext:hide()
+				return
+			elseif id == 28 then
+				-- terror
+				o.tstat:path(windower.addon_path.. 'icons/terror.png')
+				o.tstat:show()
+				o.atar:hide()
+				o.ttext:hide()
+				return
+			end
+		end
+	end
+	o.tstat:hide()
 end
