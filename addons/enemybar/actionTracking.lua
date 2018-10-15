@@ -24,6 +24,7 @@ function looking_at(a, b)
 end
 
 function is_party_member_or_pet(mob)
+	if not mob then return false end
 	if mob.id == windower.ffxi.get_player().id then return true end
 	local is_pet = mob.is_npc and mob.charmed
 
@@ -61,12 +62,16 @@ function handle_action_packet(id, data)
 		track_actions(ai)
 		track_debuffs(ai)
 	elseif 0x029 then
-		local p = packets.parse('incoming', data)
-		if S{204,206}:contains(p['Message']) then
+    	local message_id = data:unpack('H',0x19)
+    	if not message_id then return end
+    	message_id = message_id%32768
+		local param_1 = data:unpack('I',0x0D)
+    	local target_id = data:unpack('I',0x09)
+		if S{204,206}:contains(message_id) then
 			-- wears off message.
-			local target = windower.ffxi.get_mob_by_id(p['Target'])
+			local target = windower.ffxi.get_mob_by_id(target_id)
 			if target and tracked_debuff[target.id]  then
-				tracked_debuff[target.id][p['Param 1']] = nil
+				tracked_debuff[target.id][param_1] = nil
 				--windower.add_to_chat(1,'debuff wears: '..res.buffs[p['Param 1']].en..' -> '..target.name)
 			end
 		end
@@ -79,32 +84,34 @@ function track_enmity(ai)
 
 	for i,t in ipairs(ai.targets) do
 		local target = windower.ffxi.get_mob_by_id(t.id)
-		local pc = nil
-		local mob = nil
-		if actor.is_npc and not actor.charmed and (not target.is_npc or target.charmed) then
-			pc = target
-			mob = actor
-		elseif (target.is_npc and not target.charmed) and (not actor.is_npc or target.charmed)  then
-			mob = target
-			pc = actor
-		end
+		if target then
+			local pc = nil
+			local mob = nil
+			if actor.is_npc and not actor.charmed and (not target.is_npc or target.charmed) then
+				pc = target
+				mob = actor
+			elseif (target.is_npc and not target.charmed) and (not actor.is_npc or target.charmed)  then
+				mob = target
+				pc = actor
+			end
 
-		if pc and mob and is_party_member_or_pet(pc) then
-			-- we have npc/pc interaction
-			-- if the actor is the npc, then we know there's enmity. Otherwise, if the target of the pc spell isn't tracked, it definitely hates the pc now.
-			if actor == mob or not tracked_enmity[mob.id] then
-				if tracked_enmity[mob.id] and tracked_enmity[mob.id].pc then
-					if tracked_enmity[mob.id].pc.id ~= pc.id then
-						--windower.add_to_chat(1,'enmity changed: '..mob.name..' -> '..pc.name)
+			if pc and mob and is_party_member_or_pet(pc) then
+				-- we have npc/pc interaction
+				-- if the actor is the npc, then we know there's enmity. Otherwise, if the target of the pc spell isn't tracked, it definitely hates the pc now.
+				if actor == mob or not tracked_enmity[mob.id] then
+					if tracked_enmity[mob.id] and tracked_enmity[mob.id].pc then
+						if tracked_enmity[mob.id].pc.id ~= pc.id then
+							--windower.add_to_chat(1,'enmity changed: '..mob.name..' -> '..pc.name)
+						end
+					else
+						--windower.add_to_chat(1,'enmity gained: '..mob.name..' -> '..pc.name)					
 					end
-				else
-					--windower.add_to_chat(1,'enmity gained: '..mob.name..' -> '..pc.name)					
+
+					tracked_enmity[mob.id] = {pc=pc, mob=mob, time=os.time()}
+
+					-- if the actor is the npc, we don't care about the other targets. The first target is the one they targeted.
+					if actor == mob then return end
 				end
-
-				tracked_enmity[mob.id] = {pc=pc, mob=mob, time=os.time()}
-
-				-- if the actor is the npc, we don't care about the other targets. The first target is the one they targeted.
-				if actor == mob then return end
 			end
 		end
 	end
@@ -162,7 +169,6 @@ function track_debuffs(ai)
 		if target and target.is_npc and not target.charmed then
 
 		    if S{2,252}:contains(t.actions[1].message) then
-		        local target = t.id
 		        local spell = ai.param
 		        local effect = res.spells[spell].status
 
@@ -254,6 +260,7 @@ function clean_tracked_actions()
 
 	if clean_actions_tick > 0 then return end
 
+	local player = windower.ffxi.get_mob_by_target("me")
 	local time = os.time()
 	for id,action in pairs(tracked_actions) do
 		-- for incomplete items, timeout at 30s.
@@ -280,6 +287,8 @@ function clean_tracked_actions()
 			elseif enmity.pc and not looking_at(mob, windower.ffxi.get_mob_by_id(enmity.pc.id)) then
 				--windower.add_to_chat(1,'enemy no longer hates: '..enmity.mob.name..' -> '..enmity.pc.name)
 				tracked_enmity[id].pc = nil
+			elseif get_distance(player, mob) > 50 then
+				tracked_enmity[id] = nil
 			end
 		end
 	end

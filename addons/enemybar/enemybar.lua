@@ -55,6 +55,7 @@ defaults.target_bar.show_target_icon = false
 defaults.target_bar.show_target = false
 defaults.target_bar.show_action = false
 defaults.target_bar.show_dist = false
+defaults.target_bar.show_debuff = false
 defaults.subtarget_bar = {}
 defaults.subtarget_bar.pos = {x=680,y=700}
 defaults.subtarget_bar.width = 300
@@ -65,6 +66,7 @@ defaults.subtarget_bar.show_target_icon = false
 defaults.subtarget_bar.show_target = false
 defaults.subtarget_bar.show_action = false
 defaults.subtarget_bar.show_dist = false
+defaults.subtarget_bar.show_debuff = false
 defaults.aggro_bar = {}
 defaults.aggro_bar.pos = {x=350,y=550}
 defaults.aggro_bar.width = 180
@@ -75,6 +77,7 @@ defaults.aggro_bar.show_target_icon = true
 defaults.aggro_bar.show_target = true
 defaults.aggro_bar.show_action = true
 defaults.aggro_bar.show_dist = true
+defaults.aggro_bar.show_debuff = true
 defaults.aggro_bar.count = 6
 defaults.aggro_bar.show_aggro = false
 
@@ -99,26 +102,7 @@ local aggro_bars = generate_agro_bars(settings.aggro_bar)
 windower.register_event('prerender', function()
   update_bar(target_bar, windower.ffxi.get_mob_by_target('t'))
   update_bar(subtarget_bar, windower.ffxi.get_mob_by_target('st'))
-
-  if settings.aggro_bar.show_aggro then
-    local e_bar_i = 1
-    for k,v in pairs(tracked_enmity) do
-      if e_bar_i > settings.aggro_bar.count then
-        break
-      end
-      local bar = aggro_bars[e_bar_i]
-      target = windower.ffxi.get_mob_by_id(k)
-      update_bar(bar, target)
-      e_bar_i = e_bar_i + 1
-    end
-
-    for i=e_bar_i, settings.aggro_bar.count do
-        local bar = aggro_bars[i]
-        if bar then
-          bars.hide(bar)
-        end
-    end
-  end
+  update_aggro_bars()
 end)
 windower.register_event('prerender', clean_tracked_actions)
 windower.register_event('incoming chunk', handle_action_packet)
@@ -131,18 +115,14 @@ end)
 
 
 
-check_claim = function(claim_id)
+function check_claim(claim_id)
     if player_id == claim_id then
         return true
     else
-        for i = 1, 5, 1 do
-            member = windower.ffxi.get_mob_by_target('p'..i)
-            if member == nil then
-                -- do nothing
-            elseif member.id == claim_id then 
-                return true
-            end
-        end
+      local mob = windower.ffxi.get_mob_by_id(claim_id)
+      if mob and is_party_member_or_pet(mob) then
+        return true
+      end
     end
     return false
 end
@@ -153,9 +133,9 @@ function get_tint_by_target(target)
        return {red=155, green=155, blue=155}
     elseif check_claim(target.claim_id) then
        return {red=255, green=180, blue=180}
-    elseif target.in_party == true and target.id ~= player_id then
+    elseif is_party_member_or_pet(target) and target.id ~= player_id then
        return {red=102, green=255, blue=255}
-    elseif target.is_npc == false then
+    elseif not target.is_npc then
        return {red=255, green=255, blue=255}
     elseif target.claim_id == 0 then
        return {red=230, green=230, blue=138} 
@@ -206,4 +186,62 @@ function get_distance(player, target)
   local dx = player.x-target.x
   local dy = player.y-target.y
   return math.sqrt(dx*dx + dy*dy)
+end
+
+function update_aggro_bars()
+  local ordered_aggro = get_ordered_aggro()
+
+  if settings.aggro_bar.show_aggro then
+    local e_bar_i = 1
+    for i,v in ipairs(ordered_aggro) do
+      if e_bar_i > settings.aggro_bar.count then
+        break
+      end
+      local bar = aggro_bars[e_bar_i]
+      target = windower.ffxi.get_mob_by_id(v.mob.id)
+      update_bar(bar, target)
+      e_bar_i = e_bar_i + 1
+    end
+
+    for i=e_bar_i, settings.aggro_bar.count do
+        local bar = aggro_bars[i]
+        if bar then
+          bars.hide(bar)
+        end
+    end
+  end
+end
+
+-- sort by hpp (lowest -> highest) then group by debuff status.
+function get_ordered_aggro()
+  local debuffed = {}
+  local ordered = {}
+  for k,n in pairs(tracked_enmity) do
+    local mob = windower.ffxi.get_mob_by_id(k)
+    if mob then
+      n.hpp = mob.hpp
+      local is_debuffed = false
+      if tracked_debuff[k] then
+        for id,debuff in pairs(tracked_debuff[k]) do
+          if S{2,19,7,11,28}:contains(id) then
+            table.insert(debuffed,n)
+            is_debuffed = true
+            break
+          end
+        end
+      end
+      if not is_debuffed then
+        table.insert(ordered,n) 
+      end
+    end
+  end
+  local hpp_sort = function(left,right)
+      return left.hpp < right.hpp
+    end
+  table.sort(ordered, hpp_sort)
+  table.sort(debuffed, hpp_sort)
+  for i,n in ipairs(debuffed) do
+    table.insert(ordered, n)
+  end
+  return ordered
 end

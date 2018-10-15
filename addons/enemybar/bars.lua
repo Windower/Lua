@@ -18,6 +18,7 @@ function bars.new (o, bar_settings)
    o.show_target = bar_settings.show_target
    o.show_target_icon = bar_settings.show_target_icon
    o.show_action = bar_settings.show_action
+   o.show_debuff = bar_settings.show_debuff
    bars.initialize(o)
    --o:initialize()
    bars.move(o, bar_settings.pos.x, bar_settings.pos.y)
@@ -215,7 +216,7 @@ function bars.update_enmity(o, name, color)
 end
 
 function bars.update_status(o, status)
-	if status then
+	if status and o.show_debuff then
 		for id,effect in pairs(status) do
 			if S{2,19}:contains(id) then
 				--sleep
