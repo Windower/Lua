@@ -27,6 +27,7 @@ _addon.name = 'enemybar'
 _addon.author = 'mmckee,akaden'
 _addon.version = '1.1.0'
 _addon.language = 'English'
+_addon.commands = {'enemybar','eb'}
 
 config = require('config')
 images = require('images')
@@ -38,114 +39,86 @@ require 'actionTracking'
 player_id = 0
 debug_string = ''
 
-windower.register_event('load', function()
-    if windower.ffxi.get_info().logged_in then
-        player_id = windower.ffxi.get_player().id
-    end
-end)
-
 defaults = {}
-defaults.target_bar = {}
-defaults.target_bar.pos = {x=650,y=750}
-defaults.target_bar.width = 600
-defaults.target_bar.color = {alpha=255,red=255,green=0,blue=0}
-defaults.target_bar.font = 'Arial'
-defaults.target_bar.font_size = 14
-defaults.target_bar.show_target_icon = false
-defaults.target_bar.show_target = false
-defaults.target_bar.show_action = false
-defaults.target_bar.show_dist = false
-defaults.target_bar.show_debuff = false
-defaults.subtarget_bar = {}
-defaults.subtarget_bar.pos = {x=680,y=700}
-defaults.subtarget_bar.width = 300
-defaults.subtarget_bar.color = {alpha=255,red=0,green=0,blue=255}
-defaults.subtarget_bar.font = 'Arial'
-defaults.subtarget_bar.font_size = 12
-defaults.subtarget_bar.show_target_icon = false
-defaults.subtarget_bar.show_target = false
-defaults.subtarget_bar.show_action = false
-defaults.subtarget_bar.show_dist = false
-defaults.subtarget_bar.show_debuff = false
-defaults.aggro_bar = {}
-defaults.aggro_bar.pos = {x=350,y=550}
-defaults.aggro_bar.width = 180
-defaults.aggro_bar.color = {alpha=255,red=0,green=150,blue=50}
-defaults.aggro_bar.font = 'Arial'
-defaults.aggro_bar.font_size = 9
-defaults.aggro_bar.show_target_icon = true
-defaults.aggro_bar.show_target = true
-defaults.aggro_bar.show_action = true
-defaults.aggro_bar.show_dist = true
-defaults.aggro_bar.show_debuff = true
-defaults.aggro_bar.count = 6
-defaults.aggro_bar.show_aggro = false
-
+defaults.target_bar = {
+  pos={x=650,y=750}, width=600,
+  color={alpha=255,red=255,green=0,blue=0},
+  font='Arial', font_size=14,
+  show=true, show_target=false, show_target_icon=false,
+  show_action=false, show_dist=false, show_debuff=false}
+defaults.subtarget_bar = {
+  pos={x=680,y=700}, width=300,
+  color={alpha=255,red=0,green=0,blue=255},
+  font='Arial', font_size=12,
+  show=true, show_target=false, show_target_icon=false,
+  show_action=false, show_dist=false, show_debuff=false}
+defaults.focustarget_bar = {
+  pos={x=680,y=670}, width=250,
+  color={alpha=255,red=0,green=0,blue=255},
+  font='Arial', font_size=12,
+  show=true, show_target=false, show_target_icon=false,
+  show_action=false, show_dist=false, show_debuff=false}
+defaults.aggro_bar = {
+  pos={x=350,y=550}, width=180,
+  color={alpha=255,red=0,green=150,blue=50},
+  font='Arial', font_size=9,
+  show=false, show_target=false, show_target_icon=false,
+  show_action=false, show_dist=false, show_debuff=false,
+  count=6}
 settings = config.load(defaults)
 
-config.save(settings)
+local state = {}
+state.setup = false
+state.focustarget = nil
 
-
-local target_bar = bars.new(nil, settings.target_bar)
-local subtarget_bar = bars.new(nil, settings.subtarget_bar)
-
-function generate_agro_bars(settings)
-  local l = {}
-  for i = 1, settings.count do
-    l[i] = bars.new(nil, settings)
-    settings.pos.y = settings.pos.y + 27
+function initialize_bars()
+  if target_bar then 
+    bars.destroy(target_bar) 
+    target_bar = nil
   end
-  return l
-end
-local aggro_bars = generate_agro_bars(settings.aggro_bar)
-
-windower.register_event('prerender', function()
-  update_bar(target_bar, windower.ffxi.get_mob_by_target('t'))
-  update_bar(subtarget_bar, windower.ffxi.get_mob_by_target('st'))
-  update_aggro_bars()
-end)
-windower.register_event('prerender', clean_tracked_actions)
-windower.register_event('incoming chunk', handle_action_packet)
-windower.register_event('zone change', reset_tracked_actions)
-
-windower.register_event('logout', function(...)
-    -- This is a super cheap fix, but it works. 
-    windower.send_command("input //lua r enemybar");        
-end)
-
-
-
-function check_claim(claim_id)
-    if player_id == claim_id then
-        return true
-    else
-      local mob = windower.ffxi.get_mob_by_id(claim_id)
-      if mob and is_party_member_or_pet(mob) then
-        return true
-      end
+  if subtarget_bar then 
+    bars.destroy(subtarget_bar)
+    subtarget_bar = nil 
+  end
+  if focustarget_bar then 
+    bars.destroy(focustarget_bar) 
+    focustarget_bar = nil
+  end
+  if aggro_bars then
+    for i,b in ipairs(aggro_bars) do
+      bars.destroy(b)
     end
-    return false
+  end
+
+  target_bar = bars.new(nil, settings.target_bar)
+  subtarget_bar = bars.new(nil, settings.subtarget_bar)
+  focustarget_bar = bars.new(nil, settings.focustarget_bar)
+  local y = settings.aggro_bar.pos.y
+  aggro_bars = {}
+  for i = 1, settings.aggro_bar.count do
+    aggro_bars[i] = bars.new(nil, settings.aggro_bar)
+    bars.move(aggro_bars[i], settings.aggro_bar.pos.x, y)
+    y = y + 27
+  end
 end
 
-
-function get_tint_by_target(target)
-  if target.hpp == 0 then
-       return {red=155, green=155, blue=155}
-    elseif check_claim(target.claim_id) then
-       return {red=255, green=180, blue=180}
-    elseif is_party_member_or_pet(target) and target.id ~= player_id then
-       return {red=102, green=255, blue=255}
-    elseif not target.is_npc then
-       return {red=255, green=255, blue=255}
-    elseif target.claim_id == 0 then
-       return {red=230, green=230, blue=138} 
-    elseif target.claim_id ~= 0 then
-       return {red=153, green=102, blue=255}
-    end  
-end
-
-function  update_bar(bar, target)
-    if target ~= nil then   
+function  update_bar(bar, target, show)
+  if state.setup then
+    if show then
+      bars.show(bar)
+      if bar == target_bar then bars.update_target(bar, "Target Name", 79, 12.1, 1)
+      elseif bar == subtarget_bar then bars.update_target(bar, "Subtarget Name", 53, 11.4, 2)
+      elseif bar == focustarget_bar then bars.update_target(bar, "Focus Target Name", 36, 8.6, 1)
+      else bars.update_target(bar, "Aggro Target Name", 47, 6.6, 1) end
+      bars.update_action(bar, "Action Name", '')
+      bars.update_enmity(bar, "Mob Target", {red=102, green=255, blue=255})
+      bars.update_status(bar, {})
+      bars.set_name_color(bar, {red=255, green=180, blue=180})
+    else
+      bars.hide(bar)
+    end
+  else
+    if target ~= nil and show then   
       bars.show(bar)
 
       local dist = get_distance(windower.ffxi.get_mob_by_target('me'), target)
@@ -180,29 +153,30 @@ function  update_bar(bar, target)
     else
       bars.hide(bar)
     end
-end
-
-function get_distance(player, target)
-  local dx = player.x-target.x
-  local dy = player.y-target.y
-  return math.sqrt(dx*dx + dy*dy)
+  end
 end
 
 function update_aggro_bars()
-  local ordered_aggro = get_ordered_aggro()
-
-  if settings.aggro_bar.show_aggro then
-    local e_bar_i = 1
-    for i,v in ipairs(ordered_aggro) do
-      if e_bar_i > settings.aggro_bar.count then
-        break
-      end
-      local bar = aggro_bars[e_bar_i]
-      target = windower.ffxi.get_mob_by_id(v.mob.id)
-      update_bar(bar, target)
-      e_bar_i = e_bar_i + 1
+  if state.setup then
+    for i=1, settings.aggro_bar.count do
+      update_bar(aggro_bars[i], nil, settings.aggro_bar.show)
     end
+  else
+    local ordered_aggro = get_ordered_aggro()
 
+    local e_bar_i = 1
+    if settings.aggro_bar.show then
+      for i,v in ipairs(ordered_aggro) do
+        if e_bar_i > settings.aggro_bar.count then
+          break
+        end
+        local bar = aggro_bars[e_bar_i]
+        target = windower.ffxi.get_mob_by_id(v.mob.id)
+        update_bar(bar, target, settings.aggro_bar.show)
+        e_bar_i = e_bar_i + 1
+      end
+    end
+    -- hide bars not updated (all of them, if show is off)
     for i=e_bar_i, settings.aggro_bar.count do
         local bar = aggro_bars[i]
         if bar then
@@ -245,3 +219,210 @@ function get_ordered_aggro()
   end
   return ordered
 end
+
+function check_claim(claim_id)
+    if player_id == claim_id then
+        return true
+    else
+      local mob = windower.ffxi.get_mob_by_id(claim_id)
+      if mob and is_party_member_or_pet(mob) then
+        return true
+      end
+    end
+    return false
+end
+
+function get_tint_by_target(target)
+  if target.hpp == 0 then
+       return {red=155, green=155, blue=155}
+    elseif check_claim(target.claim_id) then
+       return {red=255, green=180, blue=180}
+    elseif is_party_member_or_pet(target) and target.id ~= player_id then
+       return {red=102, green=255, blue=255}
+    elseif not target.is_npc then
+       return {red=255, green=255, blue=255}
+    elseif target.claim_id == 0 then
+       return {red=230, green=230, blue=138} 
+    elseif target.claim_id ~= 0 then
+       return {red=153, green=102, blue=255}
+    end  
+end
+
+function get_distance(player, target)
+  local dx = player.x-target.x
+  local dy = player.y-target.y
+  return math.sqrt(dx*dx + dy*dy)
+end
+
+function handle_command(c, ...)
+  if not c then return end
+  local args = L{...}
+  c = c:lower()
+  if S{'set','s'}:contains(c) and args[1] and args[2] then
+    local setting = args[1]:lower()
+    local bar = normalize_bar_name(args[2])
+    if not bar then
+      windower.add_to_chat(123, 'EnemyBar: Unknown bar name: "'..args[2]:lower()..'"')
+      return
+    end
+    if setting == 'pos' then
+      if args[3] and args[4] then
+        if not tonumber(args[3]) or not tonumber(args[4]) then
+          windower.add_to_chat(123, 'EnemyBar: value is not numeric for "'..setting..'"')
+        else
+          set_setting(bar, setting, {x=tonumber(args[3]),y=tonumber(args[4])})
+        end
+      else
+        windower.add_to_chat(123, 'EnemyBar: not enough arguments for "'..setting..'"')
+      end
+    elseif setting == 'color' then
+      if args[3] and args[4] and args[5] then
+        if not tonumber(args[3]) or not tonumber(args[4]) or not tonumber(args[5]) then
+          windower.add_to_chat(123, 'EnemyBar: value is not numeric for "'..setting..'"')
+        else
+          set_setting(bar, setting, {red=tonumber(args[3]),green=tonumber(args[4]),blue=tonumber(args[5])})
+        end
+      else
+        windower.add_to_chat(123, 'EnemyBar: not enough arguments for "'..setting..'"')
+      end
+    elseif c == 'font' then
+      if args[3] then
+        set_setting(bar, setting, args[3])
+      else
+        windower.add_to_chat(123, 'EnemyBar: not enough arguments for "'..setting..'"')
+      end
+    elseif S{'font_size','width','count'}:contains(setting) then
+      if args[3] then
+        if not tonumber(args[3]) then
+          windower.add_to_chat(123, 'EnemyBar: value is not numeric for "'..setting..'"')
+        else
+          set_setting(bar, setting, tonumber(args[3]))
+        end
+      else
+        windower.add_to_chat(123, 'EnemyBar: not enough arguments for "'..setting..'"')
+      end
+    elseif S{'show','show_target_icon','show_target','show_debuff','show_action','show_dist'}:contains(setting) then
+      if args[3] then
+        local b = normalize_boolean(args[3])
+        if b == nil then
+          windower.add_to_chat(123, 'EnemyBar: unknown value for "'..setting..'"')
+        else
+          set_setting(bar, setting, b)
+        end
+      else
+        windower.add_to_chat(123, 'EnemyBar: not enough arguments for "'..setting..'"')
+      end
+    else
+      windower.add_to_chat(123, 'EnemyBar: Unknown setting: "'..setting..'"')
+    end
+  elseif S{'focustarget','ft','f'}:contains(c) then
+    if args[1] then
+      if args[1]:lower() == "clear" then
+        state.focustarget = nil
+        windower.add_to_chat(207, 'EnemyBar: focus target is now off')
+      elseif tonumber(args[1]) then
+        local t = windower.ffxi.get_mob_by_id(tonumber(args[1]))
+        if t then
+          state.focustarget = t.id
+          windower.add_to_chat(207, 'EnemyBar: focus target is now "'..t.name..'"')
+        else
+          windower.add_to_chat(123, 'EnemyBar: could not find a target with that ID')
+        end  
+      else
+        local t = windower.ffxi.get_mob_by_name(args[1])
+        if t then
+          state.focustarget = t.id
+          windower.add_to_chat(207, 'EnemyBar: focus target is now "'..t.name..'"')
+        else
+          windower.add_to_chat(123, 'EnemyBar: could not find a target by that name')
+        end        
+      end
+    else 
+      local t = windower.ffxi.get_mob_by_target('t')
+      if t then
+        state.focustarget = t.id
+        windower.add_to_chat(207, 'EnemyBar: focus target is now "'..t.name..'"')
+      else
+        windower.add_to_chat(123, 'EnemyBar: no target selected to focustarget')
+      end
+    end
+  elseif S{'demo','setup','debug','test'}:contains(c) then
+    if args[3] then
+      state.setup = normalize_boolean(args[3])
+    else
+      state.setup = not state.setup
+    end
+    windower.add_to_chat(207, 'EnemyBar: setup mode is now "'..(state.setup and 'on' or 'off')..'"')
+  elseif S{'help','h','man','manual'}:contains(c) then
+    helptext = [[Enemy Bar - Command List:')
+1. set/s [setting] [target/t/subtarget/st/aggro/a/all] [value] - set a setting to its value
+  setting: pos(x y)/font/font_size/color(r g b)/width/count/show/show_target_icon/show_debuff/show_dist/show_action/show_target
+2. focustarget/ft/f (player_name or id or blank or clear) - create a bar for a particular party member, mob by ID, or by current target (blank), or clear the current focus target
+3. setup/demo/debug/test - toggles setup mode displaying test versions of all options and enabling drag for each frame (drag coming soon!)
+4. help/h/manual/man --Shows this menu.]]
+    for _, line in ipairs(helptext:split('\n')) do
+        windower.add_to_chat(207, line)
+    end
+  end
+end
+
+function normalize_bar_name(n)
+  n = n:lower()
+  if n == 't' then
+    n = 'target'
+  elseif n == 'st' then
+    n = 'subtarget'
+  elseif n == 'a' then
+    n = 'aggro'
+  elseif S{'f','ft'}:contains(n) then
+    n = 'focustarget'
+  elseif not S{'target','subtarget','aggro','focustarget','all'}:contains(n) then
+    n = nil
+  end
+
+  return n
+end
+
+function normalize_boolean(b)
+  b = b:lower()
+  if S{'true','t','yes','y','on'}:contains(b) then
+    return true
+  elseif S{'false','f','no','n','off'}:contains(b) then
+    return false
+  else return nil end
+end
+
+function set_setting(bar, setting, v)
+  if bar == 'all' then
+    settings['target_bar'][setting] = v
+    settings['subtarget_bar'][setting] = v
+    settings['aggro_bar'][setting] = v
+    settings['focustarget_bar'][setting] = v
+  else
+    settings[bar..'_bar'][setting] = v
+  end
+  windower.add_to_chat(207, 'EnemyBar: "'..setting..'" updated for "'..bar..'" bar')
+  settings:save()
+  initialize_bars()
+end
+
+windower.register_event('load', function()
+  initialize_bars()
+  if windower.ffxi.get_info().logged_in then
+      player_id = windower.ffxi.get_player().id
+  end
+end)
+windower.register_event('prerender', function()
+  update_bar(target_bar, windower.ffxi.get_mob_by_target('t'), settings.target_bar.show)
+  update_bar(subtarget_bar, windower.ffxi.get_mob_by_target('st'), settings.subtarget_bar.show)
+  update_bar(focustarget_bar, state.focustarget and windower.ffxi.get_mob_by_id(state.focustarget) or nil, settings.focustarget_bar.show)
+  update_aggro_bars()
+end)
+windower.register_event('prerender', clean_tracked_actions)
+windower.register_event('incoming chunk', handle_action_packet)
+windower.register_event('zone change', reset_tracked_actions)
+windower.register_event('addon command', handle_command)
+windower.register_event('logout', function(...)
+    -- This is a super cheap fix, but it works. 
+    windower.send_command("input //lua r enemybar");        
+end)

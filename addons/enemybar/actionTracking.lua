@@ -30,24 +30,33 @@ function is_party_member_or_pet(mob)
 
 	local party = windower.ffxi.get_party()
 	for i=0, party.party1_count-1 do
-		if is_pet then
-			if party['p'..i].mob and party['p'..i].mob.pet_index == mob.index then return true end
-		else
-			if party['p'..i].mob and party['p'..i].mob.id == mob.id then return true end
+		local p = party['p'..i]
+		if p and p.mob then
+			if is_pet then
+				if p.mob.pet_index == mob.index then return true end
+			else
+				if p.mob.id == mob.id then return true end
+			end
 		end
 	end
 	for i=0, party.party2_count-1 do
-		if is_pet then
-			if party['a1'..i].mob and party['a1'..i].mob.pet_index == mob.index then return true end
-		else
-			if party['a1'..i].mob and party['a1'..i].mob.id == mob.id then return true end
+		local p = party['a1'..i]
+		if p and p.mob then
+			if is_pet then
+				if p.mob.pet_index == mob.index then return true end
+			else
+				if p.mob.id == mob.id then return true end
+			end
 		end
 	end
 	for i=0, party.party3_count-1 do
-		if is_pet then
-			if party['a2'..i].mob and party['a2'..i].mob.pet_index == mob.index then return true end
-		else
-			if party['a2'..i].mob and party['a2'..i].mob.id == id then return true end
+		local p = party['a2'..i]
+		if p and p.mob then
+			if is_pet then
+				if p.mob.pet_index == mob.index then return true end
+			else
+				if p.mob.id == id then return true end
+			end
 		end
 	end
 
