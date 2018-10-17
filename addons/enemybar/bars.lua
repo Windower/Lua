@@ -267,3 +267,18 @@ function bars.update_status(o, status)
 	end
 	o.tstat:hide()
 end
+
+function bars.hover(o, x, y)
+	if not o then return false end
+	return o.fg_body:hover(x,y) or 
+		   o.bg_body:hover(x,y) or 
+		   o.lcap:hover(x,y) or 
+		   o.rcap:hover(x,y) or
+		   o.dtext:hover(x,y) or
+		   o.tbut:hover(x,y) or
+		   o.ntext:hover(x,y) or
+		   o.atext:hover(x,y) or
+		   o.atar:hover(x,y) or
+		   o.ttext:hover(x,y) or
+		   o.tstat:hover(x,y)
+end

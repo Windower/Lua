@@ -48,13 +48,13 @@ defaults.target_bar = {
   show_action=false, show_dist=false, show_debuff=false}
 defaults.subtarget_bar = {
   pos={x=680,y=700}, width=300,
-  color={alpha=255,red=0,green=0,blue=255},
+  color={alpha=255,red=12,green=50,blue=101},
   font='Arial', font_size=12,
   show=true, show_target=false, show_target_icon=false,
   show_action=false, show_dist=false, show_debuff=false}
 defaults.focustarget_bar = {
   pos={x=680,y=670}, width=250,
-  color={alpha=255,red=0,green=0,blue=255},
+  color={alpha=255,red=93,green=0,blue=255},
   font='Arial', font_size=12,
   show=true, show_target=false, show_target_icon=false,
   show_action=false, show_dist=false, show_debuff=false}
@@ -64,7 +64,7 @@ defaults.aggro_bar = {
   font='Arial', font_size=9,
   show=false, show_target=false, show_target_icon=false,
   show_action=false, show_dist=false, show_debuff=false,
-  count=6}
+  count=6, stack_dir='down', stack_padding = 27}
 settings = config.load(defaults)
 
 local state = {}
@@ -98,11 +98,17 @@ function initialize_bars()
   for i = 1, settings.aggro_bar.count do
     aggro_bars[i] = bars.new(nil, settings.aggro_bar)
     bars.move(aggro_bars[i], settings.aggro_bar.pos.x, y)
-    y = y + 27
+    if settings.aggro_bar.stack_dir == 'down' then
+      y = y + settings.aggro_bar.stack_padding
+    elseif settings.aggro_bar.stack_dir == 'up' then
+      y = y - settings.aggro_bar.stack_padding
+    end
   end
+
+  bar_sets = {{target_bar}, {subtarget_bar}, {focustarget_bar}, aggro_bars}
 end
 
-function  update_bar(bar, target, show)
+function update_bar(bar, target, show)
   if state.setup then
     if show then
       bars.show(bar)
@@ -143,6 +149,13 @@ function  update_bar(bar, target, show)
       local enmity_target = tracked_enmity[target.id]
       if enmity_target and enmity_target.pc then
         bars.update_enmity(bar, enmity_target.pc.name, get_tint_by_target(enmity_target.pc))
+      elseif not target.is_npc then
+        local target_target = windower.ffxi.get_mob_by_index(target.target_index)
+        if target_target then
+          bars.update_enmity(bar, target_target.name, get_tint_by_target(target_target))
+        else
+          bars.update_enmity(bar, nil)
+        end
       else
         bars.update_enmity(bar, nil)
       end
@@ -285,13 +298,13 @@ function handle_command(c, ...)
       else
         windower.add_to_chat(123, 'EnemyBar: not enough arguments for "'..setting..'"')
       end
-    elseif c == 'font' then
+    elseif S{'font','stack_dir'}:contains(setting) then
       if args[3] then
         set_setting(bar, setting, args[3])
       else
         windower.add_to_chat(123, 'EnemyBar: not enough arguments for "'..setting..'"')
       end
-    elseif S{'font_size','width','count'}:contains(setting) then
+    elseif S{'font_size','width','count','stack_padding'}:contains(setting) then
       if args[3] then
         if not tonumber(args[3]) then
           windower.add_to_chat(123, 'EnemyBar: value is not numeric for "'..setting..'"')
@@ -358,7 +371,7 @@ function handle_command(c, ...)
 1. set/s [setting] [target/t/subtarget/st/aggro/a/all] [value] - set a setting to its value
   setting: pos(x y)/font/font_size/color(r g b)/width/count/show/show_target_icon/show_debuff/show_dist/show_action/show_target
 2. focustarget/ft/f (player_name or id or blank or clear) - create a bar for a particular party member, mob by ID, or by current target (blank), or clear the current focus target
-3. setup/demo/debug/test - toggles setup mode displaying test versions of all options and enabling drag for each frame (drag coming soon!)
+3. setup/demo/debug/test - toggles setup mode displaying test versions of all options and enabling drag for each frame
 4. help/h/manual/man --Shows this menu.]]
     for _, line in ipairs(helptext:split('\n')) do
         windower.add_to_chat(207, line)
@@ -425,4 +438,67 @@ windower.register_event('addon command', handle_command)
 windower.register_event('logout', function(...)
     -- This is a super cheap fix, but it works. 
     windower.send_command("input //lua r enemybar");        
+end)
+
+-- Handle drag and drop
+windower.register_event('mouse', function(type, x, y, delta, blocked)
+  if blocked then
+      return
+  end
+
+  -- Mouse drag
+  if type == 0 then
+    if dragged then
+      local d_x = 0
+      local d_y = 0
+      if drag_snap_key_down then
+        -- snap
+        d_x = math.floor(((x - dragged.x) + dragged.bars[1].x)/10)*10 - dragged.bars[1].x
+        d_y = math.floor(((y - dragged.y) + dragged.bars[1].y)/10)*10 - dragged.bars[1].y
+      else
+        -- no snap
+        d_x = x - dragged.x
+        d_y = y - dragged.y
+      end
+
+      for i, b in ipairs(dragged.bars) do
+          bars.move(b, b.x + d_x, b.y + d_y)
+      end
+      dragged.x = dragged.x + d_x
+      dragged.y = dragged.y + d_y
+      return true
+    end
+
+  -- Mouse left click
+  elseif type == 1 then
+    if not state.setup then return false end
+    for _, s in ipairs(bar_sets) do
+      for _, b in ipairs(s) do
+        if bars.hover(b, x, y) then
+          dragged = {bars = s, x = x , y = y}
+          return true
+        end
+      end
+    end
+
+  -- Mouse left release
+  elseif type == 2 then
+    if dragged then
+      settings.target_bar.pos = {x=target_bar.x,y=target_bar.y}
+      settings.subtarget_bar.pos = {x=subtarget_bar.x,y=subtarget_bar.y}
+      settings.focustarget_bar.pos = {x=focustarget_bar.x,y=focustarget_bar.y}
+      settings.aggro_bar.pos = {x=aggro_bars[1].x,y=aggro_bars[1].y}
+      settings:save()
+      dragged = nil
+      return true
+    end
+  end
+
+  return false
+end)
+windower.register_event('keyboard', function(dik, down) -- lol diks
+  if dik == 29 then -- if ctrl
+    drag_snap_key_down = down
+    --windower.add_to_chat(1,'ctrl: '..tostring(down))
+  end
 end)
