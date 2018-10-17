@@ -353,10 +353,10 @@ function images.hover(t, x, y)
     
     -- print(pos_x, pos_y, off_x, off_y)
 
-    return (pos_x <= x and x <= pos_x + off_x
-        or pos_x >= x and x >= pos_x + off_x)
-    and (pos_y <= y and y <= pos_y + off_y
-        or pos_y >= y and y >= pos_y + off_y)
+    return (pos_x <= x and x <= off_x
+        or pos_x >= x and x >= off_x)
+    and (pos_y <= y and y <= off_y
+        or pos_y >= y and y >= off_y)
 end
 
 function images.destroy(t)
