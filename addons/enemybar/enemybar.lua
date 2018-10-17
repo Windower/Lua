@@ -342,7 +342,7 @@ function handle_command(c, ...)
           windower.add_to_chat(123, 'EnemyBar: could not find a target with that ID')
         end  
       else
-        local t = windower.ffxi.get_mob_by_name(args[1])
+        local t = get_mob_by_name(args[1])
         if t then
           state.focustarget = t.id
           windower.add_to_chat(207, 'EnemyBar: focus target is now "'..t.name..'"')
@@ -377,6 +377,23 @@ function handle_command(c, ...)
         windower.add_to_chat(207, line)
     end
   end
+end
+
+function get_mob_by_name(n)
+  n = n:lower()
+  local worse_match = nil
+  local worser_match = nil
+  for _,mob in pairs(windower.ffxi.get_mob_array()) do
+    local mobname = mob.name:lower()
+    if n == mobname then
+      return mob
+    elseif not worse_match and mobname:sub(1, #n) == n then
+      worse_match = mob
+    elseif not worser_match and mobname:match(n) then
+      worser_match = mob
+    end
+  end
+  return worse_match and worse_match or worser_match
 end
 
 function normalize_bar_name(n)
