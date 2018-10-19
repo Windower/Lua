@@ -1,10 +1,3 @@
--- 8: casting start, 4: casting finish
--- 7: ws start, 11: npc tp finish
--- 7: ws start, 3: ws finish
--- 6: job ability
--- 9: item start, 5: item finish
-
---require('extdata')
 res = require('resources')
 vector = require('vectors')
 packets = require('packets')
@@ -19,7 +12,6 @@ clean_actions_tick = clean_actions_delay
 function looking_at(a, b)
 	local h = a.facing % math.pi
 	local h2 = (math.atan2(a.x-b.x,a.y-b.y) + math.pi/2) % math.pi
-	--windower.add_to_chat(1,''..h..' =? '..h2)
 	return math.abs(h-h2) < 0.15
 end
 
@@ -81,7 +73,6 @@ function handle_action_packet(id, data)
 			local target = windower.ffxi.get_mob_by_id(target_id)
 			if target and tracked_debuff[target.id]  then
 				tracked_debuff[target.id][param_1] = nil
-				--windower.add_to_chat(1,'debuff wears: '..res.buffs[p['Param 1']].en..' -> '..target.name)
 			end
 		end
 	end
@@ -108,14 +99,6 @@ function track_enmity(ai)
 				-- we have npc/pc interaction
 				-- if the actor is the npc, then we know there's enmity. Otherwise, if the target of the pc spell isn't tracked, it definitely hates the pc now.
 				if actor == mob or not tracked_enmity[mob.id] then
-					if tracked_enmity[mob.id] and tracked_enmity[mob.id].pc then
-						if tracked_enmity[mob.id].pc.id ~= pc.id then
-							--windower.add_to_chat(1,'enmity changed: '..mob.name..' -> '..pc.name)
-						end
-					else
-						--windower.add_to_chat(1,'enmity gained: '..mob.name..' -> '..pc.name)					
-					end
-
 					tracked_enmity[mob.id] = {pc=pc, mob=mob, time=os.time()}
 
 					-- if the actor is the npc, we don't care about the other targets. The first target is the one they targeted.
@@ -189,10 +172,8 @@ function track_debuffs(ai)
 		    elseif S{75,236,237,268,270,271}:contains(t.actions[1].message) then
 		        local effect = t.actions[1].param
 		        local spell = ai.param
-		        
-		        --if res.spells[spell].status and res.spells[spell].status == effect then
-		            apply_debuff(target, effect, spell)
-		        --end
+
+		        apply_debuff(target, effect, spell)
 		    end
 		end
 	end
@@ -209,7 +190,6 @@ function apply_debuff(target, effect, spell)
     end
 
     tracked_debuff[target.id][effect] = {target=target,spell=spell,effect=effect,time=os.time(),duration=res.spells[spell].duration or 0,pos={x=target.x,y=target.y}}
-    --windower.add_to_chat(1,'tracking debuff: '..res.buffs[effect].en..' -> '..target.name..' from '..res.spells[spell].en)
 end
 
 function did_overwrite(target, new, t)
@@ -224,7 +204,6 @@ function did_overwrite(target, new, t)
         if table.length(old) > 0 then
             for _,v in ipairs(old) do
                 if new == v then
-    				--windower.add_to_chat(1,'NOT overwritten: '..res.buffs[effect].en..' -> '..target.name..' from '..res.spells[tracked.spell].en)
                     return false
                 end
             end
@@ -235,7 +214,6 @@ function did_overwrite(target, new, t)
             for _,v in ipairs(t) do
                 if tracked.spell == v then
                     tracked_debuff[target.id][effect] = nil
-    				--windower.add_to_chat(1,'overwritten: '..res.buffs[effect].en..' -> '..target.name..' from '..res.spells[tracked.spell].en)
                 end
             end
         end
@@ -274,12 +252,10 @@ function clean_tracked_actions()
 	for id,action in pairs(tracked_actions) do
 		-- for incomplete items, timeout at 30s.
 		if not action.complete and time - action.time > 30 then
-			--windower.add_to_chat(1,'forgeting: '..action.actor.name..' performed '..action.ability.en..' -> '..(action.target and action.target.name or '?'))
 			tracked_actions[id] = nil
 
 		-- for complete actions, timeout at 3s.
 		elseif action.complete and time - action.time > 3 then
-			--windower.add_to_chat(1,'forgeting: '..action.actor.name..' performed '..action.ability.en..' -> '..(action.target and action.target.name or '?'))
 			tracked_actions[id] = nil
 		end
 	end
@@ -288,13 +264,10 @@ function clean_tracked_actions()
 		if time - enmity.time > 3 then
 			local mob = windower.ffxi.get_mob_by_id(enmity.mob.id)
 			if not mob or mob.hpp == 0 then
-				--windower.add_to_chat(1,'enemy dead: '..enmity.mob.name)
 				tracked_enmity[id] = nil
 			elseif mob.status == 0 then
-				--windower.add_to_chat(1,'enemy idle: '..enmity.mob.name)
 				tracked_enmity[id] = nil
 			elseif enmity.pc and not looking_at(mob, windower.ffxi.get_mob_by_id(enmity.pc.id)) then
-				--windower.add_to_chat(1,'enemy no longer hates: '..enmity.mob.name..' -> '..enmity.pc.name)
 				tracked_enmity[id].pc = nil
 			elseif get_distance(player, mob) > 50 then
 				tracked_enmity[id] = nil
