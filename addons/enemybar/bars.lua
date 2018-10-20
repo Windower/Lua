@@ -4,8 +4,8 @@ bars = {x_res = windower.get_windower_settings().x_res,y_res = windower.get_wind
 
 -- Base class method new
 
-function bars.new(o, bar_settings)
-   o = o or {}
+function bars.new(bar_settings)
+   o = {}
    o.width = bar_settings.width 
    o.color = bar_settings.color 
    o.font = bar_settings.font
@@ -22,23 +22,21 @@ end
 
 function bars.destroy(o)
 	if not o then return end
-	o.tbut:destroy()
-	o.lcap:destroy()
-	o.bg_body:destroy()
-	o.fg_body:destroy()
-	o.rcap:destroy()
-	o.ntext:destroy()
-	o.atext:destroy()
-	o.atar:destroy()
-	o.ttext:destroy()
-	o.dtext:destroy()
-	o.tstat:destroy()
+	o.target_indicator_image:destroy()
+	o.left_cap_image:destroy()
+	o.background_body_image:destroy()
+	o.foreground_body_image:destroy()
+	o.right_cap_image:destroy()
+	o.name_text:destroy()
+	o.action_text:destroy()
+	o.attention_arrow_image:destroy()
+	o.target_name_text:destroy()
+	o.distance_text:destroy()
+	o.target_status_image:destroy()
 end
 
--- Base class method printArea
-
 function bars.initialize(o)
-	o.tbut = images.new({
+	o.target_indicator_image = images.new({
 			pos = {x=0,y=0},
 			visible = true,
 			color = {alpha=o.color.alpha,red=255,green=50,blue=50},
@@ -47,25 +45,25 @@ function bars.initialize(o)
 			repeatable = {x=1,y=1},
 			draggable = false
 		})
-	o.lcap = images.new({
+	o.left_cap_image = images.new({
 			pos = {x=0,y=0},
 			visible = true,
-			color = {alpha=o.color.alpha,red=o.color.red/2,green=o.color.green/2,blue=o.color.blue/2},
+			color = {alpha=o.color.alpha,red=o.color.red,green=o.color.green,blue=o.color.blue},
 			size = {width=1,height=12},
 			texture = {path=windower.addon_path.. 'bg_cap.png',fit=true},
 			repeatable = {x=1,y=1},
 			draggable = false
 		})
-	o.bg_body = images.new({
+	o.background_body_image = images.new({
 			pos = {x=0,y=0},
 			visible = true,
-			color = {alpha=o.color.alpha,red=o.color.red/2,green=o.color.green/2,blue=o.color.blue/2},
+			color = {alpha=o.color.alpha,red=o.color.red,green=o.color.green,blue=o.color.blue},
 			size = {width=o.width,height=12},
 			texture = {path=windower.addon_path.. 'bg_body.png',fit=true},
 			repeatable = {x=1,y=1},
 			draggable = false		
 		})
-	o.fg_body = images.new({
+	o.foreground_body_image = images.new({
 			pos = {x=0,y=0},
 			visible = true,
 			color = {alpha=o.color.alpha,red=o.color.red,green=o.color.green,blue=o.color.blue},
@@ -74,7 +72,7 @@ function bars.initialize(o)
 			repeatable = {x=1,y=1},
 			draggable = false		
 		})
-	o.rcap = images.new({
+	o.right_cap_image = images.new({
 			pos = {x=0,y=0},
 			visible = true,
 			color = {alpha=o.color.alpha,red=o.color.red/2,green=o.color.green/2,blue=o.color.blue/2},
@@ -83,19 +81,19 @@ function bars.initialize(o)
 			repeatable = {x=1,y=1},
 			draggable = false		
 		})
-	o.ntext = texts.new('${name|(Name)}: ${hpp|(100)}%', {
+	o.name_text = texts.new('${name|(Name)}: ${hpp|(100)}%', {
 			pos = {x=0,y=0},
 			text = { size=o.font_size,font=o.font,stroke={width=2,alpha=180,red=50,green=50,blue=50}},
 			flags = {bold=true,draggable=false,italic=true},
 			bg = {visible=false}
 		})
-	o.atext = texts.new('${action|(Action)}', {
+	o.action_text = texts.new('${action|(Action)}', {
 			pos = {x=0,y=0},
 			text = { size=o.font_size*0.8,font=o.font,stroke={width=2,alpha=180,red=50,green=50,blue=50}},
 			flags = {bold=true,draggable=false,right=true},
 			bg = {visible=false}
 		})
-	o.atar = images.new({
+	o.attention_arrow_image = images.new({
 			pos = {x=0,y=0},
 			visible = true,
 			color = {alpha=o.color.alpha,red=o.color.red,green=o.color.green,blue=o.color.blue},
@@ -104,19 +102,19 @@ function bars.initialize(o)
 			repeatable = {x=1,y=1},
 			draggable = false		
 		})
-	o.ttext = texts.new('${pc|(Target)}', {
+	o.target_name_text = texts.new('${pc|(Target)}', {
 			pos = {x=0,y=0},
 			text = { size=o.font_size,font=o.font,stroke={width=2,alpha=180,red=50,green=50,blue=50}},
 			flags = {bold=true,draggable=false},
 			bg = {visible=false}
 		})
-	o.dtext = texts.new('${dist|(0.0)}\'', {
+	o.distance_text = texts.new('${dist|(0.0)}\'', {
 			pos = {x=0,y=0},
 			text = { size=o.font_size*0.8,font=o.font,stroke={width=2,alpha=180,red=50,green=50,blue=50}},
 			flags = {bold=true,draggable=false,right=true},
 			bg = {visible=false}
 		})
-	o.tstat = images.new({
+	o.target_status_image = images.new({
 			pos = {x=0,y=0},
 			visible = true,
 			size = {width=18,height=12},
@@ -124,93 +122,89 @@ function bars.initialize(o)
 			repeatable = {x=1,y=1},
 			draggable = false		
 		})
-    --windower.add_to_chat(1,'initialized: w:'..o.width)
 end
 
 function bars.move(o,x,y)
 	if not o then return end
 	o.x = x
 	o.y = y
-	o.tbut:pos(x-16,y)
-	o.lcap:pos(x,y)
-	o.bg_body:pos(x+1,y)
-	o.fg_body:pos(x+1,y)
-	o.rcap:pos(x+1+o.width,y)
-	--o.ntext:pos(x+math.floor(o.width/100), y+2+(14-o.font_size)/2)
-	o.ntext:pos(x+math.floor(o.width/100), y+3+(14-o.font_size)/4)
-	o.atext:pos(-(bars.x_res-(x+o.width-math.floor(o.width/100))),y-o.font_size+2)
-	o.atar:pos(x+o.width+8, y)
-	o.ttext:pos(x+o.width+24,y-math.floor(o.font_size/2)+2)
-	o.dtext:pos(-(bars.x_res-(x-20)),y-math.floor(o.font_size/2)+4)
-	o.tstat:pos(x+o.width + 4, y)
-    --windower.add_to_chat(1,'moved: x:'..self.x..', y:'..self.y)
+	o.target_indicator_image:pos(x-16,y)
+	o.left_cap_image:pos(x,y)
+	o.background_body_image:pos(x+1,y)
+	o.foreground_body_image:pos(x+1,y)
+	o.right_cap_image:pos(x+1+o.width,y)
+	o.name_text:pos(x+math.floor(o.width/100), y+3+(14-o.font_size)/4)
+	o.action_text:pos(-(bars.x_res-(x+o.width-math.floor(o.width/100))),y-o.font_size+2)
+	o.attention_arrow_image:pos(x+o.width+8, y)
+	o.target_name_text:pos(x+o.width+24,y-math.floor(o.font_size/2)+2)
+	o.distance_text:pos(-(bars.x_res-(x-20)),y-math.floor(o.font_size/2)+4)
+	o.target_status_image:pos(x+o.width + 4, y)
 end
 
 function bars.show(o)
 	if not o then return end
-	if o.show_dist then	o.dtext:show() end
-	o.lcap:show()
-	o.bg_body:show()
-	o.fg_body:show()
-	o.rcap:show()
-	o.ntext:show()
+	if o.show_dist then	o.distance_text:show() end
+	o.left_cap_image:show()
+	o.background_body_image:show()
+	o.foreground_body_image:show()
+	o.right_cap_image:show()
+	o.name_text:show()
 end
 
 function bars.hide(o)
 	if not o then return end
-	o.dtext:hide()
-	o.tbut:hide()
-	o.lcap:hide()
-	o.bg_body:hide()
-	o.fg_body:hide()
-	o.rcap:hide()
-	o.ntext:hide()
-	o.atext:hide()
-	o.atar:hide()
-	o.ttext:hide()
-	o.tstat:hide()
+	o.distance_text:hide()
+	o.target_indicator_image:hide()
+	o.left_cap_image:hide()
+	o.background_body_image:hide()
+	o.foreground_body_image:hide()
+	o.right_cap_image:hide()
+	o.name_text:hide()
+	o.action_text:hide()
+	o.attention_arrow_image:hide()
+	o.target_name_text:hide()
+	o.target_status_image:hide()
 end
 
 function bars.set_value(o, v)
 	if not o then return end
-	o.fg_body:width(v*o.width)
-	o.bg_body:width(o.width)
+	o.foreground_body_image:width(v*o.width)
+	o.background_body_image:width(o.width)
 end
 
 function bars.set_name_color(o, color)
 	if not o then return end
-	o.ntext:color(color.red, color.green, color.blue)
-	o.atext:color(color.red, color.green, color.blue)
+	o.name_text:color(color.red, color.green, color.blue)
+	o.action_text:color(color.red, color.green, color.blue)
 end
 
 function bars.update_target(o, name, hpp, dist, target_type)
 	if not o then return end
-	o.ntext.name = name
-	o.ntext.hpp = hpp
+	o.name_text.name = name
+	o.name_text.hpp = hpp
 	bars.set_value(o, hpp/100)
 
-	o.dtext.dist = string.format('%.1f', dist)
+	o.distance_text.dist = string.format('%.1f', dist)
 
 	if target_type == 1 and o.show_target_icon then
-		o.tbut:color(255,100,100,255)
-		o.tbut:show()
+		o.target_indicator_image:color(255,100,100,255)
+		o.target_indicator_image:show()
 	elseif target_type == 2 and o.show_target_icon then
-		o.tbut:color(100,100,255,255)
-		o.tbut:show()
+		o.target_indicator_image:color(100,100,255,255)
+		o.target_indicator_image:show()
 	else
-		o.tbut:hide()
+		o.target_indicator_image:hide()
 	end
 end
 
 function bars.update_action(o, a, debug)
 	if not o then return end
 	if a and o.show_action then
-    	--windower.add_to_chat(1,'a: '..a)
-		o.atext.action = a
-		o.atext:show()
+		o.action_text.action = a
+		o.action_text:show()
 	else
 		-- hide action text
-		o.atext:hide()
+		o.action_text:hide()
 	end
 end
 
@@ -218,15 +212,15 @@ function bars.update_enmity(o, name, color)
 	if not o then return end
 	if name and o.show_target then
 		if color then
-			o.atar:color(color.red, color.green, color.blue)
-			o.ttext:color(color.red, color.green, color.blue)
+			o.attention_arrow_image:color(color.red, color.green, color.blue)
+			o.target_name_text:color(color.red, color.green, color.blue)
 		end
-		o.ttext.pc = name
-		o.ttext:show()
-		o.atar:show()
+		o.target_name_text.pc = name
+		o.target_name_text:show()
+		o.attention_arrow_image:show()
 	else
-		o.ttext:hide()
-		o.atar:hide()
+		o.target_name_text:hide()
+		o.attention_arrow_image:hide()
 	end
 end
 
@@ -236,49 +230,49 @@ function bars.update_status(o, status)
 		for id,effect in pairs(status) do
 			if S{2,19}:contains(id) then
 				--sleep
-				o.tstat:path(windower.addon_path.. 'icons/sleep.png')
-				o.tstat:show()
-				o.atar:hide()
-				o.ttext:hide()
+				o.target_status_image:path(windower.addon_path.. 'icons/sleep.png')
+				o.target_status_image:show()
+				o.attention_arrow_image:hide()
+				o.target_name_text:hide()
 				return
 			elseif id == 7 then
 				-- petrification
-				o.tstat:path(windower.addon_path.. 'icons/petrified.png')
-				o.tstat:show()
-				o.atar:hide()
-				o.ttext:hide()
+				o.target_status_image:path(windower.addon_path.. 'icons/petrified.png')
+				o.target_status_image:show()
+				o.attention_arrow_image:hide()
+				o.target_name_text:hide()
 				return
 			elseif id == 11 then
 				--bind
-				o.tstat:path(windower.addon_path.. 'icons/bound.png')
-				o.tstat:show()
-				o.atar:hide()
-				o.ttext:hide()
+				o.target_status_image:path(windower.addon_path.. 'icons/bound.png')
+				o.target_status_image:show()
+				o.attention_arrow_image:hide()
+				o.target_name_text:hide()
 				return
 			elseif id == 28 then
 				-- terror
-				o.tstat:path(windower.addon_path.. 'icons/terror.png')
-				o.tstat:show()
-				o.atar:hide()
-				o.ttext:hide()
+				o.target_status_image:path(windower.addon_path.. 'icons/terror.png')
+				o.target_status_image:show()
+				o.attention_arrow_image:hide()
+				o.target_name_text:hide()
 				return
 			end
 		end
 	end
-	o.tstat:hide()
+	o.target_status_image:hide()
 end
 
 function bars.hover(o, x, y)
 	if not o then return false end
-	return o.fg_body:hover(x,y) or 
-		   o.bg_body:hover(x,y) or 
-		   o.lcap:hover(x,y) or 
-		   o.rcap:hover(x,y) or
-		   o.dtext:hover(x,y) or
-		   o.tbut:hover(x,y) or
-		   o.ntext:hover(x,y) or
-		   o.atext:hover(x,y) or
-		   o.atar:hover(x,y) or
-		   o.ttext:hover(x,y) or
-		   o.tstat:hover(x,y)
+	return o.foreground_body_image:hover(x,y) or 
+		   o.background_body_image:hover(x,y) or 
+		   o.left_cap_image:hover(x,y) or 
+		   o.right_cap_image:hover(x,y) or
+		   o.distance_text:hover(x,y) or
+		   o.target_indicator_image:hover(x,y) or
+		   o.name_text:hover(x,y) or
+		   o.action_text:hover(x,y) or
+		   o.attention_arrow_image:hover(x,y) or
+		   o.target_name_text:hover(x,y) or
+		   o.target_status_image:hover(x,y)
 end

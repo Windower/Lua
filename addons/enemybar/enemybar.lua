@@ -33,10 +33,13 @@ config = require('config')
 images = require('images')
 texts = require('texts')
 table = require('table')
+packets = require('packets')
+
 require 'bars'
 require 'actionTracking'
 
 player_id = nil
+party_members = {}
 debug_string = ''
 
 local state = {}
@@ -62,13 +65,13 @@ function initialize_bars()
         end
     end
 
-    target_bar = bars.new(nil, settings.target_bar)
-    subtarget_bar = bars.new(nil, settings.subtarget_bar)
-    focustarget_bar = bars.new(nil, settings.focustarget_bar)
+    target_bar = bars.new(settings.target_bar)
+    subtarget_bar = bars.new(settings.subtarget_bar)
+    focustarget_bar = bars.new(settings.focustarget_bar)
     local y = settings.aggro_bar.pos.y
     aggro_bars = {}
     for i = 1, settings.aggro_bar.count do
-        aggro_bars[i] = bars.new(nil, settings.aggro_bar)
+        aggro_bars[i] = bars.new(settings.aggro_bar)
         bars.move(aggro_bars[i], settings.aggro_bar.pos.x, y)
         if settings.aggro_bar.stack_dir == 'down' then
             y = y + settings.aggro_bar.stack_padding
@@ -120,7 +123,12 @@ function update_bar(bar, target, show)
 
             local enmity_target = tracked_enmity[target.id]
             if enmity_target and enmity_target.pc then
-                bars.update_enmity(bar, enmity_target.pc.name, get_tint_by_target(enmity_target.pc))
+                local pc = windower.ffxi.get_mob_by_id(enmity_target.pc)
+                if pc then
+                    bars.update_enmity(bar, pc.name, get_tint_by_target(pc))
+                else
+                    bars.update_enmity(bar, nil)
+                end
             elseif not target.is_npc then
                 local target_target = windower.ffxi.get_mob_by_index(target.target_index)
                 if target_target then
@@ -156,7 +164,7 @@ function update_aggro_bars(show)
                     break
                 end
                 local bar = aggro_bars[e_bar_i]
-                target = windower.ffxi.get_mob_by_id(v.mob.id)
+                target = windower.ffxi.get_mob_by_id(v.mob)
                 update_bar(bar, target, show)
                 e_bar_i = e_bar_i + 1
             end
@@ -182,7 +190,7 @@ function get_ordered_aggro()
             local is_debuffed = false
             if tracked_debuff[k] then
                 for id,debuff in pairs(tracked_debuff[k]) do
-                    if S{2,19,7,11,28}:contains(id) then
+                    if tracked_debuff_ids:contains(id) then
                         table.insert(debuffed,n)
                         is_debuffed = true
                         break
@@ -206,37 +214,106 @@ function get_ordered_aggro()
 end
 
 function check_claim(claim_id)
-        if player_id == claim_id then
-                return true
-        else
-            local mob = windower.ffxi.get_mob_by_id(claim_id)
-            if mob and is_party_member_or_pet(mob) then
-                return true
-            end
+    if player_id == claim_id then
+            return true
+    else
+        if is_party_member_or_pet(claim_id) then
+            return true
         end
-        return false
+    end
+    return false
 end
 
 function get_tint_by_target(target)
     if target.hpp == 0 then
-             return {red=155, green=155, blue=155}
-        elseif check_claim(target.claim_id) then
-             return {red=255, green=180, blue=180}
-        elseif is_party_member_or_pet(target) and target.id ~= player_id then
-             return {red=102, green=255, blue=255}
-        elseif not target.is_npc then
-             return {red=255, green=255, blue=255}
-        elseif target.claim_id == 0 then
-             return {red=230, green=230, blue=138} 
-        elseif target.claim_id ~= 0 then
-             return {red=153, green=102, blue=255}
-        end    
+        return {red=155, green=155, blue=155}
+    elseif check_claim(target.claim_id) then
+        return {red=255, green=180, blue=180}
+    elseif is_party_member_or_pet(target.id) and target.id ~= player_id then
+        return {red=102, green=255, blue=255}
+    elseif not target.is_npc then
+        return {red=255, green=255, blue=255}
+    elseif target.claim_id == 0 then
+        return {red=230, green=230, blue=138} 
+    elseif target.claim_id ~= 0 then
+        return {red=153, green=102, blue=255}
+    end    
 end
 
 function get_distance(player, target)
     local dx = player.x-target.x
     local dy = player.y-target.y
     return math.sqrt(dx*dx + dy*dy)
+end
+
+function looking_at(a, b)
+    if not a or not b then return false end
+    local h = a.facing % math.pi
+    local h2 = (math.atan2(a.x-b.x,a.y-b.y) + math.pi/2) % math.pi
+    return math.abs(h-h2) < 0.15
+end
+
+function is_npc(mob_id)
+    local is_pc = mob_id < 0x01000000
+    local is_pet = mob_id > 0x01000000 and mob_id % 0x1000 > 0x700
+
+    -- filter out pcs and known pet IDs
+    if is_pc or is_pet then return false end
+
+    -- check if the mob is charmed
+    local mob = windower.ffxi.get_mob_by_id(mob_id)
+    if not mob then return nil end
+    return mob.is_npc and not mob.charmed
+end
+
+function is_party_member_or_pet(mob_id)
+    if mob_id == player_id then return true end
+
+    if is_npc(mob_id) then return false end
+
+    return party_members[mob_id]
+end
+
+function handle_party_packets(id, data)
+    if id == 0x0DD then
+        -- cache party 
+        cache_party_members()
+    elseif id == 0x067 then
+        local p =  packets.parse('incoming', data)
+        if p['Owner Index'] > 0 then
+            local owner = windower.ffxi.get_mob_by_index(p['Owner Index'])
+            if owner and is_party_member_or_pet(owner.id) then
+                party_members[p['Pet ID']] = {is_pet = true, owner = owner.id}
+            end
+        end
+    end
+end
+
+function cache_party_members()
+    party_members = {}
+    local party = windower.ffxi.get_party()
+    if not party then return end
+    for i=0, party.party1_count-1 do
+        cache_party_member(party['p'..i])            
+    end
+    for i=0, party.party2_count-1 do
+        cache_party_member(party['a1'..i])            
+    end
+    for i=0, party.party3_count-1 do
+        cache_party_member(party['a2'..i])            
+    end
+end
+
+function cache_party_member(p)
+    if p and p.mob then
+        party_members[p.mob.id] = {is_pc = true,}
+        if p.mob.pet_index then
+            local pet = windower.ffxi.get_mob_by_index(p.mob.pet_index)
+            if pet then
+                party_members[pet.id] = {is_pet = true, owner = p.id}
+            end
+        end
+    end
 end
 
 function handle_command(c, ...)
@@ -365,7 +442,7 @@ function get_mob_by_name(n)
             worser_match = mob
         end
     end
-    return worse_match and worse_match or worser_match
+    return worse_match or worser_match
 end
 
 function normalize_bar_name(n)
@@ -463,7 +540,10 @@ windower.register_event('prerender', function()
     end
 end)
 windower.register_event('prerender', clean_tracked_actions)
-windower.register_event('incoming chunk', handle_action_packet)
+windower.register_event('incoming chunk', function(id, data)
+    handle_action_packet(id, data)
+    handle_party_packets(id, data)
+end)
 windower.register_event('zone change', reset_tracked_actions)
 windower.register_event('addon command', handle_command)
 windower.register_event('logout', function(...)
@@ -537,11 +617,11 @@ end)
 windower.register_event('keyboard', function(dik, down) -- lol diks
     if dik == 29 then -- if ctrl
         drag_snap_key_down = down
-        --windower.add_to_chat(1,'ctrl: '..tostring(down))
     end
 end)
 
 if windower.ffxi.get_info().logged_in then
     player_id = windower.ffxi.get_player().id
+    cache_party_members()
     load_settings()
 end
