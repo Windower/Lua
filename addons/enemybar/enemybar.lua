@@ -35,8 +35,8 @@ texts = require('texts')
 table = require('table')
 packets = require('packets')
 
-require 'bars'
-require 'actionTracking'
+require('bars')
+require('actionTracking')
 
 player_id = nil
 party_members = {}
@@ -116,9 +116,9 @@ function update_bar(bar, target, show)
 
             local action = tracked_actions[target.id]
             if action and not action.complete then
-                    bars.update_action(bar, action.ability.en, '')
+                bars.update_action(bar, action.ability.name, '')
             else
-                    bars.update_action(bar, nil, '')
+                bars.update_action(bar, nil, '')
             end
 
             local enmity_target = tracked_enmity[target.id]
@@ -293,13 +293,13 @@ function cache_party_members()
     party_members = {}
     local party = windower.ffxi.get_party()
     if not party then return end
-    for i=0, party.party1_count-1 do
+    for i=0, (party.party1_count or 0) - 1 do
         cache_party_member(party['p'..i])            
     end
-    for i=0, party.party2_count-1 do
+    for i=0, (party.party2_count or 0) - 1 do
         cache_party_member(party['a1'..i])            
     end
-    for i=0, party.party3_count-1 do
+    for i=0, (party.party3_count or 0) - 1 do
         cache_party_member(party['a2'..i])            
     end
 end
@@ -485,47 +485,6 @@ function set_setting(bar, setting, v)
     initialize_bars()
 end
 
-function load_settings()
-    defaults = {}
-    defaults.target_bar = {
-        pos={x=650,y=750}, width=600,
-        color={alpha=255,red=255,green=0,blue=0},
-        font='Arial', font_size=14,
-        show=true, show_target=false, show_target_icon=false,
-        show_action=false, show_dist=false, show_debuff=false}
-    defaults.subtarget_bar = {
-        pos={x=680,y=700}, width=300,
-        color={alpha=255,red=12,green=50,blue=101},
-        font='Arial', font_size=12,
-        show=true, show_target=false, show_target_icon=false,
-        show_action=false, show_dist=false, show_debuff=false}
-    defaults.focustarget_bar = {
-        pos={x=680,y=670}, width=250,
-        color={alpha=255,red=93,green=0,blue=255},
-        font='Arial', font_size=12,
-        show=true, show_target=false, show_target_icon=false,
-        show_action=false, show_dist=false, show_debuff=false}
-    defaults.aggro_bar = {
-        pos={x=350,y=550}, width=180,
-        color={alpha=255,red=0,green=150,blue=50},
-        font='Arial', font_size=9,
-        show=false, show_target=false, show_target_icon=false,
-        show_action=false, show_dist=false, show_debuff=false,
-        count=6, stack_dir='down', stack_padding = 27}
-    settings_old = config.load({})
-    if settings_old.pos then
-        -- settings.pos was the old position setting. if it's set that means we're upgrading from 1.0
-        defaults.target_bar.pos = settings_old.pos
-        defaults.target_bar.font = settings_old.font
-        defaults.subtarget_bar.font = settings_old.font
-        defaults.target_bar.font_size = settings_old.font_size
-        defaults.subtarget_bar.font_size = settings_old.font_size
-    end
-    settings = config.load(defaults)
-
-    initialize_bars()
-end
-
 windower.register_event('prerender', function()
     if player_id then
         update_bar(target_bar, windower.ffxi.get_mob_by_target('t'), settings.target_bar.show)
@@ -553,7 +512,6 @@ end)
 windower.register_event('login', function(...)
     if windower.ffxi.get_info().logged_in then
         player_id = windower.ffxi.get_player().id
-        load_settings()
     end
     state = {}
 end)
@@ -622,6 +580,43 @@ end)
 
 if windower.ffxi.get_info().logged_in then
     player_id = windower.ffxi.get_player().id
-    cache_party_members()
-    load_settings()
+    party_members = {}
 end
+
+defaults = {}
+defaults.target_bar = {
+    pos={x=650,y=750}, width=600,
+    color={alpha=255,red=255,green=0,blue=0},
+    font='Arial', font_size=14,
+    show=true, show_target=false, show_target_icon=false,
+    show_action=false, show_dist=false, show_debuff=false}
+defaults.subtarget_bar = {
+    pos={x=680,y=700}, width=300,
+    color={alpha=255,red=12,green=50,blue=101},
+    font='Arial', font_size=12,
+    show=true, show_target=false, show_target_icon=false,
+    show_action=false, show_dist=false, show_debuff=false}
+defaults.focustarget_bar = {
+    pos={x=680,y=670}, width=250,
+    color={alpha=255,red=93,green=0,blue=255},
+    font='Arial', font_size=12,
+    show=true, show_target=false, show_target_icon=false,
+    show_action=false, show_dist=false, show_debuff=false}
+defaults.aggro_bar = {
+    pos={x=350,y=550}, width=180,
+    color={alpha=255,red=0,green=150,blue=50},
+    font='Arial', font_size=9,
+    show=false, show_target=false, show_target_icon=false,
+    show_action=false, show_dist=false, show_debuff=false,
+    count=6, stack_dir='down', stack_padding = 27}
+settings_old = config.load({})
+if settings_old.pos then
+    -- settings.pos was the old position setting. if it's set that means we're upgrading from 1.0
+    defaults.target_bar.pos = settings_old.pos
+    defaults.target_bar.font = settings_old.font
+    defaults.subtarget_bar.font = settings_old.font
+    defaults.target_bar.font_size = settings_old.font_size
+    defaults.subtarget_bar.font_size = settings_old.font_size
+end
+settings = config.load(defaults)
+config.register(settings, initialize_bars)
