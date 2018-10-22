@@ -156,20 +156,16 @@ function did_overwrite(target_id, new, t)
         local old = res.spells[tracked.spell].overwrites or {}
         
         -- Check if there isn't a higher priority debuff active
-        if table.length(old) > 0 then
-            for _,v in ipairs(old) do
-                if new == v then
-                    return false
-                end
+        for _,v in ipairs(old) do
+            if new == v then
+                return false
             end
         end
         
         -- Check if a lower priority debuff is being overwritten
-        if table.length(t) > 0 then
-            for _,v in ipairs(t) do
-                if tracked.spell == v then
-                    tracked_debuff[target_id][effect] = nil
-                end
+        for _,v in ipairs(t) do
+            if tracked.spell == v then
+                tracked_debuff[target_id][effect] = nil
             end
         end
     end
