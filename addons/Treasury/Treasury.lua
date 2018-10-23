@@ -1,6 +1,6 @@
 _addon.name = 'Treasury'
-_addon.author = 'Ihina'
-_addon.version = '1.2.0.2'
+_addon.author = 'Ihina, Skyrant'
+_addon.version = '1.2.0.3'
 _addon.commands = {'treasury', 'tr'}
 
 res = require('resources')
@@ -13,6 +13,7 @@ defaults.Pass = S{}
 defaults.Lot = S{}
 defaults.Drop = S{}
 defaults.AutoDrop = false
+defaults.CityDrop = false
 defaults.AutoStack = true
 defaults.Delay = 0
 defaults.Verbose = false
@@ -103,7 +104,15 @@ function force_check()
     end
 
     -- Check inventory for unwanted items
-    if settings.AutoDrop then
+    if areas.Cities:contains(res.zones[windower.ffxi.get_info().zone].name) then
+        if settings.AutoDrop and settings.CityDrop then
+            for index, item in pairs(items.inventory) do
+                if type(item) == 'table' and code.drop:contains(item.id) then
+                    drop(item.id, index, item.count)
+                end
+            end
+        end
+    elseif settings.AutoDrop then
         for index, item in pairs(items.inventory) do
             if type(item) == 'table' and code.drop:contains(item.id) then
                 drop(item.id, index, item.count)
@@ -183,8 +192,13 @@ windower.register_event('incoming chunk', function(id, data)
         if chunk.Bag ~= inventory_id then
             return
         end
-
-        if id == 0x020 and settings.AutoDrop and code.drop:contains(chunk.Item) then
+        if areas.Cities:contains(res.zones[windower.ffxi.get_info().zone].name) then
+            if id == 0x020 and settings.AutoDrop and settings.CityDrop and code.drop:contains(chunk.Item) then
+                drop(chunk.Item, chunk.Index, chunk.Count)
+            else
+                stack()
+            end
+        elseif id == 0x020 and settings.AutoDrop and code.drop:contains(chunk.Item) then
             drop(chunk.Item, chunk.Index, chunk.Count)
         else
             -- Don't need to stack in the other case, as a new inventory packet will come in after the drop anyway
@@ -276,6 +290,17 @@ windower.register_event('addon command', function(command1, command2, ...)
         config.save(settings)
         log('AutoDrop %s':format(settings.AutoDrop and 'enabled' or 'disabled'))
 
+    elseif command1 == 'citydrop' then
+        if command2 then
+            settings.CityDrop = bool_values[command2:lower()]
+        else
+            settings.CityDrop = not settings.CityDrop
+        end
+
+        config.save(settings)
+        log('CityDrop %s':format(settings.CityDrop and 'enabled' or 'disabled'))
+        --log('Current Zone: %s':format(res.zones[windower.ffxi.get_info().zone].name))
+
     elseif command1 == 'autostack' then
         if command2 then
             settings.AutoStack = bool_values[command2:lower()]
@@ -316,6 +341,7 @@ windower.register_event('addon command', function(command1, command2, ...)
         print('    \\cs(255,255,255)lotall|passall\\cr - Lots/Passes all items currently in the pool')
         print('    \\cs(255,255,255)clearall\\cr - Removes lotting/passing/dropping settings for this character')
         print('    \\cs(255,255,255)autodrop [on|off]\\cr - Enables/disables (or toggles) the auto-drop setting')
+        print('    \\cs(255,255,255)citydrop [on|off]\\cr - Enables/disables (or toggles) the auto-drop in cities')
         print('    \\cs(255,255,255)verbose [on|off]\\cr - Enables/disables (or toggles) the verbose setting')
         print('    \\cs(255,255,255)autostack [on|off]\\cr - Enables/disables (or toggles) the autostack feature')
         print('    \\cs(255,255,255)delay <value>\\cr - Allows you to change the delay of actions (default: 0)')
@@ -323,6 +349,35 @@ windower.register_event('addon command', function(command1, command2, ...)
 
     end
 end)
+
+areas = {}
+areas.Cities = S{
+    "Ru'Lude Gardens",
+    "Upper Jeuno",
+    "Lower Jeuno",
+    "Port Jeuno",
+    "Port Windurst",
+    "Windurst Waters",
+    "Windurst Woods",
+    "Windurst Walls",
+    "Heavens Tower",
+    "Port San d'Oria",
+    "Northern San d'Oria",
+    "Southern San d'Oria",
+    "Port Bastok",
+    "Bastok Markets",
+    "Bastok Mines",
+    "Metalworks",
+    "Aht Urhgan Whitegate",
+    "Tavanazian Safehold",
+    "Nashmau",
+    "Selbina",
+    "Mhaura",
+    "Norg",
+    "Eastern Adoulin",
+    "Western Adoulin",
+    "Kazham"
+}
 
 --[[
 Copyright © 2014-2015, Windower

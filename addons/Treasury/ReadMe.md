@@ -38,7 +38,7 @@ Clears all character-specific settings (it will keep global settings)
 
 Sets the delay that should pass before lotting/passing/dropping items, in seconds. It will lot/pass/drop items in a random time interval between half the value specified and the full value. I.e. if you specify 5 seconds it will lot/pass/drop between 2.5 seconds and 5 seconds randomly.
 
-`//treasury <autodrop|autostack|verbose> [on|off]`
+`//treasury <autodrop|citydrop|autostack|verbose> [on|off]`
 
 Sets the provided setting to true or false. If neither is provided, it toggles the current setting.
 
