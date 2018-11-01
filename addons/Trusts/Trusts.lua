@@ -74,12 +74,15 @@ windower.register_event('addon command',function(...)
         chat(1,'Trusts - Command List:')
         chat(207,'//tru '..color('save <setname>',166,160)..' --Save trusts in current party.')
         chat(207,'//tru '..color('<setname>',166,160)..' --Calls trusts you saved.')
+        chat(207,'//tru '..color('list',166,160)..' --Lists your saved sets.')
         chat(207,'//tru '..color('random',166,160)..' --What\'s your fortune today?')
         chat(207,'//tru '..color('check',166,160)..' --List of unlearned trusts. gotta catch \'em all!')
     elseif cmd[1] == 'save' then
         save_set(cmd[2])
     elseif cmd[1] == 'check' then
         check_learned()
+    elseif cmd[1] == 'list' then
+        list_sets()
     else
         call_set(cmd[1] or 'default')
     end
@@ -98,6 +101,18 @@ function save_set(set)
     end
     settings:save('all')
     log('set '..set..' saved.')
+end
+
+function list_sets()
+    local chat = windower.add_to_chat
+    settings = config.load()
+    chat(1, 'Trusts - Saved sets:')
+
+    for set, _ in pairs(settings.sets) do
+        if set ~= 'default' then
+            chat(207, set)
+        end
+    end
 end
 
 function check_lang(entity)

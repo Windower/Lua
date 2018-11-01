@@ -59,7 +59,7 @@ function search_item()
             local enchant = ext.type == 'Enchanted Equipment'
             local recast = enchant and ext.charges_remaining > 0 and math.max(ext.next_use_time+18000-os.time(),0)
             local usable = recast and recast == 0
-            log(stats[lang],usable and '' or recast..' sec recast.')
+            log(stats[lang],usable and '' or recast and recast..' sec recast.')
             if usable or ext.type == 'General' then
                 if enchant and item.status ~= 5 then --not equipped
                     set_equip(item.slot,stats.slot,item.bag)
@@ -80,15 +80,18 @@ function search_item()
                 break;
             end
         else
-            log(stats[lang],false)
+            log('You don\'t have '..stats[lang]..'.')
         end
     end
 end
 
 windower.register_event('addon command',function()
     local player = windower.ffxi.get_player()
-    if S{player.main_job_id,player.sub_job_id}[4] then --BLM
-        local spell = {japanese='デジョンII',english='"Warp II"'}
+    local get_spells = windower.ffxi.get_spells()
+    local spell = S{player.main_job_id,player.sub_job_id}[4]
+        and (get_spells[261] and player.vitals.mp >= 100 and {japanese='デジョン',english='"Warp"'}
+        or get_spells[262] and player.vitals.mp >= 150 and {japanese='デジョンII',english='"Warp II"'})
+    if spell then
         windower.chat.input('/ma '..windower.to_shift_jis(spell[lang])..' <me>')
     else
         search_item()

@@ -265,7 +265,7 @@ local enums = {
 }
 
 local e = function(t, val)
-    return enums[t][val] or 'Unknown value for \'%s\': %i':format(t, val)
+    return enums[t][val] or 'Unknown value for \'%s\': %s':format(t, tostring(val))
 end
 
 --[[
@@ -445,7 +445,7 @@ fields.outgoing[0x037] = L{
     {ctype='unsigned char',     label='Slot',               fn=inv+{0}},        -- 0E
     {ctype='unsigned char',     label='_unknown2'},                             -- 0F   Takes values
     {ctype='unsigned char',     label='Bag',                fn=bag},            -- 10
-    {ctype='data[3]',           label='_unknown2'}                              -- 11
+    {ctype='data[3]',           label='_unknown3'}                              -- 11
 }
 
 -- Sort Item

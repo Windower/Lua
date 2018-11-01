@@ -336,9 +336,9 @@
     <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
-    <name>MountMuzzle</name>
+    <name>Mount Muzzle</name>
     <author>Sjshovan (Apogee)</author>
-    <description>Allows the user to change or remove the default mount music.</description>
+    <description>Change or remove the default mount music.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>https://discord.gg/b275nMv</support>
   </addon>
@@ -554,7 +554,7 @@
     <name>SpellBook</name>
     <author>Sigil Baram (Ravlyn@Asura)</author>
     <description>List unknown spells by job or category. Can also limit results by level or spent jp required by the spell.</description>
-    <bugtracker>https://github.com/sigilbaram/SpellBook/issues</support>
+    <bugtracker>https://github.com/sigilbaram/SpellBook/issues</bugtracker>
     <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
@@ -735,8 +735,29 @@
   <addon>
     <name>MyHome</name>
     <author>Centurio aka from20020516</author>
-    <description>Automatically choose and use warp spell or item.</description>
+    <description>Automatically choose and use a warp spell or an item.</description>
     <bugtracker>https://github.com/from20020516/Lua/issues</bugtracker>
     <support>https://twitter.com/from20020516</support>
+  </addon>
+  <addon>
+    <name>Debuffed</name>
+    <author>Auk</author>
+    <description>Tracks and displays debuffs on your current target.</description>
+    <bugtracker>https://github.com/aukon/Lua/issues</bugtracker>
+    <support>https://discord.gg/b275nMv</support>
+  </addon>
+  <addon>
+    <name>Tab</name>
+    <author>Centurio aka from20020516</author>
+    <description>Simple addon Replace Tab key input to &lt;stnpc&gt; or X+Tab to &lt;stpc&gt;. </description>
+    <bugtracker>https://github.com/from20020516/Lua/issues</bugtracker>
+    <support>https://twitter.com/from20020516</support>
+  </addon>
+  <addon>
+    <name>EasyNuke</name>
+    <author>FaceDesk</author>
+    <description>Unified commands to handle single target and AOE nukes and cures, plus Drain/Aspir and Absorbs.</description>
+    <bugtracker>https://github.com/deadman80/Lua/issues</bugtracker>
+    <support>https://www.ffxiah.com/user/Nyarlko</support>
   </addon>
 </addons>
