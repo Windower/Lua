@@ -1419,7 +1419,7 @@ fields.incoming[0x00E] = L{
     {ctype='unsigned char',     label='Status',             fn=statuses},       -- 1F   Status used to be 0x20
     {ctype='unsigned int',      label='_unknown2',          fn=bin+{4}},        -- 20
     {ctype='unsigned int',      label='_unknown3',          fn=bin+{4}},        -- 24
-    {ctype='unsigned int',      label='_unknown4',          fn=bin+{4}},        -- 28
+    {ctype='unsigned int',      label='_unknown4',          fn=bin+{4}},        -- 28   In Dynamis - Divergence statue's eye colors
     {ctype='unsigned int',      label='Claimer',            fn=id},             -- 2C
     {ctype='unsigned short',    label='_unknown5'},                             -- 30
     {ctype='unsigned short',    label='Model'},                                 -- 32
@@ -1720,7 +1720,7 @@ func.incoming[0x028].action_base = L{
     {ctype='bit[6]',            label='Stagger'},                               -- 02:5
     {ctype='bit[17]',           label='Param'},                                 -- 03:3
     {ctype='bit[10]',           label='Message'},                               -- 06:2
-    {ctype='bit[31]',           label='_unknown'},                              -- 07:4
+    {ctype='bit[31]',           label='_unknown'},                              -- 07:4 --Message Modifier? If you get a complete (Resist!) this is set to 2 otherwise a regular Resist is 0.
 }
 
 func.incoming[0x028].add_effect_base = L{

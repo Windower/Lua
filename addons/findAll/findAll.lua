@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name    = 'findAll'
 _addon.author  = 'Zohno'
-_addon.version = '1.20170501'
+_addon.version = '1.20180415'
 _addon.commands = {'findall'}
 
 require('chat')
@@ -469,7 +469,6 @@ function make_table(tab,tab_offset)
             ret = ret..tostring(v)..',\n'
         end
     end
-    coroutine.yield()
     return ret..offset..'}'
 end
 
@@ -519,7 +518,6 @@ function update_global_storage()
                 warning('Unable to retrieve updated item storage for %s.':format(f:sub(1,-5)))
             end
         end
-        coroutine.yield()
     end
 end
 
