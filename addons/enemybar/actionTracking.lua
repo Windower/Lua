@@ -103,7 +103,12 @@ function track_actions(ai)
         action_map = {en='Unknown (id:'..action_id..')'}
     end 
 
-    tracked_actions[ai.actor_id] = {actor_id=actor_id, target_id=ai.targets[1].id, ability=action_map, complete=completed_message_ids:contains(ai.category), time=os.time()}
+    if ai.targets[1].actions[1].message == 0 and ai.targets[1].id == ai.actor_id then
+        -- cast was interrupted
+        tracked_actions[ai.actor_id] = nil;
+    else
+        tracked_actions[ai.actor_id] = {actor_id=actor_id, target_id=ai.targets[1].id, ability=action_map, complete=completed_message_ids:contains(ai.category), time=os.time()}
+    end
 end
 
 function track_debuffs(ai)
