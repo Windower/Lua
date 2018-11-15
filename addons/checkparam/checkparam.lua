@@ -176,6 +176,7 @@ end
 integrate = {
     --[[integrate same property.information needed for development. @from20020516]]
     ['quad atk'] = 'quadruple attack',
+    ['quad attack'] = 'quadruple attack',
     ['triple atk'] = 'triple attack',
     ['double atk'] = 'double attack',
     ['dblatk'] = 'double attack',
