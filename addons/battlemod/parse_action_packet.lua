@@ -241,7 +241,7 @@ function parse_action_packet(act)
                     :gsub('${weapon_skill}',color_it(act.action.weapon_skill or 'ERROR 114',color_arr.wscol))
                     :gsub('${abil}',m.simp_name or 'ERROR 115')
                     :gsub('${numb}',numb or 'ERROR 116')
-                    :gsub('${actor}',color_it(act.actor.name or 'ERROR 117',color_arr[act.actor.owner or act.actor.type]))
+                    :gsub('${actor}',color_it((act.actor.name or 'ERROR 117' ) .. (act.actor.owner_name or "") ,color_arr[act.actor.owner or act.actor.type]))
                     :gsub('${target}',targ)
                     :gsub('${lb}','\7')
                     :gsub('${number}',act.action.number or m.param)
@@ -411,10 +411,10 @@ end
 
 function player_info(id)
     local player_table = windower.ffxi.get_mob_by_id(id)
-    local typ,owner,filt
+    local typ,owner,filt,owner_name
     
     if player_table == nil then
-        return {name=nil,id=nil,is_npc=nil,type='debug',owner=nil,race=nil}
+        return {name=nil,id=nil,is_npc=nil,type='debug',owner=nil, owner_name=nil,race=nil}
     end
     
     for i,v in pairs(windower.ffxi.get_party()) do
@@ -432,7 +432,7 @@ function player_info(id)
     
     if not filt then
         if player_table.is_npc then
-            if player_table.id%4096>2047 then
+            if player_table.index>1791 then
                 typ = 'other_pets'
                 filt = 'other_pets'
                 owner = 'other'
@@ -443,6 +443,7 @@ function player_info(id)
                             filt = 'my_pet'
                         end
                         owner = i
+                        owner_name = showownernames and '(' .. v.mob.name .. ')'
                         break
                     elseif type(v) == 'table' and v.mob and v.mob.fellow_index and v.mob.fellow_index == player_table.index then
                         if i == 'p0' then
@@ -450,6 +451,7 @@ function player_info(id)
                             filt = 'my_fellow'
                         end
                         owner = i
+                        owner_name = showownernames and '(' .. v.mob.name .. ')'
                         break
                     end
                 end
@@ -483,7 +485,7 @@ function player_info(id)
         end
     end
     if not typ then typ = 'debug' end
-    return {name=player_table.name,id=id,is_npc = player_table.is_npc,type=typ,filter=filt,owner=(owner or nil),race = player_table.race}
+    return {name=player_table.name,id=id,is_npc = player_table.is_npc,type=typ,filter=filt,owner=(owner or nil), owner_name=(owner_name or nil),race = player_table.race}
 end
 
 function get_spell(act)

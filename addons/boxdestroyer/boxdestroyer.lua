@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -- addon information
 
 _addon.name = 'boxdestroyer'
-_addon.version = '1.0.3'
+_addon.version = '1.0.4'
 _addon.command = 'boxdestroyer'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
@@ -61,8 +61,11 @@ observed_default = {
     ['range'] = false,
     ['equal'] = false,
     ['second_multiple'] = false,
-    ['first_multiple'] = false
+    ['first_multiple'] = false,
+    ['thief_tools_active'] = false
 }
+
+thief_tools = {[1022] = true}
 
 -- global variables
 
@@ -312,14 +315,13 @@ function check_incoming_chunk(id, original, modified, injected, blocked)
             local message_id = original:unpack('H', 27) % 0x8000
             
             if box[box_id] == nil then
-                box[box_id] = default
+                box[box_id] = table.copy(default)
             end
             if observed[box_id] == nil then
                 observed[box_id] = table.copy(observed_default)
             end
             
             if get_id(zone_id,'greater_less') == message_id then
-                -- It is unclear how these messages (caused by Thief's tools) work
                 box[box_id] = greater_less(box_id, param1 == 0, param0)
             elseif get_id(zone_id,'second_even_odd') == message_id then
                 -- tells whether the second digit is even or odd
@@ -330,22 +332,48 @@ function check_incoming_chunk(id, original, modified, injected, blocked)
                 box[box_id] = even_odd(box_id, 10, param0)
                 observed[box_id].first_even_odd = true
             elseif get_id(zone_id,'range') == message_id then
-                -- lower bound (param0) = solution - RANDINT(5,20)
-                -- upper bound (param1) = solution + RANDINT(5,20)
-                -- param0 + 21 > solution > param0 + 4
-                -- param1 - 4  > solution > param1 - 21
-                -- if the bound is less than 10 or greater than 99, the message changes to "greater" or "less" respectively
-                box[box_id] = greater_less(box_id, true, math.max(param1-21,param0+4) )
-                box[box_id] = greater_less(box_id, false, math.min(param0+21,param1-4) )
-                observed[box_id].range = true
+                if observed[box_id].thief_tools_active then
+                    -- Thief tools are the same as normal ranges but with larger bounds.
+                    -- lower bound (param0) = solution - RANDINT(8,32)
+                    -- upper bound (param1) = solution + RANDINT(8,32)
+                    -- param0 + 33 > solution > param0 + 7
+                    -- param1 - 7  > solution > param1 - 33
+                    -- if the bound is less than 11 or greater than 98, the message changes to "greater" or "less" respectively
+                    box[box_id] = greater_less(box_id, true, math.max(param1-33,param0+7) )
+                    box[box_id] = greater_less(box_id, false, math.min(param0+33,param1-7) )
+                    observed[box_id].thief_tools_active = false
+                else
+                    -- lower bound (param0) = solution - RANDINT(5,20)
+                    -- upper bound (param1) = solution + RANDINT(5,20)
+                    -- param0 + 21 > solution > param0 + 4
+                    -- param1 - 4  > solution > param1 - 21
+                    -- if the bound is less than 11 or greater than 98, the message changes to "greater" or "less" respectively
+                    box[box_id] = greater_less(box_id, true, math.max(param1-21,param0+4) )
+                    box[box_id] = greater_less(box_id, false, math.min(param0+21,param1-4) )
+                    observed[box_id].range = true
+                end
             elseif get_id(zone_id,'less') == message_id then
                 -- Less is a range with 9 as the lower bound
-                box[box_id] = greater_less(box_id, false, math.min(9+21,param0-4) )
-                observed[box_id].range = true
+                if observed[box_id].thief_tools_active then
+                    box[box_id] = greater_less(box_id, true, math.max(9, param0-33) )
+                    box[box_id] = greater_less(box_id, false, math.min(10+33,param0-7) )
+                    observed[box_id].thief_tools_active = false
+                else
+                    box[box_id] = greater_less(box_id, true, math.max(9, param0-21) )
+                    box[box_id] = greater_less(box_id, false, math.min(10+21,param0-4) )
+                    observed[box_id].range = true
+                end
             elseif get_id(zone_id,'greater') == message_id then
                 -- Greater is a range with 100 as the upper bound
-                box[box_id] = greater_less(box_id, true, math.max(100-21,param0+4) )
-                observed[box_id].range = true
+                if observed[box_id].thief_tools_active then
+                    box[box_id] = greater_less(box_id, true, math.max(99-33,param0+7) )
+                    box[box_id] = greater_less(box_id, false, math.min(100,param0+33) )
+                    observed[box_id].thief_tools_active = false
+                else
+                    box[box_id] = greater_less(box_id, true, math.max(99-21,param0+4) )
+                    box[box_id] = greater_less(box_id, false, math.min(100,param0+21) )
+                    observed[box_id].range = true
+                end
             elseif get_id(zone_id,'equal') == message_id then
                 -- single number that is either the first or second digit of the solution
                 local new = equal(box_id, true, param0)
@@ -377,14 +405,16 @@ function check_incoming_chunk(id, original, modified, injected, blocked)
                 observed[box_id].first_multiple = true
             elseif get_id(zone_id,'success') == message_id or get_id(zone_id,'failure') == message_id then
                 box[box_id] = nil
+            elseif get_id(zone_id,'tool_failure') == message_id then
+                observed[box_id].thief_tools_active = false
             end
         elseif id == 0x34 then
             local box_id = original:unpack('I', 5)
             if windower.ffxi.get_mob_by_id(box_id).name == 'Treasure Casket' then
                 local chances = original:byte(9)
                 if box[box_id] == nil then
-                    box[box_id] = default
-                    observed[box_id] = observed_default
+                    box[box_id] = table.copy(default)
+                    observed[box_id] = table.copy(observed_default)
                 end
                 if chances > 0 and chances < 7 then
                     display(box_id, chances)
@@ -397,6 +427,33 @@ function check_incoming_chunk(id, original, modified, injected, blocked)
     end
 end
 
+function watch_for_keys(id, original, modified, injected, blocked)
+    if blocked then
+    elseif (id == 0x036 or id == 0x037) and
+        windower.ffxi.get_mob_by_id(modified:unpack('I',0x05)).name == 'Treasure Casket' and
+        (windower.ffxi.get_player().main_job == 'THF' or windower.ffxi.get_player().sub_job == 'THF') then
+        
+        local box_id = modified:unpack('I',0x05)
+        if not box[box_id] then
+            box[box_id] = table.copy(default)
+            observed[box_id] = table.copy(observed_default)
+        end
+        
+        if id == 0x037 and thief_tools[windower.ffxi.get_items(modified:byte(0x11))[modified:byte(0xF)].id] then
+            observed[box_id].thief_tools_active = true
+        elseif id == 0x036 then
+            for i = 1,9 do
+                if thief_tools[windower.ffxi.get_items(0)[modified:byte(0x30+i)].id] then
+                    observed[box_id].thief_tools_active = true
+                    break
+                end
+            end
+        end
+    end
+end
+
 -- register event callbacks
 
 windower.register_event('incoming chunk', check_incoming_chunk)
+
+windower.register_event('outgoing chunk', watch_for_keys)

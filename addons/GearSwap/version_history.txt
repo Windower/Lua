@@ -1,4 +1,7 @@
 -------------------------------------------------
+
+GearSwap 0.934 - Fixed /item command handling.
+-------------------------------------------------
 GearSwap 0.933 - Adjusted how item use packets are chosen. 
 -------------------------------------------------
 GearSwap 0.932 - Fixed bug that prevented gearswap from identifying items by their bag when worn. 

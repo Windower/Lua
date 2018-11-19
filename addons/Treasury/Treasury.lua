@@ -1,6 +1,6 @@
 _addon.name = 'Treasury'
 _addon.author = 'Ihina'
-_addon.version = '1.2.0.2'
+_addon.version = '1.2.1.0'
 _addon.commands = {'treasury', 'tr'}
 
 res = require('resources')
@@ -19,22 +19,39 @@ defaults.Verbose = false
 
 settings = config.load(defaults)
 
-ids = T{}
+all_ids = T{}
 for item in res.items:it() do
-    ids[item.name:lower()] = item.id 
-    ids[item.name_log:lower()] = item.id 
+    local name = item.name:lower()
+    if not all_ids[name] then
+        all_ids[name] = S{}
+    end
+    local name_log = item.name_log:lower()
+    if not all_ids[name_log] then
+        all_ids[name_log] = S{}
+    end
+    all_ids[name]:add(item.id)
+    all_ids[name_log]:add(item.id)
 end
 
-s = S{'pass', 'lot', 'drop'}
 code = {}
 code.pass = S{}
 code.lot = S{}
 code.drop = S{}
 
+local flatten = function(s)
+    return s:reduce(function(s1, s2)
+        return s1 + s2
+    end, S{})
+end
+
+local extract_ids = function(names)
+    return flatten(names:map(table.get+{all_ids} .. string.lower))
+end
+
 config.register(settings, function(settings_table)
-    code.pass = settings_table.Pass:map(table.get+{ids} .. string.lower)
-    code.lot = settings_table.Lot:map(table.get+{ids} .. string.lower)
-    code.drop = settings_table.Drop:map(table.get+{ids} .. string.lower)
+    code.pass = extract_ids(settings_table.Pass)
+    code.lot = extract_ids(settings_table.Lot)
+    code.drop = extract_ids(settings_table.Drop)
 end)
 
 lotpassdrop_commands = T{
@@ -143,7 +160,7 @@ function find_id(name)
         return S{4096, 4097, 4098, 4099, 4100, 4101, 4102, 4103}
 
     else
-        return S(ids:key_filter(windower.wc_match-{name}))
+        return flatten(S(all_ids:key_filter(windower.wc_match-{name})))
 
     end
 end
@@ -228,7 +245,7 @@ windower.register_event('addon command', function(command1, command2, ...)
                 error('No items found that match: %s':format(name))
                 return
             end
-            lotpassdrop(command1, command2, ids)            
+            lotpassdrop(command1, command2, ids)
 
             if global then
                 windower.send_ipc_message('treasury %s %s %s':format(command1, command2, ids:concat(' ')))
@@ -320,12 +337,11 @@ windower.register_event('addon command', function(command1, command2, ...)
         print('    \\cs(255,255,255)autostack [on|off]\\cr - Enables/disables (or toggles) the autostack feature')
         print('    \\cs(255,255,255)delay <value>\\cr - Allows you to change the delay of actions (default: 0)')
 
-
     end
 end)
 
 --[[
-Copyright © 2014-2015, Windower
+Copyright © 2014-2018, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

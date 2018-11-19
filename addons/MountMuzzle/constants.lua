@@ -10,7 +10,7 @@ modification, are permitted provided that the following conditions are met:
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name of MountMuzzle nor the
+    * Neither the name of Mount Muzzle nor the
       names of its contributors may be used to endorse or promote products
       derived from this software without specific prior written permission.
 
@@ -24,12 +24,15 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-]]
+--]]
 
 packets = {
     inbound = {
         music_change = {
             id = 0x05F
+        },
+        zone_update = {
+            id = 0x00A
         }
     },
     outbound = {
@@ -46,18 +49,24 @@ packets = {
 player = {
     statuses = {
         mounted = 85
+    },
+    buffs = {
+        reiveMark = 511,
+        mounted = 252
     }
 }
 
 music = {
     songs = {
-        silent = 90,
-        normal = 84,
-        choco = 212,
+        silent = 91,
+        mount = 84,
+        chocobo = 212,
         zone = 0,
     },
     types = {
-        mount = 4
+        mount = 4,
+        idle_day = 0,
+        idle_night = 1
     }
 }
 
@@ -76,14 +85,14 @@ muzzles = {
         song = music.songs.silent,
         description = 'No Music (Default)'
     },
-    normal = {
-        name = 'normal',
-        song = music.songs.normal,
-        description = 'Original Music'
+    mount = {
+        name = 'mount',
+        song = music.songs.mount,
+        description = 'Mount Music'
     },
-    choco = {
-        name = 'choco',
-        song = music.songs.choco,
+    chocobo = {
+        name = 'chocobo',
+        song = music.songs.chocobo,
         description = 'Chocobo Music'
     },
     zone = {
@@ -98,5 +107,5 @@ return {
     player = player,
     music = music,
     colors = colors,
-    muzzles = muzzles    
+    muzzles = muzzles
 }

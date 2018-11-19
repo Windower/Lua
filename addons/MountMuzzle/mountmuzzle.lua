@@ -10,7 +10,7 @@ modification, are permitted provided that the following conditions are met:
     * Redistributions in binary form must reproduce the above copyright
       notice, this list of conditions and the following disclaimer in the
       documentation and/or other materials provided with the distribution.
-    * Neither the name of MountMuzzle nor the
+    * Neither the name of Mount Muzzle nor the
       names of its contributors may be used to endorse or promote products
       derived from this software without specific prior written permission.
 
@@ -24,21 +24,21 @@ LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-]]
+--]]
 
-_addon.name     = 'Mount Muzzle'
-_addon.author   = 'Sjshovan (Apogee) sjshovan@gmail.com'
-_addon.version  = '0.9.3'
+_addon.name = 'Mount Muzzle'
+_addon.description = 'Change or remove the default mount music.'
+_addon.author = 'Sjshovan (Apogee) sjshovan@gmail.com'
+_addon.version = '0.9.4'
 _addon.commands = {'mountmuzzle', 'muzzle', 'mm'}
 
 local _logger = require('logger')
-local _config  = require('config')
+local _config = require('config')
 local _packets = require('packets')
 
-require("constants")
+require('constants')
 require('helpers')
 
-local mounted = false
 local needs_inject = false
 
 local defaults = {
@@ -56,21 +56,40 @@ local help = {
         buildHelpCommandEntry('set <muzzle>', 'Set the current muzzle to the given muzzle type.'),
         buildHelpCommandEntry('get', 'Display the current muzzle.'),
         buildHelpCommandEntry('default', 'Set the current muzzle to the default (Silent).'),
+        buildHelpCommandEntry('unload', 'Unload Mount Muzzle.'),
         buildHelpCommandEntry('reload', 'Reload Mount Muzzle.'),
+        buildHelpCommandEntry('about', 'Display information about Mount Muzzle.'),
         buildHelpCommandEntry('help', 'Display Mount Muzzle commands.'),
         buildHelpSeperator('=', 26),
     },
-
     types = {
         buildHelpSeperator('=', 23),
         buildHelpTitle('Types'),
         buildHelpSeperator('=', 23),
         buildHelpTypeEntry(muzzles.silent.name:ucfirst(), muzzles.silent.description),
-        buildHelpTypeEntry(muzzles.normal.name:ucfirst(), muzzles.normal.description),
-        buildHelpTypeEntry(muzzles.choco.name:ucfirst(), muzzles.choco.description),
+        buildHelpTypeEntry(muzzles.mount.name:ucfirst(), muzzles.mount.description),
+        buildHelpTypeEntry(muzzles.chocobo.name:ucfirst(), muzzles.chocobo.description),
         buildHelpTypeEntry(muzzles.zone.name:ucfirst(), muzzles.zone.description),
         buildHelpSeperator('=', 23),
     },
+    about = {
+        buildHelpSeperator('=', 23),
+        buildHelpTitle('About'),
+        buildHelpSeperator('=', 23),
+        buildHelpTypeEntry('Name', _addon.name),
+        buildHelpTypeEntry('Description', _addon.description),
+        buildHelpTypeEntry('Author', _addon.author),
+        buildHelpTypeEntry('Version', _addon.version),
+        buildHelpSeperator('=', 23),
+    },
+    aliases = {
+        muzzles = {
+            s = muzzles.silent.name,
+            m = muzzles.mount.name,
+            c = muzzles.chocobo.name,
+            z = muzzles.zone.name
+        }
+    }
 }
 
 function display_help(table_help)
@@ -83,17 +102,13 @@ function getMuzzle()
     return settings.muzzle
 end
 
-function setMuzzle(muzzle)
-    settings.muzzle = muzzle
-    settings:save()
-end
-
-function muzzleValid(muzzle)
-    return muzzles[muzzle] ~= nil
+function getPlayerBuffs() 
+    return T(windower.ffxi.get_player().buffs)
 end
 
 function resolveCurrentMuzzle()
     local current_muzzle = getMuzzle()
+    
     if not muzzleValid(current_muzzle) then
         current_muzzle = muzzles.silent.name
         setMuzzle(current_muzzle)
@@ -102,18 +117,46 @@ function resolveCurrentMuzzle()
             colors.warn
         )
     end
+    
     return muzzles[current_muzzle]
+end
+
+function setMuzzle(muzzle)
+    settings.muzzle = muzzle
+    settings:save()
+end
+
+function playerInReive()
+    return getPlayerBuffs():contains(player.buffs.reiveMark)
+end
+
+function playerIsMounted()
+    local _player = windower.ffxi.get_player()
+    
+    if _player then
+        return _player.status == player.statuses.mounted or getPlayerBuffs():contains(player.buffs.mounted)
+    end
+    
+    return false 
+end
+
+function muzzleValid(muzzle)
+    return muzzles[muzzle] ~= nil
+end
+
+function injectMuzzleMusic()
+    injectMusic(music.types.mount, resolveCurrentMuzzle().song)
+end
+
+function injectMusic(bgmType, songID) 
+    _packets.inject(_packets.new('incoming', packets.inbound.music_change.id, {
+        ['BGM Type'] = bgmType,
+        ['Song ID'] = songID,
+    }))
 end
 
 function requestInject()
     needs_inject = true
-end
-
-function injectMuzzleMusic()
-    _packets.inject(_packets.new('incoming', packets.inbound.music_change.id, {
-        ['BGM Type'] = music.types.mount,
-        ['Song ID'] = resolveCurrentMuzzle().song,
-    }))
 end
 
 function handleInjectionNeeds() 
@@ -123,63 +166,75 @@ function handleInjectionNeeds()
     end
 end
 
-function playerIsMounted()
-    local _player = windower.ffxi.get_player()
-    if _player then
-        return mounted or _player.status == player.statuses.mounted
-    end
-    return false 
+function tryInject()
+    requestInject()
+    handleInjectionNeeds()
 end
 
-windower.register_event('login', requestInject)
-windower.register_event('load', requestInject)
-windower.register_event('zone change', requestInject)
+windower.register_event('login', 'load', 'zone change', function() 
+    tryInject()
+end)
+
+windower.register_event('unload', function() 
+    injectMusic(music.types.mount, muzzles.zone.song)
+end)
 
 windower.register_event('addon command', function(command, ...)
     if command then
         command = command:lower()
     else 
-        display_help(help.commands)
-        return
+        return display_help(help.commands)
     end
     
     local command_args = {...}
-
     local respond = false
     local response_message = ''
     local success = true
-
-    if command == 'list' then
+    
+    if command == 'list' or command == 'l' then
         display_help(help.types)
 
-    elseif command == 'set' then
+    elseif command == 'set' or command == 's' then
         respond = true
-
-        local muzzle = tostring (command_args[1]):lower()
+        
+        local muzzle = tostring(command_args[1]):lower()
+        local from_alias = help.aliases.muzzles[muzzle]
+        
+        if (from_alias ~= nil) then
+            muzzle = from_alias
+        end
 
         if not muzzleValid(muzzle) then
             success = false
             response_message = 'Muzzle type not recognized.'
         else
-            needs_inject = true
+            requestInject()
             setMuzzle(muzzle)
             response_message = 'Updated current muzzle to %s.':format(muzzle:ucfirst():color(colors.secondary))
         end
 
-    elseif command == 'get' then
+    elseif command == 'get' or command == 'g' then
         respond = true
         response_message = 'Current muzzle is %s.':format(getMuzzle():ucfirst():color(colors.secondary))
 
-    elseif command == 'default' then
+    elseif command == 'default' or command == 'd' then
         respond = true
-        needs_inject = true
+        requestInject()
 
         setMuzzle(muzzles.silent.name)
         response_message = 'Updated current muzzle to the default (%s).':format('Silent':color(colors.secondary))
 
-    elseif command == 'reload' then
+    elseif command == 'reload' or command == 'r' then
         windower.send_command('lua r mountmuzzle')
+    
+    elseif command == 'unload' or command == 'u' then
+        respond = true
+        response_message = 'Thank you for using Mount Muzzle. Goodbye.'
+        windower.send_command('lua unload mountmuzzle')
 
+    elseif command == 'about' or command == 'a' then
+        display_help(help.about)
+        
     elseif command == 'help' or command == 'h' then
         display_help(help.commands)
     else
@@ -191,30 +246,19 @@ windower.register_event('addon command', function(command, ...)
             buildCommandResponse(response_message, success)
         )
     end
-
+    
     handleInjectionNeeds()
 end)
 
-windower.register_event('outgoing chunk', function(id, data)
-    if id == packets.outbound.action.id then
-        local packet = _packets.parse('outgoing', data)
-        if packet.Category == packets.outbound.action.categories.mount then
-            mounted = true
-        elseif packet.Category == packets.outbound.action.categories.unmount then
-            mounted = false
-        end
-    end
-end)
-
 windower.register_event('incoming chunk', function(id, data)
-    if id == packets.inbound.music_change.id and playerIsMounted() then
+     if id == packets.inbound.music_change.id then
         local packet = _packets.parse('incoming', data)
-
+        
         if packet['BGM Type'] == music.types.mount then
             packet['Song ID'] = resolveCurrentMuzzle().song
             return _packets.build(packet)
         end
+        
+        tryInject()
     end
-    
-    handleInjectionNeeds()
 end)
