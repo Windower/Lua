@@ -54,7 +54,7 @@ windower.register_event('addon command', function(command, ...)
             cancelmulti = not cancelmulti
             windower.add_to_chat(121,'Battlemod: Multi-canceling flipped! - '..tostring(cancelmulti))
         elseif command:lower() == 'reload' then
-            options_load()
+            reload()
         elseif command:lower() == 'unload' then
             windower.send_command('@lua u battlemod')
         elseif command:lower() == 'simplify' then
@@ -143,6 +143,11 @@ function flip_block_cannot()
     block_cannot = not block_cannot
 end
 
+function reload()
+	current_job = 'NONE'
+	options_load()
+end
+
 function options_load()
     if windower.ffxi.get_player() then
         Self = windower.ffxi.get_player()
@@ -198,7 +203,7 @@ function options_load()
 end
 
 function filterload(job)
-    if Current_job == job then return end
+    if current_job == job then return end
     if file.exists('data\\filters\\filters-'..job..'.xml') then
         default_filt = false
         filter = config.load('data\\filters\\filters-'..job..'.xml',default_filter_table,false)
@@ -210,7 +215,7 @@ function filterload(job)
         config.save(filter)
         windower.add_to_chat(4,'Loaded default Battlemod filters')
     end
-    Current_job = job
+    current_job = job
 end
 
 ActionPacket.open_listener(parse_action_packet)
