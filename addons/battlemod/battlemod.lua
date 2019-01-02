@@ -54,7 +54,8 @@ windower.register_event('addon command', function(command, ...)
             cancelmulti = not cancelmulti
             windower.add_to_chat(121,'Battlemod: Multi-canceling flipped! - '..tostring(cancelmulti))
         elseif command:lower() == 'reload' then
-            reload()
+            current_job = 'NONE'
+            options_load()
         elseif command:lower() == 'unload' then
             windower.send_command('@lua u battlemod')
         elseif command:lower() == 'simplify' then
@@ -141,11 +142,6 @@ end
 
 function flip_block_cannot()
     block_cannot = not block_cannot
-end
-
-function reload()
-	current_job = 'NONE'
-	options_load()
 end
 
 function options_load()
