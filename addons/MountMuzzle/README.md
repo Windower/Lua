@@ -1,5 +1,5 @@
 **Author:** [Sjshovan (Apogee)](https://github.com/Ap0gee)  
-**Version:** v0.9.4  
+**Version:** v0.9.5  
 
 
 # Mount Muzzle
@@ -39,7 +39,7 @@ ___
 2. Click on `Releases`. 
 3. Click on the `Source code (zip)` link within the latest release to download.
 4. Extract the zipped folder to `Windower4/addons/`.
-5. Rename the folder to remove the version tag (`-v0.9.4`). The folder should be named `MountMuzzle`.
+5. Rename the folder to remove the version tag (`-v0.9.5`). The folder should be named `MountMuzzle`.
 
 ___
 ### Aliases
@@ -163,6 +163,12 @@ ___
 ___
 ### Change Log
 
+**v0.9.5** - 1/05/2019
+- **Fix:** Client sometimes crashes/locks when exiting game.
+- **Update:** Silent muzzle song id changed to help prevent future game updates from overriding.
+- **Update:** README Known Issues updated.
+- **Update:** README TODOS updated.
+
 **v0.9.4** - 9/06/2018
 - **Fix:** Music wouldn't change if addon loaded while on mount.
 - **Fix:** Music wouldn't change if addon unloaded while on mount.
@@ -182,7 +188,7 @@ ___
 
 **v0.9.3** - 5/31/2018
 - **Remove:** Removed /data/settings.xml file.
-- **Update:** licences now display correct author name.
+- **Update:** Licences now display correct author name.
 - **Update:** helpers.lua now requires only colors from constants.lua.
 - **Update:** constants.lua now returns table of globals for modular support.
 - **Update:** mountmuzzle.lua refactored in attempt to meet merge criteria.
@@ -214,13 +220,14 @@ ___
 
 - **Issue:** If Mount Muzzle is selected to automatically load and the player is mounted upon login, there is a significant delay before the chosen music will begin to play.
 - **Issue:** Upon changing zones the default music can be heard for a moment before the chosen music begins to play.
-- **Issue:** Unable to correctly set mount music to original if Mount Muzzle is unloaded while mounted. 
-
+- **Issue:** Unable to correctly set mount music to original if Mount Muzzle is unloaded while mounted.
+- **Issue:** Unable to alter mount music upon addon unload through the Windower `exit` command, which causes client to crash. No known viable alternatives.
 ___    
 ### TODOs
 
 - **TODO:** Investigate alternative methods for music change as packet injection/swap allows the player to hear the default music upon zone change and login, regardless of chosen music.
 - **TODO:** Investigate methods for determining which mount type the player is on when loading/unloading Mount Muzzle.
+- **TODO:** Investigate ways to prevent packet injection client crash/lock within unload event if triggered through Windower `exit` command.
 ___
 
 ### License
