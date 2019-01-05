@@ -2,7 +2,7 @@
 
 _addon.name = 'Scoreboard'
 _addon.author = 'Suji'
-_addon.version = '1.11'
+_addon.version = '1.12'
 _addon.commands = {'sb', 'scoreboard'}
 
 require('tables')
@@ -444,7 +444,7 @@ function action_handler(raw_actionpacket)
                         293,294,295,296,297,298,299,
                         300,301,302,385,386,387,388,
                         389,390,391,392,393,394,395,
-                        396,397,398,732}:contains(add.message_id) then
+                        396,397,398,732,767,768,769,770}:contains(add.message_id) then
                         actor_name = string.format("Skillchain(%s%s)", actor_name:sub(1, 3),
                                                       actor_name:len() > 3 and '.' or '')
                     end

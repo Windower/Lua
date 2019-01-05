@@ -506,6 +506,7 @@ default_settings = [[
         <condensecrits>false</condensecrits>
         <tpstatuses>true</tpstatuses>
         <simplify>true</simplify>
+        <showownernames>false</showownernames>
         <line_aoe>AOE ${numb} ]]..string.char(129,168)..[[ ${target}</line_aoe>        
         <line_aoebuff>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} (${status})</line_aoebuff>
         <line_full>[${actor}] ${numb} ${abil} ]]..string.char(129,168)..[[ ${target}</line_full>        

@@ -40,7 +40,7 @@ local escapes = T{
     ['&'] = 'amp',
     ['>'] = 'gt',
     ['<'] = 'lt',
-    ['"'] = 'quote',
+    ['"'] = 'quot',
     ['\''] = 'apos'
 }
 

@@ -126,7 +126,7 @@ function unpack_equip_list(equip_list,cur_equip)
             local item_tab = items[to_windower_bag_api(res.bags[cur_equip[slot_name].bag_id].en)][cur_equip[slot_name].slot]
             if name_match(item_tab.id,name) and
             (not augments or (#augments ~= 0 and extdata.compare_augments(augments,extdata.decode(item_tab).augments))) and
-            (not bag or bag == cur_equip[slot_name].bag_id) then
+            (not designated_bag or designated_bag == cur_equip[slot_name].bag_id) then
                 equip_list[slot_name] = nil
                 used_list[slot_id] = {bag_id=cur_equip[slot_name].bag_id,slot=cur_equip[slot_name].slot}
             end
@@ -154,7 +154,7 @@ function unpack_equip_list(equip_list,cur_equip)
                             local name,priority,augments,designated_bag = expand_entry(equip_list[slot_name])
                             
                             if (not designated_bag or designated_bag == bag.id) and name and name_match(item_tab.id,name) then
-                                if augments and #augments ~=0 then
+                                if augments and #augments ~= 0 then
                                     if res.items[item_tab.id].flags.Rare or extdata.compare_augments(augments,extdata.decode(item_tab).augments) then
                                     -- Check if the augments are right
                                     -- If the item is Rare, then even if the augments are wrong try to equip it anyway because you only have one

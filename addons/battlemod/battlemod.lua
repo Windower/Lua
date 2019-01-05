@@ -12,7 +12,7 @@ require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
 
-_addon.version = '3.23'
+_addon.version = '3.24'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth, maintainer: SnickySnacks'
 _addon.commands = {'bm','battlemod'}
@@ -54,6 +54,7 @@ windower.register_event('addon command', function(command, ...)
             cancelmulti = not cancelmulti
             windower.add_to_chat(121,'Battlemod: Multi-canceling flipped! - '..tostring(cancelmulti))
         elseif command:lower() == 'reload' then
+            current_job = 'NONE'
             options_load()
         elseif command:lower() == 'unload' then
             windower.send_command('@lua u battlemod')
@@ -198,7 +199,7 @@ function options_load()
 end
 
 function filterload(job)
-    if Current_job == job then return end
+    if current_job == job then return end
     if file.exists('data\\filters\\filters-'..job..'.xml') then
         default_filt = false
         filter = config.load('data\\filters\\filters-'..job..'.xml',default_filter_table,false)
@@ -210,7 +211,7 @@ function filterload(job)
         config.save(filter)
         windower.add_to_chat(4,'Loaded default Battlemod filters')
     end
-    Current_job = job
+    current_job = job
 end
 
 ActionPacket.open_listener(parse_action_packet)
@@ -317,9 +318,8 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                     skill = 'like level '..am.param_1..' ('..ratings_arr[am.param_2-63]..')'
                 end
             end
-            
             local outstr = (res.action_messages[am.message_id][language]
-                :gsub('$\123actor\125',color_it(actor.name or '',color_arr[actor.owner or actor.type]))
+                :gsub('$\123actor\125',color_it((actor.name or '') .. (actor.owner_name or ""),color_arr[actor.owner or actor.type]))
                 :gsub('$\123status\125',status or '')
                 :gsub('$\123item\125',color_it(item or '',color_arr.itemcol))
                 :gsub('$\123target\125',color_it(target.name or '',color_arr[target.owner or target.type]))

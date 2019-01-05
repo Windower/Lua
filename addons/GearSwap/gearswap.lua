@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.931'
+_addon.version = '0.934'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -285,15 +285,15 @@ function incoming_chunk(id,data,modified,injected,blocked)
             refresh_globals()
             next_packet_events.globals_update = data:unpack('H',3)
         end
-        if next_packet_events.pet_status_change then
+        if next_packet_events.pet_status_change and not gearswap_disabled then
             equip_sets('pet_status_change',nil,next_packet_events.pet_status_change.newstatus,next_packet_events.pet_status_change.oldstatus)
             next_packet_events.pet_status_change = nil
         end
         if next_packet_events.pet_change then
-            if next_packet_events.pet_change.pet then -- Losing a pet
+            if next_packet_events.pet_change.pet and not gearswap_disabled then -- Losing a pet
                 equip_sets('pet_change',nil,next_packet_events.pet_change.pet,false)
                 next_packet_events.pet_change = nil
-            elseif pet.isvalid then -- Gaining a pet
+            elseif pet.isvalid and not gearswap_disabled then -- Gaining a pet
                 equip_sets('pet_change',nil,pet,true)
                 next_packet_events.pet_change = nil
             end

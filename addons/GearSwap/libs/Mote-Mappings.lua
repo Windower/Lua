@@ -234,7 +234,7 @@ areas.Cities = S{
     "Bastok Mines",
     "Metalworks",
     "Aht Urhgan Whitegate",
-    "Tavanazian Safehold",
+    "Tavnazian Safehold",
     "Nashmau",
     "Selbina",
     "Mhaura",
