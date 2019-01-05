@@ -58,7 +58,7 @@ player = {
 
 music = {
     songs = {
-        silent = 91,
+        silent = 9999,
         mount = 84,
         chocobo = 212,
         zone = 0,
