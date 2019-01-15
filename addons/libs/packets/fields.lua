@@ -1361,7 +1361,8 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned char',     label='Linkshell Green'},                       -- 25
     {ctype='unsigned char',     label='Linkshell Blue'},                        -- 26
     {ctype='unsigned char',     label='_unknown5'},                             -- 27   Probably junk from the LS color dword
-    {ctype='data[0x1B]',        label='_unknown6'},                             -- 28   DSP notes that the 6th bit of byte 54 is the Ballista flag
+    {ctype='data[0x1A]',        label='_unknown6'},                             -- 28   DSP notes that the 6th bit of byte 54 is the Ballista flag
+    {ctype='unsigned char',		label='Indi Bubble'},							-- 42   Geomancer (GEO) Indi spell effect on players. 0 is no effect.
     {ctype='unsigned char',     label='Face Flags'},                            -- 43   0, 3, 4, or 8
     {ctype='data[4]',           label='_unknown7'},                             -- 44
     {ctype='unsigned char',     label='Face'},                                  -- 48
