@@ -3589,7 +3589,7 @@ fields.incoming[0x113] = L{
     {ctype='signed int',        label='Therion Ichor'},                         -- A0
     {ctype='signed int',        label='Allied Notes'},                          -- A4
     {ctype='unsigned short',    label='A.M.A.N. Vouchers Stored'},              -- A8
-    {ctype='unsigned short',    label='Unity Accolades'},                       -- AA
+    {ctype='unsigned short',    label="Login Points"},                          -- AA
     {ctype='signed int',        label='Cruor'},                                 -- AC
     {ctype='signed int',        label='Resistance Credits'},                    -- B0
     {ctype='signed int',        label='Dominion Notes'},                        -- B4
@@ -3605,6 +3605,28 @@ fields.incoming[0x113] = L{
     {ctype='signed int',        label='Voidstones'},                            -- C4
     {ctype='signed int',        label='Kupofried\'s Corundums'},                -- C8
     {ctype='unsigned char',     label='Moblin Pheromone Sacks'},                -- CC
+    {ctype='data[1]',           label='_unknown2'},                             -- CD
+    {ctype='unsigned char',     label="Rems Tale Chapter 1"},                   -- CE
+    {ctype='unsigned char',     label="Rems Tale Chapter 2"},                   -- CF
+    {ctype='unsigned char',     label="Rems Tale Chapter 3"},                   -- D0
+    {ctype='unsigned char',     label="Rems Tale Chapter 4"},                   -- D1
+    {ctype='unsigned char',     label="Rems Tale Chapter 5"},                   -- D2
+    {ctype='unsigned char',     label="Rems Tale Chapter 6"},                   -- D3
+    {ctype='unsigned char',     label="Rems Tale Chapter 7"},                   -- D4
+    {ctype='unsigned char',     label="Rems Tale Chapter 8"},                   -- D5
+    {ctype='unsigned char',     label="Rems Tale Chapter 9"},                   -- D6
+    {ctype='unsigned char',     label="Rems Tale Chapter 10"},                  -- D7
+    {ctype='data[8]',           label="_unknown3"},                             -- D8
+    {ctype='signed int',        label="Reclamation Marks"},                     -- E0
+    {ctype='signed int',        label='Unity Accolades'},                       -- E4
+    {ctype='unsigned short',    label="Fire Crystals"},                         -- E8
+    {ctype='unsigned short',    label="Ice Crystals"},                          -- EA
+    {ctype='unsigned short',    label="Wind Crystals"},                         -- EC
+    {ctype='unsigned short',    label="Earth Crystals"},                        -- EE
+    {ctype='unsigned short',    label="Lightning Crystals"},                    -- E0
+    {ctype='unsigned short',    label="Water Crystals"},                        -- F2
+    {ctype='unsigned short',    label="Light Crystals"},                        -- F4
+    {ctype='unsigned short',    label="Dark Crystals"},                         -- F6
 }
 
 -- Fish Bite Info
