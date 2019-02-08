@@ -51,7 +51,7 @@
     <author>Arcon</author>
     <description>Automatically joins or declines party invites. Configurable with blacklist/whitelist mode and auto-decline settings.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>AutoRA</name>
@@ -169,7 +169,7 @@
     <author>Arcon</author>
     <description>Shows the distance to your current target.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>DistancePlus</name>
@@ -300,14 +300,14 @@
     <author>Arcon</author>
     <description>Allows opening links to certain websites from within the game, with an optional search parameter.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>Logger</name>
     <author>Arcon</author>
     <description>Logs the chat log to a file.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>Lookup</name>
@@ -321,7 +321,7 @@
     <author>Arcon</author>
     <description>Automatically passes an item on all accounts if lotted by another.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>MacroChanger</name>
@@ -537,11 +537,18 @@
     <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
+    <name>SetTarget</name>
+    <author>Arcon</author>
+    <description>Sets the target to a given ID.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://discord.gg/b275nMv</support>
+  </addon>
+  <addon>
     <name>SpeedChecker</name>
     <author>Arcon</author>
     <description>Displays a small box indicating your current movement speed modifier (+/- X%).</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>SpellCheck</name>
@@ -597,21 +604,21 @@
     <author>Arcon</author>
     <description>Displays information about your current target in memory.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>Text</name>
     <author>Arcon</author>
     <description>Allows creating and manipulating on-screen text objects through Windower commands.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>Treasury</name>
     <author>Arcon</author>
     <description>Lots or passes items based on configurable lists, drops unwanted items from the inventory and automatically stacks items when they drop.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>thtracker</name>
@@ -632,7 +639,7 @@
     <author>Arcon</author>
     <description>Shows a target's HP percentage next to their health bar as well as party/alliance members's TP.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>translate</name>
@@ -653,7 +660,7 @@
     <author>Arcon</author>
     <description>Updates and reloads all plugins and addons when typing //update.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>VisibleFavor</name>
@@ -681,7 +688,7 @@
     <author>Arcon</author>
     <description>A file-based macro engine</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
+    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>zonetimer</name>
