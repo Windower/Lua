@@ -2662,6 +2662,13 @@ enums.spawntype = {
     [0x0A] = 'Self',
 }
 
+-- Assist Response
+fields.incoming[0x058] = L{
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
+    {ctype='unsigned int',      label='Target',             fn=id},             -- 08
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
+}
+
 -- Emote
 fields.incoming[0x05A] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04 
