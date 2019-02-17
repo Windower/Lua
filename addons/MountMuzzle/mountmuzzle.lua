@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon.name = 'Mount Muzzle'
 _addon.description = 'Change or remove the default mount music.'
 _addon.author = 'Sjshovan (Apogee) sjshovan@gmail.com'
-_addon.version = '0.9.4'
+_addon.version = '0.9.5'
 _addon.commands = {'mountmuzzle', 'muzzle', 'mm'}
 
 local _logger = require('logger')
@@ -175,10 +175,6 @@ windower.register_event('login', 'load', 'zone change', function()
     tryInject()
 end)
 
-windower.register_event('unload', function() 
-    injectMusic(music.types.mount, muzzles.zone.song)
-end)
-
 windower.register_event('addon command', function(command, ...)
     if command then
         command = command:lower()
@@ -230,6 +226,7 @@ windower.register_event('addon command', function(command, ...)
     elseif command == 'unload' or command == 'u' then
         respond = true
         response_message = 'Thank you for using Mount Muzzle. Goodbye.'
+        injectMusic(music.types.mount, muzzles.zone.song)
         windower.send_command('lua unload mountmuzzle')
 
     elseif command == 'about' or command == 'a' then

@@ -1361,7 +1361,8 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned char',     label='Linkshell Green'},                       -- 25
     {ctype='unsigned char',     label='Linkshell Blue'},                        -- 26
     {ctype='unsigned char',     label='_unknown5'},                             -- 27   Probably junk from the LS color dword
-    {ctype='data[0x1B]',        label='_unknown6'},                             -- 28   DSP notes that the 6th bit of byte 54 is the Ballista flag
+    {ctype='data[0x1A]',        label='_unknown6'},                             -- 28   DSP notes that the 6th bit of byte 54 is the Ballista flag
+    {ctype='unsigned char',     label='Indi Bubble'},                           -- 42   Geomancer (GEO) Indi spell effect on players. 0 is no effect.
     {ctype='unsigned char',     label='Face Flags'},                            -- 43   0, 3, 4, or 8
     {ctype='data[4]',           label='_unknown7'},                             -- 44
     {ctype='unsigned char',     label='Face'},                                  -- 48
@@ -2661,6 +2662,13 @@ enums.spawntype = {
     [0x0A] = 'Self',
 }
 
+-- Assist Response
+fields.incoming[0x058] = L{
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
+    {ctype='unsigned int',      label='Target',             fn=id},             -- 08
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
+}
+
 -- Emote
 fields.incoming[0x05A] = L{
     {ctype='unsigned int',      label='Player ID',          fn=id},             -- 04 
@@ -3588,7 +3596,7 @@ fields.incoming[0x113] = L{
     {ctype='signed int',        label='Therion Ichor'},                         -- A0
     {ctype='signed int',        label='Allied Notes'},                          -- A4
     {ctype='unsigned short',    label='A.M.A.N. Vouchers Stored'},              -- A8
-    {ctype='unsigned short',    label='Unity Accolades'},                       -- AA
+    {ctype='unsigned short',    label="Login Points"},                          -- AA
     {ctype='signed int',        label='Cruor'},                                 -- AC
     {ctype='signed int',        label='Resistance Credits'},                    -- B0
     {ctype='signed int',        label='Dominion Notes'},                        -- B4
@@ -3604,6 +3612,28 @@ fields.incoming[0x113] = L{
     {ctype='signed int',        label='Voidstones'},                            -- C4
     {ctype='signed int',        label='Kupofried\'s Corundums'},                -- C8
     {ctype='unsigned char',     label='Moblin Pheromone Sacks'},                -- CC
+    {ctype='data[1]',           label='_unknown2'},                             -- CD
+    {ctype='unsigned char',     label="Rems Tale Chapter 1"},                   -- CE
+    {ctype='unsigned char',     label="Rems Tale Chapter 2"},                   -- CF
+    {ctype='unsigned char',     label="Rems Tale Chapter 3"},                   -- D0
+    {ctype='unsigned char',     label="Rems Tale Chapter 4"},                   -- D1
+    {ctype='unsigned char',     label="Rems Tale Chapter 5"},                   -- D2
+    {ctype='unsigned char',     label="Rems Tale Chapter 6"},                   -- D3
+    {ctype='unsigned char',     label="Rems Tale Chapter 7"},                   -- D4
+    {ctype='unsigned char',     label="Rems Tale Chapter 8"},                   -- D5
+    {ctype='unsigned char',     label="Rems Tale Chapter 9"},                   -- D6
+    {ctype='unsigned char',     label="Rems Tale Chapter 10"},                  -- D7
+    {ctype='data[8]',           label="_unknown3"},                             -- D8
+    {ctype='signed int',        label="Reclamation Marks"},                     -- E0
+    {ctype='signed int',        label='Unity Accolades'},                       -- E4
+    {ctype='unsigned short',    label="Fire Crystals"},                         -- E8
+    {ctype='unsigned short',    label="Ice Crystals"},                          -- EA
+    {ctype='unsigned short',    label="Wind Crystals"},                         -- EC
+    {ctype='unsigned short',    label="Earth Crystals"},                        -- EE
+    {ctype='unsigned short',    label="Lightning Crystals"},                    -- E0
+    {ctype='unsigned short',    label="Water Crystals"},                        -- F2
+    {ctype='unsigned short',    label="Light Crystals"},                        -- F4
+    {ctype='unsigned short',    label="Dark Crystals"},                         -- F6
 }
 
 -- Fish Bite Info

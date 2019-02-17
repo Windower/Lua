@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name    = 'EasyNuke'
 _addon.author  = 'Nyarlko'
-_addon.version = '1.0.7'
+_addon.version = '1.0.8'
 _addon.command = "ez"
 
 require('sets')
@@ -109,7 +109,7 @@ windower.register_event("unhandled command", function (command, arg)
         if arg > #spell_tables[current_element] then 
             windower.add_to_chat(206,"Invalid Spell.") return
         end
-        windower.chat.input("/ma "..current_spell_table[arg].." <"..target_mode..">")
+        windower.chat.input("/ma \""..current_spell_table[arg].."\" <"..target_mode..">")
         
     elseif command == "boomga" or command == "bga" then
         local current_spell_table = spell_tables[current_element]["ga"]
@@ -118,7 +118,7 @@ windower.register_event("unhandled command", function (command, arg)
         if arg > #spell_tables[current_element]["ga"] or spell_tables[current_element]["ga"] == nil then 
             windower.add_to_chat(206,"Invalid Spell.") return
         end
-        windower.chat.input("/ma "..current_spell_table[arg].." <"..target_mode..">")
+        windower.chat.input("/ma \""..current_spell_table[arg].."\" <"..target_mode..">")
         
     elseif command == "boomra" or command == "bra" then
         local current_spell_table = spell_tables[current_element]["ra"]
@@ -127,7 +127,7 @@ windower.register_event("unhandled command", function (command, arg)
         if arg > #spell_tables[current_element]["ra"] or spell_tables[current_element]["ra"] == nil then
             windower.add_to_chat(206,"Invalid Spell.") return
         end
-        windower.chat.input("/ma "..current_spell_table[arg].." <"..target_mode..">")
+        windower.chat.input("/ma \""..current_spell_table[arg].."\" <"..target_mode..">")
     end    
 end)
 
@@ -140,7 +140,7 @@ windower.register_event('addon command', function (command, arg)
         if arg > #spell_tables[current_element] then 
             windower.add_to_chat(206,"Invalid Spell.") return
         end
-        windower.chat.input("/ma "..current_spell_table[arg].." <"..target_mode..">")
+        windower.chat.input("/ma \""..current_spell_table[arg].."\" <"..target_mode..">")
         
     elseif command == "boomga" or command == "bga" then
         local current_spell_table = spell_tables[current_element]["ga"]
@@ -149,7 +149,7 @@ windower.register_event('addon command', function (command, arg)
         if arg > #spell_tables[current_element]["ga"] or spell_tables[current_element]["ga"] == nil then 
             windower.add_to_chat(206,"Invalid Spell.") return
         end
-        windower.chat.input("/ma "..current_spell_table[arg].." <"..target_mode..">")
+        windower.chat.input("/ma \""..current_spell_table[arg].."\" <"..target_mode..">")
         
     elseif command == "boomra" or command == "bra" then
         local current_spell_table = spell_tables[current_element]["ra"]
@@ -158,7 +158,7 @@ windower.register_event('addon command', function (command, arg)
         if arg > #spell_tables[current_element]["ra"] or spell_tables[current_element]["ra"] == nil then
             windower.add_to_chat(206,"Invalid Spell.") return
         end
-        windower.chat.input("/ma "..current_spell_table[arg].." <"..target_mode..">")
+        windower.chat.input("/ma \""..current_spell_table[arg].."\" <"..target_mode..">")
         
     elseif command == "target" then
         if arg then

@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 _addon.name = 'STNA'
-_addon.version = '1.07'
+_addon.version = '1.08'
 _addon.author = 'Nitrous (Shiva)'
 _addon.command = 'stna'
 
@@ -69,7 +69,7 @@ windower.register_event('addon command', function(...)
         for i = 1, 9 do
             if statusTable:contains(priority[i]) then
                 windower.send_command('send @others /ma "'..statSpell[priority[i]]..'" '..player['name'])
-                if priority[i] == 'Doom' then
+                if priority[i] == 'doom' then
                     windower.send_command('input /item "Holy Water" '..player['name'])  --Auto Holy water for doom
                 end
                 return
