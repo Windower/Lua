@@ -1,5 +1,5 @@
 --[[
-Copyright © 2018, Auk
+Copyright © 2019, Xathe
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -17,7 +17,7 @@ modification, are permitted provided that the following conditions are met:
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL Auk BE LIABLE FOR ANY
+DISCLAIMED. IN NO EVENT SHALL Xathe BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -27,8 +27,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 _addon.name = 'Debuffed'
-_addon.author = 'Auk'
-_addon.version = '1.0.0.3'
+_addon.author = 'Xathe (Asura)'
+_addon.version = '1.0.0.4'
 _addon.commands = {'dbf','debuffed'}
 
 config = require('config')
@@ -41,8 +41,18 @@ defaults = {}
 defaults.interval = .1
 defaults.mode = 'blacklist'
 defaults.timers = true
+defaults.hide_below_zero = false
 defaults.whitelist = S{}
 defaults.blacklist = S{}
+defaults.colors = {}
+defaults.colors.player = {}
+defaults.colors.player.red = 255
+defaults.colors.player.green = 255
+defaults.colors.player.blue = 255
+defaults.colors.others = {}
+defaults.colors.others.red = 255
+defaults.colors.others.green = 255
+defaults.colors.others.blue = 0
 
 settings = config.load(defaults)
 box = texts.new('${current_string}', settings)
@@ -68,26 +78,29 @@ sort_commands = T{
     ['-'] = 'remove'
 }
 
+player_id = 0
 frame_time = 0
 debuffed_mobs = {}
 
 function update_box()
     local lines = L{}
     local target = windower.ffxi.get_mob_by_target('t')
-
+    
     if target and target.valid_target and (target.claim_id ~= 0 or target.spawn_type == 16) then
         local data = debuffed_mobs[target.id]
         
         if data then
             for effect, spell in pairs(data) do
-                local name = res.spells[spell[1]].name
-                local remains = math.max(0, spell[2] - os.clock())
+                local name = res.spells[spell.id].name
+                local remains = math.max(0, spell.timer - os.clock())
                 
                 if settings.mode == 'whitelist' and settings.whitelist:contains(name) or settings.mode == 'blacklist' and not settings.blacklist:contains(name) then
                     if settings.timers and remains > 0 then
-                        lines:append("%s: %.0f":format(name, remains))
+                        lines:append('\\cs(%s)%s: %.0f\\cr':format(get_color(spell.actor), name, remains))
+                    elseif remains < 0 and settings.hide_below_zero then
+                        debuffed_mobs[target.id][effect] = nil
                     else
-                        lines:append(name)
+                        lines:append('\\cs(%s)%s\\cr':format(get_color(spell.actor), name))
                     end
                 end
             end
@@ -101,13 +114,21 @@ function update_box()
     end
 end
 
+function get_color(actor)
+    if actor == player_id then
+        return '%s,%s,%s':format(settings.colors.player.red, settings.colors.player.green, settings.colors.player.blue)
+    else
+        return '%s,%s,%s':format(settings.colors.others.red, settings.colors.others.green, settings.colors.others.blue)
+    end
+end
+
 function handle_overwrites(target, new, t)
     if not debuffed_mobs[target] then
         return true
     end
     
     for effect, spell in pairs(debuffed_mobs[target]) do
-        local old = res.spells[spell[1]].overwrites or {}
+        local old = res.spells[spell.id].overwrites or {}
         
         -- Check if there isn't a higher priority debuff active
         if table.length(old) > 0 then
@@ -121,7 +142,7 @@ function handle_overwrites(target, new, t)
         -- Check if a lower priority debuff is being overwritten
         if table.length(t) > 0 then
             for _,v in ipairs(t) do
-                if spell[1] == v then
+                if spell.id == v then
                     debuffed_mobs[target][effect] = nil
                 end
             end
@@ -130,7 +151,7 @@ function handle_overwrites(target, new, t)
     return true
 end
 
-function apply_debuff(target, effect, spell)
+function apply_debuff(target, effect, spell, actor)
     if not debuffed_mobs[target] then
         debuffed_mobs[target] = {}
     end
@@ -142,7 +163,7 @@ function apply_debuff(target, effect, spell)
     end
     
     -- Create timer
-    debuffed_mobs[target][effect] = {spell, os.clock() + res.spells[spell].duration or 0}
+    debuffed_mobs[target][effect] = {id=spell, timer=(os.clock() + (res.spells[spell].duration or 0)), actor=actor}
 end
 
 function handle_shot(target)
@@ -150,9 +171,9 @@ function handle_shot(target)
         return true
     end
     
-    local current = debuffed_mobs[target][134][1]
+    local current = debuffed_mobs[target][134].id
     if current < 26 then
-        debuffed_mobs[target][134][1] = current + 1
+        debuffed_mobs[target][134].id = current + 1
     end
 end
 
@@ -169,9 +190,10 @@ function inc_action(act)
         local target = act.targets[1].id
         local spell = act.param
         local effect = res.spells[spell].status
+        local actor = act.actor_id
 
         if effect then
-            apply_debuff(target, effect, spell)
+            apply_debuff(target, effect, spell, actor)
         end
         
     -- Non-damaging spells
@@ -179,9 +201,10 @@ function inc_action(act)
         local target = act.targets[1].id
         local effect = act.targets[1].actions[1].param
         local spell = act.param
+        local actor = act.actor_id
         
         if res.spells[spell].status and res.spells[spell].status == effect then
-            apply_debuff(target, effect, spell)
+            apply_debuff(target, effect, spell, actor)
         end
     end
 end
@@ -193,12 +216,16 @@ function inc_action_message(arr)
         debuffed_mobs[arr.target_id] = nil
         
     -- Debuff expired
-    elseif S{204,206}:contains(arr.message_id) then
+    elseif S{64,204,206,350,531}:contains(arr.message_id) then
         if debuffed_mobs[arr.target_id] then
             debuffed_mobs[arr.target_id][arr.param_1] = nil
         end
     end
 end
+
+windower.register_event('login','load', function()
+    player_id = (windower.ffxi.get_player() or {}).id
+end)
 
 windower.register_event('logout','zone change', function()
     debuffed_mobs = {}
@@ -246,6 +273,10 @@ windower.register_event('addon command', function(command1, command2, ...)
     elseif command1 == 'i' or command1 == 'interval' then
         settings.interval = tonumber(command2) or .1
         log('Refresh interval set to %s seconds.':format(settings.interval))
+        settings:save()
+    elseif command1 == 'h' or command1 == 'hide' then
+        settings.hide_below_zero = not settings.hide_below_zero
+        log('Timers that reach 0 will be %s.':format(settings.hide_below_zero and 'hidden' or 'shown'))
         settings:save()
     elseif list_commands:containskey(command1) then
         if sort_commands:containskey(command2) then
