@@ -16,6 +16,10 @@ This toggles the display of timers for debuffs.
 
 This allows you to adjust the refresh interval for the textbox. It will be updated every \<value\> number of seconds.
 
+`//debuffed hide`
+
+This toggles the automatic removal of effects when their timer reaches zero.
+
 `//debuffed blacklist|whitelist add|remove <name>`
 
 This adds or removes the spell \<name\> to the specified filter.
@@ -27,6 +31,7 @@ The following abbreviations are available for addon commands:
 * `mode` to `m`
 * `timers` to `t`
 * `interval` to `i`
+* `hide` to `h`
 * `blacklist` to `b` or `blist` or `black`
 * `whitelist` to `w` or `wlist` or `white`
 * `add` to `a` or `+`
