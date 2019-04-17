@@ -1,4 +1,4 @@
---[[Copyright © 2017, Kenshi
+--[[Copyright © 2019, Kenshi
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.]]
 
 _addon.name = 'TreasurePool'
 _addon.author = 'Kenshi'
-_addon.version = '1.0'
+_addon.version = '2.0'
 
 require('luau')
 texts = require('texts')
@@ -54,115 +54,113 @@ defaults.display.text.alpha = 255
 defaults.display.text.size = 12
 
 settings = config.load(defaults)
+box = texts.new('${current_string}', settings)
 
-treasure_text = texts.new(settings.display, settings)
+local items = T{}
 
-treasure_text:appendline('Treasure Pool:')
-for i = 0, 9 do
-    treasure_text:appendline(i .. ': ${index' .. i .. '|-}${lotting' .. i .. '}')
-end
-
-goals = {}
-
-lotter = {}
-
-lot = {}
+windower.register_event('load', function()
+    local treasure = windower.ffxi.get_items().treasure
+    for i = 0, 9 do
+        if treasure[i] and treasure[i].item_id then
+            local item = res.items[treasure[i].item_id] and res.items[treasure[i].item_id].en or treasure[i].item_id
+            local pos = treasure[i].timestamp + i
+            table.insert(items, {position = pos, index = i, name = item, timestamp = treasure[i].timestamp,
+                temp = treasure[i].timestamp + 300, lotter = nil, lot = nil})
+        end
+    end
+	table.sort(items, function(a,b) return a and b and a.position < b.position end)
+end)
 
 windower.register_event('incoming chunk', function(id, data)
-
     if id == 0x0D2 then
-    
-    local packet = packets.parse('incoming', data)
-    
+        local packet = packets.parse('incoming', data)
         -- Ignore gil drop
         if packet.Item == 0xFFFF then
             return
         end
-    
-    local time_check = packet.Timestamp + 300
-    local diff = os.difftime(time_check, os.time())
-    
+        -- Double packet and leaving pt fix
+        for key, value in pairs(items) do
+            if value and value.index == packet.Index then
+                if value.timestamp == packet.Timestamp then
+                    return
+				else
+					table.remove(items, key)
+                end
+            end
+        end
+		-- Ignore item 0 packets
+		if packet.Item == 0 then
+			return
+		end
+		-- Create table
+        local time_check = packet.Timestamp + 300
+        local diff = os.difftime(time_check, os.time())
+        local item = res.items[packet.Item] and res.items[packet.Item].en or packet.Item
+        local pos = packet.Timestamp + packet.Index
         if diff <= 300 then
-            goals[packet.Index] = packet.Timestamp + 300
-            lotter[packet.Index] = ' '
+            table.insert(items, {position = pos, index = packet.Index, name = item, timestamp = packet.Timestamp,
+                temp = packet.Timestamp + 300, lotter = nil, lot = nil})
         else
-            goals[packet.Index] = os.time() + 300
-            lotter[packet.Index] = ' '
+            table.insert(items, {position = pos, index = packet.Index, name = item, timestamp = packet.Timestamp,
+                temp = os.time() + 300, lotter = nil, lot = nil})
         end
-    
+		-- Sort table
+		table.sort(items, function(a,b) return a and b and a.position < b.position end)
     end
-    
     if id == 0x0D3 then
-    
-    local lotpacket = packets.parse('incoming', data)
-    
-        -- Ignore drop to a player or floored
-        if lotpacket.Drop ~= 0 then
-            return
-        else    
-            lotter[lotpacket.Index] = lotpacket['Highest Lotter Name']
-            lot[lotpacket.Index] = lotpacket['Highest Lot']
+        local packet = packets.parse('incoming', data)
+        for key, value in pairs(items) do
+            if value.index == packet.Index then
+                if packet.Drop ~= 0 then
+                    table.remove(items, key)
+					table.sort(items, function(a,b) return a and b and a.position < b.position end)
+                else
+                    value.lotter = packet['Highest Lotter Name']
+                    value.lot = packet['Highest Lot']
+                end
+            end
         end
-    
     end
-    
-    -- Check to hide text box if zoning with treasure up
-    if id == 0xB then
-        zoning_bool = true
-    elseif id == 0xA and zoning_bool then
-        zoning_bool = false
+	if id == 0xB then
+        items = T{}
     end
-    
 end)
 
-windower.register_event('prerender', function()
-    local treasure = T(windower.ffxi.get_items().treasure)
-    local remove = S{}
-    local info = S{}
-    if zoning_bool or treasure:empty() then
-        treasure_text:update(info)
-        treasure_text:hide()
+function Update()
+    local current_string = ''
+    if items:empty() then
+        box:hide()
         return
     end
-    for i = 0, 9 do
-        if treasure[i] and treasure[i].item_id then
-            if goals[i] then
-                local diff = os.difftime(goals[i], os.time())
-                local timer = {}    
-                timer[i] = os.date('!%M:%S', diff)
-                if timer[i] then
-                    if diff < 0 then -- stop the timer when 00:00 so it don't show 59:59 for a brief moment
-                        remove:add('index' .. i)
-                        remove:add('lotting' .. i)
-                    else
-                        info['index' .. i] = (
-                            diff < 60 and
-                                '\\cs(255,0,0)' .. res.items[treasure[i].item_id].name .. ' → ' .. timer[i]
-                            or diff > 180 and
-                                '\\cs(0,255,0)' .. res.items[treasure[i].item_id].name .. ' → ' .. timer[i]
-                            or
-                                '\\cs(255,128,0)' .. res.items[treasure[i].item_id].name .. ' → ' .. timer[i]) .. '\\cr'
-                    end
+    current_string = 'Treasure Pool:'
+    for key, value in pairs(items) do
+        if value and value.temp then
+            local diff = os.difftime(value.temp, os.time())
+            local timer = os.date('!%M:%S', diff)
+            if diff >= 0 then
+                current_string = current_string..'\n['..key..']'
+                current_string = (
+                    diff < 60 and
+                    current_string..'\\cs(255,0,0)['..value.index..'] '..value.name..' → '..timer
+                    or diff > 180 and
+                    current_string..'\\cs(0,255,0)['..value.index..'] '..value.name..' → '..timer
+                    or
+                    current_string..'\\cs(255,128,0)['..value.index..'] '..value.name..' → '..timer)..'\\cr'
+                if value.lotter and value.lot and value.lot > 0 then
+                    current_string = current_string..' | '
+                    current_string = (current_string..'\\cs(0,255,255)'..value.lotter..': '..value.lot)..'\\cr'
                 end
-            else -- show item name in case the addon is loaded with items on tresure box
-                info['index' .. i] = res.items[treasure[i].item_id].name
+            else
+                table.remove(items, key)
             end
-            if lotter[i] and lot[i] then
-                if lotter[i] == ' ' then
-                    remove:add('lotting' .. i)
-                elseif lot[i] > 0 then
-                    info['lotting' .. i] = (
-                        '\\cs(0,255,255)' .. (' | ' .. lotter[i] .. ': ' .. lot[i])) .. '\\cr'
-                end
-            end
-            treasure_text:show()
-        else
-            remove:add('index' .. i)
-            remove:add('lotting' .. i)
+        box:show()
         end
-    treasure_text:update(info)
     end
-    for entry in remove:it() do
-        treasure_text[entry] = nil
-    end
+    box.current_string = current_string
+end
+
+Update:loop(0.5)
+
+windower.register_event('logout','zone change', function()
+    items = T{}
 end)
