@@ -68,7 +68,7 @@ windower.register_event('load', function()
                 temp = treasure[i].timestamp + 300, lotter = nil, lot = nil})
         end
     end
-	table.sort(items, function(a,b) return a and b and a.position < b.position end)
+    table.sort(items, function(a,b) return a and b and a.position < b.position end)
 end)
 
 windower.register_event('incoming chunk', function(id, data)
@@ -83,16 +83,16 @@ windower.register_event('incoming chunk', function(id, data)
             if value and value.index == packet.Index then
                 if value.timestamp == packet.Timestamp then
                     return
-				else
-					table.remove(items, key)
+                else
+                    table.remove(items, key)
                 end
             end
         end
-		-- Ignore item 0 packets
-		if packet.Item == 0 then
-			return
-		end
-		-- Create table
+        -- Ignore item 0 packets
+        if packet.Item == 0 then
+            return
+        end
+        -- Create table
         local time_check = packet.Timestamp + 300
         local diff = os.difftime(time_check, os.time())
         local item = res.items[packet.Item] and res.items[packet.Item].en or packet.Item
@@ -104,8 +104,8 @@ windower.register_event('incoming chunk', function(id, data)
             table.insert(items, {position = pos, index = packet.Index, name = item, timestamp = packet.Timestamp,
                 temp = os.time() + 300, lotter = nil, lot = nil})
         end
-		-- Sort table
-		table.sort(items, function(a,b) return a and b and a.position < b.position end)
+        -- Sort table
+        table.sort(items, function(a,b) return a and b and a.position < b.position end)
     end
     if id == 0x0D3 then
         local packet = packets.parse('incoming', data)
@@ -113,7 +113,7 @@ windower.register_event('incoming chunk', function(id, data)
             if value.index == packet.Index then
                 if packet.Drop ~= 0 then
                     table.remove(items, key)
-					table.sort(items, function(a,b) return a and b and a.position < b.position end)
+                    table.sort(items, function(a,b) return a and b and a.position < b.position end)
                 else
                     value.lotter = packet['Highest Lotter Name']
                     value.lot = packet['Highest Lot']
@@ -121,7 +121,7 @@ windower.register_event('incoming chunk', function(id, data)
             end
         end
     end
-	if id == 0xB then
+    if id == 0xB then
         items = T{}
     end
 end)
