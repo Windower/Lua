@@ -126,13 +126,12 @@ windower.register_event('incoming chunk', function(id, data)
     end
 end)
 
-function Update()
-    local current_string = ''
+windower.register_event('prerender', function()
     if items:empty() then
         box:hide()
         return
     end
-    current_string = 'Treasure Pool:'
+    local current_string = 'Treasure Pool:'
     for key, value in pairs(items) do
         if value and value.temp then
             local diff = os.difftime(value.temp, os.time())
@@ -141,11 +140,11 @@ function Update()
                 current_string = current_string..'\n['..key..']'
                 current_string = (
                     diff < 60 and
-                    current_string..'\\cs(255,0,0)['..value.index..'] '..value.name..' → '..timer
+                    current_string..'\\cs(255,0,0) '..value.name..' → '..timer
                     or diff > 180 and
-                    current_string..'\\cs(0,255,0)['..value.index..'] '..value.name..' → '..timer
+                    current_string..'\\cs(0,255,0) '..value.name..' → '..timer
                     or
-                    current_string..'\\cs(255,128,0)['..value.index..'] '..value.name..' → '..timer)..'\\cr'
+                    current_string..'\\cs(255,128,0) '..value.name..' → '..timer)..'\\cr'
                 if value.lotter and value.lot and value.lot > 0 then
                     current_string = current_string..' | '
                     current_string = (current_string..'\\cs(0,255,255)'..value.lotter..': '..value.lot)..'\\cr'
@@ -157,10 +156,8 @@ function Update()
         end
     end
     box.current_string = current_string
-end
+end)
 
-Update:loop(0.5)
-
-windower.register_event('logout','zone change', function()
+windower.register_event('logout', function()
     items = T{}
 end)
