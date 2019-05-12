@@ -385,13 +385,13 @@ expandable[{1,  2,  67, 77, 110,157,
             292,293,294,295,296,297,
             298,299,300,301,302,317,
             352,353,379,419,522,576,
-            577,648,650,732}]         = {subject="target", verb="loses",   objects={"HP"}         }
+            577,648,650,732,767,768}]         = {subject="target", verb="loses",   objects={"HP"}         }
 expandable[{122,167,383}]             = {subject="actor",  verb="gains",   objects={"HP"}         }
 expandable[{7,  24, 102,103,238,263,
         306,318,357,367,373,382,384,
         385,386,387,388,389,390,391,
         392,393,394,395,396,397,398,
-        539,587,606,651}]             = {subject="target", verb="gains",   objects={"HP"}         }
+        539,587,606,651,769,770}]             = {subject="target", verb="gains",   objects={"HP"}         }
 expandable[{25, 224,276,358,451,588}] = {subject="target", verb="gains",   objects={"MP"}         }
 expandable[{161,187,227,274,281}]     = {subject="actor",  verb="steals",  objects={"HP"}         }
 expandable[{165,226,454,652}]         = {subject="actor",  verb="steals",  objects={"TP"}         }
