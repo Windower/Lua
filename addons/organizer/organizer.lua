@@ -201,7 +201,7 @@ function options_load( )
 		
         if(settings.retain.slips == true) then
             org_verbose("Slips set to retain")
-            slips = {29312,29313,29314,29315,29316,29317,29318,29319,29320,29321,29322,29323,29324,29325,29326,29327,29328,29329,29330,29331,29332,29333,29334,29335,29336,29337,29338}
+            slips = {29312,29313,29314,29315,29316,29317,29318,29319,29320,29321,29322,29323,29324,29325,29326,29327,29328,29329,29330,29331,29332,29333,29334,29335,29336,29337,29338,29339}
             for _,slips_id in pairs(slips) do
                 _retain[slips_id] = "slips"
                 org_debug("settings", "Adding ("..res.items[slips_id].english..') to slip retain list')
