@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name    = 'findAll'
 _addon.author  = 'Zohno'
-_addon.version = '1.20180607'
+_addon.version = '1.20190514'
 _addon.commands = {'findall'}
 
 require('chat')
