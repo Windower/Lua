@@ -110,18 +110,18 @@ local indices = {
 }
 
 function execute_spell_cast(spell_type, arg)
-	local current_spell_table = nil
-	if spell_type == nil then
-		current_spell_table = spell_tables[current_element]
-	else
-		current_spell_table = spell_tables[current_element][spell_type]
-	end
-	if arg == nil then arg = 1 end
-	arg = tonumber(arg)
-	if current_spell_table == nil or arg > #current_spell_table then
-		windower.add_to_chat(206,"Invalid Spell.") return
-	end
-	windower.chat.input("/ma \""..current_spell_table[arg].."\" <"..target_mode..">")
+    local current_spell_table = nil
+    if spell_type == nil then
+        current_spell_table = spell_tables[current_element]
+    else
+        current_spell_table = spell_tables[current_element][spell_type]
+    end
+    if arg == nil then arg = 1 end
+    arg = tonumber(arg)
+    if current_spell_table == nil or arg > #current_spell_table then
+        windower.add_to_chat(206,"Invalid Spell.") return
+    end
+    windower.chat.input("/ma \""..current_spell_table[arg].."\" <"..target_mode..">")
 end
 
 windower.register_event("unhandled command", function (command, arg)
@@ -131,8 +131,8 @@ windower.register_event("unhandled command", function (command, arg)
         execute_spell_cast("ga", arg)
     elseif command == "boomra" or command == "bra" then
         execute_spell_cast("ra", arg)
-	elseif command == "boomhelix" or command == "bhelix" then
-		execute_spell_cast("helix", arg)
+    elseif command == "boomhelix" or command == "bhelix" then
+        execute_spell_cast("helix", arg)
     end    
 end)
 
@@ -144,8 +144,8 @@ windower.register_event('addon command', function (command, arg)
         execute_spell_cast("ga", arg)
     elseif command == "boomra" or command == "bra" then
         execute_spell_cast("ra", arg)
-	elseif command == "boomhelix" or command == "bhelix" then
-		execute_spell_cast("helix", arg)
+    elseif command == "boomhelix" or command == "bhelix" then
+        execute_spell_cast("helix", arg)
         
     elseif command == "target" then
         if arg then
