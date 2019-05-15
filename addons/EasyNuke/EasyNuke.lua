@@ -58,25 +58,33 @@ spell_tables = {}
 spell_tables["fire"] = {"Fire","Fire II","Fire III","Fire IV","Fire V","Fire VI",}
 spell_tables["fire"]["ga"] = {"Firaga","Firaga II","Firaga III","Firaja",}
 spell_tables["fire"]["ra"] = {"Fira","Fira II","Fira III"}
+spell_tables["fire"]["helix"] = {"Pyrohelix","Pyrohelix II"}
 spell_tables["earth"] = {"Stone","Stone II","Stone III","Stone IV","Stone V","Stone VI",}
 spell_tables["earth"]["ga"] = {"Stonega","Stonega II","Stonega III","Stoneja",}
 spell_tables["earth"]["ra"] = {"Stonera","Stonera II","Stonera III"}
+spell_tables["earth"]["helix"] = {"Geohelix","Geohelix II"}
 spell_tables["wind"] = {"Aero","Aero II","Aero III","Aero IV","Aero V","Aero VI",}
 spell_tables["wind"]["ga"] = {"Aeroga","Aeroga II","Aeroga III","Aeroja",}
 spell_tables["wind"]["ra"] = {"Aerora","Aerora II","Aerora III"}
+spell_tables["wind"]["helix"] = {"Anemohelix","Anemohelix II"}
 spell_tables["water"] = {"Water","Water II","Water III","Water IV","Water V","Water VI",}
 spell_tables["water"]["ga"] = {"Waterga","Waterga II","Waterga III","Waterja",}
 spell_tables["water"]["ra"] = {"Watera","Watera II","Watera III"}
+spell_tables["water"]["helix"] = {"Hydrohelix","Hydrohelix II"}
 spell_tables["ice"] = {"Blizzard","Blizzard II","Blizzard III","Blizzard IV","Blizzard V","Blizzard VI",}
 spell_tables["ice"]["ga"] = {"Blizzaga","Blizzaga II","Blizzaga III","Blizzaja",}
 spell_tables["ice"]["ra"] = {"Blizzara","Blizzara II","Blizzara III"}
+spell_tables["ice"]["helix"] = {"Cryohelix","Cryohelix II"}
 spell_tables["thunder"] = {"Thunder","Thunder II","Thunder III","Thunder IV","Thunder V","Thunder VI",}
 spell_tables["thunder"]["ga"] = {"Thundaga","Thundaga II","Thundaga III","Thundaja",}
 spell_tables["thunder"]["ra"] = {"Thundara","Thundara II","Thundara III"}
+spell_tables["thunder"]["helix"] = {"Ionohelix","Ionohelix II"}
 spell_tables["light"] = {"Banish","Banish II","Holy","Banish III",}
 spell_tables["light"]["ga"] = {"Banishga","Banishga II"}
+spell_tables["light"]["helix"] = {"Luminohelix","Luminohelix II"}
 spell_tables["dark"] = {"Impact"}
 spell_tables["dark"]["ga"] = {"Comet"}
+spell_tables["dark"]["helix"] = {"Noctohelix", "Noctohelix II"}
 spell_tables["cure"] = {"Cure","Cure II","Cure III","Cure IV","Cure V","Cure VI"}
 spell_tables["cure"]["ga"] = {"Curaga","Curaga II","Curaga III","Curaga IV","Curaga V",}
 spell_tables["cure"]["ra"] = {"Cura","Cura II","Cura III"} 
@@ -101,64 +109,43 @@ local indices = {
     dark = 8,
 }
 
+function execute_spell_cast(spell_type, arg)
+	local current_spell_table = nil
+	if spell_type == nil then
+		current_spell_table = spell_tables[current_element]
+	else
+		current_spell_table = spell_tables[current_element][spell_type]
+	end
+	if arg == nil then arg = 1 end
+	arg = tonumber(arg)
+	if current_spell_table == nil or arg > #current_spell_table then
+		windower.add_to_chat(206,"Invalid Spell.") return
+	end
+	windower.chat.input("/ma \""..current_spell_table[arg].."\" <"..target_mode..">")
+end
+
 windower.register_event("unhandled command", function (command, arg)
     if command == "boom" or command == "nuke" then
-        local current_spell_table = spell_tables[current_element]
-        if arg == nil then arg = 1 end
-        arg = tonumber(arg)
-        if arg > #spell_tables[current_element] then 
-            windower.add_to_chat(206,"Invalid Spell.") return
-        end
-        windower.chat.input("/ma \""..current_spell_table[arg].."\" <"..target_mode..">")
-        
+        execute_spell_cast(nil, arg)
     elseif command == "boomga" or command == "bga" then
-        local current_spell_table = spell_tables[current_element]["ga"]
-        if arg == nil then arg = 1 end
-        arg = tonumber(arg)
-        if arg > #spell_tables[current_element]["ga"] or spell_tables[current_element]["ga"] == nil then 
-            windower.add_to_chat(206,"Invalid Spell.") return
-        end
-        windower.chat.input("/ma \""..current_spell_table[arg].."\" <"..target_mode..">")
-        
+        execute_spell_cast("ga", arg)
     elseif command == "boomra" or command == "bra" then
-        local current_spell_table = spell_tables[current_element]["ra"]
-        if arg == nil then arg = 1 end
-        arg = tonumber(arg)
-        if arg > #spell_tables[current_element]["ra"] or spell_tables[current_element]["ra"] == nil then
-            windower.add_to_chat(206,"Invalid Spell.") return
-        end
-        windower.chat.input("/ma \""..current_spell_table[arg].."\" <"..target_mode..">")
+        execute_spell_cast("ra", arg)
+	elseif command == "boomhelix" or command == "bhelix" then
+		execute_spell_cast("helix", arg)
     end    
 end)
 
 windower.register_event('addon command', function (command, arg)
 
     if command == "boom" or command == "nuke" then
-        local current_spell_table = spell_tables[current_element]
-        if arg == nil then arg = 1 end
-        arg = tonumber(arg)
-        if arg > #spell_tables[current_element] then 
-            windower.add_to_chat(206,"Invalid Spell.") return
-        end
-        windower.chat.input("/ma \""..current_spell_table[arg].."\" <"..target_mode..">")
-        
+        execute_spell_cast(nil, arg)
     elseif command == "boomga" or command == "bga" then
-        local current_spell_table = spell_tables[current_element]["ga"]
-        if arg == nil then arg = 1 end
-        arg = tonumber(arg)
-        if arg > #spell_tables[current_element]["ga"] or spell_tables[current_element]["ga"] == nil then 
-            windower.add_to_chat(206,"Invalid Spell.") return
-        end
-        windower.chat.input("/ma \""..current_spell_table[arg].."\" <"..target_mode..">")
-        
+        execute_spell_cast("ga", arg)
     elseif command == "boomra" or command == "bra" then
-        local current_spell_table = spell_tables[current_element]["ra"]
-        if arg == nil then arg = 1 end
-        arg = tonumber(arg)
-        if arg > #spell_tables[current_element]["ra"] or spell_tables[current_element]["ra"] == nil then
-            windower.add_to_chat(206,"Invalid Spell.") return
-        end
-        windower.chat.input("/ma \""..current_spell_table[arg].."\" <"..target_mode..">")
+        execute_spell_cast("ra", arg)
+	elseif command == "boomhelix" or command == "bhelix" then
+		execute_spell_cast("helix", arg)
         
     elseif command == "target" then
         if arg then
