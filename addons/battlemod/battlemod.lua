@@ -12,7 +12,7 @@ require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
 
-_addon.version = '3.24'
+_addon.version = '3.25'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth, maintainer: SnickySnacks'
 _addon.commands = {'bm','battlemod'}
@@ -107,7 +107,7 @@ windower.register_event('addon command', function(command, ...)
     end
 end)
 
-windower.register_event('incoming text',function (original, modified, color)
+windower.register_event('incoming text',function (original, modified, color, color_m, blocked)
     if debugging then windower.debug('incoming text') end
     local redcol = color%256
     
@@ -132,9 +132,28 @@ windower.register_event('incoming text',function (original, modified, color)
             modified = true
         end
     end
+    if filter_messages(original) then
+        blocked = true
+        return blocked
+    end
     
     return modified,color
 end)
+
+function filter_messages(original)
+    for i, v in pairs(res.action_messages) do
+        if non_block_messages:contains(res.action_messages[i].id) then
+            local msg = res.action_messages[i].en
+            msg = msg:gsub("${actor}", "%.-" )
+            msg = msg:gsub("${target}", "%.-" )
+            msg = msg:gsub("${number}", "%%d+" )
+            original = original:gsub("point ", "points ")
+            if original:match(msg) then
+                return true
+            end
+        end
+    end
+end
 
 function flip_block_equip()
     block_equip = not block_equip

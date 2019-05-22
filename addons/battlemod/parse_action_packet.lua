@@ -247,7 +247,9 @@ function parse_action_packet(act)
                     :gsub('${number}',act.action.number or m.param)
                     :gsub('${status}',m.status or 'ERROR 120')
                     :gsub('${gil}',m.param..' gil')))
-                m.message = 0
+                    if not non_block_messages:contains(m.message) then
+                        m.message = 0
+                    end
             end
             if m.has_add_effect and m.add_effect_message ~= 0 and add_effect_valid[act.category] then
                 local targ = assemble_targets(act.actor,v.target,act.category,m.add_effect_message)
@@ -276,7 +278,9 @@ function parse_action_packet(act)
                         :gsub('${lb}','\7')
                         :gsub('${number}',m.add_effect_param)
                         :gsub('${status}',m.add_effect_status or 'ERROR 178')))
-                        m.add_effect_message = 0
+                        if not non_block_messages:contains(m.add_effect_message) then
+                            m.add_effect_message = 0
+                        end
                 end
             end
             if m.has_spike_effect and m.spike_effect_message ~= 0 and spike_effect_valid[act.category] then
@@ -311,7 +315,9 @@ function parse_action_packet(act)
                     :gsub('${lb}','\7')
                     :gsub('${number}',m.spike_effect_param)
                     :gsub('${status}',m.spike_effect_status or 'ERROR 150')))
-                m.spike_effect_message = 0
+                    if not non_block_messages:contains(m.spike_effect_message) then
+                        m.spike_effect_message = 0
+                    end
             end
         end
     end
