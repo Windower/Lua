@@ -144,10 +144,19 @@ function filter_messages(original)
     for i, v in pairs(res.action_messages) do
         if non_block_messages:contains(res.action_messages[i].id) then
             local msg = res.action_messages[i].en
-            msg = msg:gsub("${actor}", "%.-" )
-            msg = msg:gsub("${target}", "%.-" )
-            msg = msg:gsub("${number}", "%%d+" )
+            msg = msg:gsub("${actor}", "%%w+")
+            msg = msg:gsub("${target}", "%%w+")
+            msg = msg:gsub("${lb}", "")
+            msg = msg:gsub("${number}", "%%d+")
+            msg = msg:gsub(" ", "")
+            msg = msg:gsub("'", "")
+            msg = msg:gsub("-", "")
             original = original:gsub("point ", "points ")
+            original = original:gsub("absorb ", "absorbs ")
+            original = original:gsub(" ", "")
+            original = original:gsub("'", "")
+            original = original:gsub("-", "")
+            original = original:gsub("?", "")
             if original:match(msg) then
                 return true
             end
