@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 _addon.name = 'AzureSets'
-_addon.version = '1.22'
+_addon.version = '1.23'
 _addon.author = 'Nitrous (Shiva)'
 _addon.commands = {'aset','azuresets','asets'}
 
