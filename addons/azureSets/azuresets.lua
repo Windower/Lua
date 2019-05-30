@@ -211,7 +211,7 @@ function save_set(setname)
 end
 
 function delete_set(setname)
-	if settings.spellsets[setname] == nil then
+    if settings.spellsets[setname] == nil then
         error('Please choose an existing spellset.')
         return
     end    
@@ -258,7 +258,7 @@ windower.register_event('addon command', function(...)
             if args[1] ~= nil then
                 save_set(args[1])
             end
-		elseif comm == 'delete' then
+        elseif comm == 'delete' then
             if args[1] ~= nil then
                 delete_set(args[1])
             end
