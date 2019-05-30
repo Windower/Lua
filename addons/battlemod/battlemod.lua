@@ -132,35 +132,22 @@ windower.register_event('incoming text',function (original, modified, color, col
             modified = true
         end
     end
-    if filter_messages(original) then
-        blocked = true
-        return blocked
+    if not bm_message(original) and block_modes:contains(color) then
+        local endline = '[' .. string.char(0x7F, 0x31) .. ']'
+        if string.find(original, endline) then --allow add_to_chat messages with the modes we blocking 
+            blocked = true
+            return blocked
+        end
     end
     
     return modified,color
 end)
 
-function filter_messages(original)
-    for i, v in pairs(res.action_messages) do
-        if non_block_messages:contains(res.action_messages[i].id) then
-            local msg = res.action_messages[i].en
-            msg = msg:gsub("${actor}", "%%w+")
-            msg = msg:gsub("${target}", "%%w+")
-            msg = msg:gsub("${lb}", "")
-            msg = msg:gsub("${number}", "%%d+")
-            msg = msg:gsub(" ", "")
-            msg = msg:gsub("'", "")
-            msg = msg:gsub("-", "")
-            original = original:gsub("point ", "points ")
-            original = original:gsub("absorb ", "absorbs ")
-            original = original:gsub(" ", "")
-            original = original:gsub("'", "")
-            original = original:gsub("-", "")
-            original = original:gsub("?", "")
-            if original:match(msg) then
-                return true
-            end
-        end
+function bm_message(original)
+    local check = '[' .. string.char(0x1E) .. ']'
+    local check2 = '[' .. string.char(0x1F) .. ']'
+    if string.find(original, check) or string.find(original, check2) then
+        return true
     end
 end
 
