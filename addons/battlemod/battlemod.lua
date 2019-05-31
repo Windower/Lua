@@ -132,9 +132,15 @@ windower.register_event('incoming text',function (original, modified, color, col
             modified = true
         end
     end
-    if not bm_message(original) and block_modes:contains(color) then
-        local endline = '[' .. string.char(0x7F, 0x31) .. ']'
-        if string.find(original, endline) then --allow add_to_chat messages with the modes we blocking 
+    if block_modes:contains(color) then
+        local endline = string.char(0x7F, 0x31)
+        local item = string.char(0x1E)
+        if not bm_message(original) then
+            if original:endswith(endline) then --allow add_to_chat messages with the modes we blocking
+                blocked = true
+                return blocked
+            end
+        elseif original:endswith(endline) and string.find(original, item) then --block items action messages
             blocked = true
             return blocked
         end
@@ -144,8 +150,8 @@ windower.register_event('incoming text',function (original, modified, color, col
 end)
 
 function bm_message(original)
-    local check = '[' .. string.char(0x1E) .. ']'
-    local check2 = '[' .. string.char(0x1F) .. ']'
+    local check = string.char(0x1E)
+    local check2 = string.char(0x1F)
     if string.find(original, check) or string.find(original, check2) then
         return true
     end
