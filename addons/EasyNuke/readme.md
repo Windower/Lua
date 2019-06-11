@@ -72,3 +72,10 @@ Commands:
   * EX: //ez boomra 3 <<<< If Element Mode is Ice, and mode is "bt", will cast Blizzara III on your current battle target.
   * EX2: //boomra 2 <<<< If Element Mode is Cure, and mode is "me", you will cast Cura II on yourself.
   * Macro usage: /con ez boomra #    /OR/    /con boomra #
+  
+#### boomhelix
+* Casts the appropriate SCH Helix spell of tier XXX.
+  * EX: //ez boomhelix 2 <<<< If Element Mode is Ice, and target mode is "t", will cast Cryohelix II on your current target.
+  * EX2: //boomhelix <<<< If Element Mode is Fire, and target mode is "bt", will cast Pyrohelix on your current battle target.
+  * Macro usage: /con ez boomhelix # /OR/ /con boomhelix #
+* Also supports a short version //bhelix # or //ez bhelix
