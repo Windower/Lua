@@ -660,15 +660,15 @@ augment_values = {
         [0x538] = {{stat='Enhances "Invigorate" effect', offset=0,multiplier=0}},
         [0x539] = {{stat='Enhances "Mantra" effect', offset=0,multiplier=0}},
 
-        [0x53C] = {{stat='Enhances "Protectra V" effect', offset=0,multiplier=0}},
+        [0x53C] = {{stat='Enhances "Afflatus Solace" effect', offset=0,multiplier=0}},
         [0x53D] = {{stat='Enhances "Martyr" effect', offset=0,multiplier=0}},
-        [0x53E] = {{stat='Enhances "Shellra V" effect', offset=0,multiplier=0}},
+        [0x53E] = {{stat='Enhances "Afflatus Misery" effect', offset=0,multiplier=0}},
         [0x53F] = {{stat='Enhances "Devotion" effect', offset=0,multiplier=0}},
         
-        [0x542] = {{stat='Increases Ancient Magic II damage', offset=0,multiplier=0}},
-        [0x543] = {{stat='Reduces Ancient Magic II casting time', offset=0,multiplier=0}},
-        [0x544] = {{stat='Increases Ancient Magic II accuracy', offset=0,multiplier=0}},
-        [0x545] = {{stat='Reduces Ancient Magic II MP cost', offset=0,multiplier=0}},
+        [0x542] = {{stat='Increases Ancient Magic damage and magic burst damage', offset=0,multiplier=0}},
+        [0x543] = {{stat='Increases Elemental Magic accuracy', offset=0,multiplier=0}},
+        [0x544] = {{stat='Increases Elemental Magic debuff time and potency', offset=0,multiplier=0}},
+        [0x545] = {{stat='Increases Aspir absorption amount', offset=0,multiplier=0}},
 
         [0x548] = {{stat='Enhances "Dia III" effect', offset=0,multiplier=0}},
         [0x549] = {{stat='Enhances "Slow II" effect', offset=0,multiplier=0}},
