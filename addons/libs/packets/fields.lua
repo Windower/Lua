@@ -2139,7 +2139,7 @@ fields.incoming[0x03D] = L{
     {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 08
     {ctype='unsigned char',     label='Type'},                                  -- 09 0 = on price check, 1 = when sale is finalized
     {ctype='unsigned short',    label='_junk1'},                                -- 0A
-    {ctype='unsigned int',      label='Quantity Sold',      const=1},           -- 0C Will be 1 on price check
+    {ctype='unsigned int',      label='Count',      const=1},                   -- 0C Will be 1 on price check
 }
 
 -- Open Buy/Sell
