@@ -2132,14 +2132,14 @@ fields.incoming[0x03C] = L{
     {ref=types.shop_item,       label='Item',               count='*'},         -- 08 -   *
 }
 
--- Price response
--- Sent after an outgoing price request for an NPC vendor (0x085)
+-- Price/sale response
+-- Sent in response to an outgoing price request for an NPC vendor (0x085), and in response to player finalizing a sale.
 fields.incoming[0x03D] = L{
     {ctype='unsigned int',      label='Price',              fn=gil},            -- 04
-    {ctype='unsigned char',     label='Inventory Index',    fn=invp+{0x09}},    -- 08
-    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 09
+    {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 08
+    {ctype='unsigned char',     label='Type'},                                  -- 09 0 = on price check, 1 = when sale is finalized
     {ctype='unsigned short',    label='_junk1'},                                -- 0A
-    {ctype='unsigned int',      label='_unknown1',          const=1},           -- 0C
+    {ctype='unsigned int',      label='Count'},                                 -- 0C Will be 1 on price check
 }
 
 -- Open Buy/Sell
