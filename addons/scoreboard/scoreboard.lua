@@ -87,7 +87,7 @@ windower.register_event('addon command', function()
             sb_output('sb reset : Reset damage')
             sb_output('sb report [<target>] : Reports damage. Can take standard chatmode target options.')
             sb_output('sb reportstat <stat> [<player>] [<target>] : Reports the given stat. Can take standard chatmode target options. Ex: //sb rs acc p')
-            sb_output('Valid chatmode targets are: ' .. chatmodes:tostring():stripchars('{}"'))
+            sb_output('Valid chatmode targets are: ' .. chatmodes:concat(', '))
             sb_output('sb filter show  : Shows current filter settings')
             sb_output('sb filter add <mob1> <mob2> ... : Add mob patterns to the filter (substrings ok)')
             sb_output('sb filter clear : Clears mob filter')
@@ -184,7 +184,7 @@ windower.register_event('addon command', function()
 
             if arg then
                 if chatmodes:contains(arg) then
-                    if (arg == "t" or arg == "tell") then
+                    if arg == 't' or arg == 'tell' then
                         if not arg2 then
                             -- should be a valid player name
                             error('Invalid argument for report t: Please include player target name.')
