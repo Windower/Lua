@@ -4,10 +4,19 @@ _addon.command = 'send'
 _addon.author = 'Byrth'
 
 windower.register_event('addon command',function (...)
-    local term = table.concat({...}, ' ')
+	local term = table.concat({...}, ' ')
+	
+	local target = windower.ffxi.get_mob_by_target('t')
+	if target then
+		term = term:gsub("<tid>", tostring(target.id))
+	end
+
 	local broken_init = split(term, ' ')
 	local qual = table.remove(broken_init,1)
 	local player = windower.ffxi.get_player()
+
+	
+
 	if qual:lower()==player['name']:lower() then
 		if broken_init ~= nil then
 			relevant_msg(table.concat(broken_init,' '))
@@ -80,17 +89,15 @@ end
 function relevant_msg(msg)
 	local player = windower.ffxi.get_player()
 	
-	msg:gsub("<me>", tostring(player.name))
-	msg:gsub("<hp>", tostring(player.vitals.hp))
-	msg:gsub("<mp>", tostring(player.vitals.mp))
-	msg:gsub("<hpp>", tostring(player.vitals.hpp))
-	msg:gsub("<mpp>", tostring(player.vitals.mpp))
-	msg:gsub("<tp>", tostring(player.vitals.tp))
-	msg:gsub("<job>", tostring(player.main_job_full)..'/'..tostring(player.sub_job_full))
-	msg:gsub("<mjob>", tostring(player.main_job_full))
-	msg:gsub("<sjob>", tostring(player.sub_job_full))
-	
-
+	msg = msg:gsub("<me>", tostring(player.name))
+	msg = msg:gsub("<hp>", tostring(player.vitals.hp))
+	msg = msg:gsub("<mp>", tostring(player.vitals.mp))
+	msg = msg:gsub("<hpp>", tostring(player.vitals.hpp))
+	msg = msg:gsub("<mpp>", tostring(player.vitals.mpp))
+	msg = msg:gsub("<tp>", tostring(player.vitals.tp))
+	msg = msg:gsub("<job>", tostring(player.main_job_full)..'/'..tostring(player.sub_job_full))
+	msg = msg:gsub("<mjob>", tostring(player.main_job_full))
+	msg = msg:gsub("<sjob>", tostring(player.sub_job_full))
 	
 	if msg:sub(1,2)=='//' then
 		windower.send_command(msg:sub(3))
