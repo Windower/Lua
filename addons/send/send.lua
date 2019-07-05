@@ -89,16 +89,6 @@ end
 function relevant_msg(msg)
 	local player = windower.ffxi.get_player()
 	
-	msg = msg:gsub("<me>", tostring(player.name))
-	msg = msg:gsub("<hp>", tostring(player.vitals.hp))
-	msg = msg:gsub("<mp>", tostring(player.vitals.mp))
-	msg = msg:gsub("<hpp>", tostring(player.vitals.hpp))
-	msg = msg:gsub("<mpp>", tostring(player.vitals.mpp))
-	msg = msg:gsub("<tp>", tostring(player.vitals.tp))
-	msg = msg:gsub("<job>", tostring(player.main_job_full)..'/'..tostring(player.sub_job_full))
-	msg = msg:gsub("<mjob>", tostring(player.main_job_full))
-	msg = msg:gsub("<sjob>", tostring(player.sub_job_full))
-	
 	if msg:sub(1,2)=='//' then
 		windower.send_command(msg:sub(3))
 	elseif msg:sub(1,1)=='/' then
