@@ -8,7 +8,7 @@ windower.register_event('addon command',function (...)
 	
 	local target = windower.ffxi.get_mob_by_target('t')
 	if target then
-		term = term:gsub("<tid>", tostring(target.id))
+		term = term:gsub('<tid>', tostring(target.id))
 	end
 
 	local broken_init = split(term, ' ')
