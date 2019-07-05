@@ -11,6 +11,11 @@ windower.register_event('addon command',function (...)
 		term = term:gsub('<tid>', tostring(target.id))
 	end
 
+	local last_sub_target = windower.ffxi.get_mob_by_target('lastst')
+	if last_sub_target then
+		term = term:gsub('<lstid>', tostring(last_sub_target.id))
+	end
+
 	local broken_init = split(term, ' ')
 	local qual = table.remove(broken_init,1)
 	local player = windower.ffxi.get_player()
