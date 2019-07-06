@@ -17,7 +17,7 @@ You may change the 55 to any number from 1 to 255 to get a (not always) differen
 ### Sending mob ids through send
 
 You can send target ids from the sender to the receiver. Any addon could take advantage of this, but right now
-it's especially adventageous to use with gearswap. Gearswap will resolve the mob id to the monster if it is within range.
+it's especially advantageous to use with gearswap. Gearswap will resolve the mob id to the monster if it is within range.
 
 ```
 /con send @others /ma "Blizzard" <tid>
