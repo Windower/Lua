@@ -116,19 +116,19 @@ function get_text(id,data)
         split_text(id,v)
     end
     if stats[2] then
-        local pet_text = windower.regex.replace(stats[2],'\n',' ')
-        split_text(id,pet_text,'pet: ')
+        stats[2] = stats[2]:gsub('\n', ''):trim()
+        split_text(id,stats[2],'pet: ')
     end
     local ext = extdata.decode({id=id,extdata=data})
     if ext.augments then
         for i,v in ipairs(ext.augments) do
-			local stats = windower.regex.split(v,'(Pet|Avatar|Automaton|Wyvern|Luopan): ')
-			if stats[2] then
-				local pet_text = windower.regex.replace(stats[2],'\n',' ')
-				split_text(id,pet_text,'pet: ')
-			else
-				split_text(id,v)
-			end
+            local stats = windower.regex.split(v,'(Pet|Avatar|Automaton|Wyvern|Luopan): ')
+            if stats[2] then
+                stats[2] = stats[2]:gsub('\n', ''):trim()
+                split_text(id,stats[2],'pet: ')
+            else
+                split_text(id,v)
+            end
         end
     end
     if enhanced[id] then
@@ -147,9 +147,9 @@ function split_text(id,text,arg)
         local key = windower.regex.replace(string.lower(key),'(\\"|\\.|\\s$)','')
         local key = integrate[key] or key
         local key = arg and arg..key or key
-		if key == "blood pact damage" then
-			key = "pet: blood pact damage"
-		end
+        if key == "blood pact damage" then
+            key = "pet: blood pact damage"
+        end
         tbl[key] = tonumber(value)+(tbl[key] or 0)
         if settings.debugmode then
             log(id,res.items[id].english,key,value,tbl[key])
