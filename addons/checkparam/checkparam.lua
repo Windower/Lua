@@ -116,7 +116,7 @@ function get_text(id,data)
         split_text(id,v)
     end
     if stats[2] then
-        stats[2] = stats[2]:gsub('\n', ''):trim()
+        stats[2] = stats[2]:trim()
         split_text(id,stats[2],'pet: ')
     end
     local ext = extdata.decode({id=id,extdata=data})
@@ -124,7 +124,7 @@ function get_text(id,data)
         for i,v in ipairs(ext.augments) do
             local stats = windower.regex.split(v,'(Pet|Avatar|Automaton|Wyvern|Luopan): ')
             if stats[2] then
-                stats[2] = stats[2]:gsub('\n', ''):trim()
+                stats[2] = stats[2]:trim()
                 split_text(id,stats[2],'pet: ')
             else
                 split_text(id,v)
