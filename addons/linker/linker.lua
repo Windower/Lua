@@ -1,5 +1,5 @@
 require('luau')
-url = require("socket.url")
+local url = require('socket.url')
 
 _addon.name = 'Linker'
 _addon.author = 'Arcon'
