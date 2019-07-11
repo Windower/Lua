@@ -1,4 +1,5 @@
 require('luau')
+local url = require('socket.url')
 
 _addon.name = 'Linker'
 _addon.author = 'Arcon'
@@ -53,7 +54,7 @@ windower.register_event('addon command', function(command, ...)
     if not ... or not settings.search[command] and settings.raw[command] then
         windower.open_url(settings.raw[command])
     elseif settings.search[command] then
-        windower.open_url((settings.search[command]:gsub('${query}', L{...}:concat(' '))))
+        windower.open_url((settings.search[command]:gsub('${query}', url.escape(L{...}:concat(' ')):gsub('%%','%%%%'))))
     else
         error('Command "' .. command .. '" not found.')
     end
