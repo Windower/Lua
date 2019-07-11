@@ -171,6 +171,7 @@ function parse_action_packet(act)
                 elseif m.message == 32 then m.simp_name = 'dodged by'
                 elseif m.message == 67 then m.simp_name = 'critical hit'
                 elseif m.message == 106 then m.simp_name = 'intimidated by'
+                elseif m.message == 153 then m.simp_name = act.action.name..' fails'
                 elseif m.message == 282 then m.simp_name = 'evaded by'
                 elseif m.message == 373 then m.simp_name = 'absorbed by'
                 elseif m.message == 352 then m.simp_name = 'RA'
@@ -209,7 +210,7 @@ function parse_action_packet(act)
                 elseif m.message == 85 or m.message == 284 then
                     m.status = color_it('Resists',color_arr['statuscol'])
                 elseif m.message == 351 then
-                    m.status = color_it('status ailments',color_arr['statscol'])
+                    m.status = color_it('status ailments',color_arr['statuscol'])
                     m.simp_name = color_it('remedy',color_arr['itemcol'])
                 elseif T{75,114,156,189,248,283,312,323,336,355,408,422,423,425,659}:contains(m.message) then
                     m.status = color_it('No effect',color_arr['statuscol']) -- The status code for "No Effect" is 255, so it might actually work without this line
@@ -247,7 +248,9 @@ function parse_action_packet(act)
                     :gsub('${number}',act.action.number or m.param)
                     :gsub('${status}',m.status or 'ERROR 120')
                     :gsub('${gil}',m.param..' gil')))
-                m.message = 0
+                    if not non_block_messages:contains(m.message) then
+                        m.message = 0
+                    end
             end
             if m.has_add_effect and m.add_effect_message ~= 0 and add_effect_valid[act.category] then
                 local targ = assemble_targets(act.actor,v.target,act.category,m.add_effect_message)
@@ -276,7 +279,9 @@ function parse_action_packet(act)
                         :gsub('${lb}','\7')
                         :gsub('${number}',m.add_effect_param)
                         :gsub('${status}',m.add_effect_status or 'ERROR 178')))
-                        m.add_effect_message = 0
+                        if not non_block_messages:contains(m.add_effect_message) then
+                            m.add_effect_message = 0
+                        end
                 end
             end
             if m.has_spike_effect and m.spike_effect_message ~= 0 and spike_effect_valid[act.category] then
@@ -311,7 +316,9 @@ function parse_action_packet(act)
                     :gsub('${lb}','\7')
                     :gsub('${number}',m.spike_effect_param)
                     :gsub('${status}',m.spike_effect_status or 'ERROR 150')))
-                m.spike_effect_message = 0
+                    if not non_block_messages:contains(m.spike_effect_message) then
+                        m.spike_effect_message = 0
+                    end
             end
         end
     end
@@ -334,23 +341,29 @@ function simplify_message(msg_ID)
     local msg = res.action_messages[msg_ID][language]
     local fields = fieldsearch(msg)
 
-    if simplify and not T{23,64,125,129,133,139,140,153,204,210,211,212,213,214,244,350,442,453,516,531,557,565,582,593,594,595,596,597,598,599,674}:contains(msg_ID) then
-        if T{93,273,522,653,654,655,656,85,284,75,114,156,189,248,283,312,323,336,351,355,408,422,423,425,659,158,245,324,658}:contains(msg_ID) then
+    if simplify and not T{23,64,129,133,139,140,204,210,211,212,213,214,244,350,442,516,531,557,565,582,674}:contains(msg_ID) then
+        if T{93,273,522,653,654,655,656,85,284,75,114,156,189,248,283,312,323,336,351,355,408,422,423,425,453,659,158,245,324,658}:contains(msg_ID) then
             fields.status = true
         end
         if msg_ID == 31 then
             fields.actor = true
         end    
         if (msg_ID > 287 and msg_ID < 303) or (msg_ID > 384 and msg_ID < 399) or (msg_ID > 766 and msg_ID < 771) or
-            T{152,161,162,163,165,229,384,603,652}:contains(msg_ID) then
+            T{152,161,162,163,165,229,384,453,603,652}:contains(msg_ID) then
                 fields.ability = true
         end
         
-        if T{152,160,161,162,163,164,165,166,167,168,229,652}:contains(msg_ID) then
+        if T{125,593,594,595,596,597,598,599}:contains(msg_ID) then
+            fields.ability = true
+            fields.item = true
+        end
+        
+        if T{152,153,160,161,162,163,164,165,166,167,168,229,652}:contains(msg_ID) then
             fields.actor  = true
             fields.target = true
         end
 
+        local Despoil_msg = {[593] = 'Attack Down', [594] = 'Defense Down', [595] = 'Magic Atk. Down', [596] = 'Magic Def. Down', [597] = 'Evasion Down', [598] = 'Accuracy Down', [599] = 'Slow',}
         if line_full and fields.number and fields.target and fields.actor then
             msg = line_full
         elseif line_aoebuff and fields.status and fields.target then --and fields.actor then -- and (fields.spell or fields.ability or fields.item or fields.weapon_skill) then
@@ -360,6 +373,12 @@ function simplify_message(msg_ID)
                 msg = line_itemnum
             else
                 msg = line_item
+            end
+        elseif line_steal and fields.item and fields.ability then
+            if T{593,594,595,596,597,598,599}:contains(msg_ID) then
+                msg = line_steal..''..string.char(0x07)..'AE: '..color_it(Despoil_msg[msg_ID],color_arr['statuscol'])
+            else
+                msg = line_steal
             end
         elseif line_nonumber and not fields.number then
             msg = line_nonumber

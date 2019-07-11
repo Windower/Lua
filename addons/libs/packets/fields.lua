@@ -1361,7 +1361,8 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned char',     label='Linkshell Green'},                       -- 25
     {ctype='unsigned char',     label='Linkshell Blue'},                        -- 26
     {ctype='unsigned char',     label='_unknown5'},                             -- 27   Probably junk from the LS color dword
-    {ctype='data[0x1B]',        label='_unknown6'},                             -- 28   DSP notes that the 6th bit of byte 54 is the Ballista flag
+    {ctype='data[0x1A]',        label='_unknown6'},                             -- 28   DSP notes that the 6th bit of byte 54 is the Ballista flag
+    {ctype='unsigned char',     label='Indi Bubble'},                           -- 42   Geomancer (GEO) Indi spell effect on players. 0 is no effect.
     {ctype='unsigned char',     label='Face Flags'},                            -- 43   0, 3, 4, or 8
     {ctype='data[4]',           label='_unknown7'},                             -- 44
     {ctype='unsigned char',     label='Face'},                                  -- 48
@@ -2131,14 +2132,14 @@ fields.incoming[0x03C] = L{
     {ref=types.shop_item,       label='Item',               count='*'},         -- 08 -   *
 }
 
--- Price response
--- Sent after an outgoing price request for an NPC vendor (0x085)
+-- Price/sale response
+-- Sent in response to an outgoing price request for an NPC vendor (0x085), and in response to player finalizing a sale.
 fields.incoming[0x03D] = L{
     {ctype='unsigned int',      label='Price',              fn=gil},            -- 04
-    {ctype='unsigned char',     label='Inventory Index',    fn=invp+{0x09}},    -- 08
-    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 09
+    {ctype='unsigned char',     label='Inventory Index',    fn=inv+{0}},        -- 08
+    {ctype='unsigned char',     label='Type'},                                  -- 09 0 = on price check, 1 = when sale is finalized
     {ctype='unsigned short',    label='_junk1'},                                -- 0A
-    {ctype='unsigned int',      label='_unknown1',          const=1},           -- 0C
+    {ctype='unsigned int',      label='Count'},                                 -- 0C Will be 1 on price check
 }
 
 -- Open Buy/Sell
@@ -2659,6 +2660,13 @@ enums.spawntype = {
     [0x03] = 'Monster',
     [0x00] = 'Casket or NPC',
     [0x0A] = 'Self',
+}
+
+-- Assist Response
+fields.incoming[0x058] = L{
+    {ctype='unsigned int',      label='Player',             fn=id},             -- 04
+    {ctype='unsigned int',      label='Target',             fn=id},             -- 08
+    {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
 }
 
 -- Emote
@@ -3498,8 +3506,7 @@ fields.incoming[0x10B] = L{
 
 -- Sparks update packet
 fields.incoming[0x110] = L{
-    {ctype='unsigned short',    label='Sparks Total'},                          -- 04
-    {ctype='unsigned short',    label='_unknown1'},                             -- 06   Sparks are currently capped at 50,000
+    {ctype='unsigned int',      label='Sparks Total'},                          -- 04
     {ctype='unsigned char',     label='Unity (Shared) designator'},             -- 08   Unity (Shared) designator (0=A, 1=B, 2=C, etc.)
     {ctype='unsigned char',     label='Unity (Person) designator '},            -- 09   The game does not distinguish these
     {ctype='char[6]',           label='_unknown2'},                             -- 0A   Currently all 0xFF'd, never seen it change.
@@ -3626,7 +3633,10 @@ fields.incoming[0x113] = L{
     {ctype='unsigned short',    label="Water Crystals"},                        -- F2
     {ctype='unsigned short',    label="Light Crystals"},                        -- F4
     {ctype='unsigned short',    label="Dark Crystals"},                         -- F6
+<<<<<<< HEAD
     {ctype='signed int',        label="Deeds"},                                 -- F8
+=======
+>>>>>>> e34be6958ee92d50eb588115261e5a96a485e123
 }
 
 -- Fish Bite Info

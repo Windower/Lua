@@ -12,7 +12,7 @@ require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
 
-_addon.version = '3.24'
+_addon.version = '3.25'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth, maintainer: SnickySnacks'
 _addon.commands = {'bm','battlemod'}
@@ -54,6 +54,7 @@ windower.register_event('addon command', function(command, ...)
             cancelmulti = not cancelmulti
             windower.add_to_chat(121,'Battlemod: Multi-canceling flipped! - '..tostring(cancelmulti))
         elseif command:lower() == 'reload' then
+            current_job = 'NONE'
             options_load()
         elseif command:lower() == 'unload' then
             windower.send_command('@lua u battlemod')
@@ -106,7 +107,7 @@ windower.register_event('addon command', function(command, ...)
     end
 end)
 
-windower.register_event('incoming text',function (original, modified, color)
+windower.register_event('incoming text',function (original, modified, color, color_m, blocked)
     if debugging then windower.debug('incoming text') end
     local redcol = color%256
     
@@ -131,9 +132,30 @@ windower.register_event('incoming text',function (original, modified, color)
             modified = true
         end
     end
+    if block_modes:contains(color) then
+        local endline = string.char(0x7F, 0x31)
+        local item = string.char(0x1E)
+        if not bm_message(original) then
+            if original:endswith(endline) then --allow add_to_chat messages with the modes we blocking
+                blocked = true
+                return blocked
+            end
+        elseif original:endswith(endline) and string.find(original, item) then --block items action messages
+            blocked = true
+            return blocked
+        end
+    end
     
     return modified,color
 end)
+
+function bm_message(original)
+    local check = string.char(0x1E)
+    local check2 = string.char(0x1F)
+    if string.find(original, check) or string.find(original, check2) then
+        return true
+    end
+end
 
 function flip_block_equip()
     block_equip = not block_equip
@@ -198,7 +220,7 @@ function options_load()
 end
 
 function filterload(job)
-    if Current_job == job then return end
+    if current_job == job then return end
     if file.exists('data\\filters\\filters-'..job..'.xml') then
         default_filt = false
         filter = config.load('data\\filters\\filters-'..job..'.xml',default_filter_table,false)
@@ -210,7 +232,7 @@ function filterload(job)
         config.save(filter)
         windower.add_to_chat(4,'Loaded default Battlemod filters')
     end
-    Current_job = job
+    current_job = job
 end
 
 ActionPacket.open_listener(parse_action_packet)
