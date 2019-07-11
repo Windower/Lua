@@ -3588,7 +3588,7 @@ fields.incoming[0x113] = L{
     {ctype='signed int',        label='Therion Ichor'},                         -- A0
     {ctype='signed int',        label='Allied Notes'},                          -- A4
     {ctype='unsigned short',    label='A.M.A.N. Vouchers Stored'},              -- A8
-    {ctype='unsigned short',    label='Unity Accolades'},                       -- AA
+    {ctype='unsigned short',    label="Login Points"},                          -- AA
     {ctype='signed int',        label='Cruor'},                                 -- AC
     {ctype='signed int',        label='Resistance Credits'},                    -- B0
     {ctype='signed int',        label='Dominion Notes'},                        -- B4
@@ -3604,6 +3604,29 @@ fields.incoming[0x113] = L{
     {ctype='signed int',        label='Voidstones'},                            -- C4
     {ctype='signed int',        label='Kupofried\'s Corundums'},                -- C8
     {ctype='unsigned char',     label='Moblin Pheromone Sacks'},                -- CC
+    {ctype='data[1]',           label='_unknown2'},                             -- CD
+    {ctype='unsigned char',     label="Rems Tale Chapter 1"},                   -- CE
+    {ctype='unsigned char',     label="Rems Tale Chapter 2"},                   -- CF
+    {ctype='unsigned char',     label="Rems Tale Chapter 3"},                   -- D0
+    {ctype='unsigned char',     label="Rems Tale Chapter 4"},                   -- D1
+    {ctype='unsigned char',     label="Rems Tale Chapter 5"},                   -- D2
+    {ctype='unsigned char',     label="Rems Tale Chapter 6"},                   -- D3
+    {ctype='unsigned char',     label="Rems Tale Chapter 7"},                   -- D4
+    {ctype='unsigned char',     label="Rems Tale Chapter 8"},                   -- D5
+    {ctype='unsigned char',     label="Rems Tale Chapter 9"},                   -- D6
+    {ctype='unsigned char',     label="Rems Tale Chapter 10"},                  -- D7
+    {ctype='data[8]',           label="_unknown3"},                             -- D8
+    {ctype='signed int',        label="Reclamation Marks"},                     -- E0
+    {ctype='signed int',        label='Unity Accolades'},                       -- E4
+    {ctype='unsigned short',    label="Fire Crystals"},                         -- E8
+    {ctype='unsigned short',    label="Ice Crystals"},                          -- EA
+    {ctype='unsigned short',    label="Wind Crystals"},                         -- EC
+    {ctype='unsigned short',    label="Earth Crystals"},                        -- EE
+    {ctype='unsigned short',    label="Lightning Crystals"},                    -- E0
+    {ctype='unsigned short',    label="Water Crystals"},                        -- F2
+    {ctype='unsigned short',    label="Light Crystals"},                        -- F4
+    {ctype='unsigned short',    label="Dark Crystals"},                         -- F6
+    {ctype='signed int',        label="Deeds"},                                 -- F8
 }
 
 -- Fish Bite Info
@@ -3646,7 +3669,7 @@ fields.incoming[0x118] = L{
     {ctype='signed int',        label='Bayld'},                                     -- 04
     {ctype='unsigned short',    label='Kinetic Units'},                             -- 08
     {ctype='unsigned char',     label='Coalition Imprimaturs'},                     -- 0A
-    {ctype='unsigned char',     label='_unknown1'},                                 -- 0B   Currently holds no value
+    {ctype='unsigned char',     label='Mystical Canteens'},                         -- 0B
     {ctype='signed int',        label='Obsidian Fragments'},                        -- 0C
     {ctype='unsigned short',    label='Lebondopt Wings Stored'},                    -- 10
     {ctype='unsigned short',    label='Pulchridopt Wings Stored'},                  -- 12
@@ -3699,11 +3722,41 @@ fields.incoming[0x118] = L{
     {ctype='unsigned char',     label='Pellucid Stones Stored'},                    -- 45
     {ctype='unsigned char',     label='Fern Stones Stored'},                        -- 46
     {ctype='unsigned char',     label='Taupe Stones Stored'},                       -- 47
-    {ctype='unsigned short',    label='_unknown2'},                                 -- 48
+    {ctype='unsigned short',    label='Mellidopt Wings Stored'},                    -- 48
     {ctype='unsigned short',    label='Escha Beads'},                               -- 4A
     {ctype='signed int',        label='Escha Silt'},                                -- 4C
-    {ctype='unsigned short',    label='Potpourri'},                                 -- 50
-    {ctype='data[0x0E]',        label='_unknown3'},                                 -- 52   Room for future additions, currently holds no value
+    {ctype='signed int',        label='Potpourri'},                                 -- 50
+    {ctype='signed int',        label='Hallmarks'},                                 -- 54
+    {ctype='signed int',        label='Total Hallmarks'},                           -- 58
+    {ctype='signed int',        label='Badges of Gallantry'},                       -- 5C
+    {ctype='signed int',        label='Crafter Points'},                            -- 60
+    {ctype='unsigned char',     label='Fire Crystals Set'},                         -- 64
+    {ctype='unsigned char',     label='Ice Crystals Set'},                          -- 65
+    {ctype='unsigned char',     label='Wind Crystals Set'},                         -- 66
+    {ctype='unsigned char',     label='Earth Crystals Set'},                        -- 67
+    {ctype='unsigned char',     label='Lightning Crystals Set'},                    -- 68
+    {ctype='unsigned char',     label='Water Crystals Set'},                        -- 69
+    {ctype='unsigned char',     label='Light Crystals Set'},                        -- 6A
+    {ctype='unsigned char',     label='Dark Crystals Set'},                         -- 6B
+    {ctype='unsigned char',     label='MC-S-SR01s Set'},                            -- 6C
+    {ctype='unsigned char',     label='MC-S-SR02s Set'},                            -- 6D
+    {ctype='unsigned char',     label='MC-S-SR03s Set'},                            -- 6E
+    {ctype='unsigned char',     label='Liquefaction Spheres Set'},                  -- 6F
+    {ctype='unsigned char',     label='Induration Spheres Set'},                    -- 70
+    {ctype='unsigned char',     label='Detonation Spheres Set'},                    -- 71
+    {ctype='unsigned char',     label='Scission Spheres Set'},                      -- 72
+    {ctype='unsigned char',     label='Impaction Spheres Set'},                     -- 73
+    {ctype='unsigned char',     label='Reverberation Spheres Set'},                 -- 74
+    {ctype='unsigned char',     label='Transfixion Spheres Set'},                   -- 75
+    {ctype='unsigned char',     label='Compression Spheres Set'},                   -- 76
+    {ctype='unsigned char',     label='Fusion Spheres Set'},                        -- 77
+    {ctype='unsigned char',     label='Distortion Spheres Set'},                    -- 78
+    {ctype='unsigned char',     label='Fragmentation Spheres Set'},                 -- 79
+    {ctype='unsigned char',     label='Gravitation Spheres Set'},                   -- 7A
+    {ctype='unsigned char',     label='Light Spheres Set'},                         -- 7B
+    {ctype='unsigned char',     label='Darkness Spheres Set'},                      -- 7C
+    {ctype='data[0x03]',        label='_unknown1'},                                 -- 7D   Presumably Unused Padding
+    {ctype='signed int',        label='Silver A.M.A.N. Vouchers Stored'},           -- 80
 }
 
 types.ability_recast = L{
