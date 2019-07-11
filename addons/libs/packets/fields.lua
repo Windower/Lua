@@ -3633,10 +3633,7 @@ fields.incoming[0x113] = L{
     {ctype='unsigned short',    label="Water Crystals"},                        -- F2
     {ctype='unsigned short',    label="Light Crystals"},                        -- F4
     {ctype='unsigned short',    label="Dark Crystals"},                         -- F6
-<<<<<<< HEAD
     {ctype='signed int',        label="Deeds"},                                 -- F8
-=======
->>>>>>> e34be6958ee92d50eb588115261e5a96a485e123
 }
 
 -- Fish Bite Info
