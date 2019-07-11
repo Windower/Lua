@@ -42,7 +42,7 @@ function load_settings()
         default = 'ffxiclopedia';
         sites = {
             ffxiclopedia = {
-                search = 'http://ffxiclopedia.wikia.com/wiki/Special:Search?go=Go&search=${term}';
+                search = 'https://ffxiclopedia.fandom.com/wiki/Special:Search?query=${term}';
             };
             ['bg-wiki'] = {
                 search = 'https://www.bg-wiki.com/bg/Special:Search?go=Go&search=${term}';

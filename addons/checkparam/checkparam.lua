@@ -51,7 +51,7 @@ defaults = {
     SAM = 'store tp|double attack|triple attack|quadruple attack|weapon skill damage',
     NIN = 'store tp|double attack|triple attack|quadruple attack|subtle blow',
     DRG = 'store tp|double attack|triple attack|quadruple attack|weapon skill damage',
-    SMN = 'blood pact delay|blood pact delay ii|blood pact damage|avatar perpetuation cost|pet: magic attack bonus|pet: str|pet: double attack',
+    SMN = 'blood pact delay|blood pact delay ii|blood pact damage|avatar perpetuation cost|pet: magic attack bonus|pet: attack|pet: double attack|pet: accuracy|pet: magic accuracy|summoning magic skill|pet: blood pact damage|pet: magic damage',
     BLU = 'store tp|double attack|triple attack|quadruple attack|critical hit rate|critical hit damage|weapon skill damage|fast cast|magic attack bonus|magic accuracy|cure potency',
     COR = 'store tp|snapshot|rapid shot|fast cast|cure potency|magic accuracy|magic attack bonus|magic damage|weapon skill damage',
     PUP = 'pet: hp|pet: damage taken|pet: regen|martial arts|store tp|double attack|triple attack|quadruple attack',
@@ -116,13 +116,19 @@ function get_text(id,data)
         split_text(id,v)
     end
     if stats[2] then
-        local pet_text = windower.regex.replace(stats[2],'\n',' ')
-        split_text(id,pet_text,'pet: ')
+        stats[2] = stats[2]:trim()
+        split_text(id,stats[2],'pet: ')
     end
     local ext = extdata.decode({id=id,extdata=data})
     if ext.augments then
         for i,v in ipairs(ext.augments) do
-            split_text(id,v)
+            local stats = windower.regex.split(v,'(Pet|Avatar|Automaton|Wyvern|Luopan): ')
+            if stats[2] then
+                stats[2] = stats[2]:trim()
+                split_text(id,stats[2],'pet: ')
+            else
+                split_text(id,v)
+            end
         end
     end
     if enhanced[id] then
@@ -141,6 +147,9 @@ function split_text(id,text,arg)
         local key = windower.regex.replace(string.lower(key),'(\\"|\\.|\\s$)','')
         local key = integrate[key] or key
         local key = arg and arg..key or key
+        if key == "blood pact damage" then
+            key = "pet: blood pact damage"
+        end
         tbl[key] = tonumber(value)+(tbl[key] or 0)
         if settings.debugmode then
             log(id,res.items[id].english,key,value,tbl[key])
@@ -288,7 +297,7 @@ combination={
         stats={['pet: accuracy']=15,['pet: magic accuracy']=15,['pet: ranged accuracy']=15},type=-1},
     ['adhemar']={item=S{25614,25687,27118,27303,27474},stats={['critical hit rate']=2},type=0},
     ['amalric']={item=S{25616,25689,27120,27305,27476},stats={['magic attack bonus']=10},type=0},
-    ['apogee']={item=S{26677,26853,27029,27205,27381},stats={['blood pact damage']=2},type=0},
+    ['apogee']={item=S{26677,26853,27029,27205,27381},stats={['pet: blood pact damage']=2},type=0},
     ['argosy']={item=S{26673,26849,27025,27201,27377},stats={['double attack']=2},type=0},
     ['emicho']={item=S{25610,25683,27114,27299,27470},stats={['double attack']=2},type=0},
     ['carmine']={item=S{26679,26855,27031,27207,27383},stats={['accuracy']=10},type=0},
