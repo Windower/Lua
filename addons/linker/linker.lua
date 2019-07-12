@@ -54,7 +54,9 @@ windower.register_event('addon command', function(command, ...)
     if not ... or not settings.search[command] and settings.raw[command] then
         windower.open_url(settings.raw[command])
     elseif settings.search[command] then
-        windower.open_url((settings.search[command]:gsub('${query}', url.escape(L{...}:concat(' ')):gsub('%%','%%%%'))))
+        local query_string = url.escape(L{...}:concat(' '))
+        local adjusted_query_string = query_string:gsub('%%', '%%%%')
+        windower.open_url((settings.search[command]:gsub('${query}', adjusted_query_string)))
     else
         error('Command "' .. command .. '" not found.')
     end
