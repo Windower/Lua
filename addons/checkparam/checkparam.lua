@@ -316,6 +316,6 @@ combination={
     ['jhakri']={item=S{25578,25794,25832,25883,25950},stats={['fast cast']=3},type=-1},
     ['meghanada']={item=S{25575,25791,25829,25880,25947},stats={['regen']=3},type=-1},
     ['Sulevia\'s']={item=S{25574,25790,25828,25879,25946},stats={['subtle blow']=5},type=-1},
-	['BladeFlashEarrings']={item=S{28520,28521},stats={['double attack']=7},type=-1}
-	['HeartDudgeonEarrings']={item=S{28522,28523},stats={['dual wield']=7},type=-1}
+    ['BladeFlashEarrings']={item=S{28520,28521},stats={['double attack']=7},type=-1}
+    ['HeartDudgeonEarrings']={item=S{28522,28523},stats={['dual wield']=7},type=-1}
 }
