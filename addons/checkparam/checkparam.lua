@@ -42,7 +42,7 @@ defaults = {
     WHM = 'cure potency|cure potency ii|fast cast|cure spellcasting time|enmity|healing magic casting time|divine benison|damage taken|physical damage taken|magic damage taken',
     BLM = 'magic attack bonus|magic burst damage|magic burst damage ii|int|magic accuracy|magic damage|fast cast|elemental magic casting time',
     RDM = 'magic attack bonus|magic burst damage|magic burst damage ii|magic accuracy|fast cast|enfeebling magic skill|enhancing magic skill|store tp|dual wield',
-    THF = 'store tp|double attack|triple attack|quadruple attack|dual wield',
+    THF = 'store tp|double attack|triple attack|quadruple attack|dual wield|critical hit rate|critical hit damage|haste|weapon skill damage',
     PLD = 'enmity|damage taken|physical damage taken|magic damage taken|spell interruption rate|phalanx|cure potency|fastcast',
     DRK = 'store tp|double attack|triple attack|quadruple attack|weapon skill damage',
     BST = 'pet: double attack|pet: magic attack bonus|pet: damage taken',
@@ -316,4 +316,6 @@ combination={
     ['jhakri']={item=S{25578,25794,25832,25883,25950},stats={['fast cast']=3},type=-1},
     ['meghanada']={item=S{25575,25791,25829,25880,25947},stats={['regen']=3},type=-1},
     ['Sulevia\'s']={item=S{25574,25790,25828,25879,25946},stats={['subtle blow']=5},type=-1},
+    ['BladeFlashEarrings']={item=S{28520,28521},stats={['double attack']=7},type=-1}
+    ['HeartDudgeonEarrings']={item=S{28522,28523},stats={['dual wield']=7},type=-1}
 }
