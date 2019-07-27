@@ -767,4 +767,18 @@
     <bugtracker>https://github.com/deadman80/Lua/issues</bugtracker>
     <support>https://www.ffxiah.com/user/Nyarlko</support>
   </addon>
+  <addon>
+    <name>giltracker</name>
+    <author>Sylandro</author>
+    <description>Displays the current gil, similar to the FFXIV Gil HUD widget.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://github.com/azamorapl</support>
+  </addon>
+  <addon>
+    <name>invtracker</name>
+    <author>Sylandro</author>
+    <description>Displays a grid detailing empty and filled inventory slots, similar to the FFXIV Inventory Grid HUD widget.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://github.com/azamorapl</support>
+  </addon>
 </addons>
