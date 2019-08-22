@@ -47,7 +47,7 @@ defaults = {
     PLD = 'enmity|damage taken|physical damage taken|magic damage taken|spell interruption rate|phalanx|cure potency|fastcast',
     DRK = 'store tp|double attack|triple attack|quadruple attack|weapon skill damage',
     BST = 'pet: double attack|pet: magic attack bonus|pet: damage taken',
-    BRD = 'all songs|song effect duration|fast cast|song spellcasting time',
+    BRD = 'all songs|song effect duration|fast cast|song spellcasting time|singing skill|wind skill|string skill',
     RNG = 'store tp|snapshot|rapid shot|weapon skill damage',
     SAM = 'store tp|double attack|triple attack|quadruple attack|weapon skill damage',
     NIN = 'store tp|double attack|triple attack|quadruple attack|subtle blow',
@@ -304,6 +304,8 @@ enhanced = {
     [28619] = 'cursna+15', --Mending Cape
     [28631] = 'elemental siphon+30', --Conveyance Cape
     [28637] = 'fast cast+7', --Lifestream Cape
+    [11618] = 'song effect duration+10', -- Aoidos' Matinee
+    [20629] = 'song effect duration+5', -- Legato Dagger
 }
 combination={
     ['af']={item=S{
