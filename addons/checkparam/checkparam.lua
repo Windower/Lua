@@ -150,8 +150,7 @@ function split_text(id,text,arg)
         local key = arg and arg..key or key
         if key == "blood pact damage" then
             key = "pet: blood pact damage"
-        end
-        if key == "damage taken" then
+        elseif key == "damage taken" then
             tbl['physical damage taken'] = tonumber(value)+(tbl['physical damage taken'] or 0)
             tbl['magic damage taken'] = tonumber(value)+(tbl['magic damage taken'] or 0)
         else
@@ -213,7 +212,7 @@ integrate = {
     ['dblatk'] = 'double attack',
     ['blood pact ability delay'] = 'blood pact delay',
     ['blood pact ability delay ii'] = 'blood pact delay ii',
-    ['blood pact ab. del. ii'] = 'blood pact delay ii',
+	['blood pact ab del ii'] = 'blood pact delay ii',
     ['blood pact recast time ii'] = 'blood pact delay ii',
     ['blood pact dmg'] = 'blood pact damage',
     ['enhancing magic duration'] = 'enhancing magic effect duration',
