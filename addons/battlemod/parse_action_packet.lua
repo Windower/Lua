@@ -227,9 +227,9 @@ function parse_action_packet(act)
                 if m.fields.status then numb = m.status else numb = pref_suf((m.cparam or m.param),m.message) end
     
                 if msg and m.message == 70 and not simplify then -- fix pronoun on parry
-                    if act.actor.race == 0 then
+                    if v.target[1].race == 0 then
                         msg = msg:gsub(' his ',' its ')
-                    elseif female_races:contains(act.actor.race) then
+                    elseif female_races:contains(v.target[1].race) then
                         msg = msg:gsub(' his ',' her ')
                     end
                 end
