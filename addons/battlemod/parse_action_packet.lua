@@ -193,6 +193,26 @@ function parse_action_packet(act)
                 else m.simp_name = act.action.name or ''
                 end
 
+                -- Debuff Application Messages
+                if message_map[82]:contains(m.message) then
+                    if m.status == 'Evasion Down' then
+                        m.message = 237
+                    end
+                    if m.status == 'addle' then m.status = 'addled'
+                    elseif m.status == 'bind' then m.status = 'bound'
+                    elseif m.status == 'blindness' then m.status = 'blinded'
+                    elseif m.status == 'Inundation' then m.status = 'inundated'
+                    elseif m.status == 'paralysis' then m.status = 'paralyzed'
+                    elseif m.status == 'petrification' then m.status = 'petrified'
+                    elseif m.status == 'poison' then m.status = 'poisoned'
+                    elseif m.status == 'silence' then m.status = 'silenced'
+                    elseif m.status == 'sleep' then m.status = 'asleep'
+                    elseif m.status == 'slow' then m.status = 'slowed'
+                    elseif m.status == 'stun' then m.status = 'stunned'
+                    elseif m.status == 'weight' then m.status = 'weighed down'
+                    end
+                end
+
 --                if m.message == 93 or m.message == 273 then m.status=color_it('Vanish',color_arr['statuscol']) end
 
                 -- Special Message Handling
@@ -227,9 +247,9 @@ function parse_action_packet(act)
                 if m.fields.status then numb = m.status else numb = pref_suf((m.cparam or m.param),m.message) end
     
                 if msg and m.message == 70 and not simplify then -- fix pronoun on parry
-                    if act.actor.race == 0 then
+                    if v.target[1].race == 0 then
                         msg = msg:gsub(' his ',' its ')
-                    elseif female_races:contains(act.actor.race) then
+                    elseif female_races:contains(v.target[1].race) then
                         msg = msg:gsub(' his ',' her ')
                     end
                 end

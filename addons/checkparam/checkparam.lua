@@ -26,8 +26,8 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.]]
 
 _addon.name = 'Checkparam'
-_addon.author = 'from20020516'
-_addon.version = '1.2'
+_addon.author = 'from20020516 & Kigen'
+_addon.version = '1.3'
 _addon.commands = {'cp','checkparam'}
 
 require('logger')
@@ -35,18 +35,19 @@ res = require('resources')
 extdata = require('extdata')
 config = require('config')
 packets = require('packets')
+require('math')
 
 defaults = {
     WAR = 'store tp|double attack|triple attack|quadruple attack|weapon skill damage',
     MNK = 'store tp|double attack|triple attack|quadruple attack|martial arts|subtle blow',
-    WHM = 'cure potency|cure potency ii|fast cast|cure spellcasting time|enmity|healing magic casting time|divine benison|damage taken|physical damage taken|magic damage taken',
+    WHM = 'cure potency|cure potency ii|fast cast|quick cast|cure spellcasting time|enmity|healing magic casting time|divine benison|damage taken|physical damage taken|magic damage taken',
     BLM = 'magic attack bonus|magic burst damage|magic burst damage ii|int|magic accuracy|magic damage|fast cast|elemental magic casting time',
-    RDM = 'magic attack bonus|magic burst damage|magic burst damage ii|magic accuracy|fast cast|enfeebling magic skill|enhancing magic skill|store tp|dual wield',
-    THF = 'store tp|double attack|triple attack|quadruple attack|dual wield',
+    RDM = 'magic attack bonus|magic burst damage|magic burst damage ii|magic accuracy|fast cast|quick cast|enfeebling magic skill|enhancing magic skill|store tp|dual wield',
+    THF = 'store tp|double attack|triple attack|quadruple attack|dual wield|critical hit rate|critical hit damage|haste|weapon skill damage|steal|sneak attack|trick attack',
     PLD = 'enmity|damage taken|physical damage taken|magic damage taken|spell interruption rate|phalanx|cure potency|fastcast',
     DRK = 'store tp|double attack|triple attack|quadruple attack|weapon skill damage',
     BST = 'pet: double attack|pet: magic attack bonus|pet: damage taken',
-    BRD = 'all songs|song effect duration|fast cast|song spellcasting time',
+    BRD = 'all songs|song effect duration|fast cast|song spellcasting time|singing skill|wind skill|string skill',
     RNG = 'store tp|snapshot|rapid shot|weapon skill damage',
     SAM = 'store tp|double attack|triple attack|quadruple attack|weapon skill damage',
     NIN = 'store tp|double attack|triple attack|quadruple attack|subtle blow',
@@ -149,8 +150,12 @@ function split_text(id,text,arg)
         local key = arg and arg..key or key
         if key == "blood pact damage" then
             key = "pet: blood pact damage"
+        elseif key == "damage taken" then
+            tbl['physical damage taken'] = tonumber(value)+(tbl['physical damage taken'] or 0)
+            tbl['magic damage taken'] = tonumber(value)+(tbl['magic damage taken'] or 0)
+        else
+            tbl[key] = tonumber(value)+(tbl[key] or 0)
         end
-        tbl[key] = tonumber(value)+(tbl[key] or 0)
         if settings.debugmode then
             log(id,res.items[id].english,key,value,tbl[key])
         end
@@ -175,9 +180,25 @@ function show_results(name,mjob,sjob)
     local head = '<'..mjob..'/'..(sjob or '')..'>'
     windower.add_to_chat(160,string.color(name,1,160)..': '..string.color(head,160,160))
     for index,key in ipairs(windower.regex.split(stats,'[|]')) do
-        local value = tbl[string.lower(key)]
-        local color = {value and 1 or 160,value and 166 or 160}
-        windower.add_to_chat(160,' ['..string.color(key,color[1],160)..'] '..string.color(tostring(value),color[2],160))
+        -- WA for blood pact damage showing when it is converted to pet: blood pact damage
+        -- WA for damage taken showing when it is converted to physical/magic damage taken
+        key = string.lower(key)
+        if key ~= 'blood pact damage' and key ~= 'damage taken' then
+            local value = tbl[key]
+            local color = {value and 1 or 160,value and 166 or 160, 106, 205, 61}
+            local stat_cap = caps[key]
+            local output_string = ' ['..string.color(key,color[1],160)..']'
+            if stat_cap == nil or value == nil then
+                output_string = output_string..' '..string.color(tostring(value),color[2],160)
+            elseif value == stat_cap then
+                output_string = output_string..' '..string.color(tostring(value),color[3],160)..'/'..string.color(tostring(stat_cap),155,160)
+            elseif math.abs(value) > math.abs(stat_cap) then
+                output_string = output_string..' '..string.color(tostring(value),color[4],160)..'/'..string.color(tostring(stat_cap),155,160)
+            else
+                output_string = output_string..' '..string.color(tostring(value),color[5],160)..'/'..string.color(tostring(stat_cap),155,160)
+            end
+            windower.add_to_chat(160,output_string)
+        end
     end
     tbl = {}
 end
@@ -191,7 +212,7 @@ integrate = {
     ['dblatk'] = 'double attack',
     ['blood pact ability delay'] = 'blood pact delay',
     ['blood pact ability delay ii'] = 'blood pact delay ii',
-    ['blood pact ab. del. ii'] = 'blood pact delay ii',
+    ['blood pact ab del ii'] = 'blood pact delay ii',
     ['blood pact recast time ii'] = 'blood pact delay ii',
     ['blood pact dmg'] = 'blood pact damage',
     ['enhancing magic duration'] = 'enhancing magic effect duration',
@@ -208,6 +229,9 @@ integrate = {
     ['mag dmg'] = 'magic damage',
     ['crithit rate'] = 'critical hit rate',
     ['phys dmg taken'] = 'physical damage taken',
+    ['occ. quickens spellcasting']="quick cast",
+    ['occassionally quickens spellcasting']="quick cast",
+    ['song duration']="song effect duration",
 }
 enhanced = {
     [10392] = 'cursna+10', --Malison Medallion
@@ -279,6 +303,8 @@ enhanced = {
     [28619] = 'cursna+15', --Mending Cape
     [28631] = 'elemental siphon+30', --Conveyance Cape
     [28637] = 'fast cast+7', --Lifestream Cape
+    [11618] = 'song effect duration+10', -- Aoidos' Matinee
+    [20629] = 'song effect duration+5', -- Legato Dagger
 }
 combination={
     ['af']={item=S{
@@ -316,4 +342,23 @@ combination={
     ['jhakri']={item=S{25578,25794,25832,25883,25950},stats={['fast cast']=3},type=-1},
     ['meghanada']={item=S{25575,25791,25829,25880,25947},stats={['regen']=3},type=-1},
     ['Sulevia\'s']={item=S{25574,25790,25828,25879,25946},stats={['subtle blow']=5},type=-1},
+    ['BladeFlashEarrings']={item=S{28520,28521},stats={['double attack']=7},type=-1},
+    ['HeartDudgeonEarrings']={item=S{28522,28523},stats={['dual wield']=7},type=-1}
+}
+
+caps={
+    ['haste']=25,
+    ['subtle blow']=50,
+    ['cure potency']=50,
+    ['potency of cure effects received']=30,
+    ['quick cast']=10,
+    ['physical damage taken']=-25,
+    ['magic damage taken']=-25,
+    ['pet: haste']=25,
+    ['magic burst damage']=40,
+    ['blood pact delay']=-15,
+    ['blood pact delay ii']=-15,
+    ['save tp']=500,
+    ['fast cast']=80,
+    ['reward']=50
 }

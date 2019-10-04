@@ -701,9 +701,9 @@ end
 ---- false if the spell is not currently accessible
 -----------------------------------------------------------------------------------
 function check_spell(available_spells,spell)
-    -- Filter for spells that you do not know. Exclude Impact.
+    -- Filter for spells that you do not know. Exclude Impact / Dispelga.
     local spell_jobs = copy_entry(res.spells[spell.id].levels)
-    if not available_spells[spell.id] and not (spell.id == 503 or spell.id == 417) then
+    if not available_spells[spell.id] and not (spell.id == 503 or spell.id == 417 or spell.id == 360) then
         return false,"Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")"
     -- Filter for spells that you know, but do not currently have access to
     elseif (not spell_jobs[player.main_job_id] or not (spell_jobs[player.main_job_id] <= player.main_job_level or
