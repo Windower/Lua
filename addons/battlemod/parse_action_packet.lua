@@ -172,6 +172,7 @@ function parse_action_packet(act)
                 elseif m.message == 67 then m.simp_name = 'critical hit'
                 elseif m.message == 106 then m.simp_name = 'intimidated by'
                 elseif m.message == 153 then m.simp_name = act.action.name..' fails'
+                elseif m.message == 244 then m.simp_name = 'Mug fails'
                 elseif m.message == 282 then m.simp_name = 'evaded by'
                 elseif m.message == 373 then m.simp_name = 'absorbed by'
                 elseif m.message == 352 then m.simp_name = 'RA'
@@ -361,7 +362,7 @@ function simplify_message(msg_ID)
     local msg = res.action_messages[msg_ID][language]
     local fields = fieldsearch(msg)
 
-    if simplify and not T{23,64,129,133,139,140,204,210,211,212,213,214,244,350,442,516,531,557,565,582,674}:contains(msg_ID) then
+    if simplify and not T{23,64,133,139,140,204,210,211,212,213,214,350,442,516,531,557,565,582,674}:contains(msg_ID) then
         if T{93,273,522,653,654,655,656,85,284,75,114,156,189,248,283,312,323,336,351,355,408,422,423,425,453,659,158,245,324,658}:contains(msg_ID) then
             fields.status = true
         end
@@ -369,7 +370,7 @@ function simplify_message(msg_ID)
             fields.actor = true
         end    
         if (msg_ID > 287 and msg_ID < 303) or (msg_ID > 384 and msg_ID < 399) or (msg_ID > 766 and msg_ID < 771) or
-            T{152,161,162,163,165,229,384,453,603,652}:contains(msg_ID) then
+            T{129,152,161,162,163,165,229,384,453,603,652}:contains(msg_ID) then
                 fields.ability = true
         end
         
@@ -378,7 +379,7 @@ function simplify_message(msg_ID)
             fields.item = true
         end
         
-        if T{152,153,160,161,162,163,164,165,166,167,168,229,652}:contains(msg_ID) then
+        if T{129,152,153,160,161,162,163,164,165,166,167,168,229,244,652}:contains(msg_ID) then
             fields.actor  = true
             fields.target = true
         end
