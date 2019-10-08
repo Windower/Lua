@@ -193,7 +193,7 @@ function parse_action_packet(act)
                    act.action = {}
                 else m.simp_name = act.action.name or ''
                 end
-                
+
                 -- Debuff Application Messages
                 if message_map[82]:contains(m.message) then
                     if m.status == 'Evasion Down' then
