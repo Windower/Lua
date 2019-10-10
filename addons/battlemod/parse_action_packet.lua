@@ -281,6 +281,7 @@ function parse_action_packet(act)
                 elseif m.add_effect_message > 766 and m.add_effect_message < 769 then m.simp_add_name = skillchain_arr[m.add_effect_message-752]
                 elseif m.add_effect_message > 768 and m.add_effect_message < 771 then m.simp_add_name = skillchain_arr[m.add_effect_message-754]
                 elseif m.add_effect_message ==603 then m.simp_add_name = 'TH'
+                elseif m.add_effect_message ==776 then m.simp_add_name = 'AE: Chainbound'
                 else m.simp_add_name = 'AE'
                 end
                 local msg,numb = simplify_message(m.add_effect_message)
