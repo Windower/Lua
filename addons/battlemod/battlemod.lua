@@ -260,7 +260,6 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
         
         if not actor or not target then -- If the actor or target table is nil, ignore the packet
         elseif am.message_id == 800 then -- Spirit bond message
-            local Self = windower.ffxi.get_player()
             local status = color_it(res.buffs[am.param_1][language],color_arr.statuscol)
             local targ = color_it(target.name or '',color_arr[target.owner or target.type])
             local number = am.param_2
