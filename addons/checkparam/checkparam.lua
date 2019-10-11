@@ -58,7 +58,7 @@ defaults = {
     PUP = 'pet: hp|pet: damage taken|pet: regen|martial arts|store tp|double attack|triple attack|quadruple attack',
     DNC = 'store tp|double attack|triple attack|quadruple attack',
     SCH = 'magic attack bonus|magic burst damage|magic burst damage ii|magic accuracy|magic damage|fast cast|elemental magic casting time|cure potency|enh mag eff dur|enhancing magic effect duration',
-    GEO = 'pet: regen|pet: damage taken|indicolure effect duration|indi eff dur|fast cast|magic evasion',
+    GEO = 'pet: regen|pet: damage taken|indicolure effect duration|fast cast|magic evasion|handbell skill|geomancy skill|geomancy',
     RUN = 'enmity|damage taken|physical damage taken|magic damage taken|spell interruption rate|phalanx|inquartata|fastcast',
     levelfilter = 99,
 }
@@ -218,6 +218,7 @@ integrate = {
     ['enhancing magic duration'] = 'enhancing magic effect duration',
     ['eva'] = 'evasion',
     ['indicolure spell duration'] = 'indicolure effect duration',
+	['indi eff dur'] = 'indicolure effect duration',
     ['mag eva'] = 'magic evasion',
     ['magic atk bonus'] = 'magic attack bonus',
     ['magatkbns'] = 'magic attack bonus',

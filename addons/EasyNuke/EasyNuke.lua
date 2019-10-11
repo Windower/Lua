@@ -59,26 +59,32 @@ spell_tables["fire"] = {"Fire","Fire II","Fire III","Fire IV","Fire V","Fire VI"
 spell_tables["fire"]["ga"] = {"Firaga","Firaga II","Firaga III","Firaja",}
 spell_tables["fire"]["ra"] = {"Fira","Fira II","Fira III"}
 spell_tables["fire"]["helix"] = {"Pyrohelix","Pyrohelix II"}
+spell_tables["fire"]["am"] = {"Flare","Flare II"}
 spell_tables["earth"] = {"Stone","Stone II","Stone III","Stone IV","Stone V","Stone VI",}
 spell_tables["earth"]["ga"] = {"Stonega","Stonega II","Stonega III","Stoneja",}
 spell_tables["earth"]["ra"] = {"Stonera","Stonera II","Stonera III"}
 spell_tables["earth"]["helix"] = {"Geohelix","Geohelix II"}
+spell_tables["earth"]["am"] = {"Quake","Quake II"}
 spell_tables["wind"] = {"Aero","Aero II","Aero III","Aero IV","Aero V","Aero VI",}
 spell_tables["wind"]["ga"] = {"Aeroga","Aeroga II","Aeroga III","Aeroja",}
 spell_tables["wind"]["ra"] = {"Aerora","Aerora II","Aerora III"}
 spell_tables["wind"]["helix"] = {"Anemohelix","Anemohelix II"}
+spell_tables["wind"]["am"] = {"Tornado","Tornado II"}
 spell_tables["water"] = {"Water","Water II","Water III","Water IV","Water V","Water VI",}
 spell_tables["water"]["ga"] = {"Waterga","Waterga II","Waterga III","Waterja",}
 spell_tables["water"]["ra"] = {"Watera","Watera II","Watera III"}
 spell_tables["water"]["helix"] = {"Hydrohelix","Hydrohelix II"}
+spell_tables["water"]["am"] = {"Flood","Flood II"}
 spell_tables["ice"] = {"Blizzard","Blizzard II","Blizzard III","Blizzard IV","Blizzard V","Blizzard VI",}
 spell_tables["ice"]["ga"] = {"Blizzaga","Blizzaga II","Blizzaga III","Blizzaja",}
 spell_tables["ice"]["ra"] = {"Blizzara","Blizzara II","Blizzara III"}
 spell_tables["ice"]["helix"] = {"Cryohelix","Cryohelix II"}
+spell_tables["ice"]["am"] = {"Freeze","Freeze II"}
 spell_tables["thunder"] = {"Thunder","Thunder II","Thunder III","Thunder IV","Thunder V","Thunder VI",}
 spell_tables["thunder"]["ga"] = {"Thundaga","Thundaga II","Thundaga III","Thundaja",}
 spell_tables["thunder"]["ra"] = {"Thundara","Thundara II","Thundara III"}
 spell_tables["thunder"]["helix"] = {"Ionohelix","Ionohelix II"}
+spell_tables["thunder"]["am"] = {"Burst","Burst II"}
 spell_tables["light"] = {"Banish","Banish II","Holy","Banish III",}
 spell_tables["light"]["ga"] = {"Banishga","Banishga II"}
 spell_tables["light"]["helix"] = {"Luminohelix","Luminohelix II"}
@@ -133,6 +139,8 @@ windower.register_event("unhandled command", function (command, arg)
         execute_spell_cast("ra", arg)
     elseif command == "boomhelix" or command == "bhelix" then
         execute_spell_cast("helix", arg)
+    elseif command = "boomam" or command == "bam" then
+        execute_spell_cast("am", arg)
     end    
 end)
 
@@ -146,6 +154,8 @@ windower.register_event('addon command', function (command, arg)
         execute_spell_cast("ra", arg)
     elseif command == "boomhelix" or command == "bhelix" then
         execute_spell_cast("helix", arg)
+    elseif command = "boomam" or command == "bam" then
+        execute_spell_cast("am", arg)
         
     elseif command == "target" then
         if arg then
