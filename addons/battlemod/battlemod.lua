@@ -259,7 +259,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
         if not check_filter(actor,target,0,am.message_id) then return true end
         
         if not actor or not target then -- If the actor or target table is nil, ignore the packet
-        elseif T{800}:contains(am.message_id) then -- Spirit bond message
+        elseif am.message_id == 800 then -- Spirit bond message
             local Self = windower.ffxi.get_player()
             local status = color_it(res.buffs[am.param_1][language],color_arr.statuscol)
             local targ = color_it(target.name or '',color_arr[target.owner or target.type])
@@ -278,7 +278,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                     :gsub('${number}',number or '')
                 windower.add_to_chat(color, msg)
             end
-        elseif T{206}:contains(am.message_id) and condensetargets then -- Wears off messages
+        elseif am.message_id == 206 and condensetargets then -- Wears off messages
             -- Condenses across multiple packets
             local status
             
