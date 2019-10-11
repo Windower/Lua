@@ -259,7 +259,25 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
         if not check_filter(actor,target,0,am.message_id) then return true end
         
         if not actor or not target then -- If the actor or target table is nil, ignore the packet
-        elseif T{206}:contains(am.message_id) and condensetargets then -- Wears off messages
+        elseif am.message_id == 800 then -- Spirit bond message
+            local status = color_it(res.buffs[am.param_1][language],color_arr.statuscol)
+            local targ = color_it(target.name or '',color_arr[target.owner or target.type])
+            local number = am.param_2
+            local color = color_filt(res.action_messages[am.message_id].color, am.target_id==Self.id)
+            if simplify then
+                local msg = line_noactor
+                    :gsub('${abil}',status or '')
+                    :gsub('${target}',targ)
+                    :gsub('${numb}',number or '')
+                windower.add_to_chat(color, msg)
+            else
+                local msg = res.action_messages[am.message_id][language]
+                    :gsub('${status}',status or '')
+                    :gsub('${target}',targ)
+                    :gsub('${number}',number or '')
+                windower.add_to_chat(color, msg)
+            end
+        elseif am.message_id == 206 and condensetargets then -- Wears off messages
             -- Condenses across multiple packets
             local status
             
