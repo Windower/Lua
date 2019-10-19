@@ -1,5 +1,6 @@
 -------------------------------------------------
-
+GearSwap 0.935 - Filter enchanted items with duplicate names.
+-------------------------------------------------
 GearSwap 0.934 - Fixed /item command handling.
 -------------------------------------------------
 GearSwap 0.933 - Adjusted how item use packets are chosen. 
