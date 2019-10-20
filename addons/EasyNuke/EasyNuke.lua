@@ -139,7 +139,7 @@ windower.register_event("unhandled command", function (command, arg)
         execute_spell_cast("ra", arg)
     elseif command == "boomhelix" or command == "bhelix" then
         execute_spell_cast("helix", arg)
-    elseif command = "boomam" or command == "bam" then
+    elseif command == "boomam" or command == "bam" then
         execute_spell_cast("am", arg)
     end    
 end)
@@ -154,7 +154,7 @@ windower.register_event('addon command', function (command, arg)
         execute_spell_cast("ra", arg)
     elseif command == "boomhelix" or command == "bhelix" then
         execute_spell_cast("helix", arg)
-    elseif command = "boomam" or command == "bam" then
+    elseif command == "boomam" or command == "bam" then
         execute_spell_cast("am", arg)
         
     elseif command == "target" then
