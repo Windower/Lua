@@ -99,7 +99,9 @@ end
 
 for i,v in pairs(res.items) do
     v.prefix = '/item'
-    make_entry(v,i)
+    if not validabils['english'][v.prefix][v.english:lower()] or v.cast_delay then
+        make_entry(v,i)
+    end
 end
     
     -- Should transition these slot maps to be based off res.slots, but it's very unlikely to change.
