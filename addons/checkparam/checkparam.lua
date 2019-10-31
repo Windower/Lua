@@ -52,9 +52,9 @@ defaults = {
     SAM = 'store tp|double attack|triple attack|quadruple attack|weapon skill damage',
     NIN = 'store tp|double attack|triple attack|quadruple attack|subtle blow',
     DRG = 'store tp|double attack|triple attack|quadruple attack|weapon skill damage',
-    SMN = 'blood pact delay|blood pact delay ii|blood pact damage|avatar perpetuation cost|pet: magic attack bonus|pet: attack|pet: double attack|pet: accuracy|pet: magic accuracy|summoning magic skill|pet: blood pact damage|pet: magic damage',
-    BLU = 'store tp|double attack|triple attack|quadruple attack|critical hit rate|critical hit damage|weapon skill damage|fast cast|magic attack bonus|magic accuracy|cure potency',
-    COR = 'store tp|snapshot|rapid shot|fast cast|cure potency|magic accuracy|magic attack bonus|magic damage|weapon skill damage',
+    SMN = 'physical damage taken|magic damage taken|pet: physical damage taken|pet: magic damage taken|blood pact delay|blood pact delay ii|blood pact damage|avatar perpetuation cost|pet: magic attack bonus|pet: attack|pet: double attack|pet: accuracy|pet: magic accuracy|summoning magic skill|pet: blood pact damage|pet: magic damage',
+    BLU = 'physical damage taken|magic damage taken|haste|dual wield|store tp|double attack|triple attack|quadruple attack|critical hit rate|critical hit damage|weapon skill damage|fast cast|magic attack bonus|magic accuracy|cure potency',
+    COR = 'physical damage taken|magic damage taken|haste|dual wield|store tp|snapshot|rapid shot|fast cast|cure potency|magic accuracy|magic attack bonus|magic damage|weapon skill damage',
     PUP = 'pet: hp|pet: damage taken|pet: regen|martial arts|store tp|double attack|triple attack|quadruple attack',
     DNC = 'store tp|double attack|triple attack|quadruple attack',
     SCH = 'magic attack bonus|magic burst damage|magic burst damage ii|magic accuracy|magic damage|fast cast|elemental magic casting time|cure potency|enh mag eff dur|enhancing magic effect duration',
@@ -150,6 +150,9 @@ function split_text(id,text,arg)
         local key = arg and arg..key or key
         if key == "blood pact damage" then
             key = "pet: blood pact damage"
+        elseif key == "pet: damage taken" then
+            tbl['pet: physical damage taken'] = tonumber(value)+(tbl['pet: physical damage taken'] or 0)
+            tbl['pet: magic damage taken'] = tonumber(value)+(tbl['pet: magic damage taken'] or 0)
         elseif key == "damage taken" then
             tbl['physical damage taken'] = tonumber(value)+(tbl['physical damage taken'] or 0)
             tbl['magic damage taken'] = tonumber(value)+(tbl['magic damage taken'] or 0)
@@ -355,6 +358,8 @@ caps={
     ['quick cast']=10,
     ['physical damage taken']=-25,
     ['magic damage taken']=-25,
+    ['pet: physical damage taken']=-87.5,
+    ['pet: magic damage taken']=-87.5,
     ['pet: haste']=25,
     ['magic burst damage']=40,
     ['blood pact delay']=-15,
