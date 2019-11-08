@@ -670,12 +670,13 @@ augment_values = {
         [0x544] = {{stat='Increases Elemental Magic debuff time and potency', offset=0,multiplier=0}},
         [0x545] = {{stat='Increases Aspir absorption amount', offset=0,multiplier=0}},
 
-        [0x548] = {{stat='Enhances "Dia III" effect', offset=0,multiplier=0}},
-        [0x549] = {{stat='Enhances "Slow II" effect', offset=0,multiplier=0}},
-        [0x54A] = {{stat='Enhances "Phalanx II" effect', offset=0,multiplier=0}},
-        [0x54B] = {{stat='Enhances "Bio III" effect', offset=0,multiplier=0}},
-        [0x54C] = {{stat='Enhances "Blind II" effect', offset=0,multiplier=0}},
-        [0x54D] = {{stat='Enhances "Paralyze II" effect', offset=0,multiplier=0}},
+        [0x548] = {{stat='Enfeebling Magic duration', offset=0,multiplier=0}},
+        [0x549] = {{stat='Magic Accuracy', offset=0,multiplier=0}},
+        [0x54A] = {{stat='Enhancing Magic duration', offset=0,multiplier=0}},
+        [0x54B] = {{stat='Enspell Damage', offset=0,multiplier=0}},
+        [0x54C] = {{stat='Accuracy', offset=0,multiplier=0}},
+        [0x54D] = {{stat='Immunobreak Chance', offset=0,multiplier=0}},
+		
         [0x54E] = {{stat='Enhances "Aura Steal" effect', offset=0,multiplier=0}},
         [0x54F] = {{stat='Enhances "Ambush" effect', offset=0,multiplier=0}},
         [0x550] = {{stat='Enhances "Feint" effect', offset=0,multiplier=0}},
@@ -696,9 +697,9 @@ augment_values = {
         [0x562] = {{stat='Enhances "Beast Affinity" effect', offset=0,multiplier=0}},
         [0x563] = {{stat='Enhances "Beast Healer" effect', offset=0,multiplier=0}},
         
-        [0x566] = {{stat='Enhances "Foe Sirvente" effect', offset=0,multiplier=0}},
+        [0x566] = {{stat='Enhances "Con Anima" effect', offset=0,multiplier=0}},
         [0x567] = {{stat='Enhances "Troubadour" effect', offset=0,multiplier=0}},
-        [0x568] = {{stat='Enh. "Adventurer\'s Dirge" effect', offset=0,multiplier=0}},
+        [0x568] = {{stat='Enhances "Con Brio" effect', offset=0,multiplier=0}},
         [0x569] = {{stat='Enhances "Nightingale" effect', offset=0,multiplier=0}},
         
         [0x56C] = {{stat='Enhances "Recycle" effect', offset=0,multiplier=0}},
@@ -711,10 +712,10 @@ augment_values = {
         [0x574] = {{stat='Enhances "Blade Bash" effect', offset=0,multiplier=0}},
         [0x575] = {{stat='Enhances "Ikishoten" effect', offset=0,multiplier=0}},
         
-        [0x578] = {{stat='Increases elem. ninjutsu III damage', offset=0,multiplier=0}},
+        [0x578] = {{stat='Enhances "Yonin" and "Innin" effect', offset=0,multiplier=0}},
         [0x579] = {{stat='Enhances "Sange" effect', offset=0,multiplier=0}},
         [0x57A] = {{stat='Enh. "Ninja Tool Expertise" effect', offset=0,multiplier=0}},
-        [0x57B] = {{stat='Reduces elem. ninjutsu III cast time', offset=0,multiplier=0}},
+        [0x57B] = {{stat='Enh. Ninj. Mag. Acc/Cast Time Red.', offset=0,multiplier=0}},
         
         [0x57E] = {{stat='Enhances "Deep Breathing" effect', offset=0,multiplier=0}},
         [0x57F] = {{stat='Enhances "Angon" effect', offset=0,multiplier=0}},
