@@ -39,6 +39,13 @@
     <support>https://discord.gg/b275nMv</support>
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
+    <addon>
+    <name>autoenterkey</name>
+    <author>Chiaia</author>
+    <description>Automatically hits the enter key twice when first starting so you don't timeout on the warning message.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://discord.gg/b275nMv</support>
+  </addon>
   <addon>
     <name>autoinvite</name>
     <author>r3g1stry</author>
