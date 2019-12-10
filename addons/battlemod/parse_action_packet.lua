@@ -367,11 +367,11 @@ function simplify_message(msg_ID)
         if T{93,273,522,653,654,655,656,85,284,75,114,156,189,248,283,312,323,336,351,355,408,422,423,425,453,659,158,245,324,658}:contains(msg_ID) then
             fields.status = true
         end
-        if msg_ID == 31 then
+        if msg_ID == 31 or msg_ID == 798 or msg_ID == 799 then
             fields.actor = true
-        end    
+        end
         if (msg_ID > 287 and msg_ID < 303) or (msg_ID > 384 and msg_ID < 399) or (msg_ID > 766 and msg_ID < 771) or
-            T{129,152,161,162,163,165,229,384,453,603,652}:contains(msg_ID) then
+            T{129,152,161,162,163,165,229,384,453,603,652,798}:contains(msg_ID) then
                 fields.ability = true
         end
         
@@ -410,6 +410,14 @@ function simplify_message(msg_ID)
             msg = line_noactor
         elseif line_noability and not fields.actor then
             msg = line_noability
+        elseif line_notarget and fields.actor and fields.number then
+            if msg_ID == 798 then --Maneuver message
+                msg = line_notarget.."%"
+            elseif msg_ID == 799 then --Maneuver message with overload
+                msg = line_notarget.."% (${actor} overloaded)"
+            else
+                msg = line_notarget
+            end
         end
     end
     return msg

@@ -83,6 +83,7 @@ line_steal     = '[${actor}] ${abil} '..string.char(129,168)..' ${target} (${ite
 line_noability = '${numb} '..string.char(129,168)..' ${target}'
 line_noactor   = '${abil} ${numb} '..string.char(129,168)..' ${target}'
 line_nonumber  = '[${actor}] ${abil} '..string.char(129,168)..' ${target}'
+line_notarget  = '[${actor}] ${abil} '..string.char(129,168)..' ${number}'
 line_roll      = '${actor} ${abil} '..string.char(129,168)..' ${target} '..string.char(129,170)..' ${number}'
 
 default_settings_table = {line_aoe       = 'AOE ${numb} '..string.char(129,168)..' ${target}',
@@ -94,6 +95,7 @@ default_settings_table = {line_aoe       = 'AOE ${numb} '..string.char(129,168).
             line_noability = '${numb} '..string.char(129,168)..' ${target}',
             line_noactor   = '${abil} ${numb} '..string.char(129,168)..' ${target}',
             line_nonumber  = '[${actor}] ${abil} '..string.char(129,168)..' ${target}',
+            line_notarget  = '[${actor}] ${abil} '..string.char(129,168)..' ${number}',
             line_roll = '${actor} ${abil} '..string.char(129,168)..' ${target} '..string.char(129,170)..' ${number}',
     condensedamage=true,condensetargets=true,cancelmulti=true,oxford=true,commamode=false,targetnumber=true,swingnumber=true,sumdamage=true,condensecrits=false}
 
