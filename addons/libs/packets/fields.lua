@@ -683,7 +683,7 @@ fields.outgoing[0x05C] = L{
     {ctype='unsigned short',    label='Zone'},                                  -- 18
     {ctype='unsigned short',    label='Menu ID'},                               -- 1A
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 1C
-    {ctype='unsigned short',    label='_unknown3'},                             -- 1E   Not zone ID
+    {ctype='unsigned short',    label='Direction'},                             -- 1E
 }
 
 -- Outgoing emote
