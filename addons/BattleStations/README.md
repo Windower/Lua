@@ -29,7 +29,10 @@ ___
 ### Installation
 
 **Windower:**   
-Not yet available on windower, installation will have to be done manually.
+1. Navigate to the `Addons` section at the top of Windower.
+2. Locate the `BattleStations` addon.
+3. Click the download button.
+4. Ensure the addon is switched on.
 
 **Manual:**
 1. Navigate to <https://github.com/Ap0gee/BattleStations>.
