@@ -48,10 +48,10 @@ packets = {
 }
 
 player = {
-	statuses = {
+    statuses = {
         idle = 0x00,
         fighting = 0x01,
-	},
+    },
     buffs = {
         reiveMark = 511
     }

@@ -87,7 +87,7 @@
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
     <support>https://discord.gg/b275nMv</support>
   </addon>
-   <addon>
+  <addon>
     <name>BattleStations</name>
     <author>Sjshovan (Apogee)</author>
     <description>Change or remove the default battle music.</description>

@@ -60,7 +60,7 @@ local help = {
         buildHelpCommandEntry('default [radio]', 'Set radio(s) to the default station (Current Zone Music).'),
         buildHelpCommandEntry('normal [radio]', 'Set radio(s) to the original game music.'),
         buildHelpCommandEntry('reload', 'Reload Battle Stations.'),
-		buildHelpCommandEntry('about', 'Display information about Battle Stations.'),
+        buildHelpCommandEntry('about', 'Display information about Battle Stations.'),
         buildHelpCommandEntry('help', 'Display Battle Stations commands.'),
         buildHelpSeperator('=', 28),
     },
@@ -73,8 +73,8 @@ local help = {
         buildHelpRadioEntry(stations.receivers.party:ucfirst(), 'Plays Party Battle Music'),
         buildHelpSeperator('=', 25),
     },
-	
-	 about = {
+    
+     about = {
         buildHelpSeperator('=', 23),
         buildHelpTitle('About'),
         buildHelpSeperator('=', 23),
@@ -336,9 +336,9 @@ function listTypeValid(list_type)
 end
 
 function handleInjectionNeeds() 
-	if needs_inject then
-		injectBattleMusic()
-		needs_inject = false;
+    if needs_inject then
+        injectBattleMusic()
+        needs_inject = false;
     end
 end
 
@@ -373,7 +373,7 @@ windower.register_event('action', function(act)
 end)
 
 windower.register_event('outgoing chunk', function(id, data)
-	if id == packets.outbound.action.id then
+    if id == packets.outbound.action.id then
         local packet = _packets.parse('outgoing', data)
         if packet.Category == packets.outbound.action.categories.engage then
             injectBattleMusic()
@@ -390,18 +390,17 @@ windower.register_event('addon command', function(command, ...)
     end
   
     local command_args = {...}
- 
+    
     local respond = false
     local response_message = ''
     local success = true
 
     if command == 'list' or command == 'l' then
-        local list_type = tostring(command_args[1] or '*'):lower()
+        local list_type = (command_args[1] or '*'):lower()
         local category = command_args[2]
-    
+        
         if help.aliases.list.stations:contains(list_type) then
             if category then
-                category = tostring(category)
                 if categoryValid(category) then
                     displayStations(category)
                 
@@ -433,9 +432,9 @@ windower.register_event('addon command', function(command, ...)
     elseif command == 'set' or command == 's' then
         respond = true
         
-        local frequency = tostring(command_args[1]):lower()
+        local frequency = command_args[1]:lower()
      
-        local radio = tostring(command_args[2] or '*'):lower()
+        local radio = (command_args[2] or '*'):lower()
         
         if not frequencyValid(frequency) then
             success = false
@@ -468,7 +467,7 @@ windower.register_event('addon command', function(command, ...)
         respond = true
         
         local current_stations = resolveCurrentStations()
-        local radio = tostring(command_args[1] or '*'):lower()
+        local radio = (command_args[1] or '*'):lower()
         local frequency = current_stations[radio]
         local frequency2 = current_stations.party
         local individual = false
@@ -520,7 +519,7 @@ windower.register_event('addon command', function(command, ...)
     elseif command == 'default' or command == 'd' then
         respond = true 
         
-        local radio = tostring(command_args[1] or '*'):lower()
+        local radio = (command_args[1] or '*'):lower()
         
         if not radioValid(radio) then
             success = false
@@ -549,7 +548,7 @@ windower.register_event('addon command', function(command, ...)
     elseif command == 'normal' or command == 'n' then
         respond = true 
         
-        local radio = tostring(command_args[1] or '*'):lower()
+        local radio = (command_args[1] or '*'):lower()
         
         if not radioValid(radio) then
             success = false
@@ -577,9 +576,9 @@ windower.register_event('addon command', function(command, ...)
         
     elseif command == 'reload' or command == 'r' then
         windower.send_command('lua r battlestations')
-		
-	elseif command == 'about' or command == 'a' then
-		displayHelp(help.about)
+        
+    elseif command == 'about' or command == 'a' then
+        displayHelp(help.about)
 
     elseif command == 'help' or command == 'h' then
         displayHelp(help.commands)

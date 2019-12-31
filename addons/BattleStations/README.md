@@ -84,7 +84,7 @@ Displays the available Battle Stations commands. Below are the equivalent ways o
 **list _[radios|stations] [category#]_** 
 
 Displays the available radios and or stations. Below are some useage examples of this command:
-	
+    
     //bs list
     //bs l
     
@@ -92,7 +92,7 @@ Displays the available radios and or stations. Below are some useage examples of
     //bs l radios
     //bs l r
     
-	//bs list stations
+    //bs list stations
     //bs l stations
     //bs l s
     
@@ -130,9 +130,9 @@ Displays the currently set station on the given radio(s).  Below are some useage
 
 Sets the given radio(s) to the default station (Current Zone Music). Below are some useage examples of this command:
 
-	//bs default
+    //bs default
     //bs d
-   	
+    
     //bs d solo
     //bs d party
     
@@ -143,9 +143,9 @@ Sets the given radio(s) to the default station (Current Zone Music). Below are s
 
 Sets the given radio(s) to the original game music. Below are some useage examples of this command:
 
-	//bs normal
+    //bs normal
     //bs n
-   	
+    
     //bs n solo
     //bs n party
     
@@ -154,7 +154,7 @@ Sets the given radio(s) to the original game music. Below are some useage exampl
 **reload**
 
 Reloads the Battle Stations addon. Below are the equivalent ways of calling the command:
-	
+    
     //battlestations reload
     //stations reload
     //bs reload
@@ -166,7 +166,7 @@ Reloads the Battle Stations addon. Below are the equivalent ways of calling the 
 **about**
 
 Displays information about the Battle Stations addon. Below are the equivalent ways of calling the command:
-	
+    
     /battlestations about
     //stations about
     //bs about

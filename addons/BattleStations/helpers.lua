@@ -38,7 +38,7 @@ function buildHelpCommandEntry(command, description)
 end
 
 function buildHelpTypeEntry(name, description)
-	local entry_template = "%s %s %s"
+    local entry_template = "%s %s %s"
     local name = name:color(colors.secondary)
     local sep = "=>":color(colors.primary)
     local description = description:color(colors.info)
