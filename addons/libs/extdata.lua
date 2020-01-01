@@ -1534,6 +1534,8 @@ function tools.aug.unpack_augment(sys,short)
         return short:byte(1), short:byte(2)
     elseif sys == 3 then
         return short:byte(1) + short:byte(2)%8*256,  math.floor(short:byte(2)%128/8)
+    elseif sys == 4 then
+        return short:byte(1), short:byte(2)
     end
 end
 
@@ -1611,6 +1613,11 @@ function decode.Augmented(str)
         rettab.rank = math.floor(str:byte(3)%128/4)
         rettab.RP = math.max(points_map[rettab.rank] or 0 - str:byte(6)*256 - str:byte(5),0)
         rettab.augments = tools.aug.augments_to_table(rettab.augment_system,str:sub(7,12))
+    elseif flag_2 == 131 then
+        rettab.augment_system = 4
+        local path_map = {[0] = 'A',[1] = 'B', [2] = 'C', [3] = 'D'}
+        rettab.path = path_map[math.floor(str:byte(5)%4)]
+        rettab.augments = {'Path: ' ..rettab.path}
     elseif flag_2/128 >= 1 then -- Evolith
         rettab.augment_system = 3
         local slot_type_map = {[0] = 'None', [1] = 'Filled Upside-down Triangle', [2] = 'Filled Diamond', [3] = 'Filled Star', [4] = 'Empty Triangle', [5] = 'Empty Square', [6] = 'Empty Circle', [7] = 'Empty Upside-down Triangle', [8] = 'Empty Diamond', [9] = 'Empty Star', [10] = 'Filled Triangle', [11] = 'Filled Square', [12] = 'Filled Circle', [13] = 'Empty Circle', [14] = 'Fire', [15] = 'Ice'}
@@ -1658,6 +1665,7 @@ function decode.Equipment(str)
     local flag_1_mapping = {
         [1] = decode.Enchanted,
         [2] = decode.Augmented,
+        [3] = decode.Augmented,
         }
     if flag_1_mapping[flag_1] then
         rettab = flag_1_mapping[flag_1](str:sub(1,12))

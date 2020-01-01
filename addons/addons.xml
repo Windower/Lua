@@ -88,6 +88,13 @@
     <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
+    <name>BattleStations</name>
+    <author>Sjshovan (Apogee)</author>
+    <description>Change or remove the default battle music.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://discord.gg/b275nMv</support>
+  </addon>
+  <addon>
     <name>Blist</name>
     <author>Ikonic</author>
     <description>More detailed blist with tiered display options.  Allows for blist to be active on any or all of several chat types.</description>
