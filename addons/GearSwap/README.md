@@ -26,7 +26,7 @@ Commands (<> indicates a field. You do not actually have to use <>s):
 ** APPDATA/Windower/GearSwap/<string>
 ** ..Windower/addons/libs/<string>
 * gs reload : Reloads the current user file.
-* gs export <options> : Exports your currently equipped gear, inventory, or all the items in your current Lua files' sets into GearSwap .lua or spellcast .xml format. Takes options "inventory", "sets", and "xml." Defaults to currently equipped gear and lua otherwise. Also exports appropriate advanced set tables with augments for currently equipped gear and inventory.
+* gs export <options> : Exports your currently equipped gear, inventory, or all the items in your current Lua files' sets into GearSwap .lua or spellcast .xml format. Takes options "inventory", "all", "wearable", "sets", and "xml." Defaults to currently equipped gear and lua otherwise. Also exports appropriate advanced set tables with augments for currently equipped gear and inventory.
 * gs enable <slot> : Enables equip commands targeting a specified slot. "All" will allow all equip commands. Providing no slot argument will enable user GearSwap file execution, if it was disabled.
 * gs disable <slot> : Disables equip commands targeting a given slot. "All" will prevent all equip commands. Providing no second argument will disable user GearSwap file execution, although registered events will still run.
 * gs validate <sets|inv> <filter> : This command checks to see whether the equipment in the sets table also exists in your inventory (default), or (by passing "inv") whether the equipment in your inventory exists in your sets table. <filter> is an optional list of words that restricts the output to only those items that contain text from one of the filter's words.
