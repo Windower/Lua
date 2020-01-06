@@ -33,6 +33,8 @@ function export_set(options)
                 targinv = true
             elseif v:lower() == 'all' then
                 all_items = true
+            elseif v:lower() == 'wearable' then
+                wearable = true
             elseif S{'xml'}:contains(v:lower()) then
                 xml = true
             elseif S{'sets','set','s'}:contains(v:lower()) then
@@ -60,6 +62,8 @@ function export_set(options)
     local buildmsg = 'Exporting '
     if all_items then
         buildmsg = buildmsg..'all your items'
+    elseif wearable then
+        buildmsg = buildmsg..'all your items in inventory and wardrobes'
     elseif targinv then
         buildmsg = buildmsg..'your current inventory'
     elseif all_sets then
@@ -95,6 +99,10 @@ function export_set(options)
     if all_items then
         for i = 0, #res.bags do
             item_list:extend(get_item_list(items[res.bags[i].english:gsub(' ', ''):lower()]))
+        end
+    elseif wearable then
+        for _, v in pairs(equippable_item_bags) do
+            item_list:extend(get_item_list(items[v.english:gsub(' ', ''):lower()]))
         end
     elseif targinv then
         item_list:extend(get_item_list(items.inventory))
