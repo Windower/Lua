@@ -28,19 +28,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 _addon.name = 'AzureSets'
-_addon.version = '1.23'
+_addon.version = '1.25'
 _addon.author = 'Nitrous (Shiva)'
-_addon.commands = {'aset','azuresets','asets'}
+_addon.commands = {'aset', 'azuresets', 'asets'}
 
 require('tables')
 require('strings')
 require('logger')
-config = require('config')
-files = require('files')
-res = require('resources')
-chat = require('chat')
+local config = require('config')
+local res = require('resources')
+local chat = require('chat')
+local spells = res.spells:type('BlueMagic')
 
-defaults = {}
+local defaults = {}
 defaults.setmode = 'PreserveTraits'
 defaults.setspeed = 0.65
 defaults.spellsets = {}
@@ -57,22 +57,62 @@ slot09='Blank Gaze', slot10='Radiant Breath', slot11='Light of Penance', slot12=
 slot13='Death Ray', slot14='Eyes On Me', slot15='Sandspray'
 }
 
-settings = config.load(defaults)
+local settings = config.load(defaults)
+local BLU_JOB_ID = 16
+
+local currentSpellSet = nil
+local bluJobLevel = nil
+local bluPointsMax = nil
+local bluSlots = nil
+local get_blu_job_data = nil
 
 function initialize()
-    spells = res.spells:type('BlueMagic')
-    get_current_spellset()
+    update_blu_info()
+    update_current_spellset()
 end
 
 windower.register_event('load', initialize:cond(function() return windower.ffxi.get_info().logged_in end))
 
-windower.register_event('login', initialize)
+windower.register_event('login', function() coroutine.schedule(initialize, 5) end)
 
-windower.register_event('job change', initialize:cond(function(job) return job == 16 end))
+windower.register_event('job change', initialize)
+
+function update_blu_info(player)
+    player = player or windower.ffxi.get_player()
+    if player.main_job_id == BLU_JOB_ID then
+        bluJobLevel = player.main_job_level
+
+        if player.main_job_level > 70 then
+            bluSlots = 20
+        else
+            bluSlots = (math.floor((player.sub_job_level + 9) / 10) * 2) + 4
+        end
+        
+        bluPointsMax = (math.floor((player.main_job_level + 9) / 10) * 5) + 5
+        if player.main_job_level >= 75 then
+            bluPointsMax = bluPointsMax + player.merits.assimilation
+            if player.main_job_level == 99 then
+                bluPointsMax = bluPointsMax + player.job_points.blu.blue_magic_point_bonus
+            end
+        end
+
+        get_blu_job_data = windower.ffxi.get_mjob_data
+    elseif player.sub_job_id == BLU_JOB_ID then
+        bluJobLevel = player.sub_job_level
+        bluSlots = (math.floor((player.sub_job_level + 9) / 10) * 2) + 4
+        bluPointsMax = (math.floor((player.sub_job_level + 9) / 10) * 5) + 5
+        get_blu_job_data = windower.ffxi.get_sjob_data
+    else
+        bluJobLevel = nil
+        bluSlots = nil
+        bluPointsMax = nil
+        get_blu_job_data = nil
+    end
+end
 
 function set_spells(spellset, setmode)
-    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then
-        error('Main job not set to Blue Mage.')
+    if not bluJobLevel then
+        error('You are not a Blue Mage.')
         return
     end
     if settings.spellsets[spellset] == nil then
@@ -96,22 +136,21 @@ function set_spells(spellset, setmode)
 end
 
 function is_spellset_equipped(spellset)
-    return S(spellset):map(string.lower) == S(get_current_spellset())
+    return S(spellset):map(string.lower) == S(update_current_spellset())
 end
 
 function set_spells_from_spellset(spellset, setPhase)
     local setToSet = settings.spellsets[spellset]
-    local currentSet = get_current_spellset()
+    update_current_spellset()
 
     if setPhase == 'remove' then
         -- Remove Phase
-        for k,v in pairs(currentSet) do
+        for k, v in pairs(currentSpellSet) do
             if not setToSet:contains(v:lower()) then
                 setSlot = k
                 local slotToRemove = tonumber(k:sub(5, k:len()))
 
                 windower.ffxi.remove_blue_magic_spell(slotToRemove)
-                --log('Removed spell: '..v..' at #'..slotToRemove)
                 set_spells_from_spellset:schedule(settings.setspeed, spellset, 'remove')
                 return
             end
@@ -122,7 +161,7 @@ function set_spells_from_spellset(spellset, setPhase)
     local slotToSetTo
     for i = 1, 20 do
         local slotName = 'slot%02u':format(i)
-        if currentSet[slotName] == nil then
+        if currentSpellSet[slotName] == nil then
             slotToSetTo = i
             break
         end
@@ -130,14 +169,15 @@ function set_spells_from_spellset(spellset, setPhase)
 
     if slotToSetTo ~= nil then
         -- We found an empty slot. Find a spell to set.
-        for k,v in pairs(setToSet) do
-            if not currentSet:contains(v:lower()) then
+        for k, v in pairs(setToSet) do
+            if not currentSpellSet:contains(v:lower()) then
                 if v ~= nil then
                     local spellID = find_spell_id_by_name(v)
                     if spellID ~= nil then
-                        windower.ffxi.set_blue_magic_spell(spellID, tonumber(slotToSetTo))
-                        --log('Set spell: '..v..' ('..spellID..') at: '..slotToSetTo)
-                        set_spells_from_spellset:schedule(settings.setspeed, spellset, 'add')
+                        local verified = verify_and_set_spell(spellID, tonumber(slotToSetTo))
+                        if verified then
+                            set_spells_from_spellset:schedule(settings.setspeed, spellset, 'add')
+                        end
                         return
                     end
                 end
@@ -159,39 +199,42 @@ function find_spell_id_by_name(spellname)
     return nil
 end
 
-function set_single_spell(setspell,slot)
-    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
+function set_single_spell(setspell, slot)
+    if not bluJobLevel then return nil end
 
-    local tmpTable = T(get_current_spellset())
-    for key,val in pairs(tmpTable) do
-        if tmpTable[key]:lower() == setspell then
+    update_current_spellset()
+    for key, val in pairs(currentSpellSet) do
+        if currentSpellSet[key]:lower() == setspell then
             error('That spell is already set.')
             return
         end
     end
     if tonumber(slot) < 10 then slot = '0'..slot end
     --insert spell add code here
-    for spell in spells:it() do
-        if spell['english']:lower() == setspell then
-            --This is where single spell setting code goes.
-            --Need to set by spell id rather than name.
-            windower.ffxi.set_blue_magic_spell(spell['id'], tonumber(slot))
+    local spellId = find_spell_id_by_name(setspell)
+    if spellId then
+        local verified = verify_and_set_spell(spellId, tonumber(slot))
+        if verified then
             windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
-            tmpTable['slot'..slot] = setspell
+            currentSpellSet['slot'..slot] = setspell
         end
     end
-    tmpTable = nil
 end
 
-function get_current_spellset()
-    if windower.ffxi.get_player().main_job_id ~= 16 then return nil end
-    return T(windower.ffxi.get_mjob_data().spells)
+function update_current_spellset(player)
+    if not get_blu_job_data then
+        currentSpellSet = nil
+        return nil
+    end
+
+    currentSpellSet = T(get_blu_job_data().spells)
     -- Returns all values but 512
     :filter(function(id) return id ~= 512 end)
     -- Transforms them from IDs to lowercase English names
     :map(function(id) return spells[id].english:lower() end)
     -- Transform the keys from numeric x or xx to string 'slot0x' or 'slotxx'
     :key_map(function(slot) return 'slot%02u':format(slot) end)
+    return currentSpellSet
 end
 
 function remove_all_spells(trigger)
@@ -204,8 +247,8 @@ function save_set(setname)
         error('Please choose a name other than default.')
         return
     end
-    local curSpells = T(get_current_spellset())
-    settings.spellsets[setname] = curSpells
+    update_current_spellset()
+    settings.spellsets[setname] = currentSpellSet
     settings:save('all')
     notice('Set '..setname..' saved.')
 end
@@ -238,21 +281,66 @@ function get_spellset_content(spellset)
     settings.spellsets[spellset]:print()
 end
 
+function verify_and_set_spell(id, slot)
+    local spell = spells[id]
+    local errorMessage = nil
+    if not spell then
+        errorMessage = "spell not found"
+    end
+    if bluJobLevel and spell.levels and spell.levels[BLU_JOB_ID] and spell.levels[BLU_JOB_ID] > bluJobLevel then
+        errorMessage = "job level too low to set spell"
+    end
+    if not have_enough_points_to_add_spell(id) then
+        errorMessage = "cannot set spell, ran out of blue magic points"
+    end
+    if slot > bluSlots then
+        errorMessage = "slot " .. tostring(slot) .. " unavailable"
+    end
+
+    if errorMessage then
+        error(errorMessage)
+        return false
+    end
+
+    windower.ffxi.set_blue_magic_spell(id, slot)
+    return true
+end
+
+function have_enough_points_to_add_spell(spellId)
+    local spell = spells[spellId]
+    if not spell or not spell.blu_points then
+        return nil
+    end
+    return spell.blu_points + current_total_points_spent() <= bluPointsMax
+end
+
+function current_total_points_spent()
+    local total = 0
+    for _, spellId in pairs(get_blu_job_data().spells) do
+        local spell = spells[spellId]
+        if spell and spell.blu_points then
+            total = total + spell.blu_points
+        end
+    end
+    return total
+end
+
 windower.register_event('addon command', function(...)
-    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then
-        error('You are not on (main) Blue Mage.')
+    initialize()
+    if not bluJobLevel then
+        error('You are not a Blue Mage.')
         return nil
     end
     local args = T{...}
     if args ~= nil then
-        local comm = table.remove(args,1):lower()
+        local comm = table.remove(args, 1):lower()
         if comm == 'removeall' then
             remove_all_spells('trigger')
         elseif comm == 'add' then
             if args[2] ~= nil then
-                local slot = table.remove(args,1)
+                local slot = table.remove(args, 1)
                 local spell = args:sconcat()
-                set_single_spell(spell:lower(),slot)
+                set_single_spell(spell:lower(), slot)
             end
         elseif comm == 'save' then
             if args[1] ~= nil then
@@ -267,7 +355,7 @@ windower.register_event('addon command', function(...)
                 set_spells(args[1], args[2] or settings.setmode)
             end
         elseif comm == 'currentlist' then
-            get_current_spellset():print()
+            update_current_spellset():print()
         elseif comm == 'setlist' then
             get_spellset_list()
         elseif comm == 'spelllist' then
@@ -276,20 +364,20 @@ windower.register_event('addon command', function(...)
             end
         elseif comm == 'help' then
             local helptext = [[AzureSets - Command List:')
-            1. removeall - Unsets all spells.
-            2. spellset <setname> [ClearFirst|PreserveTraits] -- Set (setname)'s spells,
-                             optional parameter: ClearFirst or PreserveTraits: overrides
-                             setting to clear spells first or remove individually,
-                             preserving traits where possible. Default: use settings or
-                             preservetraits if settings not configured.
-            3. set <setname> (clearfirst|preservetraits) -- Same as spellset
-            4. add <slot> <spell> -- Set (spell) to slot (slot (number)).
-            5. save <setname> -- Saves current spellset as (setname).
-            6. delete <setname> -- Delete (setname) spellset.
-            7. currentlist -- Lists currently set spells.
-            8. setlist -- Lists all spellsets.
-            9. spelllist <setname> -- List spells in (setname)
-            10. help --Shows this menu.]]
+1. removeall - Unsets all spells.
+2. spellset <setname> [ClearFirst|PreserveTraits] -- Set (setname)'s spells,
+    optional parameter: ClearFirst or PreserveTraits: overrides
+    setting to clear spells first or remove individually,
+    preserving traits where possible. Default: use settings or
+    preservetraits if settings not configured.
+3. set <setname> (clearfirst|preservetraits) -- Same as spellset
+4. add <slot> <spell> -- Set (spell) to slot (slot (number)).
+5. save <setname> -- Saves current spellset as (setname).
+6. delete <setname> -- Delete (setname) spellset.
+7. currentlist -- Lists currently set spells.
+8. setlist -- Lists all spellsets.
+9. spelllist <setname> -- List spells in (setname)
+10. help --Shows this menu.]]
             for _, line in ipairs(helptext:split('\n')) do
                 windower.add_to_chat(207, line..chat.controls.reset)
             end
