@@ -1,5 +1,5 @@
 **Author:** Ricky Gall  
-**Version:** 1.24
+**Version:** 1.25
 **Description:**  
 Addon to make setting blue spells easier. Currently only works as blu main.
 
@@ -21,6 +21,10 @@ Addon to make setting blue spells easier. Currently only works as blu main.
  9. //aset help --Shows this menu.
 
 **Changes:**  
+v1.24 - v1.25
+ * Added ability to use AzureSets when sub blue mage.
+ * Added additional error checking around blue magic points, slots, and level requirements. 
+
 v1.23 - v1.24
  * Changed default spellset method to preserve traits.
  * Added setting for setmethod to either PresereTraits or ClearFirst.
