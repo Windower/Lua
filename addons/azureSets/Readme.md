@@ -1,7 +1,7 @@
 **Author:** Ricky Gall  
 **Version:** 1.25
 **Description:**  
-Addon to make setting blue spells easier. Currently only works as blu main.
+Addon to make setting blue spells easier.
 
 **Abbreviations:** aset, azureset
 
