@@ -206,6 +206,13 @@
     <support>http://www.ffxiah.com/player/Bahamut/Krizz</support>
   </addon>
   <addon>
+    <name>EmpyPopTracker</name>
+    <author>Dean James (Xurion of Bismarck)</author>
+    <description>Tracks items and key items for popping Empyrean NMs in Abyssea, such as Briareus, Apademak and Sobek.</description>
+    <bugtracker>https://github.com/xurion/ffxi-empy-pop-tracker/issues</bugtracker>
+    <support>https://www.ffxiah.com/forum/topic/54376/empyrean-pop-tracker-addon-10-years-late/</support>
+  </addon>
+  <addon>
     <name>Enemybar</name>
     <author>mmckee</author>
     <description>This is an addon for Windower4 for FFXI. It creates a big health bar for the target to make it easy to see.</description>
