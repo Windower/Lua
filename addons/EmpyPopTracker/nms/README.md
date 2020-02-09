@@ -14,12 +14,12 @@ A simple example of the above would be:
 
 ```lua
 {
-  name = 'Azdaja',
-  pops = { {
-    id = 1531, --Vacant Bugard Eye
-    type = 'key item',
-    dropped_from = { name = 'Deelgeed, Timed (F-9/F-10)' }
-  } }
+    name = 'Azdaja',
+    pops = { {
+        id = 1531, --Vacant Bugard Eye
+        type = 'key item',
+        dropped_from = { name = 'Deelgeed, Timed (F-9/F-10)' }
+    } }
 }
 ```
 
@@ -27,37 +27,38 @@ A larger example with multiple nested entites:
 
 ```lua
 {
-  name = 'Bukhis',
-  pops = { {
-    id = 1508, --Ingrown Taurus Nail
-    type = 'key item',
-    dropped_from = {
-      name = 'Khalkotaur, Forced (F-4)',
-      pops = { {
-        id = 3098, --Gnarled Taurus Horn
-        type = 'item',
-        dropped_from = { name = 'Aestutaur (G-9/G-10)' }
-      } }
+    name = 'Bukhis',
+    pops = { {
+        id = 1508, --Ingrown Taurus Nail
+        type = 'key item',
+        dropped_from = {
+            name = 'Khalkotaur, Forced (F-4)',
+            pops = { {
+                id = 3098, --Gnarled Taurus Horn
+                type = 'item',
+                dropped_from = { name = 'Aestutaur (G-9/G-10)' }
+            } }
+        }
     }, {
-      id = 1509, --Ossified Gargouille Hand
-      type = 'key item',
-      dropped_from = {
-        name = 'Quasimodo, Forced (F-4)',
-        pops = { {
-          id = 3099, --Gargouille Stone
-          type = 'item',
-          dropped_from = {
-            name = 'Gruesome Gargouille (F-10/G-10)'
-          }
-        } }
-      }
+        id = 1509, --Ossified Gargouille Hand
+        type = 'key item',
+        dropped_from = {
+            name = 'Quasimodo, Forced (F-4)',
+            pops = { {
+                id = 3099, --Gargouille Stone
+                type = 'item',
+                dropped_from = {
+                    name = 'Gruesome Gargouille (F-10/G-10)'
+                }
+            } }
+        }
     }, {
-      id = 1510, --Imbrued Vampyr Fang
-      type = 'key item',
-      dropped_from = { name = 'Lord Varney, Timed (G-10/H-10)' }
+        id = 1510, --Imbrued Vampyr Fang
+        type = 'key item',
+        dropped_from = { name = 'Lord Varney, Timed (G-10/H-10)' }
     } }
-  }
 }
+
 ```
 
 The main addon file requires the index.lua file which in turn is responsible for requiring and returning data for each nm.
