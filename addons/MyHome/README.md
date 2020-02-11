@@ -4,11 +4,12 @@
 
 ### Command
 - `//mh` OR `//warp`
+- `//mh all` OR `//warp all` will warp all characters.
 
 
 - Priorities are:
-    1. Warp <me\> - require learned and main job or sub job BLM.
-    2. Warp II <me\>
+    1. Warp <me> - require learned and main job or sub job BLM.
+    2. Warp II <me>
     3. Warp Ring - search inventory and wardrobes.
     4. Warp Cudgel
     5. Instant Warp - search inventory.
@@ -18,6 +19,7 @@
 
 ### Command
 - `//mh` または `//warp`
+- `//mh all` または `//warp all` すべての文字をワープします。
 - 優先順位:
 
 
