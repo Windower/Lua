@@ -4,6 +4,7 @@
 
 ### Command
 - `//mh` OR `//warp`
+- `//mh rei` OR `//warp rei` to use dimensional rings.
 
 
 - Priorities are:

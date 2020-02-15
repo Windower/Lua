@@ -27,19 +27,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.]]
 
 _addon.name = 'MyHome'
 _addon.author = 'from20020516'
-_addon.version = '1.0'
+_addon.version = '1.01'
 _addon.commands = {'myhome','mh','warp'}
 
 require('logger')
 extdata = require('extdata')
 
 lang = string.lower(windower.ffxi.get_info().language)
-item_info = {
+warp_items = {
     [1]={id=28540,japanese='デジョンリング',english='"Warp Ring"',slot=13},
     [2]={id=17040,japanese='デジョンカジェル',english='"Warp Cudgel"',slot=0},
     [3]={id=4181,japanese='呪符デジョン',english='"Instant Warp"'}}
 
-function search_item()
+dim_rings = {    
+	[1] = {id=26176,japanese='"Ｄ．ホラリング"',english='"Dim. Ring (Holla)"',slot=13},
+    [2] = {id=26177,japanese='"Ｄ．デムリング"',english='"Dim. Ring (Dem)"',slot=13},
+    [3] = {id=26178,japanese='"Ｄ．メアリング"',english='"Dim. Ring (Mea)"',slot=13}}
+	
+	
+function search_item(item_list)
     local item_array = {}
     local bags = {0,8,10,11,12} --inventory,wardrobe1-4
     local get_items = windower.ffxi.get_items
@@ -51,7 +57,7 @@ function search_item()
             end
         end
     end
-    for index,stats in pairs(item_info) do
+    for index,stats in pairs(item_list) do
         local item = item_array[stats.id]
         local set_equip = windower.ffxi.set_equip
         if item then
@@ -85,15 +91,18 @@ function search_item()
     end
 end
 
-windower.register_event('addon command',function()
+windower.register_event('addon command',function(command,...)
+	command = command and command:lower() or false
     local player = windower.ffxi.get_player()
     local get_spells = windower.ffxi.get_spells()
     local spell = S{player.main_job_id,player.sub_job_id}[4]
         and (get_spells[261] and player.vitals.mp >= 100 and {japanese='デジョン',english='"Warp"'}
         or get_spells[262] and player.vitals.mp >= 150 and {japanese='デジョンII',english='"Warp II"'})
-    if spell then
-        windower.chat.input('/ma '..windower.to_shift_jis(spell[lang])..' <me>')
+    if command ~= false and command:lower():startswith('rei') then
+        search_item(dim_rings)
+	elseif spell then
+		windower.chat.input('/ma '..windower.to_shift_jis(spell[lang])..' <me>')
     else
-        search_item()
+        search_item(warp_items)
     end
 end)
