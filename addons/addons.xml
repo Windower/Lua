@@ -178,6 +178,13 @@
     <bugtracker>https://github.com/svanheulen/digger-windower-addon/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Odin/Acacia</support>
   </addon>
+    <addon>
+    <name>Dimmer</name>
+    <author>Chiaia</author>
+    <description>Helps warp you to Reisenjima using (Dim) Rings.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://discord.gg/b275nMv</support>
+  </addon>
   <addon>
     <name>Distance</name>
     <author>Arcon</author>
