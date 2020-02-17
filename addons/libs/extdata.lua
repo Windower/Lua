@@ -173,6 +173,8 @@ augment_values = {
         [0x07C] = {{stat="Pet: Acc.", offset=1}, {stat="Pet: R.Acc.", offset=1}, {stat="Pet: Atk.", offset=1}, {stat="Pet: R.Atk.", offset=1}},
         [0x07D] = {{stat="Pet: M.Acc.", offset=1}, {stat="Pet: M.Dmg.", offset=1}},
         [0x07E] = {{stat='Pet: Magic Damage', offset=1}},
+        [0x07F] = {{stat="Pet: Magic dmg. taken ", offset=1,multiplier=-1,percent=true}},
+
 
         [0x080] = {{stat="Pet:",offset = 0}},
         --[0x081: Accuracy +1 Ranged Acc. +0 | value + 1
