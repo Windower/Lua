@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon.name = 'Empy Pop Tracker'
 _addon.author = 'Dean James (Xurion of Bismarck)'
 _addon.commands = { 'ept', 'empypoptracker' }
-_addon.version = '2.0.0'
+_addon.version = '2.1.0'
 
 config = require('config')
 res = require('resources')
@@ -167,16 +167,22 @@ end
 
 EmpyPopTracker.generate_info = function(nm, key_items, items)
     local info = {
-        has_all_kis = true,
+        has_all_pops = true,
         text = ''
     }
 
     if nm.pops then
-        for _, key_item_data in pairs(nm.pops) do
-            local has_pop_ki = owns_key_item(key_item_data.id, key_items)
+        for _, pop_item_data in pairs(nm.pops) do
+            local has_pop = false
 
-            if not has_pop_ki then
-                info.has_all_kis = false
+            if pop_item_data.type == 'key item' then
+                has_pop = owns_key_item(pop_item_data.id, key_items)
+            elseif pop_item_data.type == 'item' then
+                has_pop = owns_item(pop_item_data.id, items)
+            end
+
+            if not has_pop then
+                info.has_all_pops = false
             end
         end
     end
@@ -213,8 +219,7 @@ end)
 commands = {}
 
 commands.track = function(...)
-    local args = {...}
-    local nm_search_pattern = args[1]
+    local nm_search_pattern = table.concat({...}, ' ')
     local matching_nm_names = find_nms(nm_search_pattern)
 
     if #matching_nm_names == 0 then
@@ -279,7 +284,7 @@ EmpyPopTracker.update = function()
     local tracked_nm_data = nm_data[EmpyPopTracker.settings.tracking]
     local generated_info = EmpyPopTracker.generate_info(tracked_nm_data, key_items, items)
     EmpyPopTracker.text:text(generated_info.text)
-    if generated_info.has_all_kis then
+    if generated_info.has_all_pops then
         EmpyPopTracker.text:bg_color(0, 75, 0)
     else
         EmpyPopTracker.text:bg_color(0, 0, 0)
