@@ -166,30 +166,12 @@ function generate_text(data, key_items, items, depth)
 end
 
 EmpyPopTracker.generate_info = function(nm, key_items, items)
-    local info = {
-        has_all_pops = true,
-        text = ''
+    return {
+        has_all_pops = not nm.pops or T(nm.pops):all(function(item)
+            return item.type == 'item' and owns_item(item.id, items) or owns_key_item(item.id, key_items)
+        end),
+        text = generate_text(nm, key_items, items, 1)
     }
-
-    if nm.pops then
-        for _, pop_item_data in pairs(nm.pops) do
-            local has_pop = false
-
-            if pop_item_data.type == 'key item' then
-                has_pop = owns_key_item(pop_item_data.id, key_items)
-            elseif pop_item_data.type == 'item' then
-                has_pop = owns_item(pop_item_data.id, items)
-            end
-
-            if not has_pop then
-                info.has_all_pops = false
-            end
-        end
-    end
-
-    info.text = generate_text(nm, key_items, items, 1)
-
-    return info
 end
 
 function find_nms(pattern)
