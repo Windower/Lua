@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 local nms = {
     'alfard',
     'apademak',
+    'arch dynamis lord',
     'azdaja',
     'briareus',
     'bukhis',
@@ -43,7 +44,8 @@ local nms = {
     'orthrus',
     'sedna',
     'sobek',
-    'ulhuadshi'
+    'ulhuadshi',
+    'warder of courage'
 }
 
 nm_data = {}
