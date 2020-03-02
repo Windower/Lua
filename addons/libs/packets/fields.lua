@@ -95,7 +95,7 @@ do
     end
 
     bufftime = function(ts)
-        return fn((ts / 60) + 501079520 + 1009810800)
+        return fn((ts / 60) + 572662306 + 1009810800)
     end
 end
 

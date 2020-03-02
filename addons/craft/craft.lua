@@ -97,6 +97,7 @@ local support_npcs = {
     {name = "Lih Pituu", zone = 241, menu = 10018, buff = 241},
     {name = "Terude-Harude", zone = 241, menu = 10013, buff = 239},
     {name = "Fleuricette", zone = 256, menu = 1201, buff = 512},
+    {name = "Quiri-Aliri", zone = 257, menu = 1201, buff = 512},
 }
 
 local exceptions = {

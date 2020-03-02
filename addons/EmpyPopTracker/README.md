@@ -1,10 +1,10 @@
-# FFXI Empyrean Pop Tracker
+# FFXI Empy Pop Tracker
 
-An FFXI Windower 4 addon that tracks items and key items for popping Empyrean NMs in Abyssea, such as Briareus, Apademak and Sobek.
+An FFXI Windower 4 addon that tracks items and key items for popping various NMs, such as Briareus, Apademak and Warder of Courage.
 
 ![Example of Cirein-croin tracking](readme/demo.png) ![All KIs obtained](readme/demo-full.png)
 
-Key items are identified by the Zhe (Ж) character. Treasure pool counts for pop items are listed in amber after the item in the format of [3] (assuming 3 of that item in the pool).
+Originally developed to track Abyssea Empyrean weapon NMs, hence the name. Key items are identified by the Zhe (Ж) character. Treasure pool counts for pop items are listed in amber after the item in the format of [3] (assuming 3 of that item in the pool).
 
 ## Load
 
