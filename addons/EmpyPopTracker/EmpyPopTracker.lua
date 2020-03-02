@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon.name = 'Empy Pop Tracker'
 _addon.author = 'Dean James (Xurion of Bismarck)'
 _addon.commands = { 'ept', 'empypoptracker' }
-_addon.version = '2.1.0'
+_addon.version = '2.1.1'
 
 config = require('config')
 res = require('resources')
@@ -68,10 +68,12 @@ colors.warning = '\\cs(255,170,0)'
 colors.close = '\\cr'
 
 function owns_item(id, items)
-    for _, bag in ipairs(items) do
-        for _, item in ipairs(bag) do
-            if item.id == id then
-                return true
+    for _, bag in pairs(items) do
+        if type(bag) == 'table' then
+            for _, item in ipairs(bag) do
+                if item.id == id then
+                    return true
+                end
             end
         end
     end

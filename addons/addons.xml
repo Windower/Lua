@@ -215,7 +215,7 @@
   <addon>
     <name>EmpyPopTracker</name>
     <author>Dean James (Xurion of Bismarck)</author>
-    <description>Tracks items and key items for popping Empyrean NMs in Abyssea, such as Briareus, Apademak and Sobek.</description>
+    <description>Tracks items and key items for popping various NMs, such as Briareus, Apademak and Warder of Courage.</description>
     <bugtracker>https://github.com/xurion/ffxi-empy-pop-tracker/issues</bugtracker>
     <support>https://www.ffxiah.com/forum/topic/54376/empyrean-pop-tracker-addon-10-years-late/</support>
   </addon>
