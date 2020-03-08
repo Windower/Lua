@@ -1,4 +1,4 @@
-# Indi-nope 1.0.4
+# IndiNope 1.0.4
 Hides visual effects from geomancy on players.
 
 Currently does not hide geomancy effect around luopans.
