@@ -25,40 +25,24 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
- 
+
 _addon.name = 'Indi-Nope'
 _addon.author = 'Lili'
-_addon.version = '1.0.3'
-
---[[
-Indi-nope 1.0.3
-Hides visual effects from geomancy on players.
-
-Currently does not hide geomancy effect around luopans.
-
-No commands. Load it and it's on, unload and it's off.
-
-Changelog:
-
-1.0.3 - A few tweaks.
-1.0.1 - Fixed a bug where Indi-Nope would make Master stars disappear. Thanks Kenshi for finding out.
-1.0.0 - Initial
-
-Thanks to Thorny, this addon is a port to windower of his Ashita code with the same functionality.
-]]
+_addon.version = '1.0.4'
 
 require('bit')
 
 offsets = { [0x00D] = 67, [0x037] = 89, }
 
 windower.register_event('incoming chunk',function(id,original,modified,injected,blocked)
-	if injected or blocked or not offsets[id] then return end
-	
-	offset = offsets[id]
-	flags = original:byte(offsets[id])
+    if injected or blocked or not offsets[id] then return end
 
-	if bit.band(flags,0x7F) ~= 0 then
-		packet = table.concat({ original:sub(1,offset-1), string.char(bit.band(flags,0x80)), original:sub(offset+1) })
-		return packet
-	end
+    offset = offsets[id]
+    flags = original:byte(offsets[id])
+
+    -- if any of the bits 0 through 7 are set, a bubble is shown and we want to block it.
+    if bit.band(flags,0x7F) ~= 0 then
+        packet = original:sub(1,offset-1)..string.char(bit.band(flags,0x80))..original:sub(offset+1) -- preserve bit 8 (Job Master stars)
+        return packet
+    end
 end)
