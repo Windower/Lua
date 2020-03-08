@@ -810,7 +810,7 @@
     <support>https://github.com/azamorapl</support>
   </addon>
   <addon>
-    <name>Indi-Nope</name>
+    <name>IndiNope</name>
     <author>Lili</author>
     <description>Block graphical effects from Geomancer's Indi- spells.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
