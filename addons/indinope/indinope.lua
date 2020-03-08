@@ -17,7 +17,7 @@ modification, are permitted provided that the following conditions are met:
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
+DISCLAIMED. IN NO EVENT SHALL LILI BE LIABLE FOR ANY
 DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
@@ -34,7 +34,7 @@ require('bit')
 
 offsets = { [0x00D] = 67, [0x037] = 89, }
 
-windower.register_event('incoming chunk',function(id,original,modified,injected,blocked)
+windower.register_event('incoming chunk', function(id, original, modified, injected, blocked)
     if injected or blocked or not offsets[id] then return end
 
     offset = offsets[id]
@@ -42,7 +42,7 @@ windower.register_event('incoming chunk',function(id,original,modified,injected,
 
     -- if any of the bits 0 through 7 are set, a bubble is shown and we want to block it.
     if bit.band(flags,0x7F) ~= 0 then
-        packet = original:sub(1,offset-1)..string.char(bit.band(flags,0x80))..original:sub(offset+1) -- preserve bit 8 (Job Master stars)
+        packet = original:sub(1, offset - 1) .. string.char(bit.band(flags, 0x80)) .. original:sub(offset + 1) -- preserve bit 8 (Job Master stars)
         return packet
     end
 end)
