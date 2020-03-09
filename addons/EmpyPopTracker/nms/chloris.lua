@@ -78,6 +78,10 @@ return {
         dropped_from = {
             name = 'Ophanim, Forced (G-9)',
             pops = { {
+                id = 2917, --Bloodshot Hecteye
+                type = 'item',
+                dropped_from = { name = 'Beholder (G-9)' }
+            }, {
                 id = 2946, --Tarnished Pincer
                 type = 'item',
                 dropped_from = {
@@ -86,21 +90,17 @@ return {
                         id = 2916, --High-quality Limule Pincer
                         type = 'item',
                         dropped_from = { name = 'Gulch Limule (H-10)' }
-                    }, {
-                        id = 2917, --Bloodshot Hecteye
+                    } }
+                }
+            }, {
+                id = 2945, --Shriveled Wing
+                type = 'item',
+                dropped_from = {
+                    name = 'Halimede, Forced (G-12)',
+                    pops = { {
+                        id = 2915, --High-quality Clionid Wing
                         type = 'item',
-                        dropped_from = { name = 'Beholder (G-9)' }
-                    }, {
-                        id = 2945, --Shriveled Wing
-                        type = 'item',
-                        dropped_from = {
-                            name = 'Halimede, Forced (G-12)',
-                            pops = { {
-                                id = 2915, --High-quality Clionid Wing
-                                type = 'item',
-                                dropped_from = { name = 'Gully Clionid (G-12)' }
-                            } }
-                        }
+                        dropped_from = { name = 'Gully Clionid (G-12)' }
                     } }
                 }
             } }
