@@ -6,6 +6,8 @@ An FFXI Windower 4 addon that tracks items and key items for popping various NMs
 
 Originally developed to track Abyssea Empyrean weapon NMs, hence the name. Key items are identified by the Zhe (Ж) character. Treasure pool counts for pop items are listed in amber after the item in the format of [3] (assuming 3 of that item in the pool).
 
+All text colours are configurable via the auto-generated settings.xml file.
+
 ## Load
 
 `//lua load empypoptracker`
@@ -48,6 +50,6 @@ Fistule is a unique NM when compared to the others. It does not require KIs that
 
 ## Contributing
 
-Notice something not quite right? [Raise an issue](https://github.com/xurion/ffxi-empy-pop-tracker/issues).
+If there's an NM you want to have added, or if you notice something not quite right, please [raise an issue](https://github.com/xurion/ffxi-empy-pop-tracker/issues).
 
-[Pull requests](https://github.com/xurion/ffxi-empy-pop-tracker/pulls) welcome!
+Or better yet, [pull requests](https://github.com/xurion/ffxi-empy-pop-tracker/pulls) are welcome!
