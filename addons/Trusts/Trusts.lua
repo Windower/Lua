@@ -368,4 +368,5 @@ trusts = T{
     [118]={id=1018,japanese="イロハII",english="Iroha II",name="Iroha",models=3112},
     [119]={id=1019,japanese="シャントットII",english="Shantotto II",name="Shantotto",models=3110},
 --  [120]={id=1003,japanese="コーネリア",english="Cornelia",name="Cornelia",models=3119}, --goodbye, my love
+	[121]={id=999,japanese="モンブロー",english="Monberaux",name="Monberaux",models=3120},
 }
