@@ -67,6 +67,10 @@ observed_default = {
 
 thief_tools = {[1022] = true}
 
+-- color codes for ease of use
+txt = {}
+txt[36] = string.char(31,36)  -- yellow
+
 -- global variables
 
 box = {}
@@ -285,9 +289,9 @@ function display(id, chances)
         windower.add_to_chat(207, 'best guess: %d (%d%%)':format(box[id][math.ceil(#box[id] / 2)], 1 / remaining * 100))
         local clue_value,guess_value = calculate_odds(id,chances)
         if clue_value > guess_value and remaining ~= 1 then
-            windower.add_to_chat(207, 'boxdestroyer recommends examining the chest')
+            windower.add_to_chat(207, 'boxdestroyer recommends'..txt[36]..' examining the chest')
         else
-            windower.add_to_chat(207, 'boxdestroyer recommends guessing %d':format(box[id][math.ceil(#box[id] / 2)]))
+            windower.add_to_chat(207, 'boxdestroyer recommends guessing'..txt[36]..' %d':format(box[id][math.ceil(#box[id] / 2)]))
         end
     end
     
