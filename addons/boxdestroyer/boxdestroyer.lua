@@ -261,9 +261,9 @@ end
 
 function display(id, chances)
     if #box[id] == 90 then
-        windower.add_to_chat(207, 'possible combinations: 10~99')
+        windower.add_to_chat(207, 'Possible combinations: 10~99')
     else
-        windower.add_to_chat(207, 'possible combinations: ' .. table.concat(box[id], ' '))
+        windower.add_to_chat(207, 'Possible combinations: ' .. table.concat(box[id], ' '))
     end
     local remaining = math.floor(#box[id] / math.pow(2, (chances - 1)))
     if remaining == 0 then
@@ -277,13 +277,13 @@ function display(id, chances)
         local printed = false
         for _,v in pairs(box[id]) do
             if math.floor(v/10) == v%10 then
-                windower.add_to_chat(207, 'best guess: %d (%d%%)':format(v, 1 / remaining * 100))
+                windower.add_to_chat(207, 'Best guess: %d (%d%%)':format(v, 1 / remaining * 100))
                 printed = true
                 break
             end
         end
         if not printed then
-            windower.add_to_chat(207, 'best guess: %d (%d%%)':format(box[id][math.ceil(#box[id] / 2)], 1 / remaining * 100))
+            windower.add_to_chat(207, 'Best guess: %d (%d%%)':format(box[id][math.ceil(#box[id] / 2)], 1 / remaining * 100))
         end
     else
         windower.add_to_chat(207, 'best guess: %d (%d%%)':format(box[id][math.ceil(#box[id] / 2)], 1 / remaining * 100))
