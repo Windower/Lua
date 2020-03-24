@@ -2960,8 +2960,8 @@ fields.incoming[0x065] = L{
     {ctype='float',             label='Y'},                                     -- 0C
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 10
     {ctype='unsigned short',    label='Index',              fn=index},          -- 14
-    {ctype='unsigned char',     label='_unknown1'},                             -- 16   1 observed. May indicate repositoning type.
-    {ctype='unsigned char',     label='_unknown2'},                             -- 17   Unknown, but matches the same byte of a matching spawn packet
+    {ctype='unsigned char',     label='Animation'},                             -- 16
+    {ctype='unsigned char',     label='Rotation'},                              -- 17
     {ctype='data[6]',           label='_unknown3'},                             -- 18   All zeros observed.
 }
 
