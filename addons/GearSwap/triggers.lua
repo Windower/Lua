@@ -135,9 +135,14 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
                     
                     if spell.prefix == '/item' then
                         -- Item use packet handling here
-                        if bit.band(spell.target.spawn_type, 2) == 2 and find_inventory_item(spell.id) then
+                        if bit.band(spell.target.spawn_type, 2) == 2 and find_inventory_item(spell.id) and then
                             --0x36 packet
-                            command_registry[ts].proposed_packet = assemble_menu_item_packet(spell.target.id,spell.target.index,spell.id)
+                            if spell.target.distance <= 6 then
+                                command_registry[ts].proposed_packet = assemble_menu_item_packet(spell.target.id,spell.target.index,spell.id)
+                            else
+                                 windower.add_to_chat(67, "Target out of range.")
+                                 return true
+                            end
                         elseif find_usable_item(spell.id) then
                             --0x37 packet
                             command_registry[ts].proposed_packet = assemble_use_item_packet(spell.target.id,spell.target.index,spell.id)
