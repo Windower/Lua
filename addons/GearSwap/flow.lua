@@ -254,7 +254,11 @@ function equip_sets_exit(swap_type,ts,val1)
                     -- Item use packet handling here
                     if bit.band(val1.target.spawn_type, 2) == 2 and find_inventory_item(val1.id) then
                         -- 0x36 packet
-                        command_registry[ts].proposed_packet = assemble_menu_item_packet(val1.target.id,val1.target.index,val1.id)
+                        if val1.target.distance <= 6 then
+                            command_registry[ts].proposed_packet = assemble_menu_item_packet(val1.target.id,val1.target.index,val1.id)
+                        else
+                            windower.add_to_chat(67, "Target out of range.")
+                        end
                     elseif find_usable_item(val1.id) then
                         -- 0x37 packet
                         command_registry[ts].proposed_packet = assemble_use_item_packet(val1.target.id,val1.target.index,val1.id)

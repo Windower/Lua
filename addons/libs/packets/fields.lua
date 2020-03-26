@@ -2865,7 +2865,7 @@ fields.incoming[0x061] = L{
     {ctype='unsigned char',     label='Main Hand iLevel'},                      -- 56   
     {ctype='unsigned char',     label='_unknown5'},                             -- 57   Always 00 for me
     {ctype='bit[5]',            label='Unity ID'},                              -- 58   0=None, 1=Pieuje, 2=Ayame, 3=Invincible Shield, 4=Apururu, 5=Maat, 6=Aldo, 7=Jakoh Wahcondalo, 8=Naja Salaheem, 9=Flavira
-    {ctype='bit[5]',            label='_unknown5'},                             -- 58   Danger, 00ing caused my client to crash
+    {ctype='bit[5]',            label='Unity Rank'},                            -- 58   Danger, 00ing caused my client to crash
     {ctype='bit[16]',           label='Unity Points'},                          -- 59   
     {ctype='bit[6]',            label='_unknown6'},                             -- 5A   No obvious function
     {ctype='unsigned int',      label='_junk1'},                                -- 5B   
@@ -2917,8 +2917,8 @@ func.incoming[0x063][0x03] = L{
     {ctype='unsigned short',    label='_unknown2'},                             -- 0E   00 00
     {ctype='unsigned short',    label='_unknown3'},                             -- 10   76 00
     {ctype='unsigned short',    label='Infamy'},                                -- 12
-    {ctype='unsigned int',      label='_unknown2'},                             -- 14   00s
-    {ctype='unsigned int',      label='_unknown3'},                             -- 18   00s
+    {ctype='unsigned int',      label='_unknown4'},                             -- 14   00s
+    {ctype='unsigned int',      label='_unknown5'},                             -- 18   00s
     {ctype='data[64]',          label='Instinct Bitfield 1'},                   -- 1C   See below
     -- Bitpacked 2-bit values. 0 = no instincts from that species, 1 == first instinct, 2 == first and second instinct, 3 == first, second, and third instinct.
     {ctype='data[128]',         label='Monster Level Char field'},              -- 5C   Mapped onto the item ID for these creatures. (00 doesn't exist, 01 is rabbit, 02 is behemoth, etc.)
@@ -2960,8 +2960,8 @@ fields.incoming[0x065] = L{
     {ctype='float',             label='Y'},                                     -- 0C
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 10
     {ctype='unsigned short',    label='Index',              fn=index},          -- 14
-    {ctype='unsigned char',     label='_unknown1'},                             -- 16   1 observed. May indicate repositoning type.
-    {ctype='unsigned char',     label='_unknown2'},                             -- 17   Unknown, but matches the same byte of a matching spawn packet
+    {ctype='unsigned char',     label='Animation'},                             -- 16
+    {ctype='unsigned char',     label='Rotation'},                              -- 17
     {ctype='data[6]',           label='_unknown3'},                             -- 18   All zeros observed.
 }
 
