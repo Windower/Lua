@@ -46,8 +46,8 @@ require('messages')
 
 config = require('config')
 defaults = {
-    HighlightResult: false,
-    HighlightColor: 36,
+    HighlightResult = false,
+    HighlightColor = 36,
 }
 
 -- global constants
