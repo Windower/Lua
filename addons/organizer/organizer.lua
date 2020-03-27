@@ -51,7 +51,10 @@ _static = {
         sack=6,
         case=7,
         wardrobe=8,
-        safe2=9
+        safe2=9,
+        wardrobe2=10,
+        wardrobe3=11,
+        wardrobe4=12,
     }
 }
 
@@ -67,14 +70,15 @@ _valid_dump = {}
 
 default_settings = {
     dump_bags = {['Safe']=1,['Safe2']=2,['Locker']=3,['Storage']=4},
-    bag_priority = {['Safe']=1,['Safe2']=2,['Locker']=3,['Storage']=4,['Satchel']=5,['Sack']=6,['Case']=7,['Inventory']=8,['Wardrobe']=9},
+    bag_priority = {['Safe']=1,['Safe2']=2,['Locker']=3,['Storage']=4,['Satchel']=5,['Sack']=6,['Case']=7,['Inventory']=8,['Wardrobe']=9,['Wardrobe2']=10,['Wardrobe3']=11,['Wardrobe4']=12,},
     item_delay = 0,
     ignore = {},
     retain = {
         ["moogle_slip_gear"]=false,
         ["seals"]=false,
         ["items"]=false,
-        ["slips"]=false
+        ["slips"]=false,
+		["some_slips_gear"]={},
     },
     auto_heal = false,
     default_file='default.lua',
@@ -214,6 +218,12 @@ function options_load( )
     _valid_pull[0] = 1
     _valid_dump[8] = 1
     _valid_pull[8] = 1
+    _valid_dump[10] = 1
+    _valid_pull[10] = 1
+    _valid_dump[11] = 1
+    _valid_pull[11] = 1
+    _valid_dump[12] = 1
+    _valid_pull[12] = 1
 
 end
 
