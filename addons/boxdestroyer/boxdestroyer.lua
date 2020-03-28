@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -- addon information
 
 _addon.name = 'boxdestroyer'
-_addon.version = '1.0.4'
+_addon.version = '1.0.5'
 _addon.command = 'boxdestroyer'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
@@ -49,7 +49,7 @@ defaults = {
     HighlightResult = false,
     HighlightColor = 36,
 }
-
+settings = config.load(defaults)
 -- global constants
 
 default = {
