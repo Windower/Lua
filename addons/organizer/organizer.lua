@@ -37,7 +37,7 @@ config = require 'config'
 
 _addon.name = 'Organizer'
 _addon.author = 'Byrth, maintainer: Rooks'
-_addon.version = 0.20150923
+_addon.version = 0.20200328
 _addon.commands = {'organizer','org'}
 
 _static = {
@@ -78,7 +78,6 @@ default_settings = {
         ["seals"]=false,
         ["items"]=false,
         ["slips"]=false,
-		["some_slips_gear"]={},
     },
     auto_heal = false,
     default_file='default.lua',
