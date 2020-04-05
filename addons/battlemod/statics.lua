@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 language = 'english'
 skillchain_arr = {'Light:','Darkness:','Gravitation:','Fragmentation:','Distortion:','Fusion:','Compression:','Liquefaction:','Induration:','Reverberation:','Transfixion:','Scission:','Detonation:','Impaction:','Radiance:','Umbra:'}
-ratings_arr = {'TW','EEP','EP','DC','EM','T','VT','IT'}
+ratings_arr = {'TW','IEP','EP','DC','EM','T','VT','IT'}
 current_job = 'NONE'
 default_filt = false
 rcol = string.char(0x1E,0x01)
