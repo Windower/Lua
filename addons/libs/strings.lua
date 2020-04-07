@@ -189,12 +189,12 @@ function string.capitalize(str)
     return table.concat(res, ' ')
 end
 
--- Takes a padding character pad and pads the string str to the left of it, until len is reached. pad defaults to a space.
+-- Takes a padding character pad and pads the string str to the left of it, until len is reached.
 function string.lpad(str, pad, len)
     return (pad:rep(len) .. str):sub(-(len > #str and len or #str))
 end
 
--- Takes a padding character pad and pads the string str to the right of it, until len is reached. pad defaults to a space.
+-- Takes a padding character pad and pads the string str to the right of it, until len is reached.
 function string.rpad(str, pad, len)
     return (str .. pad:rep(len)):sub(1, len > #str and len or #str)
 end

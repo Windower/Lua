@@ -395,7 +395,7 @@ end
 
 local lookup = function(packet, field)
     local val = packet[field.label]
-    return field.enc and val:rpad(size(field), 0:char()):encode(field.enc) or val
+    return field.enc and (val .. 0:char()):encode(field.enc) or val
 end
 
 -- Returns binary data from a packet
