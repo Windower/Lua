@@ -434,11 +434,26 @@ string.decode = (function()
 
     return function(str, charset)
         if type(charset) == 'string' then
-            local tmp = charset
             charset = charset:sub(2):split()
             charset[0] = charset:sub(1, 1)
         end
         return str:binary():chunks(chunk_size(charset)):map(table.get+{charset} .. tonumber-{2}):concat():gsub('%z+$', '')
+    end
+end)()
+
+-- Returns a string encoded given the appropriate information.
+string.encode = (function()
+    local chunk_size = function(t)
+        local e, f = math.frexp(#t)
+        return f + math.ceil(e - 1.5)
+    end
+
+    return function(str, charset)
+        if type(charset) == 'string' then
+            charset = charset:sub(2):split()
+            charset[0] = charset:sub(1, 1)
+        end
+        return str:map(string.zfill-{chunk_size(charset)} .. math.binary .. table.find+{charset}):parse_binary()
     end
 end)()
 
