@@ -20,12 +20,23 @@ local func = {
 }
 
 -- String decoding definitions
-local ls_name_msg = T('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ':split())
-ls_name_msg[63] = 0:char()
-local item_inscr = T('0123456798ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz{':split())
-item_inscr[0] = 0:char()
-local ls_name_ext = T(('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' .. 0:char():rep(11)):split())
-ls_name_ext[0] = '`'
+local ls_enc = {
+    charset = T('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ':split()):update({
+        [0] = '`',
+        [60] = 0:char(),
+        [63] = 0:char(),
+    }),
+    bits = 6,
+    terminator = function(str)
+        return (#str % 4 == 2 and 0x60 or 0x63):char()
+    end
+}
+local sign_enc = {
+    charset = T('0123456798ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz{':split()):update({
+        [0] = 0:char(),
+    }),
+    bits = 6,
+}
 
 -- Function definitions. Used to display packet field information.
 local res = require('resources')
@@ -3243,7 +3254,7 @@ func.incoming[0x0C9][0x01] = L{
     {ctype='bit[4]',            label='_junk1'},                                -- 11   
     {ctype='unsigned char',     label='Main Job',           fn=job},            -- 12
     {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 13
-    {ctype='char[16]',          label='Linkshell',          enc=ls_name_msg},   -- 14   6-bit packed
+    {ctype='char[16]',          label='Linkshell',          enc=ls_enc},        -- 14   6-bit packed
     {ctype='unsigned char',     label='Main Job Level'},                        -- 24
     {ctype='unsigned char',     label='Sub Job Level'},                         -- 25
     {ctype='data[42]',          label='_unknown5'},                             -- 26   At least the first two bytes and the last twelve bytes are junk, possibly more
@@ -3264,7 +3275,7 @@ fields.incoming[0x0CC] = L{
     {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 88
     {ctype='char[16]',          label='Player Name'},                           -- 8C
     {ctype='unsigned int',      label='Permissions'},                           -- 98
-    {ctype='char[15]',          label='Linkshell',          enc=ls_name_msg},   -- 9C   6-bit packed
+    {ctype='char[15]',          label='Linkshell',          enc=ls_enc},        -- 9C   6-bit packed
 }
 
 -- Found Item
