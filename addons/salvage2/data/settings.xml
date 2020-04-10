@@ -1,7 +1,50 @@
-<?xml version="1.0" ?>
+<?xml version="1.1" ?>
 <settings>
-	<global>
-		<posx>1000</posx>
-		<posy>250</posy>
- 	</global>
+    <global>
+        <bg>
+            <alpha>200</alpha>
+            <blue>30</blue>
+            <green>30</green>
+            <red>30</red>
+            <visible>true</visible>
+        </bg>
+        <color>
+            <alpha>200</alpha>
+            <blue>200</blue>
+            <green>200</green>
+            <red>200</red>
+        </color>
+        <flags>
+            <bold>false</bold>
+            <bottom>false</bottom>
+            <draggable>true</draggable>
+            <italic>false</italic>
+            <right>false</right>
+        </flags>
+        <padding>0</padding>
+        <pos>
+            <x>1000</x>
+            <y>150</y>
+        </pos>
+        <posx>900</posx>
+        <posy>250</posy>
+        <text>
+            <alpha>255</alpha>
+            <blue>255</blue>
+            <font>Arial</font>
+            <fonts>
+
+            </fonts>
+            <green>255</green>
+            <red>255</red>
+            <size>12</size>
+            <stroke>
+                <alpha>255</alpha>
+                <blue>0</blue>
+                <green>0</green>
+                <red>0</red>
+                <width>0</width>
+            </stroke>
+        </text>
+    </global>
 </settings>
