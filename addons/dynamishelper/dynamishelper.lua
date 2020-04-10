@@ -36,6 +36,8 @@ _addon.version = '1.0.2.0'
 
 require('strings')
 require('sets')
+texts = require 'texts'
+require('logger')
 config = require('config')
 res = require('resources')
 
@@ -202,23 +204,50 @@ proctype = {"ja","magic","ws","random","none"}
 StaggerCount = 0
 current_proc = "lolidk"
 currentime = 0
+obtained = nil
 goodzone = false
-timer = "off"
-tracker = "off"
-proc = "off"
-trposx = 1000
-trposy = 250
-pposx = 800
-pposy = 250
+timer = "on"
+tracker = "on"
+proc = "on"
+debugMode = "off"
 
-settings = config.load()
-timer = settings['timer']
-tracker = settings['tracker']
-trposx = settings['trposx']
-trposy = settings['trposy']
-proc = settings['proc']
-pposx = settings['pposx']
-pposy = settings['pposy']
+defaults = {}
+defaults.display = {}
+defaults.display.timer = "on"
+defaults.display.tracker = "on"
+defaults.display.proc = "on"
+defaults.proc_box = {}
+defaults.proc_box.pos = {}
+defaults.proc_box.pos.x = 1000
+defaults.proc_box.pos.y = 200
+defaults.proc_box.color = {}
+defaults.proc_box.color.alpha = 200
+defaults.proc_box.color.red = 200
+defaults.proc_box.color.green = 200
+defaults.proc_box.color.blue = 200
+defaults.proc_box.bg = {}
+defaults.proc_box.bg.alpha = 200
+defaults.proc_box.bg.red = 30
+defaults.proc_box.bg.green = 30
+defaults.proc_box.bg.blue = 30
+defaults.tracker_box = {}
+defaults.tracker_box.pos = {}
+defaults.tracker_box.pos.x = 1000
+defaults.tracker_box.pos.y = 250
+defaults.tracker_box.color = {}
+defaults.tracker_box.color.alpha = 200
+defaults.tracker_box.color.red = 200
+defaults.tracker_box.color.green = 200
+defaults.tracker_box.color.blue = 200
+defaults.tracker_box.bg = {}
+defaults.tracker_box.bg.alpha = 200
+defaults.tracker_box.bg.red = 30
+defaults.tracker_box.bg.green = 30
+defaults.tracker_box.bg.blue = 30
+
+settings = config.load('data\\settings.xml',defaults)
+dynamis_box = texts.new(' Empty', settings.tracker_box, settings)
+proc_box = texts.new(' Unknown', settings.proc_box, settings)
 
 for i=1, #Currency do
      Currency[Currency[i]] = 0
@@ -228,7 +257,6 @@ windower.register_event('load', 'login', function()
     if windower.ffxi.get_info().logged_in then
         player = windower.ffxi.get_player().name
         obtained = nil
-        initializebox()
     end
 end)
 
@@ -251,60 +279,76 @@ windower.register_event('addon command',function (...)
     				timer = params[2]
 					print('Timer feature is '..timer)
    				else print("Invalid timer option.")
-   			end
-		elseif params[1]:lower() == "tracker" then
-   			if params[2]:lower() == "on" then
-    			tracker = "on"
-				initializebox()
-				windower.text.set_visibility('dynamis_box',true)
-    			print('Tracker enabled')
-   			elseif params[2]:lower() == "off" then
-    			tracker = "off"
-    			windower.text.set_visibility('dynamis_box',false)
-    			print('Tracker disabled')
-   			elseif params[2]:lower() == "reset" then
-				for i=1, #Currency do
-     				Currency[Currency[i]] = 0
-     			end
-      			obtainedf()
-     	 		initializebox()
-      			print('Tracker reset')
-   			elseif params[2]:lower() == "pos" then
-    			if params[3] then
-     				trposx, trposy = tonumber(params[3]), tonumber(params[4])
-     				obtainedf()
-     				initializebox()
-    			else print("Invalid tracker option.")
-    			end
-    		end
-  		elseif params[1]:lower() == "ll" then
-   			if params[2]:lower() == "create" then
-    			player = windower.ffxi.get_player()['name']
-    			io.open(windower.addon_path..'../../plugins/ll/dynamis-'..player..'.txt',"w"):write('if item is 1452, 1453, 1455, 1456, 1449, 1450 then lot'):close()
-    			windower.send_command('ll profile dynamis-'..player..'.txt')
-   			else print("Invalid light luggage option.")
-   			end
-  	 elseif params[1]:lower() == "proc" then
-   			if params[2]:lower() == "on" then
-   				proc = params[2]
-   				print('Proc feature enabled.')
-   			elseif params[2]:lower() == "off" then
-   		 		proc = params[2]
-    			windower.text.set_visibility('proc_box',false)
-    			print('Proc feature disabled.')
-    		elseif params[2]:lower() == "pos" then
-   				pposx, pposy = tonumber(params[3]), tonumber(params[4])
-   				initializeproc()
-   			end
+				end
+			elseif params[1]:lower() == "tracker" then
+				if params[2]:lower() == "on" then
+					tracker = "on"
+					initializebox()
+					print('Tracker enabled')
+				elseif params[2]:lower() == "off" then
+					tracker = "off"
+					dynamis_box:hide()
+					print('Tracker disabled')
+				elseif params[2]:lower() == "reset" then
+					settings = config.load(trdefaults)
+					dynamis_box = texts.new('Nothing to show', settings)
+					for i=1, #Currency do
+						Currency[Currency[i]] = 0
+					end
+					obtainedf()
+					print('Tracker reset')
+				elseif params[2]:lower() == "pos" then
+					if params[3] then
+						trposx, trposy = tonumber(params[3]), tonumber(params[4])
+						dynamis_box:pos(posx, posy)
+						else print("Invalid tracker option.")
+					end
+				end
+			elseif params[1]:lower() == "ll" then
+				if params[2]:lower() == "create" then
+					player = windower.ffxi.get_player()['name']
+					io.open(windower.addon_path..'../../plugins/ll/dynamis-'..player..'.txt',"w"):write('if item is 1452, 1453, 1455, 1456, 1449, 1450 then lot'):close()
+					windower.send_command('ll profile dynamis-'..player..'.txt')
+				else print("Invalid light luggage option.")
+				end
+			elseif params[1]:lower() == "proc" then
+				if params[2]:lower() == "on" then
+					proc = params[2]
+					print('Proc feature enabled.')
+				elseif params[2]:lower() == "off" then
+					proc = params[2]
+					proc_box:hide()
+					print('Proc feature disabled.')
+				elseif params[2]:lower() == "pos" then
+					pposx, pposy = tonumber(params[3]), tonumber(params[4])
+					proc_box:pos(posx, posy)
+				end
+			elseif params[1]:lower() == "debug" then
+				if params[2]:lower() == "on" then
+					debugMode = "on"
+					goodzone = true
+					proc = "on"
+					tracker = "on"
+					mob = "Test"
+					obtained = "1"
+					setproc()
+					initializebox()
+				elseif params[2]:lower() == "off" then
+					debugMode = "off"
+					goodzone = ProcZones:contains(windower.ffxi.get_info().zone)
+					initializeproc()
+					initializebox()
+				end
+			end
 		end
-	end
 end)
 
 
 windower.register_event('incoming text',function (original, new, color)
 --	print('event_incoming_text function')
+	original = original:strip_format()
 	if timer == 'on' then
-  		a,b,fiend = string.find(original,"%w+'s attack staggers the (%w+)%!")
+		local fiend = original:match("%w+'s attack staggers the (%w+)%!")
    		if fiend == 'fiend' then
 			StaggerCount = StaggerCount + 1
     		windower.send_command('timers c '..StaggerCount..' 30 down')
@@ -312,18 +356,19 @@ windower.register_event('incoming text',function (original, new, color)
     	end
 	end
  	if tracker == 'on' then
-     	a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+ %w+)..\46")
-     		if item == nil then
-      	 		a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+)..\46")
-       				if item == nil then
-         				a,b,item = string.find(original,"%w+ obtains an? ..(%w+%-%w+ %w+)..\46")
-          					if item == nil then
-           						a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+)..\46")
-         					end
-       				end
-     		end
--- 		a,b,item = string.find(original,"%w+ obtains an? ..(.*)..\46")
- 		if item ~= nil then
+	if debugMode == "on" then print("Starting tracker function") end
+		local item = original:match("%w+ obtains an? (%w+ %w+ %w+ %w+).")
+		if item == nil then
+			item = original:match("%w+ obtains an? (%w+ %w+ %w+).")
+		end
+		if item == nil then
+			item = original:match("%w+ obtains an? (%w+%-%w+ %w+).")
+		end
+		if item == nil then
+			item = original:match("%w+ obtains an? (%w+ %w+).")
+		end
+ 		if item then
+			if debugMode == "on" then print(item) end
  			item = item:lower()
  			for i=1, #Currency do
 				if item == Currency[i]:lower() then
@@ -351,33 +396,28 @@ end
 
 windower.register_event('zone change', function(id)
 	goodzone = ProcZones:contains(id)
+	if debugMode == "on" then goodzone = true end
 	if not goodzone then
-		windower.text.set_visibility('proc_box', false)
+		proc_box:hide()
+		dynamis_box:hide()
 	end
 end)
 
 function initializebox()
 	if obtained ~= nil and tracker == "on" then
- 		windower.text.create('dynamis_box')
- 		windower.text.set_bg_color('dynamis_box',200,30,30,30)
- 		windower.text.set_color('dynamis_box',255,200,200,200)
-		windower.text.set_location('dynamis_box',trposx,trposy)
- 		windower.text.set_visibility('dynamis_box',true)
- 		windower.text.set_bg_visibility('dynamis_box',true)
- 		windower.text.set_font('dynamis_box','Arial',12)
- 		windower.text.set_text('dynamis_box',obtained);
+		dynamis_box:show()
+		dynamis_box:text(obtained)
  	end
+	
 end
 
 windower.register_event('target change', function(targ_id)
-	--goodzone = ProcZones:contains(windower.ffxi.get_info().zone)
+	goodzone = ProcZones:contains(windower.ffxi.get_info().zone)
+	if debugMode == "on" then goodzone = true end
 	if goodzone and proc == 'on' and targ_id ~= 0 then
         mob = windower.ffxi.get_mob_by_index(targ_id)['name']
         setproc()
  	end
-
- 	--print(ProcZones:contains(windower.ffxi.get_info().zone))
-
 end)
 
 function setproc()
@@ -409,19 +449,11 @@ function setproc()
 end
 
 function initializeproc()
---		print('initializeproc function')
-		windower.text.create('proc_box')
-	 	windower.text.set_bg_color('proc_box',200,30,30,30)
-	 	windower.text.set_color('proc_box',255,200,200,200)
-	 	windower.text.set_location('proc_box',pposx,pposy)
-	 	if proc == 'on' then
-	 	 	windower.text.set_visibility('proc_box', true)
-	 	end
-	 	windower.text.set_bg_visibility('proc_box',1)
-	 	windower.text.set_font('proc_box','Arial',12)
-	 	windower.text.set_text('proc_box',' Current proc for \n '..mob..'\n is '..current_proc);
-	 	if proc == "off" then
-	 		windower.text.set_visibility('proc_box', false)
+		if goodzone == true and proc == 'on' then 
+	 	 	proc_box:show()
+			proc_box:text(' Current proc for \n '..mob..'\n is '..current_proc)
+		else
+	 		proc_box:hide()
 	 	end
 end
 
