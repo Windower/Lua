@@ -60,116 +60,116 @@ salvage_box2 = texts.new('No pathos', settings)
 
 windower.register_event('addon command',function (...)
 local params = {...};
-	if #params < 1 then
-		return
-	end
-	if params[1] then
-		if params[1]:lower() == "help" then
-			print('Salvage2 available commands:')
-			print('s2 help : Shows this help message')
-			print('s2 pos <x> <y> : Positions the list')
-			print('s2 [hide/show] : Hides the box')
-			print('s2 timer [start/stop] : Starts or stops the zone timer')
-			print('s2 remove <pathos> : Removes the pathos from the remaining list')
-		elseif params[1]:lower() == "pos" then
-			if params[3] then
-				local posx, posy = tonumber(params[2]), tonumber(params[3])
-				windower.text.set_location('salvage_box2', posx, posy)
-			end
-		elseif params[1]:lower() == "hide" then
-			salvage_box2:hide()
-		elseif params[1]:lower() == "show" then
-			salvage_box2:show()
-		elseif params[1]:lower() == "timer" then
-			if params[2] == "start" then
-				windower.send_command('timers c Remaining 6000 up')
-			elseif params[2] == "stop" then
-				windower.send_command('timers d Remaining')
-			end
-		elseif params[1]:lower() == "debug" then
-			if params[2]:lower() == "start" then
-					windower.send_command('timers c Remaining 6000 up')
-					settings_create()
-					salvage_box2:show()
-					initialize()
-			elseif params[2]:lower() == "stop" then
-					windower.send_command('timers d Remaining')
-					salvage_box2:hide()			
-			end
-		elseif params[1]:lower() == "remove" then
-			for i=1, #pathos_short  do
-				if pathos_short[i]:lower() == params[2]:lower() then
-					pathos_ident[pathos_ident[i]] = 0
-					initialize()			
-				end
-			end
-		end
-	end
+    if #params < 1 then
+        return
+    end
+    if params[1] then
+        if params[1]:lower() == "help" then
+            print('Salvage2 available commands:')
+            print('s2 help : Shows this help message')
+            print('s2 pos <x> <y> : Positions the list')
+            print('s2 [hide/show] : Hides the box')
+            print('s2 timer [start/stop] : Starts or stops the zone timer')
+            print('s2 remove <pathos> : Removes the pathos from the remaining list')
+        elseif params[1]:lower() == "pos" then
+            if params[3] then
+                local posx, posy = tonumber(params[2]), tonumber(params[3])
+                windower.text.set_location('salvage_box2', posx, posy)
+            end
+        elseif params[1]:lower() == "hide" then
+            salvage_box2:hide()
+        elseif params[1]:lower() == "show" then
+            salvage_box2:show()
+        elseif params[1]:lower() == "timer" then
+            if params[2] == "start" then
+                windower.send_command('timers c Remaining 6000 up')
+            elseif params[2] == "stop" then
+                windower.send_command('timers d Remaining')
+            end
+        elseif params[1]:lower() == "debug" then
+            if params[2]:lower() == "start" then
+                    windower.send_command('timers c Remaining 6000 up')
+                    settings_create()
+                    salvage_box2:show()
+                    initialize()
+            elseif params[2]:lower() == "stop" then
+                    windower.send_command('timers d Remaining')
+                    salvage_box2:hide()
+            end
+        elseif params[1]:lower() == "remove" then
+            for i=1, #pathos_short  do
+                if pathos_short[i]:lower() == params[2]:lower() then
+                    pathos_ident[pathos_ident[i]] = 0
+                    initialize()
+                end
+            end
+        end
+    end
 end)
 
 windower.register_event('login', function(name)
-	player = name
+    player = name
 end)
 
 function settings_create()
-	--	get player's name
-	player = windower.ffxi.get_player()['name']
-	--  set all pathos as needed
-	for i=1, #pathos_ident  do
-		if pathos_ident[i] ~= nil then
-			pathos_ident[pathos_ident[i]] = 1
-		end
-	end
+    --    get player's name
+    player = windower.ffxi.get_player()['name']
+    --  set all pathos as needed
+    for i=1, #pathos_ident  do
+        if pathos_ident[i] ~= nil then
+            pathos_ident[pathos_ident[i]] = 1
+        end
+    end
 end
 
 windower.register_event('zone change', function(id)
-	if salvage_zones:contains(id) then
-		windower.send_command('timers c Remaining 6000 up')
-		settings_create()
-		initialize()
-		salvage_box2:show()
-	else
-		windower.send_command('timers d Remaining')
-		settings_create()
-		initialize()
-		salvage_box2:hide()
-	end
+    if salvage_zones:contains(id) then
+        windower.send_command('timers c Remaining 6000 up')
+        settings_create()
+        initialize()
+        salvage_box2:show()
+    else
+        windower.send_command('timers d Remaining')
+        settings_create()
+        initialize()
+        salvage_box2:hide()
+    end
 end)
 
 windower.register_event('incoming text',function (original, new, color)
-	original = original:strip_format()
-	local pathos, name = original:match('(.*) removed for (%w+)')
-	if pathos ~= nil then
-		--print('Pathos found '..pathos)
-		if name == player then
-			for i=1, #pathos_ident  do
-				if pathos_ident[i]:lower() == pathos:lower() then
-					if pathos_ident[pathos_ident[i]] == 1 then
-						pathos_ident[pathos_ident[i]] = 0
-						initialize()
-					end
-				end
-			end
-		end
-		return new, color
-	end
+    original = original:strip_format()
+    local pathos, name = original:match('(.*) removed for (%w+)')
+    if pathos ~= nil then
+        --print('Pathos found '..pathos)
+        if name == player then
+            for i=1, #pathos_ident  do
+                if pathos_ident[i]:lower() == pathos:lower() then
+                    if pathos_ident[pathos_ident[i]] == 1 then
+                        pathos_ident[pathos_ident[i]] = 0
+                        initialize()
+                    end
+                end
+            end
+        end
+        return new, color
+    end
 end)
 
 function initialize()
-	pathos_remain = (" Pathos Remaining: \n ")
-	for i=1, #pathos_ident  do
-		if pathos_ident[pathos_ident[i]] == 1 then
-			item = pathos_short[i]
-			pathos_remain = (pathos_remain..item..' \n ')
-		end
-	end
-	salvage_box2:text(pathos_remain)
-	if pathos_remain == (" Pathos Remaining: \n ") then
-		salvage_box2:hide()
-	end
+    pathos_remain = (" Pathos Remaining: \n ")
+    for i=1, #pathos_ident  do
+        if pathos_ident[pathos_ident[i]] == 1 then
+            item = pathos_short[i]
+            pathos_remain = (pathos_remain..item..' \n ')
+        end
+    end
+    salvage_box2:text(pathos_remain)
+    if pathos_remain == (" Pathos Remaining: \n ") then
+        salvage_box2:hide()
+    end
 end
 
 windower.register_event('unload',function ()
-	windower.text.delete('salvage_box2')
-	windower.send_command('timers d Remaining')
+    windower.text.delete('salvage_box2')
+    windower.send_command('timers d Remaining')
 end )
