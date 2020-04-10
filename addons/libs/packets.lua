@@ -100,7 +100,7 @@ size = function(fields, count)
     -- A single field
     if fields.ctype then
         local bits, _, type = parse_type(fields)
-        return bits or count * sizes[type]
+        return bits or type == 'char' and 8 or count and count * sizes[type] or 0
     end
 
     -- A reference field
