@@ -1,6 +1,6 @@
 _addon.name     = 'SpellBook'
 _addon.author   = 'SigilBaram'
-_addon.version  = '1.0.0'
+_addon.version  = '1.0.1'
 _addon.commands = {'spellbook','spbk'}
 
 require('tables')
@@ -199,9 +199,12 @@ function spells_by_type(player, spell_type, learnable_only)
 
     for spell_id,spell in pairs(res.spells) do
         if ((spell_type.type == 'all' and spell.type ~= 'Trust') or
-            spell.type == spell_type.type) and not table.empty(spell.levels) and
-            not player_spells[spell_id] and (is_learnable(player, spell) or
-            not learnable_only) and not spell.unlearnable then
+            spell.type == spell_type.type) and
+            not table.empty(spell.levels) and
+            not player_spells[spell_id] and
+            (is_learnable(player, spell) or not learnable_only) and
+            not (spell_type.type == 'Trust' and spell.name:match('.*%(UC%)')) and
+            not spell.unlearnable then
 
             missing_spells:append(format_spell(spell))
             spell_count = spell_count + 1

@@ -71,7 +71,7 @@ def write_lua(messages):
         line = messages[zone_id]+','
         print("    [{}] = {}".format(zone_id, line), file=o)
     print('}',file=o)
-    print('offsets = {greater_less=1, failure=2, success=4, second_even_odd=5, first_even_odd=6, range=7, less=8, greater=9, equal=10, second_multiple=11, first_multiple=12}',file=o)
+    print('offsets = {greater_less=1, failure=2, success=4, second_even_odd=5, first_even_odd=6, range=7, less=8, greater=9, equal=10, second_multiple=11, first_multiple=12, tool_failure=13}',file=o)
     o.close()
 
 write_lua(search_dialog(zones, search))

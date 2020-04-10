@@ -2,7 +2,7 @@
 
 _addon.name = 'Scoreboard'
 _addon.author = 'Suji'
-_addon.version = '1.11'
+_addon.version = '1.12'
 _addon.commands = {'sb', 'scoreboard'}
 
 require('tables')
@@ -69,7 +69,7 @@ end
 
 -- Handle addon args
 windower.register_event('addon command', function()
-    local chatmodes = S{'s', 'l', 'p', 't', 'say', 'linkshell', 'party', 'tell'}
+    local chatmodes = S{'s', 'l', 'l2', 'p', 't', 'say', 'linkshell', 'linkshell2', 'party', 'tell'}
 
     return function(command, ...)
         if command == 'e' then
@@ -87,6 +87,7 @@ windower.register_event('addon command', function()
             sb_output('sb reset : Reset damage')
             sb_output('sb report [<target>] : Reports damage. Can take standard chatmode target options.')
             sb_output('sb reportstat <stat> [<player>] [<target>] : Reports the given stat. Can take standard chatmode target options. Ex: //sb rs acc p')
+            sb_output('Valid chatmode targets are: ' .. chatmodes:concat(', '))
             sb_output('sb filter show  : Shows current filter settings')
             sb_output('sb filter add <mob1> <mob2> ... : Add mob patterns to the filter (substrings ok)')
             sb_output('sb filter clear : Clears mob filter')
@@ -183,10 +184,14 @@ windower.register_event('addon command', function()
 
             if arg then
                 if chatmodes:contains(arg) then
-                    if arg2 and not arg2:match('^[a-zA-Z]+$') then
-                        -- should be a valid player name
-                        error('Invalid argument for report t: ' .. arg2)
-                        return
+                    if arg == 't' or arg == 'tell' then
+                        if not arg2 then
+                            -- should be a valid player name
+                            error('Invalid argument for report t: Please include player target name.')
+                            return
+                        elseif not arg2:match('^[a-zA-Z]+$') then
+                            error('Invalid argument for report t: ' .. arg2)
+                        end
                     end
                 else
                     error('Invalid parameter passed to report: ' .. arg)
@@ -432,6 +437,9 @@ function action_handler(raw_actionpacket)
                     dps_db:incr_ws_misses(target:get_name(), create_mob_name(actionpacket))
                 elseif main.resource and main.resource == 'weapon_skills' and main.conclusion then
                     dps_db:add_ws_damage(target:get_name(), create_mob_name(actionpacket), main.param, main.spell_id)
+                -- Siren's Hysteric Assault does HP drain and falls under message_id 802
+                elseif main.message_id == 802 then
+                    dps_db:add_damage(target:get_name(), create_mob_name(actionpacket), main.param)
                 elseif main.conclusion then
                     if main.conclusion.subject == 'target' and T(main.conclusion.objects):contains('HP') and main.param ~= 0 then
                         dps_db:add_damage(target:get_name(), create_mob_name(actionpacket), (main.conclusion.verb == 'gains' and -1 or 1)*main.param)
@@ -444,7 +452,7 @@ function action_handler(raw_actionpacket)
                         293,294,295,296,297,298,299,
                         300,301,302,385,386,387,388,
                         389,390,391,392,393,394,395,
-                        396,397,398,732}:contains(add.message_id) then
+                        396,397,398,732,767,768,769,770}:contains(add.message_id) then
                         actor_name = string.format("Skillchain(%s%s)", actor_name:sub(1, 3),
                                                       actor_name:len() > 3 and '.' or '')
                     end
@@ -480,7 +488,7 @@ function find_pet_owner_name(actionpacket)
     for _, member in pairs(party) do
         if type(member) == 'table' and member.mob then
             if member.mob.pet_index and member.mob.pet_index> 0 and pet.index == member.mob.pet_index then
-				name = member.mob.name
+                name = member.mob.name
                 break
             end
         end

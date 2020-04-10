@@ -424,6 +424,7 @@ function weather_update(id)
     world.real_weather_id = id
     world.real_weather = res.weather[id][language]
     world.real_weather_element = res.elements[res.weather[id].element][language]
+    world.real_weather_intensity = res.weather[world.real_weather_id].intensity
     local buff = false
     if buffactive[178] then
         buff = true
@@ -471,6 +472,7 @@ function weather_update(id)
     end
     world.weather = res.weather[world.weather_id][language]
     world.weather_element = res.elements[res.weather[world.weather_id].element][language]
+    world.weather_intensity = res.weather[world.weather_id].intensity
 end
 
 

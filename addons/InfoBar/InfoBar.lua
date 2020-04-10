@@ -107,7 +107,7 @@ function get_db(target, zones, level)
                 MOB_infobar.spawntime = spawntime or ''
                 if isaggressive == 1 then
                     MOB_infobar.isagressive = 'A'
-                    if levelmax and (level - tonumber(levelmax)) <= 10 then
+                    if levelmax and levelmax ~= '???' and (level - tonumber(levelmax)) <= 10 then
                         box:bold(true)
                     end
                 else

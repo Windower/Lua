@@ -1,4 +1,5 @@
 require('luau')
+local url = require('socket.url')
 
 _addon.name = 'Linker'
 _addon.author = 'Arcon'
@@ -39,7 +40,7 @@ defaults.search.db = 'http://ffxidb.com/search?q=${query}'
 defaults.search.ah = 'http://ffxiah.com/search/item?q=${query}'
 defaults.search.bg = 'http://wiki.bluegartr.com/index.php?title=Special:Search&search=${query}'
 defaults.search.ge = 'http://ffxi.gamerescape.com/wiki/Special:Search?search=${query}'
-defaults.search.wikia = 'http://wiki.ffxiclopedia.org/wiki/index.php?search=${query}&fulltext=Search'
+defaults.search.wikia = 'https://ffxiclopedia.fandom.com/wiki/Special:Search?query=${query}'
 
 -- Miscallenous sites
 defaults.search.g = 'http://google.com/?q=${query}'
@@ -53,7 +54,9 @@ windower.register_event('addon command', function(command, ...)
     if not ... or not settings.search[command] and settings.raw[command] then
         windower.open_url(settings.raw[command])
     elseif settings.search[command] then
-        windower.open_url((settings.search[command]:gsub('${query}', L{...}:concat(' '))))
+        local query_string = url.escape(L{...}:concat(' '))
+        local adjusted_query_string = query_string:gsub('%%', '%%%%')
+        windower.open_url((settings.search[command]:gsub('${query}', adjusted_query_string)))
     else
         error('Command "' .. command .. '" not found.')
     end

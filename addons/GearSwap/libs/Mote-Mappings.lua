@@ -234,14 +234,16 @@ areas.Cities = S{
     "Bastok Mines",
     "Metalworks",
     "Aht Urhgan Whitegate",
-    "Tavanazian Safehold",
+    "Tavnazian Safehold",
     "Nashmau",
     "Selbina",
     "Mhaura",
     "Norg",
     "Eastern Adoulin",
     "Western Adoulin",
-    "Kazham"
+    "Kazham",
+    "Rabao",
+    "Chocobo Circuit",
 }
 -- Adoulin areas, where Ionis will grant special stat bonuses.
 areas.Adoulin = S{

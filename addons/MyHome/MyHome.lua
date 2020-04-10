@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.]]
 
 _addon.name = 'MyHome'
 _addon.author = 'from20020516'
-_addon.version = '1.0'
+_addon.version = '1.1'
 _addon.commands = {'myhome','mh','warp'}
 
 require('logger')
@@ -85,15 +85,28 @@ function search_item()
     end
 end
 
-windower.register_event('addon command',function()
+windower.register_event('addon command',function(...)
+    local args = T{...}
+    local cmd = args[1]
+    if cmd == 'all' then
+        windower.chat.input('//myhome')
+        windower.send_ipc_message('myhome')
+    else
     local player = windower.ffxi.get_player()
     local get_spells = windower.ffxi.get_spells()
     local spell = S{player.main_job_id,player.sub_job_id}[4]
         and (get_spells[261] and player.vitals.mp >= 100 and {japanese='デジョン',english='"Warp"'}
         or get_spells[262] and player.vitals.mp >= 150 and {japanese='デジョンII',english='"Warp II"'})
-    if spell then
-        windower.chat.input('/ma '..windower.to_shift_jis(spell[lang])..' <me>')
-    else
-        search_item()
+        if spell then
+            windower.chat.input('/ma '..windower.to_shift_jis(spell[lang])..' <me>')
+        else
+            search_item()
+        end
+    end
+end)
+
+windower.register_event('ipc message',function (msg)
+    if msg == 'myhome' then
+        windower.chat.input('//myhome')
     end
 end)

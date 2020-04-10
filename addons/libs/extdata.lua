@@ -173,6 +173,8 @@ augment_values = {
         [0x07C] = {{stat="Pet: Acc.", offset=1}, {stat="Pet: R.Acc.", offset=1}, {stat="Pet: Atk.", offset=1}, {stat="Pet: R.Atk.", offset=1}},
         [0x07D] = {{stat="Pet: M.Acc.", offset=1}, {stat="Pet: M.Dmg.", offset=1}},
         [0x07E] = {{stat='Pet: Magic Damage', offset=1}},
+        [0x07F] = {{stat="Pet: Magic dmg. taken ", offset=1,multiplier=-1,percent=true}},
+
 
         [0x080] = {{stat="Pet:",offset = 0}},
         --[0x081: Accuracy +1 Ranged Acc. +0 | value + 1
@@ -660,22 +662,23 @@ augment_values = {
         [0x538] = {{stat='Enhances "Invigorate" effect', offset=0,multiplier=0}},
         [0x539] = {{stat='Enhances "Mantra" effect', offset=0,multiplier=0}},
 
-        [0x53C] = {{stat='Enhances "Protectra V" effect', offset=0,multiplier=0}},
+        [0x53C] = {{stat='Enhances "Afflatus Solace" effect', offset=0,multiplier=0}},
         [0x53D] = {{stat='Enhances "Martyr" effect', offset=0,multiplier=0}},
-        [0x53E] = {{stat='Enhances "Shellra V" effect', offset=0,multiplier=0}},
+        [0x53E] = {{stat='Enhances "Afflatus Misery" effect', offset=0,multiplier=0}},
         [0x53F] = {{stat='Enhances "Devotion" effect', offset=0,multiplier=0}},
         
-        [0x542] = {{stat='Increases Ancient Magic II damage', offset=0,multiplier=0}},
-        [0x543] = {{stat='Reduces Ancient Magic II casting time', offset=0,multiplier=0}},
-        [0x544] = {{stat='Increases Ancient Magic II accuracy', offset=0,multiplier=0}},
-        [0x545] = {{stat='Reduces Ancient Magic II MP cost', offset=0,multiplier=0}},
+        [0x542] = {{stat='Increases Ancient Magic damage and magic burst damage', offset=0,multiplier=0}},
+        [0x543] = {{stat='Increases Elemental Magic accuracy', offset=0,multiplier=0}},
+        [0x544] = {{stat='Increases Elemental Magic debuff time and potency', offset=0,multiplier=0}},
+        [0x545] = {{stat='Increases Aspir absorption amount', offset=0,multiplier=0}},
 
-        [0x548] = {{stat='Enhances "Dia III" effect', offset=0,multiplier=0}},
-        [0x549] = {{stat='Enhances "Slow II" effect', offset=0,multiplier=0}},
-        [0x54A] = {{stat='Enhances "Phalanx II" effect', offset=0,multiplier=0}},
-        [0x54B] = {{stat='Enhances "Bio III" effect', offset=0,multiplier=0}},
-        [0x54C] = {{stat='Enhances "Blind II" effect', offset=0,multiplier=0}},
-        [0x54D] = {{stat='Enhances "Paralyze II" effect', offset=0,multiplier=0}},
+        [0x548] = {{stat='Enfeebling Magic duration', offset=0,multiplier=0}},
+        [0x549] = {{stat='Magic Accuracy', offset=0,multiplier=0}},
+        [0x54A] = {{stat='Enhancing Magic duration', offset=0,multiplier=0}},
+        [0x54B] = {{stat='Enspell Damage', offset=0,multiplier=0}},
+        [0x54C] = {{stat='Accuracy', offset=0,multiplier=0}},
+        [0x54D] = {{stat='Immunobreak Chance', offset=0,multiplier=0}},
+		
         [0x54E] = {{stat='Enhances "Aura Steal" effect', offset=0,multiplier=0}},
         [0x54F] = {{stat='Enhances "Ambush" effect', offset=0,multiplier=0}},
         [0x550] = {{stat='Enhances "Feint" effect', offset=0,multiplier=0}},
@@ -696,9 +699,9 @@ augment_values = {
         [0x562] = {{stat='Enhances "Beast Affinity" effect', offset=0,multiplier=0}},
         [0x563] = {{stat='Enhances "Beast Healer" effect', offset=0,multiplier=0}},
         
-        [0x566] = {{stat='Enhances "Foe Sirvente" effect', offset=0,multiplier=0}},
+        [0x566] = {{stat='Enhances "Con Anima" effect', offset=0,multiplier=0}},
         [0x567] = {{stat='Enhances "Troubadour" effect', offset=0,multiplier=0}},
-        [0x568] = {{stat='Enh. "Adventurer\'s Dirge" effect', offset=0,multiplier=0}},
+        [0x568] = {{stat='Enhances "Con Brio" effect', offset=0,multiplier=0}},
         [0x569] = {{stat='Enhances "Nightingale" effect', offset=0,multiplier=0}},
         
         [0x56C] = {{stat='Enhances "Recycle" effect', offset=0,multiplier=0}},
@@ -711,10 +714,10 @@ augment_values = {
         [0x574] = {{stat='Enhances "Blade Bash" effect', offset=0,multiplier=0}},
         [0x575] = {{stat='Enhances "Ikishoten" effect', offset=0,multiplier=0}},
         
-        [0x578] = {{stat='Increases elem. ninjutsu III damage', offset=0,multiplier=0}},
+        [0x578] = {{stat='Enhances "Yonin" and "Innin" effect', offset=0,multiplier=0}},
         [0x579] = {{stat='Enhances "Sange" effect', offset=0,multiplier=0}},
         [0x57A] = {{stat='Enh. "Ninja Tool Expertise" effect', offset=0,multiplier=0}},
-        [0x57B] = {{stat='Reduces elem. ninjutsu III cast time', offset=0,multiplier=0}},
+        [0x57B] = {{stat='Enh. Ninj. Mag. Acc/Cast Time Red.', offset=0,multiplier=0}},
         
         [0x57E] = {{stat='Enhances "Deep Breathing" effect', offset=0,multiplier=0}},
         [0x57F] = {{stat='Enhances "Angon" effect', offset=0,multiplier=0}},
@@ -1533,6 +1536,8 @@ function tools.aug.unpack_augment(sys,short)
         return short:byte(1), short:byte(2)
     elseif sys == 3 then
         return short:byte(1) + short:byte(2)%8*256,  math.floor(short:byte(2)%128/8)
+    elseif sys == 4 then
+        return short:byte(1), short:byte(2)
     end
 end
 
@@ -1610,6 +1615,11 @@ function decode.Augmented(str)
         rettab.rank = math.floor(str:byte(3)%128/4)
         rettab.RP = math.max(points_map[rettab.rank] or 0 - str:byte(6)*256 - str:byte(5),0)
         rettab.augments = tools.aug.augments_to_table(rettab.augment_system,str:sub(7,12))
+    elseif flag_2 == 131 then
+        rettab.augment_system = 4
+        local path_map = {[0] = 'A',[1] = 'B', [2] = 'C', [3] = 'D'}
+        rettab.path = path_map[math.floor(str:byte(5)%4)]
+        rettab.augments = {'Path: ' ..rettab.path}
     elseif flag_2/128 >= 1 then -- Evolith
         rettab.augment_system = 3
         local slot_type_map = {[0] = 'None', [1] = 'Filled Upside-down Triangle', [2] = 'Filled Diamond', [3] = 'Filled Star', [4] = 'Empty Triangle', [5] = 'Empty Square', [6] = 'Empty Circle', [7] = 'Empty Upside-down Triangle', [8] = 'Empty Diamond', [9] = 'Empty Star', [10] = 'Filled Triangle', [11] = 'Filled Square', [12] = 'Filled Circle', [13] = 'Empty Circle', [14] = 'Fire', [15] = 'Ice'}
@@ -1657,6 +1667,7 @@ function decode.Equipment(str)
     local flag_1_mapping = {
         [1] = decode.Enchanted,
         [2] = decode.Augmented,
+        [3] = decode.Augmented,
         }
     if flag_1_mapping[flag_1] then
         rettab = flag_1_mapping[flag_1](str:sub(1,12))

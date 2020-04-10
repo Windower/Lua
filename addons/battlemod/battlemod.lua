@@ -12,7 +12,7 @@ require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
 
-_addon.version = '3.23'
+_addon.version = '3.25'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth, maintainer: SnickySnacks'
 _addon.commands = {'bm','battlemod'}
@@ -54,6 +54,7 @@ windower.register_event('addon command', function(command, ...)
             cancelmulti = not cancelmulti
             windower.add_to_chat(121,'Battlemod: Multi-canceling flipped! - '..tostring(cancelmulti))
         elseif command:lower() == 'reload' then
+            current_job = 'NONE'
             options_load()
         elseif command:lower() == 'unload' then
             windower.send_command('@lua u battlemod')
@@ -106,7 +107,7 @@ windower.register_event('addon command', function(command, ...)
     end
 end)
 
-windower.register_event('incoming text',function (original, modified, color)
+windower.register_event('incoming text',function (original, modified, color, color_m, blocked)
     if debugging then windower.debug('incoming text') end
     local redcol = color%256
     
@@ -131,9 +132,30 @@ windower.register_event('incoming text',function (original, modified, color)
             modified = true
         end
     end
+    if block_modes:contains(color) then
+        local endline = string.char(0x7F, 0x31)
+        local item = string.char(0x1E)
+        if not bm_message(original) then
+            if original:endswith(endline) then --allow add_to_chat messages with the modes we blocking
+                blocked = true
+                return blocked
+            end
+        elseif original:endswith(endline) and string.find(original, item) then --block items action messages
+            blocked = true
+            return blocked
+        end
+    end
     
     return modified,color
 end)
+
+function bm_message(original)
+    local check = string.char(0x1E)
+    local check2 = string.char(0x1F)
+    if string.find(original, check) or string.find(original, check2) then
+        return true
+    end
+end
 
 function flip_block_equip()
     block_equip = not block_equip
@@ -198,7 +220,7 @@ function options_load()
 end
 
 function filterload(job)
-    if Current_job == job then return end
+    if current_job == job then return end
     if file.exists('data\\filters\\filters-'..job..'.xml') then
         default_filt = false
         filter = config.load('data\\filters\\filters-'..job..'.xml',default_filter_table,false)
@@ -210,7 +232,7 @@ function filterload(job)
         config.save(filter)
         windower.add_to_chat(4,'Loaded default Battlemod filters')
     end
-    Current_job = job
+    current_job = job
 end
 
 ActionPacket.open_listener(parse_action_packet)
@@ -237,7 +259,25 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
         if not check_filter(actor,target,0,am.message_id) then return true end
         
         if not actor or not target then -- If the actor or target table is nil, ignore the packet
-        elseif T{206}:contains(am.message_id) and condensetargets then -- Wears off messages
+        elseif am.message_id == 800 then -- Spirit bond message
+            local status = color_it(res.buffs[am.param_1][language],color_arr.statuscol)
+            local targ = color_it(target.name or '',color_arr[target.owner or target.type])
+            local number = am.param_2
+            local color = color_filt(res.action_messages[am.message_id].color, am.target_id==Self.id)
+            if simplify then
+                local msg = line_noactor
+                    :gsub('${abil}',status or '')
+                    :gsub('${target}',targ)
+                    :gsub('${numb}',number or '')
+                windower.add_to_chat(color, msg)
+            else
+                local msg = res.action_messages[am.message_id][language]
+                    :gsub('${status}',status or '')
+                    :gsub('${target}',targ)
+                    :gsub('${number}',number or '')
+                windower.add_to_chat(color, msg)
+            end
+        elseif am.message_id == 206 and condensetargets then -- Wears off messages
             -- Condenses across multiple packets
             local status
             
@@ -312,14 +352,13 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             
             if am.message_id > 169 and am.message_id <179 then
                 if am.param_1 > 2147483647 then
-                    skill = 'like level -1 ('..ratings_arr[am.param_2-63]..')'
+                    skill = 'to be level -1 ('..ratings_arr[am.param_2-63]..')'
                 else
-                    skill = 'like level '..am.param_1..' ('..ratings_arr[am.param_2-63]..')'
+                    skill = 'to be level '..am.param_1..' ('..ratings_arr[am.param_2-63]..')'
                 end
             end
-            
             local outstr = (res.action_messages[am.message_id][language]
-                :gsub('$\123actor\125',color_it(actor.name or '',color_arr[actor.owner or actor.type]))
+                :gsub('$\123actor\125',color_it((actor.name or '') .. (actor.owner_name or ""),color_arr[actor.owner or actor.type]))
                 :gsub('$\123status\125',status or '')
                 :gsub('$\123item\125',color_it(item or '',color_arr.itemcol))
                 :gsub('$\123target\125',color_it(target.name or '',color_arr[target.owner or target.type]))

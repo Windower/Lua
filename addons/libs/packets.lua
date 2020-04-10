@@ -10,7 +10,6 @@ require('strings')
 require('functions')
 require('pack')
 
-local list, math, string, functions = _libs.lists, _libs.maths, _libs.strings
 local table = require('table')
 
 local packets = {}
@@ -69,7 +68,7 @@ local sizes = {
 }
 
 -- This defines whether to treat a type with brackets at the end as an array or something special
-local non_array_types = S{'bit', 'data', 'char'} 
+local non_array_types = S{'bit', 'data', 'char'}
 
 -- Pattern to match variable size array
 local pointer_pattern = '(.+)%*'
@@ -100,7 +99,7 @@ local size
 size = function(fields, count)
     -- A single field
     if fields.ctype then
-        local bits, type_count, type = parse_type(fields)
+        local bits, _, type = parse_type(fields)
         return bits or count * sizes[type]
     end
 
@@ -394,6 +393,11 @@ function packets.new(dir, id, values, ...)
     return packet
 end
 
+local lookup = function(packet, field)
+    local val = packet[field.label]
+    return field.enc and (val .. 0:char()):encode(field.enc) or val
+end
+
 -- Returns binary data from a packet
 function packets.build(packet)
     local fields = packets.fields(packet._dir, packet._id, packet._raw, unpack(packet._args or {}))
@@ -403,7 +407,7 @@ function packets.build(packet)
     end
 
     local pack_string = fields:map(make_pack_string):concat()
-    local data = pack_string:pack(fields:map(table.lookup-{packet, 'label'}):unpack())
+    local data = pack_string:pack(fields:map(lookup+{packet}):unpack())
     local rem = #data % 4
     if rem ~= 0 then
         data = data .. 0:char():rep(4 - rem)

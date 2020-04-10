@@ -56,6 +56,7 @@ local display = false
 local jiggle = false
 local support = false
 local zone = nil
+local hqsynth = false
 
 local conditions = {
     move = false,
@@ -96,6 +97,7 @@ local support_npcs = {
     {name = "Lih Pituu", zone = 241, menu = 10018, buff = 241},
     {name = "Terude-Harude", zone = 241, menu = 10013, buff = 239},
     {name = "Fleuricette", zone = 256, menu = 1201, buff = 512},
+    {name = "Quiri-Aliri", zone = 257, menu = 1201, buff = 512},
 }
 
 local exceptions = {
@@ -118,6 +120,17 @@ local clusters = {
     ['Water Crystal'] = 'Water Cluster',
     ['Light Crystal'] = 'Light Cluster',
     ['Dark Crystal'] = 'Dark Cluster',
+}
+
+local hqcrystal = {
+    ['Fire Crystal'] = 'Inferno Crystal',
+    ['Ice Crystal'] = 'Glacier Crystal',
+    ['Wind Crystal'] = 'Cyclone Crystal',
+    ['Earth Crystal'] = 'Terra Crystal',
+    ['Lightng. Crystal'] = 'Plasma Crystal',
+    ['Water Crystal'] = 'Torrent Crystal',
+    ['Light Crystal'] = 'Aurora Crystal',
+    ['Dark Crystal'] = 'Twilight Crystal',
 }
 
 local help_commands = [[
@@ -170,6 +183,7 @@ local help_commands_2 = [[
   also displayed.)
 14. display - Toggles whether outgoing crafting
     packets are displayed in the chat log.
+15. hqcrystal - Toggle whether to use HQ Crystal
 ]]
 
 local help_notes = [[
@@ -421,7 +435,11 @@ local function build_recipe(item)
         inventory = windower.ffxi.get_items()
         appropriated = {}
         local p = packets.new('outgoing', 0x096)
-        local id, index = fetch_ingredient(recipe['crystal'])
+        local crystal = recipe['crystal']
+        if hqsynth then
+            crystal = hqcrystal[crystal]
+        end
+        local id, index = fetch_ingredient(crystal)
         if not index then return id end
         p['Crystal'] = id
         p['Crystal Index'] = index
@@ -555,6 +573,7 @@ local function handle_status()
     notice("auto support", support)
     notice("jiggle", jiggle)
     notice("queue size", queue:length())
+    notice("hq crystal", hqsynth)
 end
 
 local function handle_delay(seconds)
@@ -718,6 +737,17 @@ local function handle_find(query, details)
     end
 end
 
+local function handle_hqsynth()
+    if hqsynth then
+        notice("Disabling HQ Crystal")
+        hqsynth = false
+    else
+        notice("Enabling HQ Crystal")
+        hqsynth = true
+    end
+end
+
+
 handlers['clear'] = handle_clear
 handlers['repeat'] = handle_repeat
 handlers['r'] = handle_repeat
@@ -734,6 +764,7 @@ handlers['help'] = handle_help
 handlers['jiggle'] = handle_jiggle
 handlers['support'] = handle_support
 handlers['find'] = handle_find
+handlers['hqcrystal'] = handle_hqsynth
 
 local function handle_command(cmd, ...)
     local cmd = cmd or 'help'
