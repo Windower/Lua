@@ -28,7 +28,7 @@ local ls_enc = {
     }),
     bits = 6,
     terminator = function(str)
-        return (#str % 4 == 2 and 0x60 or 0x63):char()
+        return (#str % 4 == 2 and 60 or 63):binary()
     end
 }
 local sign_enc = {

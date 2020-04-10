@@ -439,7 +439,7 @@ end
 string.encode = function(str, encoding)
     local binary = str:map(string.zfill-{encoding.bits} .. math.binary .. table.find+{encoding.charset})
     if encoding.terminator then
-        binary = binary .. encoding.terminator(str):binary()
+        binary = binary .. encoding.terminator(str)
     end
     return binary:rpad('0', (#binary / 8):ceil() * 8):parse_binary()
 end
