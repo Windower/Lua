@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name    = 'findAll'
 _addon.author  = 'Zohno'
-_addon.version = '1.20170501'
+_addon.version = '1.20180607'
 _addon.commands = {'findall'}
 
 require('chat')
@@ -189,10 +189,11 @@ storages_order         = S(res.bags:map(string.gsub-{' ', ''} .. string.lower ..
 
     return index1 < index2
 end)
-storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14', 'slip 15', 'slip 16', 'slip 17', 'slip 18', 'slip 19', 'slip 20', 'slip 21', 'slip 22', 'slip 23'}
+storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14', 'slip 15', 'slip 16', 'slip 17', 'slip 18', 'slip 19', 'slip 20', 'slip 21', 'slip 22', 'slip 23', 'slip 24', 'slip 25', 'slip 26', 'slip 27'}
 merged_storages_orders = storages_order + storage_slips_order + L{'key items'}
 
 function search(query, export)    
+    update_global_storage()
     update()
     if query:length() == 0 then
         return
@@ -468,7 +469,6 @@ function make_table(tab,tab_offset)
             ret = ret..tostring(v)..',\n'
         end
     end
-    coroutine.yield()
     return ret..offset..'}'
 end
 
@@ -490,14 +490,6 @@ function update()
         self_storage:create()
     end
     
-    global_storages = T{} -- global_storages[server str][character_name str][inventory_name str][item_id num] = count num
-    
-    for _,f in pairs(windower.get_dir(windower.addon_path.."\\"..storages_path)) do
-        if f:sub(-4) == '.lua' and f:sub(1,-5) ~= player_name then
-            global_storages[f:sub(1,-5)] = dofile(windower.addon_path..'\\'..storages_path..'\\'..f)
-        end
-    end
-    
 	local local_storage = get_local_storage()
 
 	if local_storage then
@@ -509,6 +501,24 @@ function update()
     self_storage:write('return '..make_table(local_storage,0)..'\n')
     collectgarbage()
     return true
+end
+
+
+function update_global_storage()
+    local player_name   = windower.ffxi.get_player().name
+    
+    global_storages = T{} -- global_storages[server str][character_name str][inventory_name str][item_id num] = count num
+    
+    for _,f in pairs(windower.get_dir(windower.addon_path.."\\"..storages_path)) do
+        if f:sub(-4) == '.lua' and f:sub(1,-5) ~= player_name then
+            local success,result = pcall(dofile,windower.addon_path..'\\'..storages_path..'\\'..f)
+            if success then
+                global_storages[f:sub(1,-5)] = result
+            else
+                warning('Unable to retrieve updated item storage for %s.':format(f:sub(1,-5)))
+            end
+        end
+    end
 end
 
 windower.register_event('load', update:cond(function() return windower.ffxi.get_info().logged_in end))

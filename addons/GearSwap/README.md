@@ -1,8 +1,8 @@
 Author: Byrth
 
-Version: 0.910
+Version: 0.930
 
-Date: 12/08/2015
+Date: 06/13/2017
 
 GearSwap
 

@@ -3,16 +3,21 @@ This library provides a set of functions to aid in debugging.
 ]]
 
 _libs = _libs or {}
-_libs.logger = true
-_libs.strings = _libs.strings or require('strings')
-_libs.chat = _libs.chat or require('chat')
+
+require('strings')
+require('chat')
+
+local string, chat = _libs.strings, _libs.chat
+local table = require('table')
+
+local logger = {}
+
+_libs.logger = logger
 
 _raw = _raw or {}
 
-local logger = {}
-logger.defaults = {}
-
 -- Set up, based on addon.
+logger.defaults = {}
 logger.defaults.logtofile = false
 logger.defaults.defaultfile = 'lua.log'
 logger.defaults.logcolor = 207

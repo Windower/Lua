@@ -3,12 +3,16 @@ Library for a matrix data structure and operations defined on it.
 ]]
 
 _libs = _libs or {}
-_libs.matrices = true
-_libs.tables = _libs.tables or require('tables')
-_libs.maths = _libs.maths or require('maths')
-_libs.vectors = _libs.vectors or require('vectors')
+
+require('tables')
+require('maths')
+require('vectors')
+
+local table, math, vector = _libs.tables, _libs.maths, _libs.vectors
 
 matrix = {}
+
+_libs.matrices = matrix
 
 _meta = _meta or {}
 _meta.M = _meta.M or {}
@@ -249,7 +253,7 @@ function matrix.vprint(m)
 end
 
 --[[
-Copyright (c) 2013, Windower
+Copyright © 2013, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:

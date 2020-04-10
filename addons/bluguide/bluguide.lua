@@ -6,7 +6,7 @@ traitboxes = require("ui/traitboxes")
 spellboxes = require("ui/spellboxes")
 setspells = require("masterlist")
 
-_addon.version = '1.1'
+_addon.version = '1.2'
 _addon.name = 'bluGuide'
 _addon.author = 'Anissa of Cerberus'
 
@@ -260,7 +260,7 @@ function close()
     windower.send_command('lua unload bluguide')
 end
 
---Copyright © 2015, Anissa
+--Copyright Â© 2015, Anissa
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without

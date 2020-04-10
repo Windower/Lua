@@ -7,9 +7,15 @@
 ]]
 
 _libs = _libs or {}
-_libs.tables = true
-_libs.maths = _libs.maths or require('maths')
-_libs.functions = _libs.functions or require('functions')
+
+require('maths')
+require('functions')
+
+local math, functions = _libs.maths, _libs.functions
+
+local table = require('table')
+
+_libs.tables = table
 
 _raw = _raw or {}
 _raw.table = setmetatable(_raw.table or {}, {__index = table})

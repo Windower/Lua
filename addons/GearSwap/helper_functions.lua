@@ -100,10 +100,7 @@ end
 ---- Filtered key
 -----------------------------------------------------------------------------------
 function user_key_filter(val)
-    if type(val) == 'string' then
-        val = string.lower(val)
-    end
-    return val
+    return type(val) == 'string' and string.lower(val) or val
 end
 
 
@@ -626,89 +623,92 @@ end
 
 -----------------------------------------------------------------------------------
 --Name: filter_pretarget(spell)
---Desc: Determines whether the current player is capable of using the proposed spell
+--Desc: Determines whether the current player is capable of using the proposed action
 ----    at pretarget.
 --Args:
----- spell - current spell table
+---- action - current action
 -----------------------------------------------------------------------------------
 --Returns:
 ---- false to cancel further command processing and just return the command.
 -----------------------------------------------------------------------------------
-function filter_pretarget(spell)
-    local category = outgoing_action_category_table[unify_prefix[spell.prefix]]
+function filter_pretarget(action)
+    local category = outgoing_action_category_table[unify_prefix[action.prefix]]
+    local bool = true
+    local err
     if world.in_mog_house then
         msg.debugging("Unable to execute commands. Currently in a Mog House zone.")
         return false
     elseif category == 3 then
         local available_spells = windower.ffxi.get_spells()
-        local spell_jobs = copy_entry(res.spells[spell.id].levels)
-        
-        -- Filter for spells that you do not know. Exclude Impact.
-        if not available_spells[spell.id] and not (spell.id == 503 or spell.id == 417) then
-            msg.debugging("Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")")
-            return false
-        -- Filter for spells that you know, but do not currently have access to
-        elseif (not spell_jobs[player.main_job_id] or not (spell_jobs[player.main_job_id] <= player.main_job_level or
-            (spell_jobs[player.main_job_id] >= 100 and number_of_jps(player.job_points[__raw.lower(res.jobs[player.main_job_id].ens)]) >= spell_jobs[player.main_job_id]) ) ) and
-            (not spell_jobs[player.sub_job_id] or not (spell_jobs[player.sub_job_id] <= player.sub_job_level)) and not (player.main_job_id == 23) then
-            msg.debugging("Unable to execute command. You do not have access to that spell ("..(res.spells[spell.id][language] or spell.id)..")")
-            return false
-        -- At this point, we know that it is technically castable by this job combination if the right conditions are met.
-        elseif player.main_job_id == 20 and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
-            (addendum_black[spell.id] and not buffactive[402] and not buffactive[416])) and
-            not (spell_jobs[player.sub_job_id] and spell_jobs[player.sub_job_id] <= player.sub_job_level) then
-            
-            if addendum_white[spell.id] then
-                msg.debugging("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
-            end
-            if addendum_black[spell.id] then
-                msg.debugging("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
-            end
-            return false
-        elseif player.sub_job_id == 20 and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
-            (addendum_black[spell.id] and not buffactive[402] and not buffactive[416])) and
-            not (spell_jobs[player.main_job_id] and (spell_jobs[player.main_job_id] <= player.main_job_level or
-            (spell_jobs[player.main_job_id] >= 100 and number_of_jps(player.job_points[__raw.lower(res.jobs[player.main_job_id].ens)]) >= spell_jobs[player.main_job_id]) ) ) then
-                        
-            if addendum_white[spell.id] then
-                msg.debugging("Unable to execute command. Addendum: White required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
-            end
-            if addendum_black[spell.id] then
-                msg.debugging("Unable to execute command. Addendum: Black required for that spell ("..(res.spells[spell.id][language] or spell.id)..")")
-            end
-            return false
-        elseif spell.type == 'BlueMagic' and not ((player.main_job_id == 16 and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) 
-            or unbridled_learning_set[spell.english]) and
-            not (player.sub_job_id == 16 and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
-            -- This code isn't hurting anything, but it doesn't need to be here either.
-            msg.debugging("Unable to execute command. Blue magic must be set to cast that spell ("..(res.spells[spell.id][language] or spell.id)..")")
-            return false
-        elseif spell.type == 'Ninjutsu'  then
-            if player.main_job_id ~= 13 and player.sub_job_id ~= 13 then
-                msg.debugging("Unable to make action packet. You do not have access to that spell ("..(spell[language] or spell.id)..")")
-                return false
-            elseif not player.inventory[tool_map[spell.english][language]] and not (player.main_job_id == 13 and player.inventory[universal_tool_map[spell.english][language]]) then
-                msg.debugging("Unable to make action packet. You do not have the proper tools.")
-                return false
-            end
+        bool,err = check_spell(available_spells,action)
+    elseif category == 7 then
+        local available = windower.ffxi.get_abilities().weapon_skills
+        if not table.contains(available,action.id) then
+            bool,err = false,"Unable to execute command. You do not have access to that weapon skill."
         end
-    elseif category == 7 or category == 9 then
-        local available = windower.ffxi.get_abilities()
-        if category == 7 and not S(available.weapon_skills)[spell.id] then
-            msg.debugging("Unable to execute command. You do not have access to that ability ("..(res.weapon_skills[spell.id][language] or spell.id)..")")
-            return false
-        elseif category == 9 and not S(available.job_abilities)[spell.id] then
-            msg.debugging("Unable to execute command. You do not have access to that ability ("..(res.job_abilities[spell.id][language] or spell.id)..")")
-            return false
+    elseif category == 9 then
+        local available = windower.ffxi.get_abilities().job_abilities
+        if not table.contains(available,action.id) then
+            bool,err = false,"Unable to execute command. You do not have access to that job ability."
         end
     elseif category == 25 and (not player.main_job_id == 23 or not windower.ffxi.get_mjob_data().species or
-        not res.monstrosity[windower.ffxi.get_mjob_data().species] or not res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[spell.id] or
-        not (res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[spell.id] <= player.main_job_level)) then
+        not res.monstrosity[windower.ffxi.get_mjob_data().species] or not res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[action.id] or
+        not (res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[action.id] <= player.main_job_level)) then
         -- Monstrosity filtering
-        msg.debugging("Unable to execute command. You do not have access to that monsterskill ("..(res.monster_abilities[spell.id][language] or spell.id)..")")
+        msg.debugging("Unable to execute command. You do not have access to that monsterskill ("..(res.monster_abilities[action.id][language] or action.id)..")")
         return false
     end
     
+    if err then
+        msg.debugging(err)
+    end
+    return bool
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: check_spell(available_spells,spell)
+--Desc: Determines whether the current player is capable of using the proposed spell
+----    at precast.
+--Args:
+---- available_spells - current set of available spells
+---- spell - current spell table
+-----------------------------------------------------------------------------------
+--Returns:
+---- false if the spell is not currently accessible
+-----------------------------------------------------------------------------------
+function check_spell(available_spells,spell)
+    -- Filter for spells that you do not know. Exclude Impact.
+    local spell_jobs = copy_entry(res.spells[spell.id].levels)
+    if not available_spells[spell.id] and not (spell.id == 503 or spell.id == 417) then
+        return false,"Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")"
+    -- Filter for spells that you know, but do not currently have access to
+    elseif (not spell_jobs[player.main_job_id] or not (spell_jobs[player.main_job_id] <= player.main_job_level or
+        (spell_jobs[player.main_job_id] >= 100 and number_of_jps(player.job_points[__raw.lower(res.jobs[player.main_job_id].ens)]) >= spell_jobs[player.main_job_id]) ) ) and
+        (not spell_jobs[player.sub_job_id] or not (spell_jobs[player.sub_job_id] <= player.sub_job_level)) and not (player.main_job_id == 23) then
+        return false,"Unable to execute command. You do not have access to that spell ("..(res.spells[spell.id][language] or spell.id)..")"
+    -- At this point, we know that it is technically castable by this job combination if the right conditions are met.
+    elseif player.main_job_id == 20 and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
+        (addendum_black[spell.id] and not buffactive[402] and not buffactive[416])) and
+        not (spell_jobs[player.sub_job_id] and spell_jobs[player.sub_job_id] <= player.sub_job_level) then
+        return false,"Unable to execute command. Addendum required for that spell ("..(res.spells[spell.id][language] or spell.id)..")"
+    elseif player.sub_job_id == 20 and ((addendum_white[spell.id] and not buffactive[401] and not buffactive[416]) or
+        (addendum_black[spell.id] and not buffactive[402] and not buffactive[416])) and
+        not (spell_jobs[player.main_job_id] and (spell_jobs[player.main_job_id] <= player.main_job_level or
+        (spell_jobs[player.main_job_id] >= 100 and number_of_jps(player.job_points[__raw.lower(res.jobs[player.main_job_id].ens)]) >= spell_jobs[player.main_job_id]) ) ) then
+        return false,"Unable to execute command. Addendum required for that spell ("..(res.spells[spell.id][language] or spell.id)..")"
+    elseif spell.type == 'BlueMagic' and not ((player.main_job_id == 16 and table.contains(windower.ffxi.get_mjob_data().spells,spell.id)) 
+        or unbridled_learning_set[spell.english]) and
+        not (player.sub_job_id == 16 and table.contains(windower.ffxi.get_sjob_data().spells,spell.id)) then
+        -- This code isn't hurting anything, but it doesn't need to be here either.
+        return false,"Unable to execute command. Blue magic must be set to cast that spell ("..(res.spells[spell.id][language] or spell.id)..")"
+    elseif spell.type == 'Ninjutsu'  then
+        if player.main_job_id ~= 13 and player.sub_job_id ~= 13 then
+            return false,"Unable to make action packet. You do not have access to that spell ("..(spell[language] or spell.id)..")"
+        elseif not player.inventory[tool_map[spell.english][language]] and not (player.main_job_id == 13 and player.inventory[universal_tool_map[spell.english][language]]) then
+            return false,"Unable to make action packet. You do not have the proper tools."
+        end
+    end
     return true
 end
 

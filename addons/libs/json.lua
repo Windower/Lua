@@ -2,15 +2,19 @@
 Small implementation of a JSON file reader.
 ]]
 
+_libs = _libs or {}
+
+require('tables')
+require('lists')
+require('sets')
+require('strings')
+
+local table, list, set, string = _libs.tables, _libs.lists, _libs.sets, _libs.strings
+local files = require('files')
+
 local json = {}
 
-_libs = _libs or {}
 _libs.json = json
-_libs.tables = _libs.tables or require('tables')
-_libs.lists = _libs.lists or require('lists')
-_libs.sets = _libs.sets or require('sets')
-_libs.strings = _libs.strings or require('strings')
-_libs.files = _libs.files or require('files')
 
 -- Define singleton JSON characters that can delimit strings.
 local singletons = '{}[],:'
@@ -20,7 +24,7 @@ local value_types = S{'boolean', 'number', 'string', 'nil'}
 -- Takes a filename and tries to parse the JSON in it, after a validity check.
 function json.read(file)
     if type(file) == 'string' then
-        file = _libs.files.new(file)
+        file = files.new(file)
     end
 
     if not file:exists() then

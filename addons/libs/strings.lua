@@ -3,9 +3,16 @@
 ]]
 
 _libs = _libs or {}
-_libs.strings = true
-_libs.functions = _libs.functions or require('functions')
-_libs.math = _libs.math or require('maths')
+
+require('functions')
+require('maths')
+
+local functions, math = _libs.functions, _libs.maths
+local table = require('table')
+
+local string = require('string')
+
+_libs.strings = string
 
 _meta = _meta or {}
 
