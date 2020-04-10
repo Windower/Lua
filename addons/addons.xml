@@ -172,6 +172,13 @@
     <support>http://www.ffxiah.com/player/Leviathan/Arcon</support>
   </addon>
   <addon>
+    <name>DistancePlus</name>
+    <author>Sammeh</author>
+    <description>Replacement for Distance Addon to show distance to current target and distance from pet.  Also color coordinates distance based on job and abilities, such as magic, ranged attacks, and JA's.  Also shows height differential for fights requiring height delta to avoid AOE.</description>
+    <bugtracker>https://github.com/SammehFFXI/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Quetzalcoatl/Sammeh</support>
+  </addon>
+  <addon>
     <name>DressUp</name>
     <author>Cairthenn</author>
     <description>Emulates BlinkMeNot functionality. Allows for customization of gear display for you or anyone else.</description>
@@ -619,6 +626,13 @@
     <description>Redirects the nm's weaknesses (VW or Abyssea) to the "tell" stream so that they can be held using the chat filters' function and highlights the important info.</description>
     <bugtracker>https://github.com/giulianoriccio/Lua/issues</bugtracker>
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
+  </addon>
+  <addon>
+    <name>XIVBar</name>
+    <author>SirEdeonX (Edeon@Asura)</author>
+    <description>Displays HP, MP and TP bars on the center of the screen, akin to FFXIV, for easy tracking</description>
+    <bugtracker>https://github.com/SirEdeonX/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Asura/Edeon</support>
   </addon>
   <addon>
     <name>Yush</name>

@@ -2098,6 +2098,8 @@ types.shop_item = L{
     {ctype='unsigned int',      label='Price',              fn=gil},            -- 00
     {ctype='unsigned short',    label='Item',               fn=item},           -- 04
     {ctype='unsigned short',    label='Shop Slot'},                             -- 08
+    {ctype='unsigned short',    label='Craft Skill'},                           -- 0A Zero on normal shops, has values that correlate to res\skills.
+    {ctype='unsigned short',    label='Craft Rank'},                            -- 0C Correlates to Rank able to purchase product from GuildNPC
 }
 
 -- Shop
