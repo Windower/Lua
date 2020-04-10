@@ -432,7 +432,7 @@ end
 
 -- Returns a string decoded given the appropriate encoding.
 string.decode = function(str, encoding)
-    return (str:binary():chunks(encoding.bits):map(table.get+{encoding.charset} .. tonumber-{2}):concat():gsub('%z+$', ''))
+    return (str:binary():chunks(encoding.bits):map(table.get+{encoding.charset} .. tonumber-{2}):concat():gsub('%z.*$', ''))
 end
 
 -- Returns a string encoded given the appropriate encoding.
