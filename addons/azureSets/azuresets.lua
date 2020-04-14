@@ -38,6 +38,7 @@ require('logger')
 local config = require('config')
 local res = require('resources')
 local chat = require('chat')
+local packets = require('packets')
 local spells = res.spells:type('BlueMagic')
 
 local defaults = {}
@@ -66,14 +67,36 @@ local bluPointsMax = nil
 local bluSlots = nil
 local get_blu_job_data = nil
 
+local spellsLookup = {}
+for spell in spells:it() do
+    spellsLookup[spell.english] = spell
+    spellsLookup[spell.english:lower()] = spell
+    spellsLookup[spell.japanese] = spell
+end
+
 function initialize()
     update_blu_info()
     update_current_spellset()
 end
 
-windower.register_event('load', initialize:cond(function() return windower.ffxi.get_info().logged_in end))
+windower.register_event('load', function()
+    local player = windower.ffxi.get_player()
+    local is_blu = player and player.main_job_id == BLU_JOB_ID
+    local logged_in = windower.ffxi.get_info()
+    if is_blu and logged_in then
+        initialize()
+    end
+end)
 
-windower.register_event('login', function() coroutine.schedule(initialize, 5) end)
+windower.register_event('incoming chunk', function(id, original, modified, injected, blocked) 
+    if id ~= 0x00A then
+        return
+    end
+    local packet = packets.parse('incoming', original)
+    if packet['Main Job'] == BLU_JOB_ID then
+       initialize()
+    end 
+end)
 
 windower.register_event('job change', initialize)
 
@@ -171,15 +194,13 @@ function set_spells_from_spellset(spellset, setPhase)
         -- We found an empty slot. Find a spell to set.
         for k, v in pairs(setToSet) do
             if not currentSpellSet:contains(v:lower()) then
-                if v ~= nil then
-                    local spellID = find_spell_id_by_name(v)
-                    if spellID ~= nil then
-                        local verified = verify_and_set_spell(spellID, tonumber(slotToSetTo))
-                        if verified then
-                            set_spells_from_spellset:schedule(settings.setspeed, spellset, 'add')
-                        end
-                        return
+                local spellID = find_spell_id_by_name(v)
+                if spellID ~= nil then
+                    local verified = verify_and_set_spell(spellID, tonumber(slotToSetTo))
+                    if verified then
+                        set_spells_from_spellset:schedule(settings.setspeed, spellset, 'add')
                     end
+                    return
                 end
             end
         end
@@ -191,17 +212,13 @@ function set_spells_from_spellset(spellset, setPhase)
 end
 
 function find_spell_id_by_name(spellname)
-    for spell in spells:it() do
-        if spell['english']:lower() == spellname:lower() then
-            return spell['id']
-        end
+    local spell = spellsLookup[spellname] or spellsLookup[spellname:lower()]
+    if spell and spell.id then
+        return spell.id
     end
-    return nil
 end
 
 function set_single_spell(setspell, slot)
-    if not bluJobLevel then return nil end
-
     update_current_spellset()
     for key, val in pairs(currentSpellSet) do
         if currentSpellSet[key]:lower() == setspell then
@@ -212,26 +229,19 @@ function set_single_spell(setspell, slot)
     if tonumber(slot) < 10 then slot = '0'..slot end
     --insert spell add code here
     local spellId = find_spell_id_by_name(setspell)
-    if spellId then
-        local verified = verify_and_set_spell(spellId, tonumber(slot))
-        if verified then
-            windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
-            currentSpellSet['slot'..slot] = setspell
-        end
+    local verified = verify_and_set_spell(spellId, tonumber(slot))
+    if verified then
+        windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
+        currentSpellSet['slot'..slot] = setspell
     end
 end
 
 function update_current_spellset(player)
-    if not get_blu_job_data then
-        currentSpellSet = nil
-        return nil
-    end
-
     currentSpellSet = T(get_blu_job_data().spells)
     -- Returns all values but 512
     :filter(function(id) return id ~= 512 end)
-    -- Transforms them from IDs to lowercase English names
-    :map(function(id) return spells[id].english:lower() end)
+    -- Transforms them from IDs to lowercase names
+    :map(function(id) return spells[id].name:lower() end)
     -- Transform the keys from numeric x or xx to string 'slot0x' or 'slotxx'
     :key_map(function(slot) return 'slot%02u':format(slot) end)
     return currentSpellSet
@@ -283,22 +293,20 @@ end
 
 function verify_and_set_spell(id, slot)
     local spell = spells[id]
-    local errorMessage = nil
     if not spell then
-        errorMessage = "spell not found"
+        error("spell not found")
+        return false
     end
     if bluJobLevel and spell.levels and spell.levels[BLU_JOB_ID] and spell.levels[BLU_JOB_ID] > bluJobLevel then
-        errorMessage = "job level too low to set spell"
+        error("job level too low to set spell")
+        return false
     end
     if not have_enough_points_to_add_spell(id) then
-        errorMessage = "cannot set spell, ran out of blue magic points"
+        error("cannot set spell, ran out of blue magic points")
+        return false
     end
     if slot > bluSlots then
-        errorMessage = "slot " .. tostring(slot) .. " unavailable"
-    end
-
-    if errorMessage then
-        error(errorMessage)
+        error("slot " .. tostring(slot) .. " unavailable")
         return false
     end
 
