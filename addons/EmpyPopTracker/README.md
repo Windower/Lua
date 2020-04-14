@@ -8,9 +8,15 @@ Originally developed to track Abyssea Empyrean weapon NMs, hence the name. Key i
 
 All text colours are configurable via the auto-generated settings.xml file.
 
+## Installation
+
+Empy Pop Tracker is now available via the Windower 4 addons list.
+
 ## Load
 
 `//lua load empypoptracker`
+
+Note: You won't have to do this if you obtained this addon via Windower.
 
 ## Track an NM
 

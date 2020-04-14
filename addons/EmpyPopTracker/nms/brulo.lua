@@ -26,34 +26,25 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local nms = {
-    'alfard',
-    'apademak',
-    'arch dynamis lord',
-    'azdaja',
-    'briareus',
-    'brulo',
-    'bukhis',
-    'carabosse',
-    'chloris',
-    'cirein-croin',
-    'dragua',
-    'glavoid',
-    'isgebind',
-    'itzpapalotl',
-    'kukulkan',
-    'maere',
-    'ogopogo',
-    'orthrus',
-    'sedna',
-    'sobek',
-    'ulhuadshi',
-    'warder of courage'
+return {
+    name = 'Brulo',
+    pops = { {
+        id = 1652, --Emerald demilune abyssite
+        type = 'key item',
+            dropped_from = {
+            name = 'Koios (Conflux #5)',
+            pops = { {
+                id = 1565, --Colorful demilune abyssite
+                type = 'key item',
+                dropped_from = {
+                    name = 'Fire/Earth Elemental',
+                    pops = { {
+                        id = 1564, --Clear demilune abyssite
+                        type = 'key item',
+                        dropped_from = { name = 'Any Cruor Prospector' }
+                    } }
+                }
+            } }
+        }
+    } }
 }
-
-nm_data = {}
-for _, nm in pairs(nms) do
-    nm_data[nm] = require('nms/' .. nm)
-end
-
-return nm_data
