@@ -30,7 +30,7 @@ require('tables')
 require('strings')
 require('maths')
 require('logger')
-texts = require 'texts'
+texts = require ('texts')
 config = require('config')
 -----------------------------
 
