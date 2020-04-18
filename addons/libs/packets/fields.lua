@@ -2377,6 +2377,7 @@ enums['ah itype'] = {
     [0x0A] = 'Open menu confirmation',
     [0x0B] = 'Sell item confirmation',
     [0x0D] = 'Sales item status',
+    [0x0E] = 'Purchase item result',
 }
 
 func.incoming[0x04C] = {}
@@ -2424,6 +2425,11 @@ enums['sale stat'] = {
     [0x0A] = 'Sold',
     [0x0B] = 'Not sold',
     [0x10] = 'Checking',
+}
+enums['buy stat'] = {
+    [0x01] = 'Success',
+    [0x02] = 'Placing',
+    [0xC5] = 'Failed',
 }
 
 -- 0x0A, 0x0B and 0x0D could probably be combined, the fields seem the same.
@@ -2484,6 +2490,25 @@ func.incoming[0x04C][0x0D] = L{
     {ctype='unsigned int',      label='_unknown6'},                             -- 30
     {ctype='unsigned int',      label='_unknown7'},                             -- 34
     {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 38
+}
+
+func.incoming[0x04C][0x0E] = L{
+    {ctype='unsigned char',     label='_unknown1'},                             -- 05
+    {ctype='unsigned char',     label='Buy Status',      fn=e+{'buy stat'}},    -- 06
+    {ctype='unsigned char',     label='_unknown2'},                             -- 07   
+    {ctype='unsigned int',      label='Price',           fn=gil},               -- 08   
+    {ctype='unsigned short',    label='Item ID',         fn=item},              -- 0C
+    {ctype='unsigned short',    label='_unknown3'},                             -- 0E
+    {ctype='unsigned short',    label='Count'},                                 -- 10
+    {ctype='unsigned int',      label='_unknown4'},                             -- 12
+    {ctype='unsigned short',    label='_unknown5'},                             -- 16
+    {ctype='char[16]',          label='Name'},                                  -- 18   Character name (pending buy only)
+    {ctype='unsigned short',    label='Pending Item ID', fn=item},              -- 28   Only filled out during pending packets
+    {ctype='unsigned short',    label='Pending Count'},                         -- 2A   Only filled out during pending packets
+    {ctype='unsigned int',      label='Pending Price',   fn=gil},               -- 2C   Only filled out during pending packets
+    {ctype='unsigned int',      label='_unknown6'},                             -- 30
+    {ctype='unsigned int',      label='_unknown7'},                             -- 34
+    {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 38   Only filled out during pending packets
 }
 
 func.incoming[0x04C][0x10] = L{
