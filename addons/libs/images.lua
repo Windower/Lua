@@ -349,7 +349,7 @@ function images.hover(t, x, y)
     end
 
     local pos_x, pos_y = t:pos()
-    local off_x, off_y = t:get_extents()
+    local off_x, off_y = meta[t].settings.size.width, meta[t].settings.size.height
     
     -- print(pos_x, pos_y, off_x, off_y)
 
