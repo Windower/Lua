@@ -35,7 +35,8 @@ packets = require('packets')
 config = require('config')
 
 defaults = {
-    active = true
+    active = true,
+    notifications = false,
 }
 
 settings = config.load(defaults)
@@ -87,24 +88,23 @@ windower.register_event('incoming chunk', function(id, data)
             parsed['Solo Combat Music'] = zone_music_map[parsed.Zone][2]
             parsed['Party Combat Music'] = zone_music_map[parsed.Zone][3]
 
-            windower.add_to_chat(8, 'Prevented campaign music.')
             return packets.build(parsed)
         end
     elseif id == 0x05F then --Music update (campaign possibly started)
         local parsed = packets.parse('incoming', data)
+        local info = windower.ffxi.get_info()
         if parsed['Song ID'] == campaign_id then
             campaign_active = true
-            if not settings.active then return end
+            if not settings.active or not zone_music_map[info.zone] then return end
 
-            local info = windower.ffxi.get_info()
-            if not zone_music_map[info.zone] then return end
-
-            if parsed['BGM Type'] == 0 then --only log to the chat once
+            if settings.notifications and parsed['BGM Type'] == 0 then --only log to the chat once
                 windower.add_to_chat(8, 'Prevented campaign music.')
             end
 
             parsed['Song ID'] = zone_music_map[info.zone][parsed['BGM Type'] + 1]
             return packets.build(parsed)
+        elseif parsed['Song ID'] == zone_music_map[info.zone][parsed['BGM Type'] + 1] then
+            campaign_active = false
         end
     end
 end)
@@ -142,6 +142,12 @@ commands.off = function()
             }))
         end
     end
+end
+
+commands.notify = function()
+    settings.notifications = not settings.notifications
+    settings:save()
+    windower.add_to_chat(8, 'Campaign notifications: ' .. tostring(settings.notifications))
 end
 
 commands.help = function()

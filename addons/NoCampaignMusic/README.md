@@ -1,4 +1,3 @@
-
 # FFXI - No Campaign Music
 
 Prevents all campaign battle music from playing in Final Fantasy XI, so you can listen to that sweet music that is normally obnoxiously interrupted.
@@ -17,6 +16,14 @@ Prevents all campaign battle music from playing in Final Fantasy XI, so you can 
 
 ```
 //ncm off
+```
+
+## Campaign notifications
+
+If you want to know when campaign is happening, you can toggle notifications:
+
+```
+//ncm notify
 ```
 
 ## Note
