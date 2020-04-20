@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'No Campaign Music'
 _addon.author = 'Dean James (Xurion of Bismarck)'
-_addon.version = '2.0.0'
+_addon.version = '2.0.1'
 _addon.commands = {'nocampaignmusic', 'ncm'}
 
 packets = require('packets')
@@ -45,8 +45,6 @@ solo_id = 101
 party_id = 215
 solo_dungeon_id = 115
 party_dungeon_id = 216
-
-campaign_active = false
 
 zone_music_map = {}
 zone_music_map[80] = { 254, 254, solo_id, party_id } --Southern San d'Oria [S]
@@ -81,10 +79,10 @@ windower.register_event('incoming chunk', function(id, data)
     local parsed = packets.parse('incoming', data)
     local zone_music = zone_music_map[parsed['Zone'] or windower.ffxi.get_info().zone]
 
+    if not zone_music then return end
+
     if id == 0x00A then  --Zone update (zoned in)
         if parsed['Day Music'] == campaign_id and zone_music then
-            campaign_active = true
-
             parsed['Day Music'] = zone_music[1]
             parsed['Night Music'] = zone_music[2]
             parsed['Solo Combat Music'] = zone_music[3]
@@ -95,8 +93,6 @@ windower.register_event('incoming chunk', function(id, data)
     else --Music update (campaign possibly started/finished)
         local info = windower.ffxi.get_info()
         if parsed['Song ID'] == campaign_id then
-            campaign_active = true
-            if not zone_music then return end
 
             if settings.Notifications and parsed['BGM Type'] == 0 then --only log to the chat once
                 windower.add_to_chat(8, 'Prevented campaign music.')
@@ -104,8 +100,6 @@ windower.register_event('incoming chunk', function(id, data)
 
             parsed['Song ID'] = zone_music[parsed['BGM Type'] + 1]
             return packets.build(parsed)
-        elseif parsed['Song ID'] == zone_music[parsed['BGM Type'] + 1] then
-            campaign_active = false
         end
     end
 end)
