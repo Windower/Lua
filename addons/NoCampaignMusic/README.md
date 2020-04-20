@@ -8,16 +8,6 @@ Prevents all campaign battle music from playing in Final Fantasy XI, so you can 
 //lua load ncm
 ```
 
-## Activate/deactivate
-
-```
-//ncm on
-```
-
-```
-//ncm off
-```
-
 ## Campaign notifications
 
 If you want to know when campaign is happening, you can toggle notifications:
