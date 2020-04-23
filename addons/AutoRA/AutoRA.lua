@@ -37,7 +37,7 @@ end
 local haltontp = function()
     settings.HaltOnTp = not settings.HaltOnTp
 
-    if settings.HaltonTp then
+    if settings.HaltOnTp then
         windower.add_to_chat(17, 'AutoRA will halt upon reaching 1000 TP')
     else
         windower.add_to_chat(17, 'AutoRA will no longer halt upon reaching 1000 TP')
