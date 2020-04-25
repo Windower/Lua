@@ -30,8 +30,8 @@ _addon.author = 'Krizz'
 _addon.version = 1.1
 _addon.commands = {'thtracker', 'th'}
 
-config = require 'config'
-texts = require 'texts'
+config = require ('config')
+texts = require ('texts')
 require('logger')
 
 defaults = {}
@@ -75,32 +75,32 @@ windower.register_event('addon command', function(command, ...)
 end)
 
 windower.register_event('incoming text', function(original, new, color)
-	original = original:strip_format()
-	local name, count = original:match('Additional effect: Treasure Hunter effectiveness against[%s%a%a%a]- (.*) increases to (%d+).')
-	
-	if name and count then
-		name = name.gsub(name, "the ", "")
-		mob = name
-		th:text(' '..name..'\n TH: '..count);
-		th:show()
-	end
+    original = original:strip_format()
+    local name, count = original:match('Additional effect: Treasure Hunter effectiveness against[%s%a%a%a]- (.*) increases to (%d+).')
+    
+    if name and count then
+        name = name.gsub(name, "the ", "")
+        mob = name
+        th:text(' '..name..'\n TH: '..count);
+        th:show()
+    end
 
-	local deadmob = original:match('%w+ defeats[%s%a%a%a]- (.*).')
-	
-	if deadmob then
-		deadmob = deadmob.gsub(deadmob, "the ", "")
-	end
-	
-	if deadmob == mob then
-		
-		th:text('No current mob')
-		th:hide()
-		mob = nil
-	end
+    local deadmob = original:match('%w+ defeats[%s%a%a%a]- (.*).')
+    
+    if deadmob then
+        deadmob = deadmob.gsub(deadmob, "the ", "")
+    end
+    
+    if deadmob == mob then
+        
+        th:text('No current mob')
+        th:hide()
+        mob = nil
+    end
 
 end)
 
 windower.register_event('zone change', function()
-	th:text('No current mob')
-	th:hide()
+    th:text('No current mob')
+    th:hide()
 end)

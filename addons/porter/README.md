@@ -14,10 +14,17 @@ porter [<slip> [<page>]] [owned]
 * **_slip_:** the number of the slip you want to show.
 * **_page_:** the page of the slip you want to show.
 * **owned:** shows only the items you own.
-
+```
+porter find
+```
+Shows storable items found in all inventory bags.
 ----
 
 ##changelog##
+### v1.20200419
+* **add**: New command, porter find.
+* **change**: Adjusted resource handling.
+
 ### v1.20130529
 * **fix**: Fixed parameters validation.
 * **change**: Aligned to Windower's addon development guidelines.

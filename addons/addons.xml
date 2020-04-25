@@ -371,6 +371,13 @@
     <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
+    <name>NoCampaignMusic</name>
+    <description>Prevents campaign battle music from playing in Shadowreign areas.</description>
+    <author>Dean James (Xurion of Bismarck)</author>
+    <bugtracker>https://github.com/xurion/ffxi-no-campaign-music/issues</bugtracker>
+    <support>https://www.ffxiah.com/forum/topic/52507/sick-of-campaign-music-prevent-it-with-this-addon/</support>
+  </addon>
+  <addon>
     <name>Nostrum</name>
     <description>Creates a click-able on-screen macro to help avoid targeting problems while curing.</description>
     <author>trv</author>
@@ -815,5 +822,5 @@
     <description>Block graphical effects from Geomancer's Indi- spells.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>https://github.com/lili-ffxi</support>
-  </addon>  
+  </addon>
 </addons>
