@@ -20,12 +20,23 @@ local func = {
 }
 
 -- String decoding definitions
-local ls_name_msg = T('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ':split())
-ls_name_msg[0] = 0:char()
-local item_inscr = T('0123456798ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz{':split())
-item_inscr[0] = 0:char()
-local ls_name_ext = T(('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ' .. 0:char():rep(11)):split())
-ls_name_ext[0] = '`'
+local ls_enc = {
+    charset = T('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ':split()):update({
+        [0] = '`',
+        [60] = 0:char(),
+        [63] = 0:char(),
+    }),
+    bits = 6,
+    terminator = function(str)
+        return (#str % 4 == 2 and 60 or 63):binary()
+    end
+}
+local sign_enc = {
+    charset = T('0123456798ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz{':split()):update({
+        [0] = 0:char(),
+    }),
+    bits = 6,
+}
 
 -- Function definitions. Used to display packet field information.
 local res = require('resources')
@@ -348,6 +359,7 @@ enums['action'] = {
     [0x0F] = 'Switch target',
     [0x10] = 'Ranged attack',
     [0x12] = 'Dismount Chocobo',
+    [0x13] = 'Tractor Dialogue'
     [0x14] = 'Zoning/Appear', -- I think, the resource for this is ambiguous.
     [0x19] = 'Monsterskill',
     [0x1A] = 'Mount',
@@ -1433,7 +1445,7 @@ fields.incoming[0x017] = L{
     {ctype='unsigned char',     label='Mode',               fn=chat},           -- 04
     {ctype='bool',              label='GM'},                                    -- 05
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 06   Set only for Yell
-    {ctype='char[16]',          label='Sender Name'},                           -- 08
+    {ctype='char[0x10]',        label='Sender Name'},                           -- 08
     {ctype='char*',             label='Message'},                               -- 18   Max of 150 characters
 }
 
@@ -2366,6 +2378,7 @@ enums['ah itype'] = {
     [0x0A] = 'Open menu confirmation',
     [0x0B] = 'Sell item confirmation',
     [0x0D] = 'Sales item status',
+    [0x0E] = 'Purchase item result',
 }
 
 func.incoming[0x04C] = {}
@@ -2413,6 +2426,11 @@ enums['sale stat'] = {
     [0x0A] = 'Sold',
     [0x0B] = 'Not sold',
     [0x10] = 'Checking',
+}
+enums['buy stat'] = {
+    [0x01] = 'Success',
+    [0x02] = 'Placing',
+    [0xC5] = 'Failed',
 }
 
 -- 0x0A, 0x0B and 0x0D could probably be combined, the fields seem the same.
@@ -2473,6 +2491,25 @@ func.incoming[0x04C][0x0D] = L{
     {ctype='unsigned int',      label='_unknown6'},                             -- 30
     {ctype='unsigned int',      label='_unknown7'},                             -- 34
     {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 38
+}
+
+func.incoming[0x04C][0x0E] = L{
+    {ctype='unsigned char',     label='_unknown1'},                             -- 05
+    {ctype='unsigned char',     label='Buy Status',      fn=e+{'buy stat'}},    -- 06
+    {ctype='unsigned char',     label='_unknown2'},                             -- 07   
+    {ctype='unsigned int',      label='Price',           fn=gil},               -- 08   
+    {ctype='unsigned short',    label='Item ID',         fn=item},              -- 0C
+    {ctype='unsigned short',    label='_unknown3'},                             -- 0E
+    {ctype='unsigned short',    label='Count'},                                 -- 10
+    {ctype='unsigned int',      label='_unknown4'},                             -- 12
+    {ctype='unsigned short',    label='_unknown5'},                             -- 16
+    {ctype='char[16]',          label='Name'},                                  -- 18   Character name (pending buy only)
+    {ctype='unsigned short',    label='Pending Item ID', fn=item},              -- 28   Only filled out during pending packets
+    {ctype='unsigned short',    label='Pending Count'},                         -- 2A   Only filled out during pending packets
+    {ctype='unsigned int',      label='Pending Price',   fn=gil},               -- 2C   Only filled out during pending packets
+    {ctype='unsigned int',      label='_unknown6'},                             -- 30
+    {ctype='unsigned int',      label='_unknown7'},                             -- 34
+    {ctype='unsigned int',      label='Timestamp',          fn=utime},          -- 38   Only filled out during pending packets
 }
 
 func.incoming[0x04C][0x10] = L{
@@ -2865,7 +2902,7 @@ fields.incoming[0x061] = L{
     {ctype='unsigned char',     label='Main Hand iLevel'},                      -- 56   
     {ctype='unsigned char',     label='_unknown5'},                             -- 57   Always 00 for me
     {ctype='bit[5]',            label='Unity ID'},                              -- 58   0=None, 1=Pieuje, 2=Ayame, 3=Invincible Shield, 4=Apururu, 5=Maat, 6=Aldo, 7=Jakoh Wahcondalo, 8=Naja Salaheem, 9=Flavira
-    {ctype='bit[5]',            label='_unknown5'},                             -- 58   Danger, 00ing caused my client to crash
+    {ctype='bit[5]',            label='Unity Rank'},                            -- 58   Danger, 00ing caused my client to crash
     {ctype='bit[16]',           label='Unity Points'},                          -- 59   
     {ctype='bit[6]',            label='_unknown6'},                             -- 5A   No obvious function
     {ctype='unsigned int',      label='_junk1'},                                -- 5B   
@@ -2917,8 +2954,8 @@ func.incoming[0x063][0x03] = L{
     {ctype='unsigned short',    label='_unknown2'},                             -- 0E   00 00
     {ctype='unsigned short',    label='_unknown3'},                             -- 10   76 00
     {ctype='unsigned short',    label='Infamy'},                                -- 12
-    {ctype='unsigned int',      label='_unknown2'},                             -- 14   00s
-    {ctype='unsigned int',      label='_unknown3'},                             -- 18   00s
+    {ctype='unsigned int',      label='_unknown4'},                             -- 14   00s
+    {ctype='unsigned int',      label='_unknown5'},                             -- 18   00s
     {ctype='data[64]',          label='Instinct Bitfield 1'},                   -- 1C   See below
     -- Bitpacked 2-bit values. 0 = no instincts from that species, 1 == first instinct, 2 == first and second instinct, 3 == first, second, and third instinct.
     {ctype='data[128]',         label='Monster Level Char field'},              -- 5C   Mapped onto the item ID for these creatures. (00 doesn't exist, 01 is rabbit, 02 is behemoth, etc.)
@@ -2960,8 +2997,8 @@ fields.incoming[0x065] = L{
     {ctype='float',             label='Y'},                                     -- 0C
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 10
     {ctype='unsigned short',    label='Index',              fn=index},          -- 14
-    {ctype='unsigned char',     label='_unknown1'},                             -- 16   1 observed. May indicate repositoning type.
-    {ctype='unsigned char',     label='_unknown2'},                             -- 17   Unknown, but matches the same byte of a matching spawn packet
+    {ctype='unsigned char',     label='Animation'},                             -- 16
+    {ctype='unsigned char',     label='Rotation'},                              -- 17
     {ctype='data[6]',           label='_unknown3'},                             -- 18   All zeros observed.
 }
 
@@ -3243,7 +3280,7 @@ func.incoming[0x0C9][0x01] = L{
     {ctype='bit[4]',            label='_junk1'},                                -- 11   
     {ctype='unsigned char',     label='Main Job',           fn=job},            -- 12
     {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 13
-    {ctype='char[16]',          label='Linkshell',          enc=ls_name_msg},   -- 14   6-bit packed
+    {ctype='data[15]',          label='Linkshell',          enc=ls_enc},        -- 14   6-bit packed
     {ctype='unsigned char',     label='Main Job Level'},                        -- 24
     {ctype='unsigned char',     label='Sub Job Level'},                         -- 25
     {ctype='data[42]',          label='_unknown5'},                             -- 26   At least the first two bytes and the last twelve bytes are junk, possibly more
@@ -3264,7 +3301,7 @@ fields.incoming[0x0CC] = L{
     {ctype='unsigned int',      label='Timestamp',          fn=time},           -- 88
     {ctype='char[16]',          label='Player Name'},                           -- 8C
     {ctype='unsigned int',      label='Permissions'},                           -- 98
-    {ctype='char[16]',          label='Linkshell',          enc=ls_name_msg},   -- 9C   6-bit packed
+    {ctype='data[15]',          label='Linkshell',          enc=ls_enc},        -- 9C   6-bit packed
 }
 
 -- Found Item
@@ -3426,12 +3463,17 @@ fields.incoming[0x0F6] = L{
     {ctype='unsigned int',      label='Type',               fn=e+{'ws mark'}},  -- 04
 }
 
+enums['reraise'] = {
+    [0x01] = 'Raise dialogue',
+    [0x02] = 'Tractor dialogue',
+}
+
 -- Reraise Activation
 fields.incoming[0x0F9] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
-    {ctype='unsigned char',     label='_unknown1'},                             -- 0A
-    {ctype='unsigned char',     label='_unknown2'},                             -- 0B
+    {ctype='unsigned char',     label='Category',           fn=e+{'reraise'}},  -- 0A
+    {ctype='unsigned char',     label='_unknown1'},                             -- 0B
 }
 
 -- Furniture Interaction

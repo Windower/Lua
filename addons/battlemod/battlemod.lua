@@ -352,9 +352,9 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             
             if am.message_id > 169 and am.message_id <179 then
                 if am.param_1 > 2147483647 then
-                    skill = 'like level -1 ('..ratings_arr[am.param_2-63]..')'
+                    skill = 'to be level -1 ('..ratings_arr[am.param_2-63]..')'
                 else
-                    skill = 'like level '..am.param_1..' ('..ratings_arr[am.param_2-63]..')'
+                    skill = 'to be level '..am.param_1..' ('..ratings_arr[am.param_2-63]..')'
                 end
             end
             local outstr = (res.action_messages[am.message_id][language]

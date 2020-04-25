@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -- addon information
 
 _addon.name = 'boxdestroyer'
-_addon.version = '1.0.4'
+_addon.version = '1.0.5'
 _addon.command = 'boxdestroyer'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
@@ -36,11 +36,20 @@ _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
 require('pack')
 require('tables')
+require('chat')
 
 -- load message constants
 
 require('messages')
 
+-- config
+
+config = require('config')
+defaults = {
+    HighlightResult = false,
+    HighlightColor = 36,
+}
+settings = config.load(defaults)
 -- global constants
 
 default = {
@@ -257,9 +266,9 @@ end
 
 function display(id, chances)
     if #box[id] == 90 then
-        windower.add_to_chat(207, 'possible combinations: 10~99')
+        windower.add_to_chat(207, 'Possible combinations: 10~99')
     else
-        windower.add_to_chat(207, 'possible combinations: ' .. table.concat(box[id], ' '))
+        windower.add_to_chat(207, 'Possible combinations: ' .. table.concat(box[id], ' '))
     end
     local remaining = math.floor(#box[id] / math.pow(2, (chances - 1)))
     if remaining == 0 then
@@ -273,22 +282,20 @@ function display(id, chances)
         local printed = false
         for _,v in pairs(box[id]) do
             if math.floor(v/10) == v%10 then
-                windower.add_to_chat(207, 'best guess: %d (%d%%)':format(v, 1 / remaining * 100))
+                windower.add_to_chat(207, 'Best guess: %d (%d%%)':format(v, 1 / remaining * 100))
                 printed = true
                 break
             end
         end
         if not printed then
-            windower.add_to_chat(207, 'best guess: %d (%d%%)':format(box[id][math.ceil(#box[id] / 2)], 1 / remaining * 100))
+            windower.add_to_chat(207, 'Best guess: %d (%d%%)':format(box[id][math.ceil(#box[id] / 2)], 1 / remaining * 100))
         end
     else
         windower.add_to_chat(207, 'best guess: %d (%d%%)':format(box[id][math.ceil(#box[id] / 2)], 1 / remaining * 100))
         local clue_value,guess_value = calculate_odds(id,chances)
-        if clue_value > guess_value and remaining ~= 1 then
-            windower.add_to_chat(207, 'boxdestroyer recommends examining the chest')
-        else
-            windower.add_to_chat(207, 'boxdestroyer recommends guessing %d':format(box[id][math.ceil(#box[id] / 2)]))
-        end
+        local result = clue_value > guess_value and remaining ~= 1 and 'examining the chest' or 'guessing ' .. '%d':format(box[id][math.ceil(#box[id] / 2)])
+        local formatted_result = settings.HighlightResult and result:color(settings.HighlightColor) or result
+        windower.add_to_chat(207, 'boxdestroyer recommends ' .. formatted_result .. '.')
     end
     
 end
