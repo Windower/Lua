@@ -156,6 +156,7 @@ function split_text(id,text,arg)
         elseif key == "damage taken" then
             tbl['physical damage taken'] = tonumber(value)+(tbl['physical damage taken'] or 0)
             tbl['magic damage taken'] = tonumber(value)+(tbl['magic damage taken'] or 0)
+            tbl['breath damage taken'] = tonumber(value)+(tbl['breath damage taken'] or 0)
         else
             tbl[key] = tonumber(value)+(tbl[key] or 0)
         end
