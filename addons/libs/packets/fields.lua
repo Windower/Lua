@@ -3281,6 +3281,7 @@ func.incoming[0x0C9][0x01] = L{
     {ctype='unsigned char',     label='Main Job',           fn=job},            -- 12
     {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 13
     {ctype='data[15]',          label='Linkshell',          enc=ls_enc},        -- 14   6-bit packed
+    {ctype='unsigned char',     label='_padding1'},                             -- 23
     {ctype='unsigned char',     label='Main Job Level'},                        -- 24
     {ctype='unsigned char',     label='Sub Job Level'},                         -- 25
     {ctype='data[42]',          label='_unknown5'},                             -- 26   At least the first two bytes and the last twelve bytes are junk, possibly more
