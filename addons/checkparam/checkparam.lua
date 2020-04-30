@@ -156,6 +156,7 @@ function split_text(id,text,arg)
         elseif key == "damage taken" then
             tbl['physical damage taken'] = tonumber(value)+(tbl['physical damage taken'] or 0)
             tbl['magic damage taken'] = tonumber(value)+(tbl['magic damage taken'] or 0)
+            tbl['breath damage taken'] = tonumber(value)+(tbl['breath damage taken'] or 0)
         else
             tbl[key] = tonumber(value)+(tbl[key] or 0)
         end
@@ -221,7 +222,7 @@ integrate = {
     ['enhancing magic duration'] = 'enhancing magic effect duration',
     ['eva'] = 'evasion',
     ['indicolure spell duration'] = 'indicolure effect duration',
-	['indi eff dur'] = 'indicolure effect duration',
+    ['indi eff dur'] = 'indicolure effect duration',
     ['mag eva'] = 'magic evasion',
     ['magic atk bonus'] = 'magic attack bonus',
     ['magatkbns'] = 'magic attack bonus',
@@ -356,8 +357,9 @@ caps={
     ['cure potency']=50,
     ['potency of cure effects received']=30,
     ['quick cast']=10,
-    ['physical damage taken']=-25,
-    ['magic damage taken']=-25,
+    ['physical damage taken']=-50,
+    ['magic damage taken']=-50,
+    ['breath damage taken']=-50,
     ['pet: physical damage taken']=-87.5,
     ['pet: magic damage taken']=-87.5,
     ['pet: haste']=25,
