@@ -2714,7 +2714,7 @@ fields.incoming[0x05A] = L{
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0E
     {ctype='unsigned short',    label='Emote',              fn=emote},          -- 10
-    {ctype='unsigned short',    label='_unknown1',          const=2},           -- 12
+    {ctype='unsigned short',    label='_unknown1'},                             -- 12
     {ctype='unsigned short',    label='_unknown2'},                             -- 14
     {ctype='unsigned char',     label='Type'},                                  -- 16   2 for motion, 0 otherwise
     {ctype='unsigned char',     label='_unknown3'},                             -- 17
