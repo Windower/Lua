@@ -351,12 +351,12 @@ function images.hover(t, x, y)
     local pos_x, pos_y = t:pos()
     local off_x, off_y = t:get_extents()
     
-    -- print(pos_x, pos_y, off_x, off_y)
+    -- print(x, y, pos_x, pos_y, off_x, off_y)
 
-    return (pos_x <= x and x <= pos_x + off_x
-        or pos_x >= x and x >= pos_x + off_x)
-    and (pos_y <= y and y <= pos_y + off_y
-        or pos_y >= y and y >= pos_y + off_y)
+    return (pos_x <= x and x <= off_x
+        or pos_x >= x and x >= off_x)
+    and (pos_y <= y and y <= off_y
+        or pos_y >= y and y >= off_y)
 end
 
 function images.destroy(t)
