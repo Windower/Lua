@@ -925,7 +925,7 @@ fields.outgoing[0x0C0] = L{
 -- /makelinkshell
 fields.outgoing[0x0C3] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04  
-    {ctype='unsigned char',     label='Linkshell Numbger'},                     -- 05  
+    {ctype='unsigned char',     label='Linkshell Number'},                      -- 05  
     {ctype='data[2]',           label='_junk1'}                                 -- 05
 }
 
