@@ -567,7 +567,7 @@ function table.to_xml(t, indentlevel)
         end
         if type(val) == 'table' and next(val) then
             str = str..indent..'<'..key..'>\n'
-            str = str..table.to_xml(val, indentlevel + 1)..'\n'
+            str = str..table.to_xml(val, indentlevel + 1)
             str = str..indent..'</'..key..'>\n'
         else
             if type(val) == 'table' then
