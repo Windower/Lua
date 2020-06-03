@@ -315,13 +315,13 @@ function exp_msg(val,msg)
     elseif msg == 371 or msg == 372 then
         lp.registry[t] = (lp.registry[t] or 0) + val
         lp.current = lp.current + val
-        if lp.current + val >= lp.tnm and lp.number_of_merits ~= lp.maximum_merits then
+        if lp.current >= lp.tnm and lp.number_of_merits ~= lp.maximum_merits then
             -- Merit Point gained!
-            lp.number_of_merits = lp.number_of_merits + math.min(math.floor(lp.current/lp.tnm),lp.maximum_merits)
+            lp.number_of_merits = math.min(lp.number_of_merits + math.floor(lp.current/lp.tnm),lp.maximum_merits)
             lp.current = lp.current%lp.tnm
         else
             -- If a merit point was not gained, 
-            lp.current = math.min(lp.current+val,lp.tnm-1)
+            lp.current = math.min(lp.current,lp.tnm-1)
         end
     end
     update_box()
