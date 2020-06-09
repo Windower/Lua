@@ -313,22 +313,22 @@ function parse_action_packet(act)
                 local col = res.action_messages[m.spike_effect_message].color
                 local color = color_filt(col,act.actor.id==Self.id)
                 
-                local _actor = act.actor
+                local actor = act.actor
                 if m.spike_effect_message == 14 then 
                     m.simp_spike_name = 'from counter'
                 elseif T{33,606}:contains(m.spike_effect_message) then
                     m.simp_spike_name = 'counter'
-                    _actor = v.target[1] --Counter dmg is done by the target, fix for coloring the dmg
+                    actor = v.target[1] --Counter dmg is done by the target, fix for coloring the dmg
                 elseif m.spike_effect_message == 592 then
                     m.simp_spike_name = 'missed counter'
                 elseif m.spike_effect_message == 536 then
                     m.simp_spike_name = 'retaliation'
-                    _actor = v.target[1] --Retaliation dmg is done by the target, fix for coloring the dmg
+                    actor = v.target[1] --Retaliation dmg is done by the target, fix for coloring the dmg
                 elseif m.spike_effect_message == 535 then
                     m.simp_spike_name = 'from retaliation'
                 else
                     m.simp_spike_name = 'spikes'
-                    _actor = v.target[1] --Spikes dmg is done by the target, fix for coloring the dmg
+                    actor = v.target[1] --Spikes dmg is done by the target, fix for coloring the dmg
                 end
 
                 local msg = simplify_message(m.spike_effect_message)
@@ -339,7 +339,7 @@ function parse_action_packet(act)
                     :gsub('${item}',act.action.item or 'ERROR 144')
                     :gsub('${weapon_skill}',act.action.weapon_skill or 'ERROR 145')
                     :gsub('${abil}',m.simp_spike_name or act.action.name or 'ERROR 146')
-                    :gsub('${numb}',col == 'D' and color_it(numb or 'ERROR 147', color_arr[_actor.damage]) or (numb or 'ERROR 147'))
+                    :gsub('${numb}',col == 'D' and color_it(numb or 'ERROR 147', color_arr[actor.damage]) or (numb or 'ERROR 147'))
                     :gsub((simplify and '${target}' or '${actor}'),color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
                     :gsub((simplify and '${actor}' or '${target}'),targ)
                     :gsub('${lb}','\7')
