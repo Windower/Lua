@@ -159,8 +159,9 @@ function parse_action_packet(act)
     for i,v in pairs(act.targets) do
         for n,m in pairs(v.actions) do
             if m.message ~= 0 and res.action_messages[m.message] ~= nil then
+                local col = res.action_messages[m.message].color
                 local targ = assemble_targets(act.actor,v.target,act.category,m.message)
-                local color = color_filt(res.action_messages[m.message].color,v.target[1].id==Self.id)
+                local color = color_filt(col,v.target[1].id==Self.id)
                 if m.reaction == 11 and act.category == 1 then m.simp_name = 'parried by'
                 elseif m.reaction == 12 and act.category == 1 then m.simp_name = 'blocked by'
                 elseif m.message == 1 then m.simp_name = 'hit'
@@ -188,7 +189,7 @@ function parse_action_packet(act)
                 elseif m.message == 437 or m.message == 438 then m.simp_name = act.action.name..' (JAs and TP)'
                 elseif m.message == 439 or m.message == 440 then m.simp_name = act.action.name..' (SPs, JAs, TP, and MP)'
                 elseif T{252,265,268,269,271,272,274,275,379,650}:contains(m.message) then m.simp_name = 'Magic Burst! '..act.action.name
-                elseif not act.action then 
+                elseif not act.action then
                    m.simp_name = ''
                    act.action = {}
                 else m.simp_name = act.action.name or ''
@@ -262,7 +263,7 @@ function parse_action_packet(act)
                     :gsub('${item2}',color_it(act.action.item2 or 'ERROR 121',color_arr.itemcol))
                     :gsub('${weapon_skill}',color_it(act.action.weapon_skill or 'ERROR 114',color_arr.wscol))
                     :gsub('${abil}',m.simp_name or 'ERROR 115')
-                    :gsub('${numb}',numb or 'ERROR 116')
+                    :gsub('${numb}',col == 'D' and color_it(numb or 'ERROR 116', color_arr[act.actor.damage]) or (numb or 'ERROR 116'))
                     :gsub('${actor}',color_it((act.actor.name or 'ERROR 117' ) .. (act.actor.owner_name or "") ,color_arr[act.actor.owner or act.actor.type]))
                     :gsub('${target}',targ)
                     :gsub('${lb}','\7')
@@ -275,7 +276,8 @@ function parse_action_packet(act)
             end
             if m.has_add_effect and m.add_effect_message ~= 0 and add_effect_valid[act.category] then
                 local targ = assemble_targets(act.actor,v.target,act.category,m.add_effect_message)
-                local color = color_filt(res.action_messages[m.add_effect_message].color,v.target[1].id==Self.id)
+                local col = res.action_messages[m.add_effect_message].color
+                local color = color_filt(col,v.target[1].id==Self.id)
                 if m.add_effect_message > 287 and m.add_effect_message < 303 then m.simp_add_name = skillchain_arr[m.add_effect_message-287]
                 elseif m.add_effect_message > 384 and m.add_effect_message < 399 then m.simp_add_name = skillchain_arr[m.add_effect_message-384]
                 elseif m.add_effect_message > 766 and m.add_effect_message < 769 then m.simp_add_name = skillchain_arr[m.add_effect_message-752]
@@ -295,7 +297,7 @@ function parse_action_packet(act)
                         :gsub('${item}',act.action.item or 'ERROR 129')
                         :gsub('${weapon_skill}',act.action.weapon_skill or 'ERROR 130')
                         :gsub('${abil}',m.simp_add_name or act.action.name or 'ERROR 131')
-                        :gsub('${numb}',numb or 'ERROR 132')
+                        :gsub('${numb}',col == 'D' and color_it(numb or 'ERROR 132', color_arr[act.actor.damage]) or (numb or 'ERROR 132'))
                         :gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
                         :gsub('${target}',targ)
                         :gsub('${lb}','\7')
@@ -308,20 +310,25 @@ function parse_action_packet(act)
             end
             if m.has_spike_effect and m.spike_effect_message ~= 0 and spike_effect_valid[act.category] then
                 local targ = assemble_targets(act.actor,v.target,act.category,m.spike_effect_message)
-                local color = color_filt(res.action_messages[m.spike_effect_message].color,act.actor.id==Self.id)
+                local col = res.action_messages[m.spike_effect_message].color
+                local color = color_filt(col,act.actor.id==Self.id)
                 
+                local _actor = act.actor
                 if m.spike_effect_message == 14 then 
                     m.simp_spike_name = 'from counter'
                 elseif T{33,606}:contains(m.spike_effect_message) then
                     m.simp_spike_name = 'counter'
+                    _actor = v.target[1] --Counter dmg is done by the target, fix for coloring the dmg
                 elseif m.spike_effect_message == 592 then
                     m.simp_spike_name = 'missed counter'
                 elseif m.spike_effect_message == 536 then
                     m.simp_spike_name = 'retaliation'
+                    _actor = v.target[1] --Retaliation dmg is done by the target, fix for coloring the dmg
                 elseif m.spike_effect_message == 535 then
                     m.simp_spike_name = 'from retaliation'
                 else
                     m.simp_spike_name = 'spikes'
+                    _actor = v.target[1] --Spikes dmg is done by the target, fix for coloring the dmg
                 end
 
                 local msg = simplify_message(m.spike_effect_message)
@@ -332,7 +339,7 @@ function parse_action_packet(act)
                     :gsub('${item}',act.action.item or 'ERROR 144')
                     :gsub('${weapon_skill}',act.action.weapon_skill or 'ERROR 145')
                     :gsub('${abil}',m.simp_spike_name or act.action.name or 'ERROR 146')
-                    :gsub('${numb}',numb or 'ERROR 147')
+                    :gsub('${numb}',col == 'D' and color_it(numb or 'ERROR 147', color_arr[_actor.damage]) or (numb or 'ERROR 147'))
                     :gsub((simplify and '${target}' or '${actor}'),color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
                     :gsub((simplify and '${actor}' or '${target}'),targ)
                     :gsub('${lb}','\7')
@@ -460,7 +467,7 @@ end
 
 function player_info(id)
     local player_table = windower.ffxi.get_mob_by_id(id)
-    local typ,owner,filt,owner_name
+    local typ,dmg,owner,filt,owner_name
     
     if player_table == nil then
         return {name=nil,id=nil,is_npc=nil,type='debug',owner=nil, owner_name=nil,race=nil}
@@ -471,10 +478,13 @@ function player_info(id)
             typ = i
             if i == 'p0' then
                 filt = 'me'
+                dmg = 'mydmg'
             elseif i:sub(1,1) == 'p' then
                 filt = 'party'
+                dmg = 'partydmg'
             else
                 filt = 'alliance'
+                dmg = 'allydmg'
             end
         end
     end
@@ -485,11 +495,13 @@ function player_info(id)
                 typ = 'other_pets'
                 filt = 'other_pets'
                 owner = 'other'
+                dmg = 'otherdmg'
                 for i,v in pairs(windower.ffxi.get_party()) do
                     if type(v) == 'table' and v.mob and v.mob.pet_index and v.mob.pet_index == player_table.index then
                         if i == 'p0' then
                             typ = 'my_pet'
                             filt = 'my_pet'
+                            dmg = 'mydmg'
                         end
                         owner = i
                         owner_name = showownernames and '(' .. v.mob.name .. ')'
@@ -498,6 +510,7 @@ function player_info(id)
                         if i == 'p0' then
                             typ = 'my_fellow'
                             filt = 'my_fellow'
+                            dmg = 'mydmg'
                         end
                         owner = i
                         owner_name = showownernames and '(' .. v.mob.name .. ')'
@@ -507,6 +520,7 @@ function player_info(id)
             else
                 typ = 'mob'
                 filt = 'monsters'
+                dmg = 'mobdmg'
                 
                 if filter.enemies then
                     for i,v in pairs(Self.buffs) do
@@ -531,10 +545,11 @@ function player_info(id)
         else
             typ = 'other'
             filt = 'others'
+            dmg = 'otherdmg'
         end
     end
     if not typ then typ = 'debug' end
-    return {name=player_table.name,id=id,is_npc = player_table.is_npc,type=typ,filter=filt,owner=(owner or nil), owner_name=(owner_name or nil),race = player_table.race}
+    return {name=player_table.name,id=id,is_npc = player_table.is_npc,type=typ,damage=dmg,filter=filt,owner=(owner or nil), owner_name=(owner_name or nil),race = player_table.race}
 end
 
 function get_spell(act)
