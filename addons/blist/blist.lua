@@ -33,7 +33,7 @@ _addon.version = '1.2.0.1'
 
 require 'tables'
 require 'strings'
-require 'colors'
+require 'chat/colors'
 local config = require 'config'
 require 'logger'
 
