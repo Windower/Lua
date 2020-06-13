@@ -75,7 +75,7 @@ function search_item()
                             log_flag = false
                             log('Item use within 3 seconds..')
                         end
-                    until ext.usable or delay > 10
+                    until ext.usable or delay > 30
                 end
                 windower.chat.input('/item '..windower.to_shift_jis(stats[lang])..' <me>')
                 break;
