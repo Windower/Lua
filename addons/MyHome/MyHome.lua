@@ -32,12 +32,21 @@ _addon.commands = {'myhome','mh','warp'}
 
 require('logger')
 extdata = require('extdata')
+res_slots = require('resources').slots
 
 lang = string.lower(windower.ffxi.get_info().language)
 item_info = {
     [1]={id=28540,japanese='デジョンリング',english='"Warp Ring"',slot=13},
     [2]={id=17040,japanese='デジョンカジェル',english='"Warp Cudgel"',slot=0},
     [3]={id=4181,japanese='呪符デジョン',english='"Instant Warp"'}}
+
+function gs_disable_slot(slot)
+	windower.send_command('gs disable '..res_slots[slot].en:gsub(' ','_'))
+end
+
+function gs_enable_slot(slot)
+	windower.send_command('wait 3;gs enable '..res_slots[slot].en:gsub(' ','_'))
+end
 
 function search_item()
     local item_array = {}
@@ -76,7 +85,13 @@ function search_item()
                         end
                     until ext.usable or delay > 10
                 end
+				if windower.to_shift_jis(stats[lang]) == '"Warp Ring"' or '"Warp Cudgel"' then
+					gs_disable_slot(stats.slot)
+				end
                 windower.chat.input('/item '..windower.to_shift_jis(stats[lang])..' <me>')
+				if windower.to_shift_jis(stats[lang]) == '"Warp Ring"' or '"Warp Cudgel"' then
+					gs_enable_slot(stats.slot)
+				end
                 break;
             end
         else
