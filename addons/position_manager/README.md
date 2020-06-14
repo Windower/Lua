@@ -5,7 +5,7 @@ Set and save screen position per-character.
 Command: `//pm set pos_x pos_y [name]`
 
 `pos_x` and `pos_y` are obligatory and must be numbers.  
-The `name` parameter is optional. If no name is provided, settings will be saved for the current character.  
+`name` is optional. If no name is provided, settings will be saved for the current character.  
 `:all` is a special name that can be used to set the default position.  
 
 **Note**: Characters are only moved after they're logged in. The `:all` position will be used for the character login screen as well.
