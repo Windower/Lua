@@ -2,7 +2,7 @@
 
 Set and save screen position per-character.  
 
-Command: `//pm set pos_x pos_y [name]`
+Command: `//pm set <pos_x> <pos_y> [name]`
 
 `pos_x` and `pos_y` are obligatory and must be numbers.  
 `name` is optional. If no name is provided, settings will be saved for the current character.  
