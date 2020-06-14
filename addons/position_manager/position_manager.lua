@@ -34,6 +34,7 @@ if not windower.file_exists(windower.windower_path .. '\\plugins\\WinControl.dll
     windower.send_command('lua u position_manager')
     return
 else
+    print('position_manager: loading WinControl...')
     windower.send_command('load wincontrol')
 end
 
