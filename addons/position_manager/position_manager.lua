@@ -56,28 +56,30 @@ function handle_commands(cmd,pos_x,pos_y,name)
 
     if cmd == 'r' then
         windower.send_command('lua r position_manager')
-    elseif cmd == 'set' then
-        if not name or name == ':current' then
+    elseif cmd == 'set' and type(pos_x) == 'number' and type(pos_y) == 'number' then
+        if name ~= nil and type(name) ~= 'string' then
+            windower.add_to_chat(207,'plugin_manager: ERROR - invalid name provided.')
+            windower.send_command('pm help')
+            return
+        elseif not name then
             name = windower.ffxi.get_player().name
         elseif name == ':all' then
             name = 'all'
         end
 
-        if name and pos_x and pos_y then
-            settings.x = tonumber(pos_x)
-            settings.y = tonumber(pos_y)
-            config.save(settings,name)
+        settings.x = tonumber(pos_x)
+        settings.y = tonumber(pos_y)
+        config.save(settings,name)
 
-            if windower.ffxi.get_info().logged_in then
-                player_name = windower.ffxi.get_player().name
-                if name:lower() == player_name:lower() then
-                    move(settings)
-                end
-                -- TODO: add IPC
+        -- TODO: possibly add IPC
+        if windower.ffxi.get_info().logged_in then
+            player_name = windower.ffxi.get_player().name
+            if name:lower() == player_name:lower() then
+                move(settings)
             end
         end
     elseif cmd == 'help' then
-        windower.add_to_chat(207,'position_manager: Usage: //pm set <x> <y> [Charactername|:all|:current]')
+        windower.add_to_chat(207,'position_manager: Usage: //pm set <x> <y> [name]')
         windower.add_to_chat(207,'position_manager: See the readme for details.')
     else
         windower.add_to_chat(207,'position_manager: %s command not found.':format(cmd))
