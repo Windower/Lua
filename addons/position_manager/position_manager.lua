@@ -48,17 +48,17 @@ default = {
 settings = config.load(default)
 
 function move(settings)
-    windower.send_command('wincontrol move %s %s':format(settings.x,settings.y))
+    windower.send_command('wincontrol move %s %s':format(settings.x, settings.y))
 end
 
-function handle_commands(cmd,pos_x,pos_y,name)
+function handle_commands(cmd, pos_x, pos_y, name)
     cmd = cmd:lower() or 'help'
 
     if cmd == 'r' then
         windower.send_command('lua r position_manager')
     elseif cmd == 'set' and type(pos_x) == 'number' and type(pos_y) == 'number' then
         if name ~= nil and type(name) ~= 'string' then
-            windower.add_to_chat(207,'plugin_manager: ERROR - invalid name provided.')
+            windower.add_to_chat(207, 'plugin_manager: ERROR - invalid name provided.')
             windower.send_command('pm help')
             return
         elseif not name then
@@ -69,7 +69,7 @@ function handle_commands(cmd,pos_x,pos_y,name)
 
         settings.x = tonumber(pos_x)
         settings.y = tonumber(pos_y)
-        config.save(settings,name)
+        config.save(settings, name)
 
         -- TODO: possibly add IPC
         if windower.ffxi.get_info().logged_in then
@@ -79,13 +79,13 @@ function handle_commands(cmd,pos_x,pos_y,name)
             end
         end
     elseif cmd == 'help' then
-        windower.add_to_chat(207,'position_manager: Usage: //pm set <x> <y> [name]')
-        windower.add_to_chat(207,'position_manager: See the readme for details.')
+        windower.add_to_chat(207, 'position_manager: Usage: //pm set <x> <y> [name]')
+        windower.add_to_chat(207, 'position_manager: See the readme for details.')
     else
-        windower.add_to_chat(207,'position_manager: %s command not found.':format(cmd))
+        windower.add_to_chat(207, 'position_manager: %s command not found.':format(cmd))
         windower.send_command('pm help')
     end
 end
 
-config.register(settings,move)
-windower.register_event('addon command',handle_commands)
+config.register(settings, move)
+windower.register_event('addon command', handle_commands)
