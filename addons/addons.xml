@@ -819,8 +819,15 @@
   <addon>
     <name>IndiNope</name>
     <author>Lili</author>
-    <description>Block graphical effects from Geomancer's Indi- spells.</description>
+    <description>Blocks graphical effects from Geomancer's Indi- spells.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>https://github.com/lili-ffxi</support>
   </addon>
+  <addon>
+    <name>position_manager</name>
+    <author>Lili</author>
+    <description>Allows you to set a screen position per character name. Each character will be moved to that screen position on login. Requires the WinControl plugin to be installed.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://github.com/lili-ffxi</support>
+  </addon>  
 </addons>
