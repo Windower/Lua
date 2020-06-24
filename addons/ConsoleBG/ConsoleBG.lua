@@ -8,16 +8,16 @@ require('logger')
 
 defaults = {}
 defaults.bg = {}
-defaults.bg.alpha = 255
+defaults.bg.alpha = 192
 defaults.bg.red = 0
 defaults.bg.green = 0
 defaults.bg.blue = 0
 defaults.pos = {}
-defaults.pos.x = 1
-defaults.pos.y = 25
+defaults.pos.x = 0
+defaults.pos.y = 0
 defaults.extents = {}
-defaults.extents.x = 600
-defaults.extents.y = 314
+defaults.extents.x = 7680
+defaults.extents.y = 360
 
 settings = config.load(defaults)
 
@@ -76,11 +76,11 @@ windower.register_event('addon command', function(command1, ...)
             end
         elseif (command1 == 'Position' or command1 == 'Size') then
             if ((2 > argcount) or (argcount > 2)) then
-                error('Invalid syntax. Check the "help" command.')        
+                error('Invalid syntax. Check the "help" command.')
             else
                 consolesettings(command1, ...)
             end
-      
+
         end
 
     elseif command1 == 'help' then
@@ -94,7 +94,7 @@ windower.register_event('addon command', function(command1, ...)
 
     else
         error('Unknown command! Use the "help" command for a list of commands.')
-    
+
     end
 end)
 

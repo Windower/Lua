@@ -12,7 +12,7 @@ require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
 
-_addon.version = '3.25'
+_addon.version = '3.26'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth, maintainer: SnickySnacks'
 _addon.commands = {'bm','battlemod'}

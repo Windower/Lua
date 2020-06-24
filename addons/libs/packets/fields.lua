@@ -925,7 +925,7 @@ fields.outgoing[0x0C0] = L{
 -- /makelinkshell
 fields.outgoing[0x0C3] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04  
-    {ctype='unsigned char',     label='Linkshell Numbger'},                     -- 05  
+    {ctype='unsigned char',     label='Linkshell Number'},                      -- 05  
     {ctype='data[2]',           label='_junk1'}                                 -- 05
 }
 
@@ -2641,7 +2641,7 @@ fields.incoming[0x056] = function (data, type)
 end
 
 func.incoming[0x056].type = L{ 
-    {ctype='int',                label='Type',   fn=e+{'quest_mission_log'}}    -- 24
+    {ctype='short',         label='Type',       fn=e+{'quest_mission_log'}}     -- 24
 }
 
 func.incoming[0x056][0x0080] = L{
@@ -3408,7 +3408,7 @@ fields.incoming[0x0E0] = L{
 -- Party Member List
 fields.incoming[0x0E1] = L{
     {ctype='unsigned short',    label='Party ID'},                              -- 04 For whatever reason, this is always valid ASCII in my captured packets.
-    {ctype='unsigned short',    label='_unknown1',          const=0x0080},      -- 06  Likely contains information about the current chat mode and vote count
+    {ctype='unsigned short',    label='_unknown1',          const=0x8000},      -- 06  Likely contains information about the current chat mode and vote count
 }
 
 -- Char Info
