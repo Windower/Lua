@@ -1429,7 +1429,6 @@ fields.incoming[0x00E] = L{
     {ctype='float',             label='Y'},                                     -- 14
     {ctype='unsigned int',      label='Walk Count'},                            -- 18   Steadily increases until rotation changes. Does not reset while the mob isn't walking. Only goes until 0xFF1F.
     {ctype='unsigned short',    label='_unknown1',          fn=bin+{2}},        -- 1A
-    {ctype='unsigned short',    label='_unknown0',          fn=bin+{2}},        -- 1C
     {ctype='unsigned char',     label='HP %',               fn=percent},        -- 1E
     {ctype='unsigned char',     label='Status',             fn=statuses},       -- 1F   Status used to be 0x20
     {ctype='unsigned int',      label='_unknown2',          fn=bin+{4}},        -- 20
