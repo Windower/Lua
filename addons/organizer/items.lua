@@ -42,7 +42,7 @@ local function validate_id(id)
 end
 
 local function wardrobecheck(bag_id,id)
-    return bag_id~=8 or (bag_id == 8 and res.items[id] and (res.items[id].type == 4 or res.items[id].type == 5) )
+    return _static.wardrobe_ids[bag_id]==nil or ( res.items[id] and (res.items[id].type == 4 or res.items[id].type == 5) )
 end
 
 function Items.new(loc_items,bool)
@@ -351,7 +351,7 @@ end
 function item_tab:put_away(usable_bags)
     org_debug("move", "Putting away "..res.items[self.id].english)
     local current_items = self._parent._parent
-    usable_bags = usable_bags or {1,9,4,2,5,6,7,8}
+    usable_bags = usable_bags or _static.usable_bags
     local bag_free
     for _,v in ipairs(usable_bags) do
         local bag_max = windower.ffxi.get_bag_info(v).max
