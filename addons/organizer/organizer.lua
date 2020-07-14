@@ -38,7 +38,7 @@ slips = require 'slips'
 
 _addon.name = 'Organizer'
 _addon.author = 'Byrth, maintainer: Rooks'
-_addon.version = 0.20200328
+_addon.version = 0.20200714
 _addon.commands = {'organizer','org'}
 
 _static = {
@@ -207,7 +207,7 @@ function options_load( )
 		
         if(settings.retain.slips == true) then
             org_verbose("Slips set to retain")
-            for _,slips_id in slips.storages:it() do
+            for _,slips_id in pairs(slips.storages) do
                 _retain[slips_id] = "slips"
                 org_debug("settings", "Adding ("..res.items[slips_id].english..') to slip retain list')
             end
