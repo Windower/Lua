@@ -518,12 +518,16 @@ add_effect_animation_strings['weaponskill_finish'] = {
     [12]  = 'scission',
     [13]  = 'detonation',
     [14]  = 'impaction',
+    [15]  = 'radiance',
+    [16]  = 'umbra',
     }
 
 add_effect_animation_strings['spell_finish'] = add_effect_animation_strings['weaponskill_finish']
+add_effect_animation_strings['mob_tp_finish'] = add_effect_animation_strings['weaponskill_finish']
+add_effect_animation_strings['avatar_tp_finish'] = add_effect_animation_strings['weaponskill_finish']
 
-local add_effect_effect_strings = {
-    }
+local add_effect_effect_strings = {}
+
 function action:get_add_effect()
     if not rawget(rawget(self,'raw'),'has_add_effect') then return false end
     local animation = self:get_add_effect_animation_string()
