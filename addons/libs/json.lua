@@ -300,7 +300,7 @@ local function escape_str(s)
     return s
 end
 
-function json.stringify(obj, as_key)
+function json.to_json(obj, as_key)
     local s = {}  -- We'll build the string as an array of strings to be concatenated.
     local kind = kind_of(obj)  -- This is 'array' if it's an array or type(obj) otherwise.
     if kind == 'array' then
@@ -308,7 +308,7 @@ function json.stringify(obj, as_key)
       s[#s + 1] = '['
       for i, val in ipairs(obj) do
         if i > 1 then s[#s + 1] = ', ' end
-        s[#s + 1] = json.stringify(val)
+        s[#s + 1] = json.to_json(val)
       end
       s[#s + 1] = ']'
     elseif kind == 'table' then
@@ -316,9 +316,9 @@ function json.stringify(obj, as_key)
         s[#s + 1] = '{'
         for k, v in pairs(obj) do
           if #s > 1 then s[#s + 1] = ', ' end
-          s[#s + 1] = json.stringify(k, true)
+          s[#s + 1] = json.to_json(k, true)
           s[#s + 1] = ':'
-          s[#s + 1] = json.stringify(v)
+          s[#s + 1] = json.to_json(v)
         end
         s[#s + 1] = '}'
     elseif kind == 'string' then
