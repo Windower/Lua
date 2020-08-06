@@ -1,6 +1,6 @@
 _addon.name = 'Treasury'
 _addon.author = 'Ihina'
-_addon.version = '1.2.1.0'
+_addon.version = '1.2.1.1'
 _addon.commands = {'treasury', 'tr'}
 
 res = require('resources')
@@ -122,7 +122,7 @@ function force_check()
     -- Check inventory for unwanted items
     if settings.AutoDrop then
         for index, item in pairs(items.inventory) do
-            if type(item) == 'table' and code.drop:contains(item.id) then
+            if type(item) == 'table' and code.drop:contains(item.id) and item.status == 0 then
                 drop(item.id, index, item.count)
             end
         end
@@ -201,7 +201,7 @@ windower.register_event('incoming chunk', function(id, data)
             return
         end
 
-        if id == 0x020 and settings.AutoDrop and code.drop:contains(chunk.Item) then
+        if id == 0x020 and settings.AutoDrop and code.drop:contains(chunk.Item) and chunk.Status == 0 then
             drop(chunk.Item, chunk.Index, chunk.Count)
         else
             -- Don't need to stack in the other case, as a new inventory packet will come in after the drop anyway

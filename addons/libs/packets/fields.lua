@@ -2579,6 +2579,28 @@ fields.incoming[0x051] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 16   May varying meaningfully, but it's unclear
 }
 
+enums[0x052] = {
+    [0x00] = 'Standard',
+    [0x01] = 'Event',
+    [0x02] = 'Event Skipped',
+    [0x03] = 'String Event',
+    [0x04] = 'Fishing',
+}
+
+func.incoming[0x052] = {}
+func.incoming[0x052].base = L{
+    {ctype='unsigned char',     label='Type',               fn=e+{0x052}},      -- 04
+}
+
+func.incoming[0x052][0x02] = L{
+    {ctype='unsigned short',    label='Menu ID'},                               -- 05
+}
+
+-- NPC Release
+fields.incoming[0x052] = function(data, type)
+    return func.incoming[0x052].base + (func.incoming[0x052][type or data:byte(5)] or L{})
+end
+
 -- Logout Time
 -- This packet is likely used for an entire class of system messages,
 -- but the only one commonly encountered is the logout counter.
