@@ -371,6 +371,13 @@
     <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
+    <name>MountRoulette</name>
+    <author>Dean James (Xurion of Bismarck)</author>
+    <description>Summon a mount at random, similar to Mount Roulette in FFXIV.</description>
+    <bugtracker>https://github.com/xurion/ffxi-mount-roulette/issues</bugtracker>
+    <support>https://www.ffxiah.com/forum/topic/52094/randommount-a-random-mount-selector-for-windower/</support>
+  </addon>
+  <addon>
     <name>NoCampaignMusic</name>
     <description>Prevents campaign battle music from playing in Shadowreign areas.</description>
     <author>Dean James (Xurion of Bismarck)</author>
@@ -829,5 +836,5 @@
     <description>Allows you to set a screen position per character name. Each character will be moved to that screen position on login. Requires the WinControl plugin to be installed.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>https://github.com/lili-ffxi</support>
-  </addon>  
+  </addon>
 </addons>
