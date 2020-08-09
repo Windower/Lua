@@ -53,6 +53,8 @@ windower.register_event('addon command', function()
         end
     end
 
+    if #allowed_mounts == 0 then return end
+
     -- Generate random number and use it to choose a mount
     local mount_index = math.ceil(math.random() * #allowed_mounts)
     windower.send_command('input /mount ' .. allowed_mounts[mount_index])
