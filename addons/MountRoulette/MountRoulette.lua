@@ -4,6 +4,7 @@ _addon.version = '3.0.0'
 _addon.commands = {'mountroulette', 'mr'}
 
 require('lists')
+require('sets')
 resources = require('resources')
 
 math.randomseed(os.time())
@@ -15,6 +16,7 @@ for _, mount in ipairs(resources.mounts) do
 end
 
 function update_allowed_mounts()
+    local allowed_mounts_set = S{}
     local kis = windower.ffxi.get_key_items()
 
     for _, id in ipairs(kis) do
@@ -25,17 +27,14 @@ function update_allowed_mounts()
             end)
             local mount = possible_mounts[mount_index]
 
-            -- Add this to allowed mounts if it is not already there
-            if not allowed_mounts:contains(mount) then
-                allowed_mounts:append(mount)
-            end
+            allowed_mounts_set:add(mount)
         end
     end
+
+    allowed_mounts = L(allowed_mounts_set)
 end
 
-windower.register_event('load', function()
-    update_allowed_mounts()
-end)
+update_allowed_mounts()
 
 windower.register_event('incoming chunk', function(id)
     if id == 0x055 then --ki update
@@ -43,19 +42,7 @@ windower.register_event('incoming chunk', function(id)
     end
 end)
 
-windower.register_event('addon command', function(command)
-    command = command and command:lower() or 'mount'
-
-    if commands[command] then
-        commands[command]()
-    else
-        commands.help()
-    end
-end)
-
-commands = {}
-
-commands.mount = function()
+windower.register_event('addon command', function()
     local player = windower.ffxi.get_player()
 
     -- If the player is mounted, dismount now
@@ -69,11 +56,4 @@ commands.mount = function()
     -- Generate random number and use it to choose a mount
     local mount_index = math.ceil(math.random() * #allowed_mounts)
     windower.send_command('input /mount ' .. allowed_mounts[mount_index])
-end
-
-commands.help = function()
-    windower.add_to_chat(8, '---Mount Roulette---')
-    windower.add_to_chat(8, 'Available commands:')
-    windower.add_to_chat(8, '//mr mount (or just //mr) - Selects a mount at random, or dismounts if mounted')
-    windower.add_to_chat(8, '//mr help - displays this help')
-end
+end)
