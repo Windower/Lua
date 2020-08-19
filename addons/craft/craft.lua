@@ -231,7 +231,7 @@ end
 
 local function get_support(id, data)
     if (id == 0x34) and conditions['support'] then
-        local mob, npc = validate(support_npcs, true)
+        local mob, npc = validate(support_npcs, false)
         local p = packets.new('outgoing', 0x5b, {
             ["Target"] = mob.id,
             ["Option Index"] = 1,
