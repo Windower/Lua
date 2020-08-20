@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Sedna',
+    item = 2967, --Sedna's Tusk
+    item_target_count = 50,
     pops = { {
         id = 1512, --Shimmering Pugil Scale
         type = 'key item',

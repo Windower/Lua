@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Glavoid',
+    item = 2927, --Glavoid Shell
+    item_target_count = 50,
     pops = { {
         id = 1473, --Sodden Sandworm Husk
         type = 'key item',
