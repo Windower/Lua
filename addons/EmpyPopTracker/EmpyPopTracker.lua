@@ -106,7 +106,7 @@ function get_item_count(id, items)
         if type(bag) == 'table' then
             for _, item in ipairs(bag) do
                 if item.id == id then
-                    count = count + 1
+                    count = count + item.count
                 end
             end
         end
