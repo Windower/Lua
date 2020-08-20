@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Isgebind',
+    item = 3290, --Isgebind's Heart
+    item_target_count = 75,
     pops = { {
         id = 1526, --Begrimed Dragon Hide
         type = 'key item',

@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Dragua',
+    item = 3288, --Dragua's Scale
+    item_target_count = 75,
     pops = { {
         id = 1521, --Bloodied Dragon Ear
         type = 'key item',
