@@ -4,7 +4,7 @@
 
 # craft #
 
-* A Final Fantasxy XI Crafting Addon
+* A Final Fantasy XI Crafting Addon
 
 #### Commands: ####
 1. help - Shows a menu of commands in game.
