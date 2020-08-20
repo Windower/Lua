@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name     = 'craft'
 _addon.author   = 'Mojo'
-_addon.version  = '1.1.0'
+_addon.version  = '1.1.1'
 _addon.commands = {'craft'}
 
 require('chat')
@@ -210,7 +210,7 @@ Notes:
   displayed on FFXIAH.
 ]]
 
-local function validate(npcs, bypass_distance)
+local function validate(npcs)
     zone = windower.ffxi.get_info()['zone']
     local valid = false
     for _, npc in pairs(npcs) do
@@ -218,7 +218,7 @@ local function validate(npcs, bypass_distance)
             valid = true
             local mob = windower.ffxi.get_mob_by_name(npc.name)
             if mob then
-                if (math.sqrt(mob.distance) < 6) or bypass_distance then
+                if (math.sqrt(mob.distance) < 6) then
                     return mob, npc
                 end
             end
@@ -231,7 +231,7 @@ end
 
 local function get_support(id, data)
     if (id == 0x34) and conditions['support'] then
-        local mob, npc = validate(support_npcs, false)
+        local mob, npc = validate(support_npcs)
         local p = packets.new('outgoing', 0x5b, {
             ["Target"] = mob.id,
             ["Option Index"] = 1,
