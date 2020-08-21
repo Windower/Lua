@@ -19541,12 +19541,6 @@ return {
             "Dhalmel Leather",
         },
     },
-    ["Leather Ring 2"] = {
-        ["crystal"] = "Wind Crystal",
-        ["ingredients"] = {
-            "Leath. Kit 60",
-        },
-    },
     ["Leather Shield"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
