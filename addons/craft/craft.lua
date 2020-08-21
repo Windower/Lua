@@ -106,6 +106,7 @@ local exceptions = {
     ['Ice Card'] = 9765,
     ['Wind Card'] = 9766,
     ['Earth Card'] = 9767,
+    ['Lightning Card'] = 9768,
     ['Water Card'] = 9769,
     ['Light Card'] = 9770,
     ['Dark Card'] = 9771,
