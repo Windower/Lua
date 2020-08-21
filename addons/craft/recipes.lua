@@ -9999,13 +9999,13 @@ return {
             "Dk. Ixion Ferrule",
         },
     },
-    ["Dagger (Weapon)"] = {
+    ["Dagger"] = {
         ["crystal"] = "Light Crystal",
         ["ingredients"] = {
             "Rusty Dagger",
         },
     },
-    ["Dagger (Weapon) 2"] = {
+    ["Dagger 2"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
             "Bronze Ingot",
@@ -15417,6 +15417,19 @@ return {
             "Distilled Water",
         },
     },
+    ["Griffon Leather 3"] = {
+        ["crystal"] = "Dark Crystal",
+        ["ingredients"] = {
+            "Win. Tea Leaves",
+            "Win. Tea Leaves",
+            "Win. Tea Leaves",
+            "Griffon Hide",
+            "Griffon Hide",
+            "Griffon Hide",
+            "Tanning Vat",
+            "Distilled Water",
+        },
+    },
     ["Grilled Hare"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -15748,13 +15761,13 @@ return {
     ["Hard Leather Ring"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Leath. Kit 60",
+            "Tiger Leather",
         },
     },
     ["Hard Leather Ring 2"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Tiger Leather",
+            "Leath. Kit 60",
         },
     },
     ["Hard-boiled Egg"] = {
@@ -19526,6 +19539,12 @@ return {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Dhalmel Leather",
+        },
+    },
+    ["Leather Ring 2"] = {
+        ["crystal"] = "Wind Crystal",
+        ["ingredients"] = {
+            "Leath. Kit 60",
         },
     },
     ["Leather Shield"] = {
