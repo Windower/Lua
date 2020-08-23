@@ -26,7 +26,7 @@
 
 _addon.name = 'position_manager'
 _addon.author = 'Lili'
-_addon.version = '1.0.0'
+_addon.version = '1.0.1'
 _addon.command = 'pm'
 
 if not windower.file_exists(windower.windower_path .. '\\plugins\\WinControl.dll') then
@@ -56,7 +56,7 @@ function handle_commands(cmd, pos_x, pos_y, name)
 
     if cmd == 'r' then
         windower.send_command('lua r position_manager')
-    elseif cmd == 'set' and type(pos_x) == 'number' and type(pos_y) == 'number' then
+    elseif cmd == 'set' and pos_x and pos_y then
         if name ~= nil and type(name) ~= 'string' then
             windower.add_to_chat(207, 'plugin_manager: ERROR - invalid name provided.')
             windower.send_command('pm help')
@@ -69,7 +69,13 @@ function handle_commands(cmd, pos_x, pos_y, name)
 
         settings.x = tonumber(pos_x)
         settings.y = tonumber(pos_y)
-        config.save(settings, name)
+        if settings.x and settings.y then
+            config.save(settings, name)
+        else
+            windower.add_to_chat(207, 'plugin_manager: ERROR - invalid position provided.')
+            windower.send_command('pm help')
+            return
+        end
 
         -- TODO: possibly add IPC
         if windower.ffxi.get_info().logged_in then

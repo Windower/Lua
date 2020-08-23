@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Bukhis',
+    item = 2966, --Bukhis's Wing
+    item_target_count = 50,
     pops = { {
         id = 1508, --Ingrown Taurus Nail
         type = 'key item',

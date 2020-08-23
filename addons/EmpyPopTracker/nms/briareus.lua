@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Briareus',
+    item = 2929, --Helm of Briareus
+    item_target_count = 50,
     pops = { {
         id = 1482, --Dented Gigas Shield
         type = 'key item',

@@ -72,7 +72,7 @@ end
 function functions.prepare(fn, ...)
     local args = {...}
     return function()
-        fn(unpack(args))
+        return fn(unpack(args))
     end
 end
 

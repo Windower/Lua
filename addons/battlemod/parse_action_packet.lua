@@ -53,7 +53,7 @@ function parse_action_packet(act)
                         if r.message ~= 0 and m.message ~= 0 then
                             if m.message == r.message or (condensecrits and S{1,67}:contains(m.message) and S{1,67}:contains(r.message)) then 
                                 if (m.effect == r.effect) or (S{1,67}:contains(m.message) and S{0,2,4}:contains(m.effect) and S{0,2,4}:contains(r.effect)) then  -- combine kicks and crits
-                                     if m.reaction == r.reaction or (S{8,10}:contains(m.reaction) and S{8,10}:contains(r.reaction)) then  -- combine hits and guards
+                                     if m.reaction == r.reaction then --or (S{8,10}:contains(m.reaction) and S{8,10}:contains(r.reaction)) then  -- combine hits and guards
 --                                        windower.add_to_chat(8, 'Condensed: '..m.message..':'..r.message..' - '..m.effect..':'..r.effect..' - '..m.reaction..':'..r.reaction)
                                         r.number = r.number + 1
                                         if not sumdamage then
@@ -163,14 +163,14 @@ function parse_action_packet(act)
                 local targ = assemble_targets(act.actor,v.target,act.category,m.message)
                 local color = color_filt(col,v.target[1].id==Self.id)
                 if m.reaction == 11 and act.category == 1 then m.simp_name = 'parried by'
-                elseif m.reaction == 12 and act.category == 1 then m.simp_name = 'blocked by'
-                elseif m.message == 1 then m.simp_name = 'hit'
+                --elseif m.reaction == 12 and act.category == 1 then m.simp_name = 'blocked by'
+                elseif m.message == 1 and (act.category == 1 or act.category == 11) then m.simp_name = 'hit'
                 elseif m.message == 15 then m.simp_name = 'missed'
                 elseif m.message == 29 or m.message == 84 then m.simp_name = 'is paralyzed'
                 elseif m.message == 30 then m.simp_name = 'anticipated by'
                 elseif m.message == 31 then m.simp_name = 'absorbed by'
                 elseif m.message == 32 then m.simp_name = 'dodged by'
-                elseif m.message == 67 then m.simp_name = 'critical hit'
+                elseif m.message == 67 and (act.category == 1 or act.category == 11) then m.simp_name = 'critical hit'
                 elseif m.message == 106 then m.simp_name = 'intimidated by'
                 elseif m.message == 153 then m.simp_name = act.action.name..' fails'
                 elseif m.message == 244 then m.simp_name = 'Mug fails'
@@ -230,7 +230,11 @@ function parse_action_packet(act)
                 elseif m.message == 655 or m.message == 656 then
                     m.status = color_it('Completely Resists',color_arr['statuscol'])
                 elseif m.message == 85 or m.message == 284 then
-                    m.status = color_it('Resists',color_arr['statuscol'])
+                    if m.unknown == 2 then
+                        m.status = color_it('Resists!',color_arr['statuscol'])
+                    else
+                        m.status = color_it('Resists',color_arr['statuscol'])
+                    end
                 elseif m.message == 351 then
                     m.status = color_it('status ailments',color_arr['statuscol'])
                     m.simp_name = color_it('remedy',color_arr['itemcol'])
@@ -255,7 +259,24 @@ function parse_action_packet(act)
                         msg = msg:gsub(' his ',' her ')
                     end
                 end
-                local prefix = (bit.band(m.unknown,1)==1 and "Cover! " or "")..(bit.band(m.unknown,2)==1 and "Resist! " or "")..(bit.band(m.unknown,4)==1 and "Magic Burst! " or "")..(bit.band(m.unknown,8)==1 and "Immunobreak! " or "")..(bit.band(m.unknown,16)==1 and "Critical Hit! " or "")
+                
+                local reaction_lookup = reaction_offsets[act.category] and (m.reaction - reaction_offsets[act.category]) or 0
+                local has_line_break = string.find(res.action_messages[m.message].en, '${lb}') and true or false
+                local prefix = (not has_line_break or simplify) and S{1,3,4,6,11,13,14,15}:contains(act.category) and (bit.band(m.unknown,1)==1 and "Cover! " or "")
+                                ..(bit.band(m.unknown,4)==4 and "Magic Burst! " or "") --Used on Swipe/Lunge MB
+                                ..(bit.band(m.unknown,8)==8 and "Immunobreak! " or "") --Unused? Displayed directly on message
+                                ..(bit.band(m.unknown,16)==16 and "Critical Hit! " or "") --Unused? Crits have their own message
+                                ..(reaction_lookup == 4 and "Blocked! " or "")
+                                ..(reaction_lookup == 2 and "Guarded! " or "")
+                                ..(reaction_lookup == 3 and S{3,4,6,11,13,14,15}:contains(act.category) and "Parried! " or "") or "" --Unused? They are send the same as missed
+                local prefix2 = has_line_break and S{1,3,4,6,11,13,14,15}:contains(act.category) and (bit.band(m.unknown,1)==1 and "Cover! " or "")
+                                ..(bit.band(m.unknown,2)==2 and "Resist! " or "")
+                                ..(bit.band(m.unknown,4)==4 and "Magic Burst! " or "") --Used on Swipe/Lunge MB
+                                ..(bit.band(m.unknown,8)==8 and "Immunobreak! " or "") --Unused? Displayed directly on message
+                                ..(bit.band(m.unknown,16)==16 and "Critical Hit! " or "") --Unused? Crits have their own message
+                                ..(reaction_lookup == 4 and "Blocked! " or "")
+                                ..(reaction_lookup == 2 and "Guarded! " or "")
+                                ..(reaction_lookup == 3 and S{3,4,6,11,13,14,15}:contains(act.category) and "Parried! " or "") or "" --Unused? They are send the same as missed
                 windower.add_to_chat(color,prefix..make_condensedamage_number(m.number)..( (msg or tostring(m.message))
                     :gsub('${spell}',color_it(act.action.spell or 'ERROR 111',color_arr.spellcol))
                     :gsub('${ability}',color_it(act.action.ability or 'ERROR 112',color_arr.abilcol))
@@ -266,7 +287,7 @@ function parse_action_packet(act)
                     :gsub('${numb}',col == 'D' and color_it(numb or 'ERROR 116', color_arr[act.actor.damage]) or (numb or 'ERROR 116'))
                     :gsub('${actor}',color_it((act.actor.name or 'ERROR 117' ) .. (act.actor.owner_name or "") ,color_arr[act.actor.owner or act.actor.type]))
                     :gsub('${target}',targ)
-                    :gsub('${lb}','\7')
+                    :gsub('${lb}','\7'..prefix2)
                     :gsub('${number}',act.action.number or m.param)
                     :gsub('${status}',m.status or 'ERROR 120')
                     :gsub('${gil}',m.param..' gil')))
@@ -504,7 +525,7 @@ function player_info(id)
                             dmg = 'mydmg'
                         end
                         owner = i
-                        owner_name = showownernames and '(' .. v.mob.name .. ')'
+                        owner_name = showownernames and ' (' .. v.mob.name .. ')'
                         break
                     elseif type(v) == 'table' and v.mob and v.mob.fellow_index and v.mob.fellow_index == player_table.index then
                         if i == 'p0' then
@@ -513,7 +534,7 @@ function player_info(id)
                             dmg = 'mydmg'
                         end
                         owner = i
-                        owner_name = showownernames and '(' .. v.mob.name .. ')'
+                        owner_name = showownernames and ' (' .. v.mob.name .. ')'
                         break
                     end
                 end

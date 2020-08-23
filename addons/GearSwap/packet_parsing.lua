@@ -334,8 +334,9 @@ parse.i[0x117] = function (data)
 end
 
 parse.i[0x053] = function (data)
-    if data:unpack('H',0xD) == 0x12D and player then
-        -- You're unable to use trust magic if you're not the party leader or solo
+    local message = data:unpack('H',0xD)
+    if (message == 0x12D or message == 0x12A or message == 0x12B or message == 0x12C) and player then
+        -- You're unable to use trust magic if you're not the party leader, solo, pt full or trying to summon an already summoned trust
         local ts,tab = command_registry:find_by_time()
         if tab and tab.spell and tab.spell.prefix ~= '/pet' and not gearswap_disabled then
             tab.spell.action_type = 'Interruption'

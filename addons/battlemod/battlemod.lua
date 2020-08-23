@@ -12,7 +12,7 @@ require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
 
-_addon.version = '3.26'
+_addon.version = '3.27'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth, maintainer: SnickySnacks'
 _addon.commands = {'bm','battlemod'}
@@ -397,7 +397,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             end
         end
     elseif id == 0x06F then
-        if original:byte(5) == 0 then
+        if original:byte(5) == 0 or original:byte(5) == 12 then
             local result = original:byte(6)
             if result == 1 then
                 windower.add_to_chat(8,' -------------- HQ Tier 1! --------------')

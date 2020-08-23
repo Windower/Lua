@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Sobek',
+    item = 2964, --Sobek's Skin
+    item_target_count = 50,
     pops = { {
         id = 1500, --Molted Peiste Skin
         type = 'key item',

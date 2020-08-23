@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Orthrus',
+    item = 3287, --Orthrus's Claw
+    item_target_count = 75,
     pops = { {
         id = 1520, --Steaming cerberus tongue
         type = 'key item',

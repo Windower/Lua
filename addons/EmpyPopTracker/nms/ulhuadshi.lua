@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Ulhuadshi',
+    item = 2963, --Ulhuadshi's Fang
+    item_target_count = 50,
     pops = { {
         id = 1492, --Shriveled Hecteyes Stalk
         type = 'key item',
