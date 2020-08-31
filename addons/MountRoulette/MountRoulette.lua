@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name    = 'Mount Roulette'
 _addon.author  = 'Dean James (Xurion of Bismarck)'
-_addon.version = '3.0.0'
+_addon.version = '3.0.1'
 _addon.commands = {'mountroulette', 'mr'}
 
 require('lists')
@@ -39,7 +39,7 @@ math.randomseed(os.time())
 
 allowed_mounts = L{}
 possible_mounts = L{}
-for _, mount in ipairs(resources.mounts) do
+for _, mount in pairs(resources.mounts) do
     possible_mounts:append(mount.name:lower())
 end
 
@@ -85,5 +85,5 @@ windower.register_event('addon command', function()
 
     -- Generate random number and use it to choose a mount
     local mount_index = math.ceil(math.random() * #allowed_mounts)
-    windower.send_command('input /mount ' .. allowed_mounts[mount_index])
+    windower.send_command('input /mount "' .. allowed_mounts[mount_index] .. '"')
 end)
