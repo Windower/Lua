@@ -26,7 +26,7 @@ Will set the default positioning for all characters to X: 0 and Y: 60 (the heigh
 Will set the default position for the character called "Yourname" to X: 1920 and Y: 0.  
 This will make the character appear on the secondary screen that is to the right of the main screen - useful for multi-screen setups.
 
-`//pm set delay 1 all`
+`//pm set delay 1 all`  
 `//pm set Yourmain 0 40`  
 `//pm set Youralt 800 40`  
 Will set delay to 1 for all characters, then set the position of your main to X: 0, Y: 40, and your alt to X: 800, Y: 40.  
