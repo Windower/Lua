@@ -73,7 +73,7 @@ function handle_commands(cmd, ...)
         local name = arg[3]
         if name ~= nil and type(name) ~= 'string' then
             windower.add_to_chat(207, 'position_manager: ERROR - invalid name provided.')
-            windower.send_command('pm help')
+            show_help()
             return
         elseif not name then
             name = windower.ffxi.get_player().name
@@ -91,7 +91,7 @@ function handle_commands(cmd, ...)
                 show_help()
                 return
             end
-        elseif tonumber(arg[1]) and tonumber(arg[2]) then
+        elseif arg[1] and arg[2] then
             settings.x = tonumber(arg[1])
             settings.y = tonumber(arg[2])
         
@@ -110,6 +110,10 @@ function handle_commands(cmd, ...)
                 show_help()
                 return
             end
+        else
+            windower.add_to_chat(207, 'position_manager: ERROR - invalid arguments provided.')
+            show_help()
+            return
         end
         -- TODO: possibly add IPC
         return
