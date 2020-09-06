@@ -395,8 +395,8 @@
   <name>NyzulHelper</name>
     <author>Glarin of Asura</author>
     <description>Tracks and displays the Current Floor, Time Remaining, Objective, Floors Completed, Reward Rate, and Potenial Tokens.</description>
-    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://github.com/GlarinAsura/Lua/issues</support>
+    <bugtracker>https://github.com/GlarinAsura/Lua/issues</bugtracker>
+    <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
     <name>obiaway</name>
