@@ -94,16 +94,16 @@ function handle_commands(cmd, ...)
         elseif arg[1] and arg[2] then
             settings.x = tonumber(arg[1])
             settings.y = tonumber(arg[2])
-        
+
             if settings.x and settings.y then
                 config.save(settings, name)
-                
+
                 if windower.ffxi.get_info().logged_in then
                     player_name = windower.ffxi.get_player().name
                     if name:lower() == player_name:lower() then
                         move(settings)
                     end
-                end                
+                end
                 windower.add_to_chat(207, 'position_manager: Position set to %s, %s for %s.':format(settings.x, settings.y, name))
             else
                 windower.add_to_chat(207, 'position_manager: ERROR - invalid position provided.')
@@ -119,7 +119,7 @@ function handle_commands(cmd, ...)
         return
     elseif cmd ~= 'help' then
         windower.add_to_chat(207, 'position_manager: %s command not found.':format(cmd))
-    end        
+    end
     show_help()
 end
 
