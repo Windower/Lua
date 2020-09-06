@@ -26,7 +26,7 @@
 
 _addon.name = 'position_manager'
 _addon.author = 'Lili'
-_addon.version = '1.0.1'
+_addon.version = '1.1'
 _addon.command = 'pm'
 
 if not windower.file_exists(windower.windower_path .. '\\plugins\\WinControl.dll') then
@@ -43,22 +43,28 @@ config = require('config')
 default = {
     x = 0,
     y = 0,
+    delay = 0,
 }
 
 settings = config.load(default)
 
 function move(settings)
+    if settings.delay > 0 then
+        coroutine.sleep(settings.delay)
+    end
     windower.send_command('wincontrol move %s %s':format(settings.x, settings.y))
 end
 
-function handle_commands(cmd, pos_x, pos_y, name)
-    cmd = cmd:lower() or 'help'
+function handle_commands(cmd, ...)
+    cmd = cmd:lower()
 
     if cmd == 'r' then
         windower.send_command('lua r position_manager')
-    elseif cmd == 'set' and pos_x and pos_y then
+        return
+    elseif cmd == 'set' then
+        local name = arg[3]
         if name ~= nil and type(name) ~= 'string' then
-            windower.add_to_chat(207, 'plugin_manager: ERROR - invalid name provided.')
+            windower.add_to_chat(207, 'position_manager: ERROR - invalid name provided.')
             windower.send_command('pm help')
             return
         elseif not name then
@@ -67,31 +73,48 @@ function handle_commands(cmd, pos_x, pos_y, name)
             name = 'all'
         end
 
-        settings.x = tonumber(pos_x)
-        settings.y = tonumber(pos_y)
-        if settings.x and settings.y then
-            config.save(settings, name)
-        else
-            windower.add_to_chat(207, 'plugin_manager: ERROR - invalid position provided.')
-            windower.send_command('pm help')
-            return
-        end
-
-        -- TODO: possibly add IPC
-        if windower.ffxi.get_info().logged_in then
-            player_name = windower.ffxi.get_player().name
-            if name:lower() == player_name:lower() then
-                move(settings)
+        if arg[1] == 'delay' then
+            settings.delay = tonumber(arg[2])
+            if settings.delay > 0 then
+                config.save(settings, name)
+                windower.add_to_chat(207, 'position_manager: Delay set to %s for %s.':format(settings.delay, name))
+            else
+                windower.add_to_chat(207, 'position_manager: ERROR - invalid delay provided.')
+                windower.send_command('pm help')
+                return
+            end
+        elseif tonumber(arg[1]) and tonumber(arg[2]) then
+            settings.x = tonumber(arg[1])
+            settings.y = tonumber(arg[2])
+        
+            if settings.x and settings.y then
+                config.save(settings, name)
+                
+                if windower.ffxi.get_info().logged_in then
+                    player_name = windower.ffxi.get_player().name
+                    if name:lower() == player_name:lower() then
+                        move(settings)
+                    end
+                end                
+                windower.add_to_chat(207, 'position_manager: Position set to %s,%s for %s.':format(settings.x, settings.y, name))
+            else
+                windower.add_to_chat(207, 'position_manager: ERROR - invalid position provided.')
+                windower.send_command('pm help')
+                return
             end
         end
-    elseif cmd == 'help' then
-        windower.add_to_chat(207, 'position_manager: Usage: //pm set <x> <y> [name]')
-        windower.add_to_chat(207, 'position_manager: See the readme for details.')
-    else
+        -- TODO: possibly add IPC
+        return
+    elseif cmd ~= 'help' then
         windower.add_to_chat(207, 'position_manager: %s command not found.':format(cmd))
-        windower.send_command('pm help')
-    end
+    end        
+
+    windower.add_to_chat(207, 'position_manager: Commands:')
+    windower.add_to_chat(207, '  //pm set <x> <y> [name]')
+    windower.add_to_chat(207, '  //pm set delay <seconds> [name]')
+    windower.add_to_chat(207, 'position_manager: See the readme for details.')
 end
 
 config.register(settings, move)
+
 windower.register_event('addon command', handle_commands)
