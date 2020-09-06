@@ -1,6 +1,6 @@
 # Position Manager
 
-Set and save screen position per-character.  
+Set and save screen position per-character. Requires the WinControl addon.  
 
 Command:  
 `//pm set <pos_x> <pos_y> [name]`
