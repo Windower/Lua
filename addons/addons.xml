@@ -392,6 +392,13 @@
     <bugtracker>https://github.com/trv6/Lua/issues</bugtracker>
   </addon>
   <addon>
+  <name>NyzulHelper</name>
+    <author>Glarin of Asura</author>
+    <description>Tracks and displays the Current Floor, Time Remaining, Objective, Floors Completed, Reward Rate, and Potenial Tokens.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://github.com/GlarinAsura/Lua/issues</support>
+  </addon>
+  <addon>
     <name>obiaway</name>
     <description>Automatically collect and remove elemental obi based on day/weather/storm conditions.</description>
     <support>https://discord.gg/b275nMv</support>
