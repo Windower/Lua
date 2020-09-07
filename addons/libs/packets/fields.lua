@@ -359,6 +359,7 @@ enums['action'] = {
     [0x0F] = 'Switch target',
     [0x10] = 'Ranged attack',
     [0x12] = 'Dismount Chocobo',
+    [0x13] = 'Tractor Dialogue',
     [0x14] = 'Zoning/Appear', -- I think, the resource for this is ambiguous.
     [0x19] = 'Monsterskill',
     [0x1A] = 'Mount',
@@ -924,7 +925,7 @@ fields.outgoing[0x0C0] = L{
 -- /makelinkshell
 fields.outgoing[0x0C3] = L{
     {ctype='unsigned char',     label='_unknown1'},                             -- 04  
-    {ctype='unsigned char',     label='Linkshell Numbger'},                     -- 05  
+    {ctype='unsigned char',     label='Linkshell Number'},                      -- 05  
     {ctype='data[2]',           label='_junk1'}                                 -- 05
 }
 
@@ -2578,6 +2579,28 @@ fields.incoming[0x051] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 16   May varying meaningfully, but it's unclear
 }
 
+enums[0x052] = {
+    [0x00] = 'Standard',
+    [0x01] = 'Event',
+    [0x02] = 'Event Skipped',
+    [0x03] = 'String Event',
+    [0x04] = 'Fishing',
+}
+
+func.incoming[0x052] = {}
+func.incoming[0x052].base = L{
+    {ctype='unsigned char',     label='Type',               fn=e+{0x052}},      -- 04
+}
+
+func.incoming[0x052][0x02] = L{
+    {ctype='unsigned short',    label='Menu ID'},                               -- 05
+}
+
+-- NPC Release
+fields.incoming[0x052] = function(data, type)
+    return func.incoming[0x052].base + (func.incoming[0x052][type or data:byte(5)] or L{})
+end
+
 -- Logout Time
 -- This packet is likely used for an entire class of system messages,
 -- but the only one commonly encountered is the logout counter.
@@ -2640,7 +2663,7 @@ fields.incoming[0x056] = function (data, type)
 end
 
 func.incoming[0x056].type = L{ 
-    {ctype='int',                label='Type',   fn=e+{'quest_mission_log'}}    -- 24
+    {ctype='short',         label='Type',       fn=e+{'quest_mission_log'}}     -- 24
 }
 
 func.incoming[0x056][0x0080] = L{
@@ -2713,7 +2736,7 @@ fields.incoming[0x05A] = L{
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0E
     {ctype='unsigned short',    label='Emote',              fn=emote},          -- 10
-    {ctype='unsigned short',    label='_unknown1',          const=2},           -- 12
+    {ctype='unsigned short',    label='_unknown1'},                             -- 12
     {ctype='unsigned short',    label='_unknown2'},                             -- 14
     {ctype='unsigned char',     label='Type'},                                  -- 16   2 for motion, 0 otherwise
     {ctype='unsigned char',     label='_unknown3'},                             -- 17
@@ -3043,15 +3066,21 @@ fields.incoming[0x068] = L{
     {ctype='char*',             label='Pet Name'},                              -- 18
 }
 
+types.synth_skills = L{
+    {ctype='bit[6]',            label='Skill'},                                 -- 1A - 1D:0
+    {ctype='boolbit',           label='Skillup Allowed'},                       -- 1A - 1D:6
+    {ctype='boolbit',           label='Desynth'},                               -- 1A - 1D:7
+}
+
 -- Self Synth Result
-fields.incoming[0x06F] = L{
+fields.incoming[0x06F] = L{    
     {ctype='unsigned char',     label='Result',             fn=e+{'synth'}},    -- 04
     {ctype='signed char',       label='Quality'},                               -- 05
     {ctype='unsigned char',     label='Count'},                                 -- 06   Even set for fail (set as the NQ amount in that case)
     {ctype='unsigned char',     label='_junk1'},                                -- 07
     {ctype='unsigned short',    label='Item',               fn=item},           -- 08
     {ctype='unsigned short[8]', label='Lost Item',          fn=item},           -- 0A
-    {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A
+    {ref=types.synth_skills,    count=4},
     {ctype='unsigned char[4]',  label='Skillup',            fn=div+{10}},       -- 1E
     {ctype='unsigned short',    label='Crystal',            fn=item},           -- 22
 }
@@ -3280,6 +3309,7 @@ func.incoming[0x0C9][0x01] = L{
     {ctype='unsigned char',     label='Main Job',           fn=job},            -- 12
     {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 13
     {ctype='data[15]',          label='Linkshell',          enc=ls_enc},        -- 14   6-bit packed
+    {ctype='unsigned char',     label='_padding1'},                             -- 23
     {ctype='unsigned char',     label='Main Job Level'},                        -- 24
     {ctype='unsigned char',     label='Sub Job Level'},                         -- 25
     {ctype='data[42]',          label='_unknown5'},                             -- 26   At least the first two bytes and the last twelve bytes are junk, possibly more
@@ -3406,7 +3436,7 @@ fields.incoming[0x0E0] = L{
 -- Party Member List
 fields.incoming[0x0E1] = L{
     {ctype='unsigned short',    label='Party ID'},                              -- 04 For whatever reason, this is always valid ASCII in my captured packets.
-    {ctype='unsigned short',    label='_unknown1',          const=0x0080},      -- 06  Likely contains information about the current chat mode and vote count
+    {ctype='unsigned short',    label='_unknown1',          const=0x8000},      -- 06  Likely contains information about the current chat mode and vote count
 }
 
 -- Char Info
@@ -3462,12 +3492,17 @@ fields.incoming[0x0F6] = L{
     {ctype='unsigned int',      label='Type',               fn=e+{'ws mark'}},  -- 04
 }
 
+enums['reraise'] = {
+    [0x01] = 'Raise dialogue',
+    [0x02] = 'Tractor dialogue',
+}
+
 -- Reraise Activation
 fields.incoming[0x0F9] = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 04
     {ctype='unsigned short',    label='Index',              fn=index},          -- 08
-    {ctype='unsigned char',     label='_unknown1'},                             -- 0A
-    {ctype='unsigned char',     label='_unknown2'},                             -- 0B
+    {ctype='unsigned char',     label='Category',           fn=e+{'reraise'}},  -- 0A
+    {ctype='unsigned char',     label='_unknown1'},                             -- 0B
 }
 
 -- Furniture Interaction
