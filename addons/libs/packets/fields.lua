@@ -3093,7 +3093,7 @@ fields.incoming[0x070] = L{
     {ctype='unsigned char',     label='_junk1'},                                -- 07
     {ctype='unsigned short',    label='Item',               fn=item},           -- 08
     {ctype='unsigned short[8]', label='Lost Item',          fn=item},           -- 0A
-    {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A   Unsure about this
+    {ref=types.synth_skills,    count=4},
     {ctype='char*',             label='Player Name'},                           -- 1E   Name of the player
 }
 
