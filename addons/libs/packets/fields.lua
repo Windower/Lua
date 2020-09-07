@@ -2736,7 +2736,7 @@ fields.incoming[0x05A] = L{
     {ctype='unsigned short',    label='Player Index',       fn=index},          -- 0C
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0E
     {ctype='unsigned short',    label='Emote',              fn=emote},          -- 10
-    {ctype='unsigned short',    label='_unknown1'},                             -- 12
+    {ctype='unsigned short',    label='_unknown1',          const=2},           -- 12
     {ctype='unsigned short',    label='_unknown2'},                             -- 14
     {ctype='unsigned char',     label='Type'},                                  -- 16   2 for motion, 0 otherwise
     {ctype='unsigned char',     label='_unknown3'},                             -- 17
@@ -3073,7 +3073,7 @@ types.synth_skills = L{
 }
 
 -- Self Synth Result
-fields.incoming[0x06F] = L{    
+fields.incoming[0x06F] = L{
     {ctype='unsigned char',     label='Result',             fn=e+{'synth'}},    -- 04
     {ctype='signed char',       label='Quality'},                               -- 05
     {ctype='unsigned char',     label='Count'},                                 -- 06   Even set for fail (set as the NQ amount in that case)
@@ -3436,7 +3436,7 @@ fields.incoming[0x0E0] = L{
 -- Party Member List
 fields.incoming[0x0E1] = L{
     {ctype='unsigned short',    label='Party ID'},                              -- 04 For whatever reason, this is always valid ASCII in my captured packets.
-    {ctype='unsigned short',    label='_unknown1',          const=0x8000},      -- 06  Likely contains information about the current chat mode and vote count
+    {ctype='unsigned short',    label='_unknown1',          const=0x0080},      -- 06  Likely contains information about the current chat mode and vote count
 }
 
 -- Char Info
