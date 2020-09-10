@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Chloris',
+    item = 2928, --2Lf. Chloris Bud
+    item_target_count = 50,
     pops = { {
         id = 1470, --Gory Scorpion Claw
         type = 'key item',

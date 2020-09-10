@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Carabosse',
+    item = 2930, --Carabosse's Gem
+    item_target_count = 50,
     pops = { {
         id = 1485, --Pellucid Fly Eye
         type = 'key item',

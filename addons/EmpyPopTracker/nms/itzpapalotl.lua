@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Itzpapalotl',
+    item = 2962, --Itzpapa. Scale
+    item_target_count = 50,
     pops = { {
         id = 1488, --Venomous Wamoura Feeler
         type = 'key item',

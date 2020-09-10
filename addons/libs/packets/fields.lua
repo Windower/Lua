@@ -1445,8 +1445,8 @@ fields.incoming[0x017] = L{
     {ctype='unsigned char',     label='Mode',               fn=chat},           -- 04
     {ctype='bool',              label='GM'},                                    -- 05
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 06   Set only for Yell
-    {ctype='char[0x10]',        label='Sender Name'},                           -- 08
-    {ctype='char*',             label='Message'},                               -- 18   Max of 150 characters
+    {ctype='char[0xF]',         label='Sender Name'},                           -- 08
+    {ctype='char*',             label='Message'},                               -- 17   Max of 150 characters
 }
 
 -- Job Info
@@ -3066,6 +3066,12 @@ fields.incoming[0x068] = L{
     {ctype='char*',             label='Pet Name'},                              -- 18
 }
 
+types.synth_skills = L{
+    {ctype='bit[6]',            label='Skill'},                                 -- 1A - 1D:0
+    {ctype='boolbit',           label='Skillup Allowed'},                       -- 1A - 1D:6
+    {ctype='boolbit',           label='Desynth'},                               -- 1A - 1D:7
+}
+
 -- Self Synth Result
 fields.incoming[0x06F] = L{
     {ctype='unsigned char',     label='Result',             fn=e+{'synth'}},    -- 04
@@ -3074,7 +3080,7 @@ fields.incoming[0x06F] = L{
     {ctype='unsigned char',     label='_junk1'},                                -- 07
     {ctype='unsigned short',    label='Item',               fn=item},           -- 08
     {ctype='unsigned short[8]', label='Lost Item',          fn=item},           -- 0A
-    {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A
+    {ref=types.synth_skills,    count=4},
     {ctype='unsigned char[4]',  label='Skillup',            fn=div+{10}},       -- 1E
     {ctype='unsigned short',    label='Crystal',            fn=item},           -- 22
 }
@@ -3087,7 +3093,7 @@ fields.incoming[0x070] = L{
     {ctype='unsigned char',     label='_junk1'},                                -- 07
     {ctype='unsigned short',    label='Item',               fn=item},           -- 08
     {ctype='unsigned short[8]', label='Lost Item',          fn=item},           -- 0A
-    {ctype='unsigned char[4]',  label='Skill',              fn=skill},          -- 1A   Unsure about this
+    {ref=types.synth_skills,    count=4},
     {ctype='char*',             label='Player Name'},                           -- 1E   Name of the player
 }
 

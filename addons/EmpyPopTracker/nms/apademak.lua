@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Apademak',
+    item = 3289, --Apademak Horn
+    item_target_count = 75,
     pops = { {
         id = 1525, --Torn Khimaira Wing
         type = 'key item',

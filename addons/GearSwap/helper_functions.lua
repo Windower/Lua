@@ -852,7 +852,7 @@ function cmd_reg:find_by_spell(value)
     for i,v in pairs(self) do
         if type(v) == 'table' and v.spell and v.spell.prefix == value.prefix and v.spell.name == value.name then
             potential_entries[i] = v.timestamp or 0
-        elseif type(v) == 'table' and v.spell and v.spell.name == 'Double-Up' and value.type == 'CorsairRoll' then
+        elseif type(v) == 'table' and v.spell and v.spell.english == 'Double-Up' and value.type == 'CorsairRoll' then
             -- Double Up ability uses will return action packets that match Corsair Rolls rather than Double Up
             potential_entries[i] = v.timestamp or 0
         end

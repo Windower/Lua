@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon.name = 'Empy Pop Tracker'
 _addon.author = 'Dean James (Xurion of Bismarck)'
 _addon.commands = { 'ept', 'empypoptracker' }
-_addon.version = '2.3.0'
+_addon.version = '2.4.0'
 
 config = require('config')
 res = require('resources')
@@ -98,6 +98,21 @@ function owns_item(id, items)
     end
 
     return false
+end
+
+function get_item_count(id, items)
+    local count = 0
+    for _, bag in pairs(items) do
+        if type(bag) == 'table' then
+            for _, item in ipairs(bag) do
+                if item.id == id then
+                    count = count + item.count
+                end
+            end
+        end
+    end
+
+    return count
 end
 
 function owns_key_item(id, items)
@@ -181,6 +196,18 @@ function generate_text(data, key_items, items, depth)
         if pop.dropped_from.pops then
             text = text .. generate_text(pop.dropped_from, key_items, items, depth + 1)
         end
+    end
+
+    if data.item then
+        local count = get_item_count(data.item, items)
+        local start = ''
+        local finish = ''
+        if count >= data.item_target_count then
+            start = start_color('obtained')
+            finish = '\\cr'
+        end
+
+        text = text .. '\n\n' .. start .. res.items[data.item].name .. ': ' .. count .. '/' .. data.item_target_count .. finish
     end
 
     return text

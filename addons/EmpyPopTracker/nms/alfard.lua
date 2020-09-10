@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Alfard',
+    item = 3291, --Alfard's Fang
+    item_target_count = 75,
     pops = { {
         id = 1530, --Venomous hydra fang
         type = 'key item',

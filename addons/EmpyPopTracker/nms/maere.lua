@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Maere',
+    item = 3294, --Colorless Soul
+    item_target_count = 75,
     pops = { {
         id = 1654, --Indigo demilune abyssite
         type = 'key item',

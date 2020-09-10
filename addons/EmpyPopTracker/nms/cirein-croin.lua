@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Cirein-croin',
+    item = 2965, --Cirein. Lantern
+    item_target_count = 50,
     pops = { {
         id = 1504, --Glistening Orobon Liver
         type = 'key item',
