@@ -1445,8 +1445,8 @@ fields.incoming[0x017] = L{
     {ctype='unsigned char',     label='Mode',               fn=chat},           -- 04
     {ctype='bool',              label='GM'},                                    -- 05
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 06   Set only for Yell
-    {ctype='char[0x10]',        label='Sender Name'},                           -- 08
-    {ctype='char*',             label='Message'},                               -- 18   Max of 150 characters
+    {ctype='char[0xF]',         label='Sender Name'},                           -- 08
+    {ctype='char*',             label='Message'},                               -- 17   Max of 150 characters
 }
 
 -- Job Info
