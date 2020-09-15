@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 _addon.name = 'Pouches'
-_addon.version = '1'
+_addon.version = '2'
 _addon.author = 'Omnys@Valefor'
 _addon.command = 'pouches'
 
@@ -41,7 +41,10 @@ res = require('resources')
 
 inverted = {}
 item = {}
-    
+inventory_info = {} 
+inventory_info.current = windower.ffxi.get_bag_info(0).count
+inventory_info.max = windower.ffxi.get_bag_info(0).max
+
 windower.register_event('load', function(...)
     for k,v in pairs(res.items) do
         inverted[string.lower(v.english)] = {id = k, targets = v.targets, cast = v.cast_time}
@@ -51,11 +54,21 @@ end)
 function use_item()
     windower.chat.input('/item "' .. item.name .. '" <me>')
     item.count = item.count - 1
-    if item.count > 0 and windower.ffxi.get_player().status == 0 then
-        use_item:schedule(item.delay)
+    if item.count > 0 and windower.ffxi.get_player().status == 0 then	
+        if inventory_info.current < inventory_info.max then 
+            use_item:schedule(item.delay)
+        else
+            log("Your inventory is full...Aboriting")
+		  end
     end
 end
 
+windower.register_event('incoming chunk', function(id)
+    if id == 0x020 or 0x01E or 0x01D then
+        inventory_info.current = windower.ffxi.get_bag_info(0).count
+        inventory_info.max = windower.ffxi.get_bag_info(0).max -- this is probably not needed, but I don't want a user to have to reload when they complete a gobbie bag quest.  
+    end
+end)
 windower.register_event('addon command', function(...)
     local inv = windower.ffxi.get_items(0) -- get main inventory
     local args    = T{...}:map(string.lower)
@@ -73,9 +86,13 @@ windower.register_event('addon command', function(...)
             end
         end
         if item.count > 0 then
-            log('Found '..item.count..' '..item.name..'. Commencing Use.')
-            log('You may simply type /heal to stop.')
-            use_item()
+            if inventory_info.current < inventory_info.max then 
+                log('Found '..item.count..' '..item.name..'. Commencing Use.')
+                log('You may simply type /heal to stop.')
+                use_item()
+            else
+                log("Your inventory is full...Aboriting")
+            end
         else
             log('Item, '..item.name..' not found in main inventory, or is not the type of item that can be used.')
         end
