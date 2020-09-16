@@ -128,9 +128,7 @@ local function zone(val)
 end
 
 local function item(val)
-    return val ~= 0 and res.items[val]
-            and res.items[val].name
-        or '-'
+    return val ~= 0 and res.items[val] and res.items[val].name or '-'
 end
 
 local function server(val)
@@ -193,13 +191,8 @@ local function inv(bag, val)
     if val == 0 or not res.bags[bag] then
         return '-'
     end
-    
-    local items = windower.ffxi.get_items(bag)
-    if not items[val] then
-        return '-'
-    end
 
-    return item(items[val].id)
+    return item(windower.ffxi.get_items(bag, val).id)
 end
 
 local function invp(index, val, data)
