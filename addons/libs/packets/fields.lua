@@ -193,8 +193,8 @@ local function inv(bag, val)
     if val == 0 or not res.bags[bag] then
         return '-'
     end
-
-    local items = windower.ffxi.get_items()[res.bags[bag].english:lower()]
+    
+    local items = windower.ffxi.get_items(bag)
     if not items[val] then
         return '-'
     end
