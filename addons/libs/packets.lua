@@ -1,5 +1,5 @@
 --[[
-A library to facilitate packet usage 
+A library to facilitate packet usage
 ]]
 
 _libs = _libs or {}
@@ -164,6 +164,7 @@ parse = function(fields, data, index, max, lookup, depth)
                         bits = sizes[type] * type_count
 
                         field.ctype = '%s[%u]':format(type, type_count)
+                        field.vlstring = type == 'char'
 
                         count = max
                     end
@@ -264,6 +265,10 @@ local make_pack_string = function(field)
         return pack_ids[ctype]
     end
 
+    if field.vlstring then
+        return 'z'
+    end
+
     local type_name, number = ctype:match(array_pattern)
     if type_name then
         number = tonumber(number)
@@ -296,7 +301,7 @@ end
 -- If data is a string it parses an existing packet, otherwise it will create
 -- a new packet table for injection. In that case, data can ba an optional
 -- table containing values to initialize the packet to.
--- 
+--
 -- Example usage
 --  Injection:
 --      local packet = packets.new('outgoing', 0x050, {
@@ -310,7 +315,7 @@ end
 --      packet['Inventory Index'] = 27  -- 27th item in the inventory
 --      packet['Equipment Slot'] = 15   -- 15th slot, left ring
 --      packets.inject(packet)
--- 
+--
 --  Parsing:
 --      windower.register_event('outgoing chunk', function(id, data)
 --          if id == 0x0B6 then -- outgoing /tell
@@ -454,3 +459,4 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Windower BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
+

@@ -104,7 +104,7 @@ end
 
 function display_songs()
     windower.add_to_chat(207, 'Available songs:')
-    for id=40,900,5 do
+    for id=25,900,5 do
         local output = '  '
         for i=0,4 do
             if songs[id+i] then
