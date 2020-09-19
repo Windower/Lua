@@ -46,6 +46,14 @@ For a full list of trackable NMs, see the nms directory or use the `list` comman
 
 `//ept show`
 
+### Toggle Mini Mode
+
+`//ept mini`
+
+### Toggle Collectable Item Display
+
+`//ept collectables`
+
 ### Display Help
 
 `//ept help`
