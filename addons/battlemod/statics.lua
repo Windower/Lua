@@ -108,7 +108,7 @@ default_settings_table = {line_aoe       = 'AOE ${numb} '..string.char(129,168).
             line_nonumber  = '[${actor}] ${abil} '..string.char(129,168)..' ${target}',
             line_notarget  = '[${actor}] ${abil} '..string.char(129,168)..' ${number}',
             line_roll = '${actor} ${abil} '..string.char(129,168)..' ${target} '..string.char(129,170)..' ${number}',
-    condensedamage=true,condensetargets=true,cancelmulti=true,oxford=true,commamode=false,targetnumber=true,condensetargetname=false,swingnumber=true,sumdamage=true,condensecrits=false,showownernames=false}
+    condensedamage=true,condensetargets=true,cancelmulti=true,oxford=true,commamode=false,targetnumber=true,condensetargetname=false,swingnumber=true,sumdamage=true,condensecrits=false,showownernames=false,crafting=true,}
 
 message_map = {}
 for n=1,700,1 do
@@ -532,6 +532,7 @@ default_settings = [[
         <tpstatuses>true</tpstatuses>
         <simplify>true</simplify>
         <showownernames>false</showownernames>
+        <crafting>true</crafting>
         <line_aoe>AOE ${numb} ]]..string.char(129,168)..[[ ${target}</line_aoe>        
         <line_aoebuff>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} (${status})</line_aoebuff>
         <line_full>[${actor}] ${numb} ${abil} ]]..string.char(129,168)..[[ ${target}</line_full>        
