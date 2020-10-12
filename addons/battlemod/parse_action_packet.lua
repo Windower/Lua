@@ -10,6 +10,7 @@ function parse_action_packet(act)
     end
     act.actor = player_info(act.actor_id)
     act.action = get_spell(act) -- Pulls the resources line for the action
+    act.actor.name = act.actor and act.actor.name and string.gsub(act.actor.name,'-', string.char(0x81,0x7C)) --fix for ffxi chat splits on trusts with -
     
     if not act.action then
         return act
@@ -144,7 +145,7 @@ function parse_action_packet(act)
         if condensetargets and i > 1 then
             for n=1,i-1 do
                 local m = act.targets[n]
---                windower.add_to_chat(8,m.actions[1].message..'  '..v.actions[1].message)
+                --windower.add_to_chat(8,m.actions[1].message..'  '..v.actions[1].message)
                 if (v.actions[1].message == m.actions[1].message and v.actions[1].param == m.actions[1].param) or
                     (message_map[m.actions[1].message] and message_map[m.actions[1].message]:contains(v.actions[1].message) and v.actions[1].param == m.actions[1].param) or
                     (message_map[m.actions[1].message] and message_map[m.actions[1].message]:contains(v.actions[1].message) and v.actions[1].param == m.actions[1].param) then
@@ -182,6 +183,7 @@ function parse_action_packet(act)
                 elseif m.message == 576 then m.simp_name = 'RA hit squarely'
                 elseif m.message == 577 then m.simp_name = 'RA struck true'
                 elseif m.message == 157 then m.simp_name = 'Barrage'
+                elseif m.message == 76 then m.simp_name = 'No targets within range'
                 elseif m.message == 77 then m.simp_name = 'Sange'
                 elseif m.message == 360 then m.simp_name = act.action.name..' (JA reset)'
                 elseif m.message == 426 or m.message == 427 then m.simp_name = 'Bust! '..act.action.name
@@ -221,9 +223,13 @@ function parse_action_packet(act)
                 if m.message == 93 or m.message == 273 then
                     m.status=color_it('Vanish',color_arr['statuscol'])
                 elseif m.message == 522 and simplify then
-                    targ = targ..' (stunned)'
-                elseif m.message == 1023 then
-                    m.status = color_it('attacks and defenses enhanced',color_arr['statuscol'])
+                    targ = targ..' ('..color_it('stunned',color_arr['statuscol'])..')'
+                elseif m.message == 416 and simplify then
+                    targ = targ..' ('..color_it('Magic Attack Boost and Magic Defense Boost',color_arr['statuscol'])..')'
+                elseif m.message == 1023 and simplify then
+                    targ = targ..' ('..color_it('attacks and defenses enhanced',color_arr['statuscol'])..')'
+                elseif m.message == 762 and simplify then
+                    targ = targ..' ('..color_it('all status parameters boosted',color_arr['statuscol'])..')'
                 elseif T{158,188,245,324,592,658}:contains(m.message) and simplify then
                     -- When you miss a WS or JA. Relevant for condensed battle.
                     m.status = 'Miss' --- This probably doesn't work due to the if a==nil statement below.
@@ -394,14 +400,14 @@ function simplify_message(msg_ID)
     local fields = fieldsearch(msg)
 
     if simplify and not T{23,64,133,139,140,204,210,211,212,213,214,350,442,516,531,557,565,582,674}:contains(msg_ID) then
-        if T{93,273,522,653,654,655,656,85,284,75,114,156,189,248,283,312,323,336,351,355,408,422,423,425,453,659,158,245,324,658,1023}:contains(msg_ID) then
+        if T{93,273,522,653,654,655,656,85,284,75,114,156,189,248,283,312,323,336,351,355,408,422,423,425,453,659,158,245,324,658}:contains(msg_ID) then
             fields.status = true
         end
         if msg_ID == 31 or msg_ID == 798 or msg_ID == 799 then
             fields.actor = true
         end
         if (msg_ID > 287 and msg_ID < 303) or (msg_ID > 384 and msg_ID < 399) or (msg_ID > 766 and msg_ID < 771) or
-            T{129,152,161,162,163,165,229,384,453,603,652,798,1023}:contains(msg_ID) then
+            T{129,152,161,162,163,165,229,384,453,603,652,798}:contains(msg_ID) then
                 fields.ability = true
         end
         
@@ -410,7 +416,7 @@ function simplify_message(msg_ID)
             fields.item = true
         end
         
-        if T{129,152,153,160,161,162,163,164,165,166,167,168,229,244,652,1023}:contains(msg_ID) then
+        if T{129,152,153,160,161,162,163,164,165,166,167,168,229,244,652}:contains(msg_ID) then
             fields.actor  = true
             fields.target = true
         end
@@ -455,28 +461,40 @@ end
 
 function assemble_targets(actor,targs,category,msg)
     local targets = {}
+    local samename = {}
+    local total = 0
     for i,v in pairs(targs) do
     -- Done in two loops so that the ands and commas don't get out of place.
     -- This loop filters out unwanted targets.
-        if check_filter(actor,v,category,msg) then
-            targets[#targets+1] = v
+        if check_filter(actor,v,category,msg) or check_filter(v,actor,category,msg) then
+            if samename[v.name] and condensetargetname then
+                samename[v.name] = samename[v.name] + 1
+            else 
+                targets[#targets+1] = v
+                samename[v.name] = 1
+            end
+            total = total + 1
         end
     end
-    
     local out_str
-    if targetnumber and #targets > 1 then
-        out_str = '{'..#targets..'} '
+    if targetnumber and total > 1 then
+        out_str = '{'..total..'}: '
     else
         out_str = ''
     end
     
     for i,v in pairs(targets) do
+        local name
+        local numb = condensetargetname and samename[v.name] > 1 and ' {'..samename[v.name]..'}' or ''
         if i == 1 then
-            out_str = out_str..color_it(v.name,color_arr[v.owner or v.type]) 
+            name = color_it(v.name,color_arr[v.owner or v.type])
+            out_str = out_str..name..numb
         else
-            out_str = conjunctions(out_str,color_it(v.name,color_arr[v.owner or v.type]),#targets,i)
+            name = color_it(v.name,color_arr[v.owner or v.type])
+            out_str = conjunctions(out_str,name..numb,#targets,i)
         end
     end
+    out_str =  string.gsub(out_str,'-', string.char(0x81,0x7C)) --fix for ffxi chat splits on trusts with -
     return out_str
 end
 
