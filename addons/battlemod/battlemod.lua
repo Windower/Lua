@@ -73,6 +73,9 @@ windower.register_event('addon command', function(command, ...)
         elseif command:lower() == 'showownernames' then
             showownernames = not showownernames
             windower.add_to_chat(121,'Battlemod: Show pet owner names flipped! - '..tostring(showownernames))
+        elseif command:lower() == 'crafting' then
+            crafting = not crafting
+            windower.add_to_chat(121,'Battlemod: Display crafting results flipped! - '..tostring(crafting))
         elseif command:lower() == 'colortest' then
             local counter = 0
             local line = ''
@@ -106,8 +109,9 @@ windower.register_event('addon command', function(command, ...)
             print('               * swingnumber   --- Show # of attack rounds ('..tostring(swingnumber)..')')
             print('               * sumdamage     --- Sums condensed damage, if false damage is comma separated ('..tostring(sumdamage)..')')
             print('               * condensecrits --- Condenses critical hits and normal hits together ('..tostring(condensecrits)..')')
-            print('           4. cancelmulti      --- Cancles multiple consecutive identical lines ('..tostring(cancelmulti)..')')
-            print('           5. showonernames    --- Show the name of the owner on pet messages ('..tostring(showownernames)..')')
+            print('           4. cancelmulti      --- Cancels multiple consecutive identical lines ('..tostring(cancelmulti)..')')
+            print('           5. showonernames    --- Shows the name of the owner on pet messages ('..tostring(showownernames)..')')
+            print('           6. crafting         --- Enables early display of crafting results ('..tostring(crafting)..')')
             print('Utilities: 1. colortest        --- Shows the 509 possible colors for use with the settings file')
             print('           2. reload           --- Reloads settings file')
             print('           3. unload           --- Unloads Battlemod')
@@ -390,7 +394,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
         end
 
 ------------ SYNTHESIS ANIMATION --------------
-    elseif id == 0x030 then
+    elseif id == 0x030 and crafting then
         if windower.ffxi.get_player().id == original:unpack("I",5) or windower.ffxi.get_mob_by_target('t') and windower.ffxi.get_mob_by_target('t').id == original:unpack("I",5) then
             local crafter_name = (windower.ffxi.get_player().id == original:unpack("I",5) and windower.ffxi.get_player().name) or windower.ffxi.get_mob_by_target('t').name
             local result = original:byte(13)
@@ -404,7 +408,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                 windower.add_to_chat(8,'Craftmod: Unhandled result '..tostring(result))
             end
         end
-    elseif id == 0x06F then
+    elseif id == 0x06F and crafting then
         if original:byte(5) == 0 or original:byte(5) == 12 then
             local result = original:byte(6)
             if result == 1 then
