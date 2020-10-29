@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 _addon.name     = 'craft'
-_addon.author   = 'Mojo'
-_addon.version  = '1.1.1'
+_addon.author   = 'Mojo, Recipes provided by BG-Wiki.com'
+_addon.version  = '1.1.2'
 _addon.commands = {'craft'}
 
 require('chat')

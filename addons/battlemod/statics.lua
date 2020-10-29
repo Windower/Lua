@@ -29,7 +29,7 @@ ratings_arr = {'TW','IEP','EP','DC','EM','T','VT','IT'}
 current_job = 'NONE'
 default_filt = false
 rcol = string.char(0x1E,0x01)
-non_block_messages = T{1,2,7,14,15,24,25,26,30,31,32,33,44,63,67,69,70,77,102,103,110,122,132,152,157,158,161,162,163,165,167,185,187,188,196,197,223,224,225,226,227,228,229,238,245,252,263,264,265,274,275,276,281,282,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,306,317,318,324,352,353,354,357,358,366,367,373,379,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,409,413,451,452,454,522,535,536,537,539,576,577,587,588,592,603,606,608,648,650,651,658,732,736,746,747,748,749,750,751,752,753,767,768,769,770,781}
+non_block_messages = T{1,2,7,14,15,24,25,26,30,31,32,33,44,63,67,69,70,77,102,103,110,122,132,152,157,158,161,162,163,165,167,185,187,188,196,197,223,224,225,226,227,228,229,238,245,252,263,264,265,274,275,276,281,282,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,306,317,318,324,352,353,354,357,358,366,367,373,379,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,409,413,451,452,454,522,535,536,537,539,576,577,587,588,592,603,606,648,650,651,658,732,736,746,747,748,749,750,751,752,753,767,768,769,770,781}
 passed_messages = T{4,5,6,16,17,18,20,34,35,36,40,47,48,49,64,78,87,88,89,90,112,116,154,170,171,172,173,174,175,176,177,178,191,192,198,204,215,217,218,219,234,246,249,307,315,328,350,336,523,530,531,558,561,563,575,584,601,609,562,610,611,612,613,614,615,616,617,618,619,620,625,626,627,628,629,630,631,632,633,634,635,636,643,660,661,662,62,94,251,308,313,372,8,105,253,679,97,62,94,251,313,308,206,72,38,53}
 agg_messages = T{85,653,655,75,156,189,248,323,355,408,422,425,82,93,116,127,131,134,151,144,146,148,150,166,186,194,230,236,237,242,243,268,271,319,320,364,375,412,414,416,420,424,426,432,433,441,602,645,668,435,437,439}
 color_redundant = T{26,33,41,71,72,89,94,109,114,164,173,181,184,186,70,84,104,127,128,129,130,131,132,133,134,135,136,137,138,139,140,64,86,91,106,111,175,178,183,81,101,16,65,87,92,107,112,174,176,182,82,102,67,68,69,170,189,15,208,18,25,32,40,163,185,23,24,27,34,35,42,43,162,165,187,188,30,31,14,205,144,145,146,147,148,149,150,151,152,153,190,13,9,253,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,284,285,286,287,292,293,294,295,300,301,301,303,308,309,310,311,316,317,318,319,324,325,326,327,332,333,334,335,340,341,342,343,344,345,346,347,348,349,350,351,355,357,358,360,361,363,366,369,372,374,375,378,381,384,395,406,409,412,415,416,418,421,424,437,450,453,456,458,459,462,479,490,493,496,499,500,502,505,507,508,10,51,52,55,58,62,66,80,83,85,88,90,93,100,103,105,108,110,113,122,168,169,171,172,177,179,180,12,11,37,291} -- 37 and 291 might be unique colors, but they are not gsubbable.
@@ -108,7 +108,7 @@ default_settings_table = {line_aoe       = 'AOE ${numb} '..string.char(129,168).
             line_nonumber  = '[${actor}] ${abil} '..string.char(129,168)..' ${target}',
             line_notarget  = '[${actor}] ${abil} '..string.char(129,168)..' ${number}',
             line_roll = '${actor} ${abil} '..string.char(129,168)..' ${target} '..string.char(129,170)..' ${number}',
-    condensedamage=true,condensetargets=true,cancelmulti=true,oxford=true,commamode=false,targetnumber=true,swingnumber=true,sumdamage=true,condensecrits=false}
+    condensedamage=true,condensetargets=true,cancelmulti=true,oxford=true,commamode=false,targetnumber=true,condensetargetname=false,swingnumber=true,sumdamage=true,condensecrits=false,showownernames=false,crafting=true,}
 
 message_map = {}
 for n=1,700,1 do
@@ -164,6 +164,13 @@ message_map[194] = T{280}
 message_map[185] = T{264}
 message_map[243] = T{278}
 message_map[2] = T{264}
+message_map[668] = T{669} -- Valiance
+message_map[762] = T{365} -- Mix: Samson's Strength
+message_map[242] = T{277}
+message_map[238] = T{367} -- Phototrophic Blessing
+message_map[188] = T{282} -- Misses
+message_map[342] = T{344} -- Dispelga
+message_map[369] = T{403} -- Ultimate Terror
 
 spike_effect_valid = {true,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
 add_effect_valid = {true,true,true,true,false,false,false,false,false,false,true,false,true,false,false}
@@ -518,12 +525,14 @@ default_settings = [[
         <oxford>true</oxford>
         <commamode>false</commamode>
         <targetnumber>true</targetnumber>
+        <condensetargetname>false</condensetargetname>
         <swingnumber>true</swingnumber>
         <sumdamage>true</sumdamage>
         <condensecrits>false</condensecrits>
         <tpstatuses>true</tpstatuses>
         <simplify>true</simplify>
         <showownernames>false</showownernames>
+        <crafting>true</crafting>
         <line_aoe>AOE ${numb} ]]..string.char(129,168)..[[ ${target}</line_aoe>        
         <line_aoebuff>${actor} ${abil} ]]..string.char(129,168)..[[ ${target} (${status})</line_aoebuff>
         <line_full>[${actor}] ${numb} ${abil} ]]..string.char(129,168)..[[ ${target}</line_full>        
