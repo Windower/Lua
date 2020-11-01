@@ -149,7 +149,10 @@ windower.register_event('addon command', function()
                     error("Invalid value for 'showallidps'. Must be true or false.")
                     return
                 end
+<<<<<<< HEAD
 
+=======
+>>>>>>> 164d3764c9dd6875e9786b0fcc7c9af3013a15e8
                 settings:save()
                 sb_output("Setting 'showalldps' set to " .. tostring(settings.showallidps))
             elseif setting == 'resetfilters' then
@@ -161,7 +164,10 @@ windower.register_event('addon command', function()
                     error("Invalid value for 'resetfilters'. Must be true or false.")
                     return
                 end
+<<<<<<< HEAD
 
+=======
+>>>>>>> 164d3764c9dd6875e9786b0fcc7c9af3013a15e8
                 settings:save()
                 sb_output("Setting 'resetfilters' set to " .. tostring(settings.resetfilters))
             elseif setting == 'showfellow' then
@@ -173,7 +179,10 @@ windower.register_event('addon command', function()
                     error("Invalid value for 'showfellow'. Must be true or false.")
                     return
                 end
+<<<<<<< HEAD
 
+=======
+>>>>>>> 164d3764c9dd6875e9786b0fcc7c9af3013a15e8
                 settings:save()
                 sb_output("Setting 'showfellow' set to " .. tostring(settings.showfellow))
             elseif setting == 'alternateoutput' then
@@ -475,7 +484,11 @@ function action_handler(raw_actionpacket)
                             300,301,302,385,386,387,388,
                             389,390,391,392,393,394,395,
                             396,397,398,732,767,768,769,770}:contains(add.message_id) then
+<<<<<<< HEAD
                             actor_name = string.format("SC:%s", actor_name:sub(1, 13))
+=======
+                            actor_name = string.format("SC:%s", actor_name:sub(1, 12))
+>>>>>>> 164d3764c9dd6875e9786b0fcc7c9af3013a15e8
                         end
                     end
                     if add.conclusion.subject == 'target' and T(add.conclusion.objects):contains('HP') and add.param ~= 0 then
