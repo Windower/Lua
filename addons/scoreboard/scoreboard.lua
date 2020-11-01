@@ -30,6 +30,7 @@ default_settings.visible = true
 default_settings.showfellow = true
 default_settings.UpdateFrequency = 0.5
 default_settings.combinepets = true
+default_settings.alternateoutput = false
 
 default_settings.display = {}
 default_settings.display.pos = {}
@@ -148,7 +149,6 @@ windower.register_event('addon command', function()
                     error("Invalid value for 'showallidps'. Must be true or false.")
                     return
                 end
-                
                 settings:save()
                 sb_output("Setting 'showalldps' set to " .. tostring(settings.showallidps))
             elseif setting == 'resetfilters' then
@@ -160,7 +160,6 @@ windower.register_event('addon command', function()
                     error("Invalid value for 'resetfilters'. Must be true or false.")
                     return
                 end
-                
                 settings:save()
                 sb_output("Setting 'resetfilters' set to " .. tostring(settings.resetfilters))
             elseif setting == 'showfellow' then
@@ -172,9 +171,19 @@ windower.register_event('addon command', function()
                     error("Invalid value for 'showfellow'. Must be true or false.")
                     return
                 end
-                
                 settings:save()
                 sb_output("Setting 'showfellow' set to " .. tostring(settings.showfellow))
+            elseif setting == 'alternateoutput' then
+                if params[2] == 'true' then
+                    settings.alternateoutput = true
+                elseif params[2] == 'false' then
+                    settings.alternateoutput = false
+                else
+                    error("Invalid value for 'alternateoutput'. Must be true or false.")
+                    return
+                end
+                settings:save()
+                sb_output("Setting 'alternateoutput' set to " .. tostring(settings.alternateoutput))
             end
         elseif command == 'reset' then
             reset()
@@ -448,13 +457,23 @@ function action_handler(raw_actionpacket)
                 
                 if add and add.conclusion then
                     local actor_name = create_mob_name(actionpacket)
-                    if T{196,223,288,289,290,291,292,
-                        293,294,295,296,297,298,299,
-                        300,301,302,385,386,387,388,
-                        389,390,391,392,393,394,395,
-                        396,397,398,732,767,768,769,770}:contains(add.message_id) then
-                        actor_name = string.format("Skillchain(%s%s)", actor_name:sub(1, 3),
-                                                      actor_name:len() > 3 and '.' or '')
+                    if not settings.alternateoutput then
+                        if T{196,223,288,289,290,291,292,
+                            293,294,295,296,297,298,299,
+                            300,301,302,385,386,387,388,
+                            389,390,391,392,393,394,395,
+                            396,397,398,732,767,768,769,770}:contains(add.message_id) then
+                            actor_name = string.format("Skillchain(%s%s)", actor_name:sub(1, 3),
+                                                        actor_name:len() > 3 and '.' or '')
+                        end
+                    else
+                        if T{196,223,288,289,290,291,292,
+                            293,294,295,296,297,298,299,
+                            300,301,302,385,386,387,388,
+                            389,390,391,392,393,394,395,
+                            396,397,398,732,767,768,769,770}:contains(add.message_id) then
+                            actor_name = string.format("SC:%s", actor_name:sub(1, 12))
+                        end
                     end
                     if add.conclusion.subject == 'target' and T(add.conclusion.objects):contains('HP') and add.param ~= 0 then
                         dps_db:add_damage(target:get_name(), actor_name, (add.conclusion.verb == 'gains' and -1 or 1)*add.param)
@@ -507,11 +526,19 @@ function create_mob_name(actionpacket)
             result = actor
         end
         if settings.combinepets then
-            result = 'Pets'
+            if settings.alternateoutput then
+                result = 'Pets:'
+            else
+                result = 'Pets'
+            end
         else
             result = actor
         end
-        result = result..' ('..string.sub(owner, 1, 3)..'.)'
+        if settings.alternateoutput then
+            result = result..string.sub(owner, 1, 11)
+        else
+            result = result..' ('..string.sub(owner, 1, 3)..'.)'
+        end
     else
         return actor
     end
