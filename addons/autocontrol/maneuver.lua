@@ -91,10 +91,10 @@ Burden_tb = texts.new(str, settings)
 windower.register_event("action", function(act)
     if mjob_id == 18 then
         local abil_ID = act['param']
-        local actor_id = act['actor_id']
+        local actor_index = act['actor_index']
         local player = T(windower.ffxi.get_player())
-        local pet_index = windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index']
         
+        local pet_index = windower.ffxi.get_mob_by_index(windower.ffxi.get_player()['index'])['pet_index']
         if act['category'] == 6 and actor_id == player.id and S{136,139,141,142,143,144,145,146,147,148,309,310}:contains(abil_ID) then
             if S{141, 142, 143, 144, 145, 146, 147, 148}:contains(abil_ID) and maneuvertimers then
                 windower.send_command('timers c "Maneuver: '..maneuver..'" 60 down')
@@ -143,8 +143,8 @@ windower.register_event("action", function(act)
                 text_update_loop('stop')
                 Burden_tb:hide()
             end
-        elseif S{1688,1689,1690,1691,1692,1755,1765,1812,1876,2489,2490,2491}:contains(abil_ID-256) 
-               and windower.ffxi.get_mob_by_id(actor_id)['index'] == pet_index 
+        elseif S{1688,1689,1690,1691,1692,1755,1765,1812,1876,2489,2490,2491}:contains(abil_ID-256)
+               and windower.ffxi.get_mob_by_index(actor_index)['index'] == pet_index
                and pet_index ~= nil then
                 local abil = abil_ID - 256
                 windower.send_command('@timers c "'..autoabils[abil].name..'" '..autoabils[abil].recast..' up')
@@ -328,7 +328,7 @@ function text_update_loop(str)
             end
             Burden_tb:update()
             
-            local player_mob = windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])
+            local player_mob = windower.ffxi.get_mob_by_index(windower.ffxi.get_player()['index'])
             if player_mob then
                 if player_mob['pet_index']
                    and player_mob['pet_index'] ~= 0 then 

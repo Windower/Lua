@@ -80,14 +80,14 @@ function initialize()
         windower.send_command('@wait 5;lua i autocontrol initialize')
         return
     end
-    local playermob = windower.ffxi.get_mob_by_id(player.id)
+    local playermob = windower.ffxi.get_mob_by_index(player.index)
     mjob_id = player.main_job_id
     atts = res.items:category('Automaton')
     decay = 1
     for key,_ in pairs(heat) do
         heat[key] = 0
         Burden_tb[key] = 0
-        Burden_tb['time' .. key] = 0 
+        Burden_tb['time' .. key] = 0
     end
     if mjob_id == 18 then
         if playermob.pet_index and playermob.pet_index ~= 0 then
@@ -113,8 +113,8 @@ function attach_set(autoset)
         return
     end
 
-    local playermob = windower.ffxi.get_mob_by_id(windower.ffxi.get_player().id)
     if playermob.pet_index and playermob.pet_index ~= 0 then 
+    local playermob = windower.ffxi.get_mob_by_index(windower.ffxi.get_player().index)
         local recast = windower.ffxi.get_ability_recasts()[recast_ids.deactivate]
         if recast == 0 then
             windower.send_command('input /pet "Deactivate" <me>')
