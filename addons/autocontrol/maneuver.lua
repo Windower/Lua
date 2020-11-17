@@ -91,7 +91,7 @@ Burden_tb = texts.new(str, settings)
 windower.register_event("action", function(act)
     if mjob_id == 18 then
         local abil_ID = act['param']
-        local actor_index = act['actor_index']
+        local actor_id = act['actor_id']
         local player = T(windower.ffxi.get_player())
         
         local pet_index = windower.ffxi.get_mob_by_index(windower.ffxi.get_player()['index'])['pet_index']
@@ -144,7 +144,7 @@ windower.register_event("action", function(act)
                 Burden_tb:hide()
             end
         elseif S{1688,1689,1690,1691,1692,1755,1765,1812,1876,2489,2490,2491}:contains(abil_ID-256)
-               and windower.ffxi.get_mob_by_index(actor_index)['index'] == pet_index
+               and windower.ffxi.get_mob_by_id(actor_id)['index'] == pet_index
                and pet_index ~= nil then
                 local abil = abil_ID - 256
                 windower.send_command('@timers c "'..autoabils[abil].name..'" '..autoabils[abil].recast..' up')
