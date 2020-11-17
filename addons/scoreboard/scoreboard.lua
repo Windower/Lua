@@ -90,14 +90,13 @@ windower.register_event('addon command', function()
             sb_output('sb reset : Resets damage')
             sb_output('sb report [<target>] : Reports damage. Can take standard chatmode target options.')
             sb_output('sb reportstat <stat> [<player>] [<target>] : Reports the given stat. Can take standard chatmode target options. Ex: //sb rs acc p')
-            sb_output('Valid chatmode targets are: ' .. chatmodes:concat(', '))
+            sb_output('  Valid chatmode targets are: ' .. chatmodes:concat(', '))
             sb_output('sb filter show  : Shows current filter settings')
             sb_output('sb filter add <mob1> <mob2> ... : Adds mob patterns to the filter (substrings ok)')
             sb_output('sb filter clear : Clears mob filter')
             sb_output('sb visible : Toggles scoreboard visibility')
-            sb_output('sb stat <stat> [<player>] : Shows specific damage stats. Respects filters. If player isn\'t specified, ' ..
-                  'stats for everyone are displayed. Valid stats are:')
-            sb_output(dps_db.player_stat_fields:tostring():stripchars('{}"'))
+            sb_output('sb stat <stat> [<player>] : Shows specific damage stats. Respects filters. If player isn\'t specified, stats for everyone are displayed.')
+            sb_output('  Valid stats are:'..dps_db.player_stat_fields:tostring():stripchars('{}"'))
             sb_output('sb set <flag> <value> : Sets configuration variables')
         elseif command == 'pos' then
             if params[2] then
