@@ -258,7 +258,7 @@ function parse_action_packet(act)
                 end
                 local msg,numb = simplify_message(m.message)
                 if not color_arr[act.actor.owner or act.actor.type] then windower.add_to_chat(123,'Battlemod error, missing filter:'..tostring(act.actor.owner)..' '..tostring(act.actor.type)) end
-                if m.fields.status then numb = m.status else numb = pref_suf((m.cparam or m.param),m.message) end
+                if m.fields.status then numb = m.status else numb = pref_suf((m.cparam or m.param),m.message,act.actor.damage,col) end
     
                 if msg and m.message == 70 and not simplify then -- fix pronoun on parry
                     if v.target[1].race == 0 then
@@ -292,7 +292,7 @@ function parse_action_packet(act)
                     :gsub('${item2}',color_it(act.action.item2 or 'ERROR 121',color_arr.itemcol))
                     :gsub('${weapon_skill}',color_it(act.action.weapon_skill or 'ERROR 114',color_arr.wscol))
                     :gsub('${abil}',m.simp_name or 'ERROR 115')
-                    :gsub('${numb}',col == 'D' and color_it(numb or 'ERROR 116', color_arr[act.actor.damage]) or (numb or 'ERROR 116'))
+                    :gsub('${numb}',numb or 'ERROR 116')
                     :gsub('${actor}',color_it((act.actor.name or 'ERROR 117' ) .. (act.actor.owner_name or "") ,color_arr[act.actor.owner or act.actor.type]))
                     :gsub('${target}',targ)
                     :gsub('${lb}','\7'..prefix2)
@@ -316,7 +316,7 @@ function parse_action_packet(act)
                 else m.simp_add_name = 'AE'
                 end
                 local msg,numb = simplify_message(m.add_effect_message)
-                if m.add_effect_fields.status then numb = m.add_effect_status else numb = pref_suf((m.cadd_effect_param or m.add_effect_param),m.add_effect_message) end
+                if m.add_effect_fields.status then numb = m.add_effect_status else numb = pref_suf((m.cadd_effect_param or m.add_effect_param),m.add_effect_message,act.actor.damage,col) end
                 if not act.action then
 --                    windower.add_to_chat(color, 'act.action==nil : '..m.message..' - '..m.add_effect_message..' - '..msg)
                 else
@@ -326,7 +326,7 @@ function parse_action_packet(act)
                         :gsub('${item}',act.action.item or 'ERROR 129')
                         :gsub('${weapon_skill}',act.action.weapon_skill or 'ERROR 130')
                         :gsub('${abil}',m.simp_add_name or act.action.name or 'ERROR 131')
-                        :gsub('${numb}',col == 'D' and color_it(numb or 'ERROR 132', color_arr[act.actor.damage]) or (numb or 'ERROR 132'))
+                        :gsub('${numb}',numb or 'ERROR 132')
                         :gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
                         :gsub('${target}',targ)
                         :gsub('${lb}','\7')
@@ -361,14 +361,14 @@ function parse_action_packet(act)
                 end
 
                 local msg = simplify_message(m.spike_effect_message)
-                if m.spike_effect_fields.status then numb = m.spike_effect_status else numb = pref_suf((m.cspike_effect_param or m.spike_effect_param),m.spike_effect_message) end
+                if m.spike_effect_fields.status then numb = m.spike_effect_status else numb = pref_suf((m.cspike_effect_param or m.spike_effect_param),m.spike_effect_message,actor.damage,col) end
                 windower.add_to_chat(color,make_condensedamage_number(m.spike_effect_number)..(msg
                     :gsub('${spell}',act.action.spell or 'ERROR 142')
                     :gsub('${ability}',act.action.ability or 'ERROR 143')
                     :gsub('${item}',act.action.item or 'ERROR 144')
                     :gsub('${weapon_skill}',act.action.weapon_skill or 'ERROR 145')
                     :gsub('${abil}',m.simp_spike_name or act.action.name or 'ERROR 146')
-                    :gsub('${numb}',col == 'D' and color_it(numb or 'ERROR 147', color_arr[actor.damage]) or (numb or 'ERROR 147'))
+                    :gsub('${numb}',numb or 'ERROR 147')
                     :gsub((simplify and '${target}' or '${actor}'),color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
                     :gsub((simplify and '${actor}' or '${target}'),targ)
                     :gsub('${lb}','\7')
@@ -384,8 +384,8 @@ function parse_action_packet(act)
     return act
 end
 
-function pref_suf(param,msg_ID)
-    local outstr = tostring(param)
+function pref_suf(param,msg_ID,actor_dmg,col)
+    local outstr = (col == 'D' or dmg_drain_msg:contains(msg_ID)) and color_it(tostring(param),color_arr[actor_dmg]) or tostring(param)
     if res.action_messages[msg_ID] and res.action_messages[msg_ID].prefix then
         outstr = res.action_messages[msg_ID].prefix..' '..outstr
     end
