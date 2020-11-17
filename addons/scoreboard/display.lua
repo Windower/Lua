@@ -300,7 +300,7 @@ function Display:report_summary (...)
 
     -- Send the report to the specified chatmode
     slow_output(build_input_command(chatmode, tell_target),
-                wrap_elements(elements, 'Damage: ', self.settings.alternateoutput),
+                wrap_elements(elements, 'Damage: ', self.settings.oneperline),
                 self.settings.numplayers)
 end
 
@@ -408,7 +408,7 @@ function Display:report_stat(stat, args)
         end)
 
         -- Send the report to the specified chatmode
-        local wrapped = wrap_elements(elements:slice(1, self.settings.numplayers):map(function (p) return p[2] end), header, self.settings.alternateoutput)
+        local wrapped = wrap_elements(elements:slice(1, self.settings.numplayers):map(function (p) return p[2] end), header, self.settings.oneperline)
         slow_output(build_input_command(args.chatmode, args.telltarget), wrapped, self.settings.numplayers)
     end
 end

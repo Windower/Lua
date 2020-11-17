@@ -30,7 +30,9 @@ default_settings.visible = true
 default_settings.showfellow = true
 default_settings.UpdateFrequency = 0.5
 default_settings.combinepets = true
-default_settings.alternateoutput = false
+default_settings.oneperline = false
+default_settings.compactsc = false
+default_settings.compactpets = false
 
 default_settings.display = {}
 default_settings.display.pos = {}
@@ -85,17 +87,18 @@ windower.register_event('addon command', function()
             sb_output('Scoreboard v' .. _addon.version .. '. Author: Suji')
             sb_output('sb help : Shows help message')
             sb_output('sb pos <x> <y> : Positions the scoreboard')
-            sb_output('sb reset : Reset damage')
+            sb_output('sb reset : Resets damage')
             sb_output('sb report [<target>] : Reports damage. Can take standard chatmode target options.')
             sb_output('sb reportstat <stat> [<player>] [<target>] : Reports the given stat. Can take standard chatmode target options. Ex: //sb rs acc p')
             sb_output('Valid chatmode targets are: ' .. chatmodes:concat(', '))
             sb_output('sb filter show  : Shows current filter settings')
-            sb_output('sb filter add <mob1> <mob2> ... : Add mob patterns to the filter (substrings ok)')
+            sb_output('sb filter add <mob1> <mob2> ... : Adds mob patterns to the filter (substrings ok)')
             sb_output('sb filter clear : Clears mob filter')
             sb_output('sb visible : Toggles scoreboard visibility')
-            sb_output('sb stat <stat> [<player>]: Shows specific damage stats. Respects filters. If player isn\'t specified, ' ..
+            sb_output('sb stat <stat> [<player>] : Shows specific damage stats. Respects filters. If player isn\'t specified, ' ..
                   'stats for everyone are displayed. Valid stats are:')
             sb_output(dps_db.player_stat_fields:tostring():stripchars('{}"'))
+            sb_output('sb set <flag> <value> : Sets configuration variables')
         elseif command == 'pos' then
             if params[2] then
                 local posx, posy = tonumber(params[1]), tonumber(params[2])
@@ -176,17 +179,39 @@ windower.register_event('addon command', function()
                 
                 settings:save()
                 sb_output("Setting 'showfellow' set to " .. tostring(settings.showfellow))
-            elseif setting == 'alternateoutput' then
+            elseif setting == 'oneperline' then
                 if params[2] == 'true' then
-                    settings.alternateoutput = true
+                    settings.oneperline = true
                 elseif params[2] == 'false' then
-                    settings.alternateoutput = false
+                    settings.oneperline = false
                 else
-                    error("Invalid value for 'alternateoutput'. Must be true or false.")
+                    error("Invalid value for 'oneperline'. Must be true or false.")
                     return
                 end
                 settings:save()
-                sb_output("Setting 'alternateoutput' set to " .. tostring(settings.alternateoutput))
+                sb_output("Setting 'oneperline' set to " .. tostring(settings.oneperline))
+            elseif setting == 'compactsc' then
+                if params[2] == 'true' then
+                    settings.compactsc = true
+                elseif params[2] == 'false' then
+                    settings.compactsc = false
+                else
+                    error("Invalid value for 'compactsc'. Must be true or false.")
+                    return
+                end
+                settings:save()
+                sb_output("Setting 'compactsc' set to " .. tostring(settings.compactsc))
+            elseif setting == 'compactpets' then
+                if params[2] == 'true' then
+                    settings.compactpets = true
+                elseif params[2] == 'false' then
+                    settings.compactpets = false
+                else
+                    error("Invalid value for 'compactpets'. Must be true or false.")
+                    return
+                end
+                settings:save()
+                sb_output("Setting 'compactpets' set to " .. tostring(settings.compactpets))
             end
         elseif command == 'reset' then
             reset()
@@ -460,7 +485,7 @@ function action_handler(raw_actionpacket)
                 
                 if add and add.conclusion then
                     local actor_name = create_mob_name(actionpacket)
-                    if not settings.alternateoutput then
+                    if not settings.compactsc then
                         if T{196,223,288,289,290,291,292,
                             293,294,295,296,297,298,299,
                             300,301,302,385,386,387,388,
@@ -529,7 +554,7 @@ function create_mob_name(actionpacket)
             result = actor
         end
         if settings.combinepets then
-            if settings.alternateoutput then
+            if settings.compactpets then
                 result = 'Pets:'
             else
                 result = 'Pets'
@@ -537,7 +562,7 @@ function create_mob_name(actionpacket)
         else
             result = actor
         end
-        if settings.alternateoutput then
+        if settings.compactpets then
             result = result..string.sub(owner, 1, 11)
         else
             result = result..' ('..string.sub(owner, 1, 3)..'.)'
