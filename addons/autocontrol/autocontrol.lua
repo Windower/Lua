@@ -80,7 +80,7 @@ function initialize()
         windower.send_command('@wait 5;lua i autocontrol initialize')
         return
     end
-
+    local playermob = windower.ffxi.get_mob_by_id(player.id)
     mjob_id = player.main_job_id
     atts = res.items:category('Automaton')
     decay = 1
@@ -90,7 +90,7 @@ function initialize()
         Burden_tb['time' .. key] = 0 
     end
     if mjob_id == 18 then
-        if player.pet_index then 
+        if playermob.pet_index and playermob.pet_index ~= 0 then
             running = 1
             text_update_loop('start')
             if settings.burdentracker then
