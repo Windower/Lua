@@ -34,24 +34,27 @@ attachments_to_abilities = {
 }
 
 local player_id = windower.ffxi.get_player().id
+
 windower.register_event("action", function(act)
     local abil_ID = act['param']
     local actor_id = act['actor_id']
     local pet_index = windower.ffxi.get_mob_by_id(player_id)['pet_index']
 
     if act['category'] == 6 and actor_id == player_id and (abil_ID == 136 or abil_ID == 310 or abil_ID == 139) then
-        avalible_abilities = {}
+        local avalible_abilities = {}
         local automaton = windower.ffxi.get_mjob_data()
+
         if attachments_to_abilities[automaton.frame] then
             table.insert(avalible_abilities, autoabils[attachments_to_abilities[automaton.frame]])
         end
+
         for _, id in pairs(automaton.attachments) do
             if attachments_to_abilities[id] then
                 table.insert(avalible_abilities, autoabils[attachments_to_abilities[id]])
             end
         end
 
-        for _, ability in pairs(avalible_abilities) do
+        for _, ability in pairs(avalible_abilities) do -- if abil_ID is deactivate delete ability timers, otherwise create them.
             windower.send_command('timers '.. (abil_ID == 139 and "d" or "c") .. ' "'..ability.name..'" ' ..  (abil_ID == 139 and "" or ability.recast..' up abilities/' .. ability.icon))
         end
     elseif autoabils[abil_ID-256] and windower.ffxi.get_mob_by_id(actor_id)['index'] == pet_index and pet_index ~= nil then
