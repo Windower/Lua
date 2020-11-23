@@ -35,6 +35,10 @@ attachments_to_abilities = {
 
 local player_id = windower.ffxi.get_player().id
 
+windower.register_event("login", function()
+    player_id = windower.ffxi.get_player().id
+end)
+
 windower.register_event("action", function(act)
     local abil_ID = act['param']
     local actor_id = act['actor_id']
