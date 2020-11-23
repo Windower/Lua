@@ -83,9 +83,9 @@ function initialize()
 
     mjob_id = player.main_job_id
     atts = res.items:category('Automaton')
-
+    local playermob = windower.ffxi.get_mob_by_index(windower.ffxi.get_player().index)
     if mjob_id == 18 then
-        if player.pet_index then 
+        if playermob.pet_index then
             if settings.burdentracker then
                 burden_hud:show()
             end
