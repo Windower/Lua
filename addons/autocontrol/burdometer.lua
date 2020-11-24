@@ -54,7 +54,7 @@ windower.register_event("action", function(act)
     local abil_id = act['param']
     local actor_id = act['actor_id']
     local player = windower.ffxi.get_player()
-    local pet_index = windower.ffxi.get_mob_by_id(windower.ffxi.get_player()['id'])['pet_index']
+    local pet_index = windower.ffxi.get_mob_by_index(player.index).pet_index
 
     if player.main_job_id ~= 18 then
         return
