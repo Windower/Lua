@@ -83,9 +83,9 @@ function initialize()
 
     mjob_id = player.main_job_id
     atts = res.items:category('Automaton')
-
+    local playermob = windower.ffxi.get_mob_by_index(windower.ffxi.get_player().index)
     if mjob_id == 18 then
-        if player.pet_index then 
+        if playermob.pet_index then
             if settings.burdentracker then
                 burden_hud:show()
             end
@@ -104,8 +104,8 @@ function attach_set(autoset)
         return
     end
 
-    local playermob = windower.ffxi.get_mob_by_id(windower.ffxi.get_player().id)
     if playermob.pet_index and playermob.pet_index ~= 0 then 
+    local playermob = windower.ffxi.get_mob_by_index(windower.ffxi.get_player().index)
         local recast = windower.ffxi.get_ability_recasts()[recast_ids.deactivate]
         if recast == 0 then
             windower.send_command('input /pet "Deactivate" <me>')
