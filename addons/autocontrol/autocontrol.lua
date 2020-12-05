@@ -103,9 +103,9 @@ function attach_set(autoset)
         log('The '..autoset..' set is already equipped.')
         return
     end
-
-    if playermob.pet_index and playermob.pet_index ~= 0 then 
+   
     local playermob = windower.ffxi.get_mob_by_index(windower.ffxi.get_player().index)
+    if playermob.pet_index and playermob.pet_index ~= 0 then 
         local recast = windower.ffxi.get_ability_recasts()[recast_ids.deactivate]
         if recast == 0 then
             windower.send_command('input /pet "Deactivate" <me>')
