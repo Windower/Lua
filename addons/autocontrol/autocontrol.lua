@@ -1,5 +1,5 @@
 --[[
-Copyright © 2013-2014, Ricky Gall
+Copyright © 2013, 2014, 2020 Ricky Gall, Nifim
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 _addon.name = 'autocontrol'
-_addon.version = '2.0'
+_addon.version = '2.0.1'
 _addon.author = 'Nitrous (Shiva)'
 _addon.commands = {'autocontrol','acon'}
 
@@ -83,7 +83,13 @@ function initialize()
 
     mjob_id = player.main_job_id
     atts = res.items:category('Automaton')
-    local playermob = windower.ffxi.get_mob_by_index(windower.ffxi.get_player().index)
+
+    local playermob = windower.ffxi.get_mob_by_index(player.index)
+    while(playermob == nil) do
+        coroutine.sleep(1)
+        playermob = windower.ffxi.get_mob_by_index(player.index)
+    end
+
     if mjob_id == 18 then
         if playermob.pet_index then
             if settings.burdentracker then

@@ -33,7 +33,7 @@ attachments_to_abilities = {
     [8682] = 3485,
 }
 
-local player_id = windower.ffxi.get_player().id
+local player_id
 
 windower.register_event("login", function()
     player_id = windower.ffxi.get_player().id

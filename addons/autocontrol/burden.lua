@@ -1,4 +1,5 @@
 local set = require("sets")
+local packets = require("packets")
 
 local o = {
     fire = 0,
@@ -17,12 +18,17 @@ local mt = {
 setmetatable(o, mt)
 local updaters = {}
 local heatsink
-for _, id in pairs(windower.ffxi.get_mjob_data().attachments) do
-    heatsink = (id == 8610)
-    if heatsink then
-        break
+
+windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blocked)
+    if id == 0x044 then
+        for _, id in pairs(windower.ffxi.get_mjob_data().attachments) do
+            heatsink = (id == 8610)
+            if heatsink then
+                break
+            end
+        end
     end
-end
+end)
 
 local thresholdModifiers =
 {
@@ -162,11 +168,9 @@ local count_to_decay_rate = {
     [3] = 6,
 }
 function burden.update_decay_rate()
-    print(heatsink)
     if heatsink then
         local count = 0
         for _, v in pairs(windower.ffxi.get_player().buffs) do
-            print(v)
             if v == 305 then
                 count = count + 1
             end
