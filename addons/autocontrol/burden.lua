@@ -21,10 +21,13 @@ local heatsink
 
 windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blocked)
     if id == 0x044 then
-        for _, id in pairs(windower.ffxi.get_mjob_data().attachments) do
-            heatsink = (id == 8610)
-            if heatsink then
-                break
+        attachments = windower.ffxi.get_mjob_data().attachments
+        if attachements then
+            for _, id in pairs(attachements) do
+                heatsink = (id == 8610)
+                if heatsink then
+                    break
+                end
             end
         end
     end
