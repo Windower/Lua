@@ -39,6 +39,11 @@ windower.register_event("login", function()
     player_id = windower.ffxi.get_player().id
 end)
 
+windower.register_event("load", function()
+    local player = windower.ffxi.get_player()
+    player_id = player and player.id
+end)
+
 windower.register_event("action", function(act)
     local abil_ID = act['param']
     local actor_id = act['actor_id']

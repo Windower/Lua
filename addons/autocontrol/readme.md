@@ -1,5 +1,5 @@
 **Author:** Ricky Gall  
-**Version:** 2.0.2
+**Version:** 2.0.3
 **Description:**  
 Addon to make setting automaton attachments easier. Currently only works as pup main. Includes burden tracker.  
 
