@@ -21,9 +21,9 @@ local heatsink
 
 windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blocked)
     if id == 0x044 then
-        attachments = windower.ffxi.get_mjob_data().attachments
-        if attachements then
-            for _, id in pairs(attachements) do
+        local attachments = windower.ffxi.get_mjob_data().attachments
+        if attachments then
+            for _, id in pairs(attachments) do
                 heatsink = (id == 8610)
                 if heatsink then
                     break
