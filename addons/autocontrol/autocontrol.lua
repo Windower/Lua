@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 _addon.name = 'autocontrol'
-_addon.version = '2.0.3'
+_addon.version = '2.0.4'
 _addon.author = 'Nitrous (Shiva)'
 _addon.commands = {'autocontrol','acon'}
 
@@ -293,5 +293,13 @@ windower.register_event('addon command', function(comm, ...)
         log('  bgcolor <r> <g> <b> | txtcolor <r> <g> <b>')
         log('  settings - shows current settings')
         log('  show/hide - toggles visibility of the tracker so you can make changes.')
+    end
+end)
+
+windower.register_event("job change", function(main_job_id)
+    if main_job_id == 18 and settings.burdentracker then
+        burden_hud:show()
+    else
+        burden_hud:hide()
     end
 end)

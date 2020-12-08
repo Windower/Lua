@@ -70,4 +70,4 @@ windower.register_event("action", function(act)
         local abil = abil_ID - 256
         windower.send_command('@timers c "'..autoabils[abil].name..'" '..autoabils[abil].recast..' up')
     end
-end)    
+end)

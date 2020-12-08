@@ -136,7 +136,6 @@ function updaters.maneuver(self, type)
             burden.threshold = burden.threshold + thresholdModifiers[item.id]
         end
     end
-    windower.add_to_chat(4, self[type])
 end
 
 function updaters.ice(self) updaters.maneuver(self, "ice") end
