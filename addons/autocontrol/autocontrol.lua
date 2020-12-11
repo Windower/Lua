@@ -1,5 +1,5 @@
 --[[
-Copyright © 2013-2014, Ricky Gall
+Copyright © 2013, 2014, 2020 Ricky Gall, Nifim
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 _addon.name = 'autocontrol'
-_addon.version = '1.02'
+_addon.version = '2.0.4'
 _addon.author = 'Nitrous (Shiva)'
 _addon.commands = {'autocontrol','acon'}
 
@@ -63,8 +63,8 @@ defaults.burdentracker = true
 
 settings = config.load(defaults)
 
-require('maneuver') -- has to be loaded after settings are parsed.
-
+burden_hud = require('burdometer') -- has to be loaded after settings are parsed.
+require("autoabils")
 recast_ids = {}
 recast_ids.deactivate = res.job_abilities:with('english', 'Deactivate').recast_id
 recast_ids.activate = res.job_abilities:with('english', 'Activate').recast_id
@@ -83,26 +83,23 @@ function initialize()
 
     mjob_id = player.main_job_id
     atts = res.items:category('Automaton')
-    decay = 1
-    for key,_ in pairs(heat) do
-        heat[key] = 0
-        Burden_tb[key] = 0
-        Burden_tb['time' .. key] = 0 
+
+    local playermob = windower.ffxi.get_mob_by_index(player.index)
+    while(playermob == nil) do
+        coroutine.sleep(1)
+        playermob = windower.ffxi.get_mob_by_index(player.index)
     end
+
     if mjob_id == 18 then
-        if player.pet_index then 
-            running = 1
-            text_update_loop('start')
+        if playermob.pet_index then
             if settings.burdentracker then
-              Burden_tb:show()
+                burden_hud:show()
             end
         end
     end
 end
 
 windower.register_event('load', 'login', initialize)
-
-windower.register_event('logout', 'unload', text_update_loop:prepare('stop'))
 
 function attach_set(autoset)
     if windower.ffxi.get_player().main_job_id ~= 18 or not settings.autosets[autoset] then
@@ -112,8 +109,8 @@ function attach_set(autoset)
         log('The '..autoset..' set is already equipped.')
         return
     end
-
-    local playermob = windower.ffxi.get_mob_by_id(windower.ffxi.get_player().id)
+   
+    local playermob = windower.ffxi.get_mob_by_index(windower.ffxi.get_player().index)
     if playermob.pet_index and playermob.pet_index ~= 0 then 
         local recast = windower.ffxi.get_ability_recasts()[recast_ids.deactivate]
         if recast == 0 then
@@ -268,15 +265,15 @@ windower.register_event('addon command', function(comm, ...)
     elseif comm == "maneuvertimers" or comm == "mt" then
         maneuvertimers = not maneuvertimers
     elseif S{'fonttype','fontsize','pos','bgcolor','txtcolor'}:contains(comm) then
-            if comm == 'fonttype' then Burden_tb:font(args[1])
-        elseif comm == 'fontsize' then Burden_tb:size(args[1])
-        elseif comm == 'pos' then Burden_tb:pos(args[1], args[2])
-        elseif comm == 'bgcolor' then Burden_tb:bgcolor(args[1], args[2], args[3])
-        elseif comm == 'txtcolor' then Burden_tb:color(args[1], args[2], args[3])
+            if comm == 'fonttype' then burden_hud:font(args[1])
+        elseif comm == 'fontsize' then burden_hud:size(args[1])
+        elseif comm == 'pos' then burden_hud:pos(args[1], args[2])
+        elseif comm == 'bgcolor' then burden_hud:bgcolor(args[1], args[2], args[3])
+        elseif comm == 'txtcolor' then burden_hud:color(args[1], args[2], args[3])
         end
         config.save(settings, 'all')
-    elseif comm == 'show' then Burden_tb:show()
-    elseif comm == 'hide' then Burden_tb:hide()
+    elseif comm == 'show' then burden_hud:show()
+    elseif comm == 'hide' then burden_hud:hide()
     elseif comm == 'settings' then 
         log('BG: R: '..settings.bg.red..' G: '..settings.bg.green..' B: '..settings.bg.blue)
         log('Font: '..settings.text.font..' Size: '..settings.text.size)
@@ -296,5 +293,13 @@ windower.register_event('addon command', function(comm, ...)
         log('  bgcolor <r> <g> <b> | txtcolor <r> <g> <b>')
         log('  settings - shows current settings')
         log('  show/hide - toggles visibility of the tracker so you can make changes.')
+    end
+end)
+
+windower.register_event("job change", function(main_job_id)
+    if main_job_id == 18 and settings.burdentracker then
+        burden_hud:show()
+    else
+        burden_hud:hide()
     end
 end)
