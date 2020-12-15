@@ -177,7 +177,7 @@ function burden.update_decay_rate()
                 count = count + 1
             end
         end
-        burden.decay_rate = count_to_rate[count];
+        burden.decay_rate = count_to_decay_rate[count];
     else
         burden.decay_rate = 1
     end
