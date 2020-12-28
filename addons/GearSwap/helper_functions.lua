@@ -42,6 +42,7 @@ function string.lower(message)
     end
 end
 
+
 -----------------------------------------------------------------------------------
 --Name: string.upper()
 --Args:
@@ -359,7 +360,7 @@ function parse_set_to_keys(str)
     local count = 0
     
     -- Loop as long as remainder hasn't been nil'd or reduced to 0 characters, but only to a maximum of 30 tries.
-    while remainder and #remainder and count < 30 do
+    while remainder ~= "" and count < 30 do
         -- Try aaa.bbb set names first
         while sep == '.' do
             _,_,key,sep,remainder = remainder:find("^([^%.%[]*)(%.?%[?)(.*)")
@@ -380,7 +381,8 @@ function parse_set_to_keys(str)
                 _,_,key,stop,sep,remainder = remainder:find("^([^']+)('])(%.?%[?)(.*)")
             elseif sep == '"' then
                 _,_,key,stop,sep,remainder = remainder:find('^([^"]+)("])(%.?%[?)(.*)')
-            elseif not sep or #sep == 0 then
+            end
+            if not sep or #sep == 0 then
                 -- If there is no single or double quote detected, attempt to treat the index as a number or boolean
                 local _,_,pot_key,pot_stop,pot_sep,pot_remainder = remainder:find('^([^%]]+)(])(%.?%[?)(.*)')
                 if tonumber(pot_key) then
@@ -389,6 +391,8 @@ function parse_set_to_keys(str)
                     key,stop,sep,remainder = true,pot_stop,pot_sep,pot_remainder
                 elseif pot_key == 'false' then
                     key,stop,sep,remainder = false,pot_stop,pot_sep,pot_remainder
+                elseif pot_key and pot_key ~= "" then
+                    key,stop,sep,remainder = pot_key,pot_stop,pot_sep,pot_remainder
                 end
             end
             result:append(key)
@@ -399,6 +403,7 @@ function parse_set_to_keys(str)
 
     return result
 end
+
 
 -----------------------------------------------------------------------------------
 ----Name: get_set_from_keys(keys)
@@ -427,7 +432,6 @@ function get_set_from_keys(keys)
 end
 
 
-
 -----------------------------------------------------------------------------------
 --Name: initialize_arrow_offset(mob_table)
 --Desc: Returns the current target arrow offset.
@@ -450,7 +454,6 @@ function initialize_arrow_offset(mob_table)
     backtab.z = arrow.z-mob_table.z
     return backtab
 end
-
 
 
 -----------------------------------------------------------------------------------
@@ -566,6 +569,7 @@ function assemble_menu_item_packet(target_id,target_index,...)
     return outstr
 end
 
+
 -----------------------------------------------------------------------------------
 --Name: find_inventory_item(item_id)
 --Desc: Finds a npc trade item in normal inventory. Assumes items array
@@ -585,6 +589,7 @@ function find_inventory_item(item_id)
     end
 end
 
+
 -----------------------------------------------------------------------------------
 --Name: find_usable_item(item_id,bool)
 --Desc: Finds a usable item in temporary or normal inventory. Assumes items array
@@ -596,7 +601,6 @@ end
 ---- inventory_index - The item's use inventory index (if it exists)
 ---- bag_id - The item's bag ID (if it exists)
 -----------------------------------------------------------------------------------
-
 function find_usable_item(item_id)
     for _,bag in ipairs(usable_item_bags) do
         for i,v in pairs(items[to_windower_bag_api(bag.en)]) do
