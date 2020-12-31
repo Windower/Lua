@@ -68,7 +68,7 @@ windower.register_event('addon command', function(command, ...)
         "werebuster","mage's staff","vorpal sword","swordbreaker","brave blade","death sickle","double axe","dancing dagger","killer bow","windslicer",
         "sasuke katana","radiant lance","scepter staff","wightslayer","quicksilver","inferno claws","main gauche","elder staff","destroyers","senjuinrikio",
         "heart snatcher","subduer","dissector","expunger","morgenstern","gravedigger","rampager","coffinmaker","gonzo-shizunori","retributor","michishiba","thyrsusstab",
-        "trial wand","trial blade"}
+        "trial wand","trial blade","chaosbringer"}
     if command == 'run' then
         windower.add_to_chat(121,'latentchecker: Starting...')
         windower.ffxi.set_equip(0, 0, 0) -- Remove main/sub weapons
