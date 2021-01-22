@@ -1467,6 +1467,8 @@ fields.incoming[0x01B] = L{
     {ref=types.job_level,       lookup={res.jobs, 0x01},    count=0x16},        -- 49
     {ctype='unsigned char',     label='Current Monster Level'},                 -- 5F
     {ctype='unsigned int',      label='Encumbrance Flags'},                     -- 60   [legs, hands, body, head, ammo, range, sub, main,] [back, right_ring, left_ring, right_ear, left_ear, waist, neck, feet] [HP, CHR, MND, INT, AGI, VIT, DEX, STR,] [X X X X X X X MP]
+    {ctype='unsigned short',    label='_unknown7'},                             -- 64
+    {ctype='unsigned short',    label='Mastery Rank'},                          -- 66
 }
 
 -- Inventory Count
@@ -2920,7 +2922,8 @@ fields.incoming[0x061] = L{
     {ctype='bit[5]',            label='Unity Rank'},                            -- 58   Danger, 00ing caused my client to crash
     {ctype='bit[16]',           label='Unity Points'},                          -- 59   
     {ctype='bit[6]',            label='_unknown6'},                             -- 5A   No obvious function
-    {ctype='unsigned int',      label='_junk1'},                                -- 5B   
+    {ctype='unsigned int',      label='_junk1'},                                -- 5B
+    {ctype='unsigned int',      label='_junk2'},                                -- 60
 }
 
 types.combat_skill = L{
