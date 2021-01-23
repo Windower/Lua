@@ -779,6 +779,37 @@ local function handle_command(cmd, ...)
     end
 end
 
+-- This is here so if a player does a manual synth the result is not displayed twice, since results are only hidden on injected synthesis.
+windower.register_event('outgoing chunk', function(id,original,modified,injected,blocked)
+	if id == 0x096 and injected then
+		injected_synth = true
+	end
+end)
+
+windower.register_event('incoming chunk', function(id,original,modified,injected,blocked)
+	if id == 0x06F and injected_synth then
+		local p = packets.parse('incoming',original)
+		if p['Result'] == (0 or 2) then
+			local item = res.items[p['Item']].en
+			windower.add_to_chat(121, 'You synthesized: \30\02%s\30\01.':format(item))
+		injected_synth = false	
+		end
+		if p['Result'] == (1 or 5) then
+			windower.add_to_chat(121,'Your synthesis has failed and your crystal is lost.')
+			if p['Lost Item 1'] ~= 0 then windower.add_to_chat(121, 'You lost: \30\02%s\30\01.':format(res.items[p['Lost Item 1']].en)) end 
+			if p['Lost Item 2'] ~= 0 then windower.add_to_chat(121, 'You lost: \30\02%s\30\01.':format(res.items[p['Lost Item 2']].en)) end 
+			if p['Lost Item 3'] ~= 0 then windower.add_to_chat(121, 'You lost: \30\02%s\30\01.':format(res.items[p['Lost Item 3']].en)) end 
+			if p['Lost Item 4'] ~= 0 then windower.add_to_chat(121, 'You lost: \30\02%s\30\01.':format(res.items[p['Lost Item 4']].en)) end 
+			if p['Lost Item 5'] ~= 0 then windower.add_to_chat(121, 'You lost: \30\02%s\30\01.':format(res.items[p['Lost Item 5']].en)) end 
+			if p['Lost Item 6'] ~= 0 then windower.add_to_chat(121, 'You lost: \30\02%s\30\01.':format(res.items[p['Lost Item 6']].en)) end 
+			if p['Lost Item 7'] ~= 0 then windower.add_to_chat(121, 'You lost: \30\02%s\30\01.':format(res.items[p['Lost Item 7']].en)) end 
+			if p['Lost Item 8'] ~= 0 then windower.add_to_chat(121, 'You lost: \30\02%s\30\01.':format(res.items[p['Lost Item 8']].en)) end 
+			injected_synth = false
+		end
+	end
+end)
+
+
 windower.register_event('addon command', handle_command)
 windower.register_event('outgoing chunk', display_crafting_packet)
 windower.register_event('outgoing chunk', block_sort)
