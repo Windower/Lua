@@ -39,7 +39,7 @@ item_info = {
     [2]={id=26177,japanese='Ｄ．デムリング',english='"Dim. Ring (Dem)"',slot=13},
     [3]={id=26178,japanese='Ｄ．メアリング',english='"Dim. Ring (Mea)"',slot=13},
     [4]={id=10385,japanese="キュムラスマスク+1",english="Cumulus Masque +1",slot=4},
-        }
+}
 
 function search_item()
     local item_array = {}
