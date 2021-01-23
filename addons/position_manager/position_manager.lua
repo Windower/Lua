@@ -1,4 +1,4 @@
---Copyright © 2021, Lili
+--Copyright © 2020, Lili
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -98,7 +98,7 @@ function resize(settings)
     local width = settings.width == -1 and windower.get_windower_settings().ui_x_res or settings.width
     local height = settings.height == -1 and windower.get_windower_settings().ui_y_res or settings.height
 
-    windower.send_command('wincontrol move %s %s':format(settings.x, settings.y))
+    windower.send_command('wincontrol resize %s %s':format(width, height))
     --print('::wincontrol resize %s %s':format(width, height))
 end
 
