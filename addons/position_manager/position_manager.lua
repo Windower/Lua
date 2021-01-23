@@ -26,7 +26,7 @@
 
 _addon.name = 'position_manager'
 _addon.author = 'Lili'
-_addon.version = '2.0'
+_addon.version = '2.0.1'
 _addon.command = 'pm'
 
 if not windower.file_exists(windower.windower_path .. '\\plugins\\WinControl.dll') then
@@ -38,9 +38,9 @@ else
     windower.send_command('load wincontrol')
 end
 
-config = require('config')
+local config = require('config')
 
-default = {
+local default = {
     x = 0,
     y = 0,
     width = -1,
@@ -48,7 +48,7 @@ default = {
     delay = 0,
 }
 
-settings = config.load(default)
+local settings = config.load(default)
 
 function get_name(name)
     if name ~= nil and type(name) ~= 'string' then
@@ -71,7 +71,7 @@ end
 function show_help()
     windower.add_to_chat(207, 'position_manager: Commands:')
     windower.add_to_chat(207, '  //pm set <x> <y> [name]')
-    windower.add_to_chat(207, '  //pm size <width> <height> [name]')    
+    windower.add_to_chat(207, '  //pm size <width> <height> [name]')
     windower.add_to_chat(207, '  //pm delay <seconds> [name]')
     windower.add_to_chat(207, 'position_manager: See the readme for details.')
 end
@@ -80,9 +80,9 @@ function move(settings)
     if settings.delay > 0 then
         coroutine.sleep(settings.delay)
     end
-    
+
     windower.send_command('wincontrol move %s %s':format(settings.x, settings.y))
-    --print('::wincontrol move %s %s':format(settings.x, settings.y))    
+    --print('::wincontrol move %s %s':format(settings.x, settings.y))
 end
 
 function resize(settings)
@@ -90,16 +90,16 @@ function resize(settings)
         windower.send_command('wincontrol resize reset')
         return
     end
-    
+
     if settings.delay > 0 then
         coroutine.sleep(settings.delay)
     end
-    
+
     local width = settings.width == -1 and windower.get_windower_settings().ui_x_res or settings.width
     local height = settings.height == -1 and windower.get_windower_settings().ui_y_res or settings.height
-    
+
     windower.send_command('wincontrol move %s %s':format(settings.x, settings.y))
-    --print('::wincontrol resize %s %s':format(width, height))    
+    --print('::wincontrol resize %s %s':format(width, height))
 end
 
 function handle_commands(cmd, ...)
@@ -115,10 +115,10 @@ function handle_commands(cmd, ...)
         if not name then
             return
         end
-        
+
         arg[1] = arg[1] == 'default' and -1 or tonumber(arg[1])
         arg[2] = arg[2] == 'default' and -1 or tonumber(arg[2])
-        
+
         if arg[1] and arg[2] then
             if cmd == 'set' then
                 settings.x = arg[1]
@@ -134,7 +134,7 @@ function handle_commands(cmd, ...)
             elseif cmd == 'size' then
                 settings.width = arg[1]
                 settings.height = arg[2]
-                
+
                 if settings.width and settings.height then
                     config.save(settings, name)
                     windower.add_to_chat(207, 'position_manager: Window size set to %s, %s for %s.':format(settings.width, settings.height, name))
@@ -148,20 +148,17 @@ function handle_commands(cmd, ...)
             return false
         end
 
-        if windower.ffxi.get_info().logged_in then
-            player_name = windower.ffxi.get_player().name
-            if name:lower() == player_name:lower() then
-                if cmd == 'set' then 
-                    move(settings)
-                elseif cmd == 'size' then 
-                    resize(settings)
-                end
+        if player_name and name:lower() == player_name:lower() then
+            if cmd == 'set' then
+                move(settings)
+            elseif cmd == 'size' then
+                resize(settings)
             end
         end
-        
+
         windower.send_ipc_message(name)
         return true
-        
+
     elseif cmd == 'delay' then
         settings.delay = tonumber(arg[2])
 
@@ -185,8 +182,13 @@ config.register(settings, resize)
 
 windower.register_event('addon command', handle_commands)
 
+windower.register_event('load','login','logout', function(name)
+    local player = windower.ffxi.get_player()
+    player_name = player and player.name
+end)
+
 windower.register_event('ipc message', function(msg)
-    if (windower.ffxi.get_info().logged_in and msg == windower.ffxi.get_player().name) or msg == 'all' then
+    if msg == player_name or msg == 'all' then
         config.reload(settings)
     end
 end)
