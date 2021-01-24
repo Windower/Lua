@@ -46,7 +46,7 @@ end
 windower.register_event('addon command', function (...)
     args = {...};
     if args[1]:lower() == 'help' then
-        log('//drop <\30\02item\30\01>\nDrops a specific \30\02item\30\01. does not require quotes, capitalization, and accepts auto-translate.') 
+        log('//drop <\30\02item\30\01>\nDrops a specific \30\02item\30\01. Does not require quotes, capitalization, and accepts auto-translate.') 
         return
     end
     for i, v in pairs(args) do args[i]=windower.convert_auto_trans(args[i]) end --thanks Akaden
