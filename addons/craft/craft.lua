@@ -779,6 +779,33 @@ local function handle_command(cmd, ...)
     end
 end
 
+-- This is here so if a player does a legitimate synth the result is not displayed twice, since results are only hidden on injected synthesis.
+windower.register_event('outgoing chunk', function(id, original, modified, injected, blocked)
+    if id == 0x096 and injected then
+        injected_synth = true
+    end
+end)
+
+windower.register_event('incoming chunk', function(id, original, modified, injected, blocked)
+    if id == 0x06F and injected_synth then
+        local p = packets.parse('incoming',original)
+        if p['Result'] == 0 or p['Result'] == 2 then
+            local item = res.items[p['Item']].english
+            windower.add_to_chat(121, 'You synthesized: \30\02%s\30\01.':format(item))
+            injected_synth = false	
+        end
+        if p['Result'] == 1 or p['Result'] == 5 then
+            windower.add_to_chat(121,'Your synthesis has failed and your crystal is lost.')
+            for i=1, 8 do 
+                if p['Lost Item '..i] ~= 0 then 
+                    windower.add_to_chat(121, 'You lost: \30\02%s\30\01.':format(res.items[p['Lost Item '..i]].english)) 
+                end 
+            end
+            injected_synth = false
+        end
+    end
+end)
+
 windower.register_event('addon command', handle_command)
 windower.register_event('outgoing chunk', display_crafting_packet)
 windower.register_event('outgoing chunk', block_sort)
