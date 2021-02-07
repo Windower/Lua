@@ -1,5 +1,5 @@
 _addon.author = 'Arcon'
-_addon.version = '2.1.2.0'
+_addon.version = '2.2.0.0'
 _addon.language = 'English'
 _addon.command = 'yush'
 
@@ -107,6 +107,8 @@ check = function(keyset)
         if key <= keyset then
             if type(val) == 'string' then
                 windower.send_command(val)
+            elseif type(val) == 'function' then
+                val()
             else
                 current = val
                 stack:append(current)
@@ -126,7 +128,7 @@ parse_binds = function(fbinds, top)
     rawset(names, top, rawget(_innerG._names, fbinds))
     for key, val in pairs(fbinds) do
         key = S(key:split('+')):map(string.lower)
-        if type(val) == 'string' then
+        if type(val) == 'string' or type(val) == 'function' then
             rawset(top, key, val)
         else
             local sub = {}
