@@ -27,92 +27,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 _addon.name = 'Job Change'
-_addon.author = 'Sammeh'
-_addon.version = '1.0.3'
+_addon.author = 'Sammeh; Akaden'
+_addon.version = '1.0.4'
 _addon.command = 'jc'
 
 -- 1.0.1 first release
 -- 1.0.2 added 'reset' command to simply reset to existing job.  Changes sub job to a random starting job and back.
 -- 1.0.3 Code clean-up
+-- 1.0.4 Added /jc main/sub command and organized solve for fewest changes.
 
 require('tables')
 packets = require('packets')
 res = require ('resources')
 
-function jobchange(job,main_sub)
-    windower.add_to_chat(4,"JobChange: Changing "..main_sub.." job to:"..res.jobs[job].ens)
-    if job and main_sub then 
-        local packet = packets.new('outgoing', 0x100, {
-            [main_sub:sub(1,1):upper()..main_sub:sub(2)..' Job'] = job,
-        })
-        packets.inject(packet)
-        coroutine.sleep(0.5)
-    end    
+local temp_jobs =  T { 'NIN', 'DNC', 'WAR', 'MNK', 'WHM', 'BLM', 'RDM', 'THF' } 
+local mog_zones = S { 'Selbina', 'Mhaura', 'Tavnazian Safehold', 'Nashmau', 'Rabao', 'Kazham', 'Norg'}
+local moogles = S { 'Moogle', 'Nomad Moogle', 'Green Thumb Moogle' }
+
+local log = function(msg)
+    windower.add_to_chat(4,'JobChange: '..msg)
 end
 
-windower.register_event('addon command', function(command, ...)
-    local self = windower.ffxi.get_player()
-    local args = L{...}
-    local job = ''
-    if args[1] then 
-        job = args[1]:lower()
-    end
-    local main_sub = ''
-    if command:lower() == 'main' then
-        main_sub = 'main'
-    elseif command:lower() == 'sub' then
-        main_sub = 'sub'
-    elseif command:lower() == 'reset' then
-        windower.add_to_chat(4,"JobChange: Resetting Job")
-        main_sub = 'sub'
-        job = windower.ffxi.get_player().sub_job:lower()
-    else
-        windower.add_to_chat(4,"JobChange Syntax: //jc main|sub JOB  -- Chnages main or sub to target JOB")
-        windower.add_to_chat(4,"JobChange Syntax: //jc reset -- Resets Current Job")
-        return
-    end
-    local conflict = find_conflict(job,self)
-    local jobid = find_job(job,self)
-    if jobid then 
-        local npc = find_job_change_npc()
-        if npc then
-            if not conflict then 
-                jobchange(jobid,main_sub)
-            else
-                local temp_job = find_temp_job(self)            
-                windower.add_to_chat(4,"JobChange: Conflict with "..conflict)
-                if main_sub == conflict then 
-                    jobchange(temp_job,main_sub)
-                    jobchange(jobid,main_sub)
-                else
-                    jobchange(temp_job,conflict)
-                    jobchange(jobid,main_sub)
-                end
-            end
-        else
-            windower.add_to_chat(4,"JobChange: Not close enough to a Moogle!")
-        end        
-    else
-        windower.add_to_chat(4,"JobChange: Could not change "..command.." to "..job:upper().." ---Mistype|NotUnlocked")
-    end
-    
-end)
+local jobchange = function(job, main)
+    local packet = packets.new('outgoing', 0x100, {
+        [(main and 'Main' or 'Sub')..' Job'] = job,
+    })
+    packets.inject(packet)
+end
 
-function find_conflict(job,self)
-    if self.main_job == job:upper() then
-        return "main"
+local find_conflict = function(job_name, p)
+    if p.main_job == job_name:upper() then
+        return 'main'
     end
-    if self.sub_job == job:upper() then
-        return "sub"
+    if p.sub_job == job_name:upper() then
+        return 'sub'
     end
 end
 
-function find_temp_job(self)
-    local starting_jobs = S { 'WAR', 'MNK', 'WHM', 'BLM', 'RDM', 'THF' } 
-    for i in pairs(starting_jobs) do
-        if not find_conflict(i,self) then 
+local find_temp_job = function(p)
+    for _, job_name in ipairs(temp_jobs) do
+        if not find_conflict(job_name, p) and p.jobs[job_name:upper()] > 0 then 
             for index,value in pairs(res.jobs) do
-                if value.ens == i then
+                if value.ens == job_name then
                     return index
                 end
             end
@@ -120,8 +76,9 @@ function find_temp_job(self)
     end
 end
 
-function find_job(job,self)
-    local jobLevel = self.jobs[job:upper()]
+local find_job = function(job,p)
+    if job == nil then return nil end
+    local jobLevel = p.jobs[job:upper()]
     for index,value in pairs(res.jobs) do
         if value.ens:lower() == job and jobLevel > 0 then 
             return index
@@ -129,17 +86,122 @@ function find_job(job,self)
     end
 end
 
-
-function find_job_change_npc()
+local find_job_change_npc = function()
     local info = windower.ffxi.get_info()
-    if not (info.mog_house or S{'Selbina', 'Mhaura', 'Tavnazian Safehold', 'Nashmau', 'Rabao', 'Kazham', 'Norg'}:contains(res.zones[info.zone].english)) then
-        windower.add_to_chat(4,'JobChange: Not in a zone with a Change NPC')
+    if not (info.mog_house or mog_zones:contains(res.zones[info.zone].english)) then
+        log('Not in a zone with a Change NPC')
         return
     end
 
-    for i, v in pairs(windower.ffxi.get_mob_array()) do
-        if v.distance < 36 and S{'Moogle', 'Nomad Moogle', 'Green Thumb Moogle'}:contains(v.name) then
+    for _, v in pairs(windower.ffxi.get_mob_array()) do
+        if v.distance < 36 and v.valid_target and moogles:contains(v.name) then
             return v
         end
     end
 end
+
+windower.register_event('addon command', function(command, ...)
+    local p = windower.ffxi.get_player()
+    local args = L{...}
+    local job = ''
+    if args[1] then 
+        job = args[1]:lower()
+    end
+    local main = nil
+    local sub = nil
+    if command:lower() == 'main' then
+        main = job
+        if main and main:upper() == p.main_job then main = nil end
+    elseif command:lower() == 'sub' then
+        sub = job
+        if sub and sub:upper() == p.sub_job then main = nil end
+    elseif command:lower() == 'reset' then
+        log('Resetting Job')
+        sub = p.sub_job:lower()
+    elseif command:contains('/') or command:contains('\\') then
+        command = command:gsub('\\','/')
+        local js = command:split('/')
+        main = (js[1] ~= '' and js[1] or nil)
+        sub = (js[2] ~= '' and js[2] or nil)
+        -- remove identicals.
+        if main and main:upper() == p.main_job then main = nil end
+        if sub and sub:upper() == p.sub_job then sub = nil end
+    elseif command ~= nil and command ~= '' then
+        main = command:lower()
+        if main and main:upper() == p.main_job then main = nil end
+    else
+        log('Syntax: //jc main|sub JOB  -- Chnages main or sub to target JOB')
+        log('Syntax: //jc main/sub  -- Changes main and sub')
+        log('Syntax: //jc reset -- Resets Current Job')
+        return
+    end
+
+    local changes = T{}
+
+    local main_id = find_job(main, p)
+    if main ~= nil and main_id == nil then 
+        log('Could not change main job to to '..main:upper()..' ---Mistype|NotUnlocked')
+        return
+    end
+    local sub_id = find_job(sub, p)
+    if sub ~= nil and sub_id == nil then 
+        log('Could not change sub job to to '..sub:upper()..' ---Mistype|NotUnlocked')
+        return
+    end
+
+    if main_id == nil and sub_id == nil then
+        log('No change required.')
+        return
+    end
+
+    if main_id ~= nil and main:upper() == p.sub_job then
+        if sub_id ~= nil and sub:upper() == p.main_job then
+            changes:append({job_id=find_temp_job(p), is_conflict=true, is_main=false})
+            changes:append({job_id=main_id, is_main=true})
+            changes:append({job_id=sub_id, is_main=false})
+        else
+            if sub_id ~= nil then
+                changes:append({job_id=sub_id, is_main=false})
+            else
+                changes:append({job_id=find_temp_job(p), is_conflict=true, is_main=false})
+            end
+            changes:append({job_id=main_id, is_main=true})
+        end
+    elseif sub_id ~= nil and sub:upper() == p.main_job then
+        if main_id ~= nil then
+            changes:append({job_id=main_id, is_main=true})
+        else
+            changes:append({job_id=find_temp_job(p), is_conflict=true, is_main=true})
+        end
+        changes:append({job_id=sub_id, is_main=false})
+    else
+        if main_id ~= nil then
+            if main:upper() == p.main_job then
+                changes:append({job_id=find_temp_job(p), is_conflict=true, is_main=true})
+            end
+            changes:append({job_id=main_id, is_main=true})
+        end
+        if sub_id ~= nil then
+            if sub:upper() == p.sub_job then
+                changes:append({job_id=find_temp_job(p), is_conflict=true, is_main=false})
+            end
+            changes:append({job_id=sub_id, is_main=false})
+        end
+    end
+
+    local npc = find_job_change_npc()
+    if npc then
+        for _, change in ipairs(changes) do
+            if change.is_conflict then
+                log('Conflict with '..(change.is_main and 'main' or 'sub')..' job. Changing to: '..res.jobs[change.job_id].ens)
+            else
+                log('Changing '..(change.is_main and 'main' or 'sub')..' job to: '..res.jobs[change.job_id].ens)
+            end
+            jobchange(change.job_id, change.is_main)
+
+            coroutine.sleep(0.5)
+        end
+    else
+        log('Not close enough to a Moogle!')
+    end       
+end)
