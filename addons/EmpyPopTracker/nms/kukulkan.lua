@@ -28,8 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Kukulkan',
-    item = 2932, --Kukulkan's Fang
-    item_target_count = 50,
+    collectable = 2932, --Kukulkan's Fang
+    collectable_target_count = 50,
     pops = { {
         id = 1466, --Mucid Ahriman Eyeball
         type = 'key item',
