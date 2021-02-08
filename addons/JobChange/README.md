@@ -3,8 +3,9 @@ Job Change AddOn.
 Allows command line job change as long as you're within 6 yalms of a Job Change NPC. 
 
 Usage:
-* //jc main job
-* //jc sub job
+* //jc main job - change just main job
+* //jc sub job - change just sub job
+* //jc main/sub - change both jobs at the same time.
 * //jc reset   (Resets JA's by changing your sub job off and back)
 
 

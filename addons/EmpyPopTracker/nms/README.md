@@ -2,23 +2,23 @@
 
 The data structure for each trackable NM uses a series of nested NM entities. A standard NM entity contains the following data:
 
-| Key                 | Type      | Required? | Description                    |
-| ------------------- | --------- | --------- | ------------------------------ |
-| name                | String    | Required  | Name of the NM                 |
-| item                | Number    | Optional  | The ID of the wanted item      |
-| item_target_count   | Number    | Optional  | The target no. of wanted items |
-| pops                | Table     | Optional  | The pop information for the NM |
-| pops{}.id           | Number    | Required  | The ID of the item/key item    |
-| pops{}.type         | String    | Required  | Either "key item" or "item"    |
-| pops{}.dropped_from | NM Entity | Required  | A nested set of NM information |
+| Key                      | Type      | Required? | Description                         |
+| ------------------------ | --------- | --------- | ----------------------------------- |
+| name                     | String    | Required  | Name of the NM                      |
+| collectable              | Number    | Optional  | The ID of the collectable item      |
+| collectable_target_count | Number    | Optional  | The target no. of collectable items |
+| pops                     | Table     | Optional  | The pop information for the NM      |
+| pops{}.id                | Number    | Required  | The ID of the item/key item         |
+| pops{}.type              | String    | Required  | Either "key item" or "item"         |
+| pops{}.dropped_from      | NM Entity | Required  | A nested set of NM information      |
 
 A simple example of the above would be:
 
 ```lua
 {
     name = 'Azdaja',
-    item = 3292, --Azdaja's Horn
-    item_target_count = 75,
+    collectable = 3292, --Azdaja's Horn
+    collectable_target_count = 75,
     pops = { {
         id = 1531, --Vacant Bugard Eye
         type = 'key item',
@@ -32,8 +32,8 @@ A larger example with multiple nested entities:
 ```lua
 {
     name = 'Bukhis',
-    item = 2966, --Bukhis's Wing
-    item_target_count = 50,
+    collectable = 2966, --Bukhis's Wing
+    collectable_target_count = 50,
     pops = { {
         id = 1508, --Ingrown Taurus Nail
         type = 'key item',

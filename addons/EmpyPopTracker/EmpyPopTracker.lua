@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon.name = 'Empy Pop Tracker'
 _addon.author = 'Dean James (Xurion of Bismarck)'
 _addon.commands = { 'ept', 'empypoptracker' }
-_addon.version = '2.4.0'
+_addon.version = '2.5.0'
 
 config = require('config')
 res = require('resources')
@@ -78,6 +78,8 @@ defaults.colors.bgall = {}
 defaults.colors.bgall.red = 0
 defaults.colors.bgall.green = 75
 defaults.colors.bgall.blue = 0
+defaults.collectables = true
+defaults.expanded = true
 
 EmpyPopTracker.settings = config.load(defaults)
 EmpyPopTracker.text = require('texts').new(EmpyPopTracker.settings.text, EmpyPopTracker.settings)
@@ -176,38 +178,44 @@ function generate_text(data, key_items, items, depth)
             pop_name = ucwords(resource.name)
         end
 
-        --separator line for each top-level mob
-        if depth == 1 then
+        if depth == 1 and EmpyPopTracker.settings.expanded then
             text = text .. '\n'
         end
 
-        local item_colour
-        if owns_pop then
-            item_colour = start_color('obtained')
-        else
-            item_colour = start_color('needed')
-        end
-
+        local item_colour = start_color(owns_pop and 'obtained' or 'needed')
         local pool_notification = ''
         if in_pool_count > 0 then
             pool_notification = start_color('pool') .. ' [' .. in_pool_count .. ']' .. '\\cr'
         end
-        text = text .. '\n' .. get_indent(depth) .. pop.dropped_from.name .. '\n' .. get_indent(depth) .. ' >> ' .. item_colour .. item_identifier .. pop_name .. '\\cr' .. pool_notification
+
+        local name_color = ''
+        local name_color_end = ''
+        if not EmpyPopTracker.settings.expanded and owns_pop then
+            name_color = item_colour
+            name_color_end = '\\cr'
+        end
+
+        text = text .. '\n' .. get_indent(depth) .. name_color .. pop.dropped_from.name .. name_color_end
+
+        if EmpyPopTracker.settings.expanded then
+            text = text .. '\n' .. get_indent(depth) .. ' >> ' .. item_colour .. item_identifier .. pop_name .. '\\cr' .. pool_notification
+        end
+
         if pop.dropped_from.pops then
             text = text .. generate_text(pop.dropped_from, key_items, items, depth + 1)
         end
     end
 
-    if data.item then
-        local count = get_item_count(data.item, items)
+    if data.collectable and EmpyPopTracker.settings.collectables then
+        local count = get_item_count(data.collectable, items)
         local start = ''
         local finish = ''
-        if count >= data.item_target_count then
+        if count >= data.collectable_target_count then
             start = start_color('obtained')
             finish = '\\cr'
         end
 
-        text = text .. '\n\n' .. start .. res.items[data.item].name .. ': ' .. count .. '/' .. data.item_target_count .. finish
+        text = text .. '\n\n' .. start .. res.items[data.collectable].name .. ': ' .. count .. '/' .. data.collectable_target_count .. finish
     end
 
     return text
@@ -291,6 +299,8 @@ commands.help = function()
     windower.add_to_chat(EmpyPopTracker.settings.add_to_chat_mode, '//ept hide - hides the UI')
     windower.add_to_chat(EmpyPopTracker.settings.add_to_chat_mode, '//ept show - shows the UI')
     windower.add_to_chat(EmpyPopTracker.settings.add_to_chat_mode, '//ept list - lists all trackable NMs')
+    windower.add_to_chat(EmpyPopTracker.settings.add_to_chat_mode, '//ept mini - toggles mini/expanded mode')
+    windower.add_to_chat(EmpyPopTracker.settings.add_to_chat_mode, '//ept collectables - toggles the collectable item')
     windower.add_to_chat(EmpyPopTracker.settings.add_to_chat_mode, '//ept help - displays this help')
 end
 
@@ -306,6 +316,18 @@ commands.bg = function()
     local tracking_nm = nm_data[EmpyPopTracker.settings.tracking]
     local url = 'https://www.bg-wiki.com/bg/' .. tracking_nm.name
     windower.open_url(url)
+end
+
+commands.collectables = function()
+    EmpyPopTracker.settings.collectables = not EmpyPopTracker.settings.collectables
+    EmpyPopTracker.settings:save()
+    EmpyPopTracker.update()
+end
+
+commands.mini = function()
+    EmpyPopTracker.settings.expanded = not EmpyPopTracker.settings.expanded
+    EmpyPopTracker.settings:save()
+    EmpyPopTracker.update()
 end
 
 EmpyPopTracker.update = function()
