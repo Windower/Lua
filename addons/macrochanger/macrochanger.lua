@@ -152,7 +152,7 @@ windower.register_event('addon command', function(...)
   if args[1] == 'disableall' then
     if args[2] == 'on' then
       globaldisable = 1
-      warning('All automated macro switching disabled.')
+      notice('All automated macro switching disabled.')
     elseif args[2] == 'off' then
       globaldisable = 0
       notice('Automated macro switching enabled.')
