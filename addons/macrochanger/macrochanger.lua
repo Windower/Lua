@@ -139,7 +139,9 @@ windower.register_event('job change',function ()
       notice('Auto Macro Switching Disabled for ' .. job ..'.')
     else
       log('Job changed to ' .. job .. ' - switched to Book: ' .. book .. ' and Page: ' .. page)
-      windower.send_command('input /macro book '..book..';wait 0.2;input /macro set '..page..';')
+      windower.chat.input('/macro book ' .. book)
+      coroutine.sleep(0.2)
+      windower.chat.input('/macro set ' .. page)
     end
   elseif globaldisable == 1 then
     notice('Auto Macro Switching Disabled for All Jobs.')
