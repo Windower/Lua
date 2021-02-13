@@ -138,7 +138,7 @@ windower.register_event('job change',function ()
 		if ((book == 'disabled') or (page == 'disabled')) then
 			notice('Auto Macro Switching Disabled for ' .. job ..'.')
 		else
-			log('Changing macros to Book: ' .. book .. ' and Page: ' .. page .. '.  Job Changed to ' .. job)
+			log('Job changed to ' .. job .. ' - switched to Book: ' .. book .. ' and Page: ' .. page)
 			windower.send_command('input /macro book '..book..';wait 0.2;input /macro set '..page..';')
 		end
 	elseif globaldisable == 1 then
