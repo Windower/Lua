@@ -33,7 +33,7 @@ require('strings')
 require('logger')
 
 windower.register_event('load', function()
-	globaldisable = 0
+  globaldisable = 0
     macros = {
         WAR = {Book = '', Page = ''},
         MNK = {Book = '', Page = ''},
@@ -58,31 +58,31 @@ windower.register_event('load', function()
         GEO = {Book = '', Page = ''},
         RUN = {Book = '', Page = ''},
         }
-	options_load()
+  options_load()
 end)
 
 function options_load()
-	local f = io.open(windower.addon_path..'data/settings.txt', "r")
-	if f == nil then
-		local g = io.open(windower.addon_path..'data/settings.txt', "w")
-		g:write('Release Date: 9:00 PM, 4-01-13\46\n')
-		g:write('Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file\46\n')
-		g:write('Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant\46\n')
-		g:write('Author Comment: If you ever mess it up so that it does not work, you can just delete it and MacroChanger will regenerate it upon reload\46\n')
-		g:write('Author Comment: For the output customization lines, simply place the book and page number that you would like to change to upon a job change.\46\n')
-		g:write('Author Comment: If 2 jobs share a book, you can place the same book number for each job, then put their individual pages.\46\n')
-		g:write('Author Comment: Example:  BLM and SCH both use Macro Book 2:  BLM uses page 3. SCH uses page 1.\46\n')
-		g:write('Author Comment: Put BLM Book: 2,  BLM Page: 3,  SCH Book: 2,  SCH Page: 1.\46\n')
-		g:write('Author Comment: If you wish to disable auto-macro Changing for a specific job, type "disabled" instead of a book number.  (e.g. BLM Book: disabled)\n')
-		g:write('Author Comment: The design of the settings file is credited to Byrthnoth as well as the creation of the settings file.\n\n\n')
-		g:write('File Settings: Fill in below\n')
-		g:write('Disable All: 0\n')
-		g:write('WAR Book: 1\nWAR Page: 1\nMNK Book: 2\nMNK Page: 1\nWHM Book: 3\nWHM Page: 1\nBLM Book: 4\nBLM Page: 1\nRDM Book: 5\nRDM Page: 1\nTHF Book: 6\nTHF Page: 1\n')
-		g:write('PLD Book: 7\nPLD Page: 1\nDRK Book: 8\nDRK Page: 1\nBST Book: 9\nBST Page: 1\nBRD Book: 10\nBRD Page: 1\nRNG Book: 11\nRNG Page: 1\nSAM Book: 12\nSAM Page: 1\n')
-		g:write('NIN Book: 13\nNIN Page: 1\nDRG Book: 14\nDRG Page: 1\nSMN Book: 15\nSMN Page: 1\nBLU Book: 16\nBLU Page: 1\nCOR Book: 17\nCOR Page: 1\nPUP Book: 18\nPUP Page: 1\n')
-		g:write('DNC Book: 19\nDNC Page: 1\nSCH Book: 20\nSCH Page: 1\nGEO Book: 20\nGEO Page: 1\nRUN Book: 20\nRUN Page: 1\n')
-		g:close()
-		DisableAll = 0
+  local f = io.open(windower.addon_path..'data/settings.txt', "r")
+  if f == nil then
+    local g = io.open(windower.addon_path..'data/settings.txt', "w")
+    g:write('Release Date: 9:00 PM, 4-01-13\46\n')
+    g:write('Author Comment: This document is whitespace sensitive, which means that you need the same number of spaces between things as exist in this initial settings file\46\n')
+    g:write('Author Comment: It looks at the first two words separated by spaces and then takes anything as the value in question if the first two words are relevant\46\n')
+    g:write('Author Comment: If you ever mess it up so that it does not work, you can just delete it and MacroChanger will regenerate it upon reload\46\n')
+    g:write('Author Comment: For the output customization lines, simply place the book and page number that you would like to change to upon a job change.\46\n')
+    g:write('Author Comment: If 2 jobs share a book, you can place the same book number for each job, then put their individual pages.\46\n')
+    g:write('Author Comment: Example:  BLM and SCH both use Macro Book 2:  BLM uses page 3. SCH uses page 1.\46\n')
+    g:write('Author Comment: Put BLM Book: 2,  BLM Page: 3,  SCH Book: 2,  SCH Page: 1.\46\n')
+    g:write('Author Comment: If you wish to disable auto-macro Changing for a specific job, type "disabled" instead of a book number.  (e.g. BLM Book: disabled)\n')
+    g:write('Author Comment: The design of the settings file is credited to Byrthnoth as well as the creation of the settings file.\n\n\n')
+    g:write('File Settings: Fill in below\n')
+    g:write('Disable All: 0\n')
+    g:write('WAR Book: 1\nWAR Page: 1\nMNK Book: 2\nMNK Page: 1\nWHM Book: 3\nWHM Page: 1\nBLM Book: 4\nBLM Page: 1\nRDM Book: 5\nRDM Page: 1\nTHF Book: 6\nTHF Page: 1\n')
+    g:write('PLD Book: 7\nPLD Page: 1\nDRK Book: 8\nDRK Page: 1\nBST Book: 9\nBST Page: 1\nBRD Book: 10\nBRD Page: 1\nRNG Book: 11\nRNG Page: 1\nSAM Book: 12\nSAM Page: 1\n')
+    g:write('NIN Book: 13\nNIN Page: 1\nDRG Book: 14\nDRG Page: 1\nSMN Book: 15\nSMN Page: 1\nBLU Book: 16\nBLU Page: 1\nCOR Book: 17\nCOR Page: 1\nPUP Book: 18\nPUP Page: 1\n')
+    g:write('DNC Book: 19\nDNC Page: 1\nSCH Book: 20\nSCH Page: 1\nGEO Book: 20\nGEO Page: 1\nRUN Book: 20\nRUN Page: 1\n')
+    g:close()
+    DisableAll = 0
         macros = {
             WAR = {Book = '1', Page = '1'},
             MNK = {Book = '2', Page = '1'},
@@ -107,63 +107,61 @@ function options_load()
             GEO = {Book = '20', Page = '1'},
             RUN = {Book = '20', Page = '1'},
             }
-		print('Default settings file created')
-		notice('MacroChanger created a settings file and loaded!')
-	else
-		f:close()
-		for curline in io.lines(windower.addon_path..'data/settings.txt') do
-			local splat = curline:gsub(':',''):split(' ')
-			local cmd = ''
-			if splat[1] and macros[splat[1]:upper()] and splat[2] ~=nil and (splat[2]:lower() == 'book' or splat[2]:lower() == 'page') and splat[3] then
-				macros[splat[1]:upper()][splat[2]:ucfirst()] = splat[3] -- Instead of a number, this can also be 'disabled'
-			elseif splat[1] and splat[2] and (splat[1]..' '..splat[2]) == 'disable all' and tonumber(splat[3]) then
-				globaldisable = tonumber(splat[3])
-			end
-		end
-		notice('MacroChanger read from a settings file and loaded!')
-	end
+    print('Default settings file created')
+    notice('MacroChanger created a settings file and loaded!')
+  else
+    f:close()
+    for curline in io.lines(windower.addon_path..'data/settings.txt') do
+      local splat = curline:gsub(':',''):split(' ')
+      local cmd = ''
+      if splat[1] and macros[splat[1]:upper()] and splat[2] ~=nil and (splat[2]:lower() == 'book' or splat[2]:lower() == 'page') and splat[3] then
+        macros[splat[1]:upper()][splat[2]:ucfirst()] = splat[3] -- Instead of a number, this can also be 'disabled'
+      elseif splat[1] and splat[2] and (splat[1]..' '..splat[2]) == 'disable all' and tonumber(splat[3]) then
+        globaldisable = tonumber(splat[3])
+      end
+    end
+    notice('MacroChanger read from a settings file and loaded!')
+  end
 end
 
 windower.register_event('job change',function ()
 -- Could use the job ID passed into this function, but the addon would have to include the resources library
-	local job = windower.ffxi.get_player().main_job
-	local book = ''
-	local page = ''
-	if globaldisable == 0 then
+  local job = windower.ffxi.get_player().main_job
+  local book = ''
+  local page = ''
+  if globaldisable == 0 then
         if job and macros[job] then
-			book = macros[job].Book
-			page = macros[job].Page
-		end
+      book = macros[job].Book
+      page = macros[job].Page
+    end
 
-		if ((book == 'disabled') or (page == 'disabled')) then
-			notice('Auto Macro Switching Disabled for ' .. job ..'.')
-		else
-			log('Job changed to ' .. job .. ' - switched to Book: ' .. book .. ' and Page: ' .. page)
-			windower.send_command('input /macro book '..book..';wait 0.2;input /macro set '..page..';')
-		end
-	elseif globaldisable == 1 then
-
-		notice('Auto Macro Switching Disabled for All Jobs.')
-
-	end
+    if ((book == 'disabled') or (page == 'disabled')) then
+      notice('Auto Macro Switching Disabled for ' .. job ..'.')
+    else
+      log('Job changed to ' .. job .. ' - switched to Book: ' .. book .. ' and Page: ' .. page)
+      windower.send_command('input /macro book '..book..';wait 0.2;input /macro set '..page..';')
+    end
+  elseif globaldisable == 1 then
+    notice('Auto Macro Switching Disabled for All Jobs.')
+  end
 end)
 
 windower.register_event('addon command', function(...)
     local args = {...}
-	local mjob = windower.ffxi.get_player().main_job
-	if args[1] == 'disableall' then
-		if args[2] == 'on' then
-			globaldisable = 1
-			warning('All automated macro switching disabled.')
-		elseif args[2] == 'off' then
-			globaldisable = 0
-			notice('Automated macro switching enabled.')
-		end
-	elseif args[1]:lower() == 'help' then
-		log('MacroChanger Commands:')
-		log('disableall [on|off]')
-		log('  on - Disables all automated macro switching')
-		log('  off - Enables all automated macro switching not disabled individually')
-		log('Resets to what is stored in settings upon unloading of addon.  To Permanently change, please change the option in the settings file.')
-	end
+  local mjob = windower.ffxi.get_player().main_job
+  if args[1] == 'disableall' then
+    if args[2] == 'on' then
+      globaldisable = 1
+      warning('All automated macro switching disabled.')
+    elseif args[2] == 'off' then
+      globaldisable = 0
+      notice('Automated macro switching enabled.')
+    end
+  elseif args[1]:lower() == 'help' then
+    log('MacroChanger Commands:')
+    log('disableall [on|off]')
+    log('  on - Disables all automated macro switching')
+    log('  off - Enables all automated macro switching not disabled individually')
+    log('Resets to what is stored in settings upon unloading of addon.  To Permanently change, please change the option in the settings file.')
+  end
 end)
