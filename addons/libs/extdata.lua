@@ -1683,17 +1683,10 @@ end
 
 function decode.Linkshell(str)
     local status_map = {[0]='Unopened',[1]='Linkshell',[2]='Pearlsack',[3]='Linkpearl',[4]='Broken'}
-    local name_end = function()
-        if str:sub(#str,#str) ~= string.char(0) then
-          return #str
-        end
-        for i=#str-1,10,-1 do
-            if str:sub(i,i) ~= string.char(0) then
-                return i
-            end
-        end
-    end()
-
+    local name_end = #str
+    while str:byte(name_end) == 0 do
+        name_end = name_end - 1
+    end
     local name_map = {[0]="'",[1]="a",[2]='b',[3]='c',[4]='d',[5]='e',[6]='f',[7]='g',[8]='h',[9]='i',[10]='j',
         [11]='k',[12]='l',[13]='m',[14]='n',[15]='o',[16]='p',[17]='q',[18]='r',[19]='s',[20]='t',[21]='u',[22]='v',[23]='w',
         [24]='x',[25]='yx',[26]='z',[27]='A',[28]='B',[29]='C',[30]='D',[31]='E',[32]='F',[33]='G',[34]='H',[35]='I',[36]='J',
