@@ -115,7 +115,7 @@ function parse(settings)
         local full_parsed = parsed.global
         local player = windower.ffxi.get_player()
         if player then
-            full_parsed = full_parsed:update(parsed[player.name:lower()], true)
+            full_parsed = table.update(full_parsed, rawget(parsed, player.name:lower()), true)
         end
 
         return settings:update(full_parsed, true)
@@ -133,7 +133,7 @@ function parse(settings)
 
     local player = windower.ffxi.get_player()
     if player then
-        full_parsed = full_parsed:update(parsed[player.name:lower()], true)
+        full_parsed = table.update(full_parsed, rawget(parsed, player.name:lower()), true)
     end
 
     return merge(settings, full_parsed)
