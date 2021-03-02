@@ -36,7 +36,7 @@ res = require 'resources'
 slips = require 'slips'
 
 _addon.name = 'porter'
-_addon.version = '1.20200419'
+_addon.version = '1.20210302'
 _addon.command = 'porter'
 _addon.author = 'Zohno'
 
