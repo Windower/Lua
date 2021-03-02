@@ -186,8 +186,10 @@ function options_load( )
             slip_lists = require('slips')
             for slip_id,slip_list in pairs(slip_lists.items) do
                 for item_id in slip_list:it() do
-                    _retain[item_id] = "moogle slip"
-                    org_debug("settings", "Adding ("..res.items[item_id].english..') to slip retain list')
+                    if item_id ~= 0 then
+                        _retain[item_id] = "moogle slip"
+                        org_debug("settings", "Adding ("..res.items[item_id].english..') to slip retain list')
+                    end
                 end
             end
         end
