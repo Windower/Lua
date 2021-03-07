@@ -1243,7 +1243,8 @@ fields.incoming[0x00A] = L{
     {ctype='unsigned short',    label='Night Music'},                           -- 58
     {ctype='unsigned short',    label='Solo Combat Music'},                     -- 5A
     {ctype='unsigned short',    label='Party Combat Music'},                    -- 5C
-    {ctype='data[4]',           label='_unknown4'},                             -- 5E
+    {ctype='unsigned short',    label='Mount Music'},                           -- 5E
+    {ctype='data[2]',           label='_unknown4'},                             -- 60
     {ctype='unsigned short',    label='Menu Zone'},                             -- 62   Only set if the menu ID is sent, used as the zone for menu responses (0x5b, 0x5c)
     {ctype='unsigned short',    label='Menu ID'},                               -- 64
     {ctype='unsigned short',    label='_unknown5'},                             -- 66
