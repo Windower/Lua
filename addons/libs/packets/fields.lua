@@ -733,7 +733,7 @@ fields.outgoing[0x063] = L{
 --"New" Key Item examination packet
 fields.outgoing[0x064] = L{
     {ctype='unsigned int',      label='Player',             fn=id},             -- 04
-    {ctype='byte[0x40]',        label='flags'},                                 -- 08  These correspond to a particular section of the 0x55 incoming packet
+    {ctype='data[0x40]',        label='flags'},                                 -- 08  These correspond to a particular section of the 0x55 incoming packet
     {ctype='unsigned int',      label='_unknown1'},                             -- 48  This field somehow denotes which half-0x55-packet the flags corresponds to
 }
 
@@ -1243,7 +1243,8 @@ fields.incoming[0x00A] = L{
     {ctype='unsigned short',    label='Night Music'},                           -- 58
     {ctype='unsigned short',    label='Solo Combat Music'},                     -- 5A
     {ctype='unsigned short',    label='Party Combat Music'},                    -- 5C
-    {ctype='data[4]',           label='_unknown4'},                             -- 5E
+    {ctype='unsigned short',    label='Mount Music'},                           -- 5E
+    {ctype='data[2]',           label='_unknown4'},                             -- 60
     {ctype='unsigned short',    label='Menu Zone'},                             -- 62   Only set if the menu ID is sent, used as the zone for menu responses (0x5b, 0x5c)
     {ctype='unsigned short',    label='Menu ID'},                               -- 64
     {ctype='unsigned short',    label='_unknown5'},                             -- 66
@@ -3133,7 +3134,7 @@ fields.incoming[0x075] = L{
     {ctype='unsigned int',      label='Fight Designation'},                     -- 04   Anything other than 0 makes a timer. 0 deletes the timer.
     {ctype='unsigned int',      label='Timestamp Offset',   fn=time},           -- 08   Number of seconds since 15:00:00 GMT 31/12/2002 (0x3C307D70)
     {ctype='unsigned int',      label='Fight Duration',     fn=time},           -- 0C
-    {ctype='byte[12]',          label='_unknown1'},                             -- 10   This packet clearly needs position information, but it's unclear how these bytes carry it
+    {ctype='data[12]',          label='_unknown1'},                             -- 10   This packet clearly needs position information, but it's unclear how these bytes carry it
     {ctype='unsigned int',      label='Battlefield Radius'},                    -- 1C   Yalms*1000, so a 50 yalm battlefield would have 50,000 for this field
     {ctype='unsigned int',      label='Render Radius'},                         -- 20   Yalms*1000, so a fence that renders when you're 25 yalms away would have 25,000 for this field
 }

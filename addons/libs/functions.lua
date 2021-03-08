@@ -145,9 +145,9 @@ function functions.it(fn, ...)
     end
 end
 
--- Schedules the current function to run delayed by the provided time in seconds
+-- Schedules the current function to run delayed by the provided time in seconds and returns the coroutine
 function functions.schedule(fn, time, ...)
-    coroutine.schedule(fn:prepare(...), time)
+    return coroutine.schedule(fn:prepare(...), time)
 end
 
 -- Returns a function that, when called, will execute the underlying function delayed by the provided number of seconds
@@ -495,7 +495,7 @@ function string.map(str, fn)
 end
 
 --[[
-Copyright © 2013-2015, Windower
+Copyright Â© 2013-2015, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
