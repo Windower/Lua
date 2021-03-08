@@ -2,7 +2,7 @@
 -- Currencies -----------------------------------------------------------------
 -------------------------------------------------------------------------------
 
-Currencies = T {
+currencies = T {
     "Ordelle Bronzepiece",
     "Montiont Silverpiece",
     "One Byne Bill",
@@ -20,7 +20,7 @@ Currencies = T {
 -- Granules -------------------------------------------------------------------
 -------------------------------------------------------------------------------
 
-Granules = T {
+granules = T {
     "Crimson granules of time",
     "Azure granules of time",
     "Amber granules of time",
@@ -32,7 +32,7 @@ Granules = T {
 -- Proc Types----- ------------------------------------------------------------
 -------------------------------------------------------------------------------
 
-proctype = {"ja", "magic", "ws", "random", "none"}
+proc_types = {"ja", "magic", "ws", "random", "none"}
 
 -------------------------------------------------------------------------------
 -- Enemy Stagger Array based on time > stagger > name -------------------------

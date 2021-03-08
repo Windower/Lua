@@ -23,6 +23,7 @@
 --ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
 --Features
 -- Zone Timer
 -- Time extention tracker
@@ -34,39 +35,42 @@
 _addon.name = 'DynamisHelper'
 _addon.author = 'Krizz, Skyrant'
 _addon.commands = {'DynamisHelper','dh'}
-_addon.version = '2.3'
+_addon.version = '2.0'
 
 config = require('config')
 texts = require('texts')
 res = require('resources')
 require('statics')
 
-ProcZones = res.zones:english(string.startswith-{'Dynamis'}):keyset()
+-- Dynamis Zones
+-- 186  Dynamis - Bastok
+-- 134  Dynamis - Beaucedine
+--  40  Dynamis - Buburimu
+-- 188  Dynamis - Jeuno
+--  41  Dynamis - Qufim
+-- 185  Dynamis - San d'Oria
+--  42  Dynamis - Tavnazia
+--  39  Dynamis - Valkurm
+-- 187  Dynamis - Windurst
+-- 135  Dynamis - Xarcabard
+proc_zones = res.zones:english(string.startswith-{'Dynamis'}):keyset()
 
--------------------------------------------------------------------------------
--- Define default values ------------------------------------------------------
--------------------------------------------------------------------------------
 defaults = T{}
 defaults.window = {}
 defaults.window.pos = {}
 
--------------------------------------------------------------------------------
--- Load defaults from settings.xml --------------------------------------------
--------------------------------------------------------------------------------
 settings = config.load(defaults)
 
--- upgrade to new settings file if old settings still exist -------------------
+-- Convert settings to new style
 if settings.trposx and settings.trposy then
-    -- copy position from old config to new one
     settings.window.pos.x = settings.trposx
     settings.window.pos.y = settings.trposy
-    -- delete old settings here -----------------------------------------------
-    config.save(settings, 'all')
+    config.save(settings)
 end
 
-Green = "\\cs(0,255,0)"
-Red = "\\cs(255,0,0)"
-Yellow = "\\cs(255,255,0)"
+green = "\\cs(0,255,0)"
+red = "\\cs(255,0,0)"
+yellow = "\\cs(255,255,0)"
 
 current_mob = nil
 current_proc = nil
@@ -74,67 +78,56 @@ obj_time = 0
 end_time = 0
 
 window = texts.new(" ",settings.window,settings)
+window:hide()
 w = T{}
 
--------------------------------------------------------------------------------
--- Initialize the Currencies array. We need this to keep track of the drops -----
--------------------------------------------------------------------------------
 function init_currency()
-	for currency in Currencies:it() do
+    for currency in currencies:it() do
         w[currency] = 0
     end
 end
 init_currency()
 
--------------------------------------------------------------------------------
--- Initialize the time Granules array. Keeps track of the time extensions -----
--------------------------------------------------------------------------------
 function init_granules()
-    for granule in Granules:it() do
+    for granule in granules:it() do
         w[granule] = 0
     end
 end
 init_granules()
 
--------------------------------------------------------------------------------
--- The on screen window structure ---------------------------------------------
--------------------------------------------------------------------------------
 function init_window()
     local showCurrenciesDivider = false
-    window.text(window,Yellow.."Time remaining: ${time|initializing...}")
-    window.appendline(window,"\\cr————————————————————")
-    window.appendline(window,"${current_mob|(unknown)}\n"..Green.."${current_proc|(none)}")
-    window.appendline(window,"\\cr————————————————————")
-    for currency in Currencies:it() do
+    window:text(yellow .. 'Time remaining: ${time|initializing...}')
+    window:appendline('\\cr————————————————————')
+    window:appendline('${current_mob|(unknown)}\n' .. green .. '${current_proc|(none)}')
+    window:appendline('\\cr————————————————————')
+    for currency in currencies:it() do
         if w[currency] > 0 then
             showCurrenciesDivider = true
-            if currency == "Ordelle Bronzepiece" or currency == "Montiont Silverpiece" then
-                window.appendline(window, currency..": ${"..currency.."|0}")
-            elseif currency == "One Byne Bill" or currency == "One Hundred Byne Bill" then
-                window.appendline(window, currency..": ${"..currency.."|0}")
-            elseif currency == "Tukuku Whiteshell" or currency == "Lungo-Nango Jadeshell" then
-                window.appendline(window, currency..": ${"..currency.."|0}")
+            if currency == 'Ordelle Bronzepiece' or currency == 'Montiont Silverpiece' then
+                window:appendline(currency .. ': ${' .. currency .. '|0}')
+            elseif currency == 'One Byne Bill' or currency == 'One Hundred Byne Bill' then
+                window:appendline(currency .. ': ${' .. currency .. '|0}')
+            elseif currency == 'Tukuku Whiteshell' or currency == 'Lungo-Nango Jadeshell' then
+                window:appendline(currency .. ': ${' .. currency .. '|0}')
             else
-                window.appendline(window, "\\cr"..currency..": ${"..currency.."|0}")
+                window:appendline('\\cr' .. currency .. ': ${' .. currency .. '|0}')
             end
         end
     end
     if showCurrenciesDivider then
-        window.appendline(window,"\\cr————————————————————")
+        window.appendline(window,'\\cr————————————————————')
     end
-    for granule in Granules:it() do
+    for granule in granules:it() do
         if(w[granule] == 1) then
-            window.appendline(window, Green..granule)
+            window.appendline(window, green..granule)
         else
-            window.appendline(window, Red..granule)
+            window.appendline(window, red..granule)
         end
     end
 end
 init_window()
 
--------------------------------------------------------------------------------
--- Register a prerendere event for the display refresh ------------------------
--------------------------------------------------------------------------------
 windower.register_event('prerender', function()
 	if obj_time < 1 or obj_time == end_time - os.time() then
         return
@@ -144,11 +137,9 @@ windower.register_event('prerender', function()
 	w.time = os.date('!%H:%M:%S', obj_time)
 	window:update(w)
 end)
--------------------------------------------------------------------------------
--- Did we enter a Dynamis Zone? -----------------------------------------------
--------------------------------------------------------------------------------
+
 windower.register_event('zone change', function(zone)
-    if ProcZones:contains(zone) then
+    if proc_zones:contains(zone) then
         init_currency()
         init_granules()
         window:show()
@@ -157,39 +148,16 @@ windower.register_event('zone change', function(zone)
     end
 end)
 
-window:hide()
-
--------------------------------------------------------------------------------
--- Check if we are in Dynamis and show the overlay ----------------------------
--------------------------------------------------------------------------------
-if ProcZones:contains(windower.ffxi.get_info().zone) then
+if proc_zones:contains(windower.ffxi.get_info().zone) then
     window:show()
 end
--------------------------------------------------------------------------------
--- 186  Dynamis - Bastok ------------------------------------------------------
--- 134  Dynamis - Beaucedine --------------------------------------------------
---  40  Dynamis - Buburimu ----------------------------------------------------
--- 188  Dynamis - Jeuno -------------------------------------------------------
---  41  Dynamis - Qufim -------------------------------------------------------
--- 185  Dynamis - San d'Oria --------------------------------------------------
---  42  Dynamis - Tavnazia ----------------------------------------------------
---  39  Dynamis - Valkurm -----------------------------------------------------
--- 187  Dynamis - Windurst ----------------------------------------------------
--- 135  Dynamis - Xarcabard ---------------------------------------------------
--------------------------------------------------------------------------------
 
--------------------------------------------------------------------------------
--- Get the player name for light luggage profile ------------------------------
--------------------------------------------------------------------------------
 windower.register_event('load', 'login', function()
     if windower.ffxi.get_info().logged_in then
         player = windower.ffxi.get_player().name
     end
 end)
 
--------------------------------------------------------------------------------
--- Parse the chat messages for drops, staggers and time extensions ------------
--------------------------------------------------------------------------------
 windower.register_event('incoming text',function (original, new, color)
     local time = nil
     local item = nil
@@ -200,45 +168,39 @@ windower.register_event('incoming text',function (original, new, color)
             return new, color
         end
     end
-    if string.find(original,"remaining in Dynamis.") then
-        obj_time = (tonumber(original:match("%d+")) * 60)
+    if string.find(original,'remaining in Dynamis.') then
+        obj_time = (tonumber(original:match('%d+')) * 60)
         end_time = os.time() + obj_time
     end
-    if string.find(original,"will be expelled from Dynamis") then
-        obj_time = (tonumber(original:match("%d+")) * 60)
+    if string.find(original,'will be expelled from Dynamis') then
+        obj_time = (tonumber(original:match('%d+')) * 60)
         end_time = os.time() + obj_time
     end
-    if string.find(original,"Your stay in Dynamis has been extended by %d+ minutes.") then
-        end_time = end_time + (tonumber(original:match("%d+")) * 60)
+    if string.find(original,'Your stay in Dynamis has been extended by %d+ minutes.') then
+        end_time = end_time + (tonumber(original:match('%d+')) * 60)
         w.time = os.date('!%H:%M:%S', end_time)
     end
-    item = original:match("Obtained key item: ..(%w+ %w+ %w+ %w+)..\46")
+    item = original:match('Obtained key item: ..(%w+ %w+ %w+ %w+)..\46')
     if item ~= nil then
-        item = item:lower()
-        for granule in Granules:it() do
+        for granule in granules:it() do
             if item == granule:lower() then
                 w[granule] = 1
                 init_window()
             end
         end
     end
-    item = original:match("%w+ obtains an? ..(%w+ %w+ %w+ %w+)..\46")
-    --a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+ %w+)..\46")
+    item = original:match('%w+ obtains an? ..(%w+ %w+ %w+ %w+)..\46')
     if item == nil then
-        item = original:match("%w+ obtains an? ..(%w+ %w+ %w+)..\46")
-        --a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+ %w+)..\46")
+        item = original:match('%w+ obtains an? ..(%w+ %w+ %w+)..\46')
         if item == nil then
-            item = original:match("%w+ obtains an? ..(%w+%-%w+ %w+)..\46")
-            --a,b,item = string.find(original,"%w+ obtains an? ..(%w+%-%w+ %w+)..\46")
+            item = original:match('%w+ obtains an? ..(%w+%-%w+ %w+)..\46')
             if item == nil then
-                item = original:match("%w+ obtains an? ..(%w+ %w+)..\46")
-                --a,b,item = string.find(original,"%w+ obtains an? ..(%w+ %w+)..\46")
+                item = original:match('%w+ obtains an? ..(%w+ %w+)..\46')
             end
         end
     end
     if item ~= nil then
-        item = item:lower()
-        for currency in Currencies:it() do
+        for currency in currencies:it() do
             if item == currency:lower() then
             w[currency] = w[currency] + 1
             init_window()
@@ -248,23 +210,17 @@ windower.register_event('incoming text',function (original, new, color)
     return new, color
 end)
 
--------------------------------------------------------------------------------
--- Register target change event to get the monster name -----------------------
--------------------------------------------------------------------------------
-windower.register_event('target change', function(targ_id)
+windower.register_event('target change', function(targ_index)
     current_mob = nil
     current_proc = nil
-    if targ_id ~= 0 then
-        mob = windower.ffxi.get_mob_by_index(targ_id)
+    if targ_index ~= 0 then
+        mob = windower.ffxi.get_mob_by_index(targ_index)
         current_mob = mob.name
         w.current_mob = current_mob
         setproc()
     end
 end)
 
--------------------------------------------------------------------------------
--- Find the proc for the monster based on time or job -------------------------
--------------------------------------------------------------------------------
 function setproc()
     local currenttime = windower.ffxi.get_info().time
     local window
@@ -276,10 +232,10 @@ function setproc()
         window = 'night'
     end
 
-    for i=1, #proctype do
-        for j=1, #staggers[window][proctype[i]] do
-            if current_mob == staggers[window][proctype[i]][j] then
-                current_proc = proctype[i]
+    for i=1, #proc_types do
+        for j=1, #staggers[window][proc_types[i]] do
+            if current_mob == staggers[window][proc_types[i]][j] then
+                current_proc = proc_types[i]
             end
         end
     end
@@ -292,38 +248,34 @@ function setproc()
     end
 end
 
--------------------------------------------------------------------------------
--- Print the help Information -------------------------------------------------
--------------------------------------------------------------------------------
-help = T{
-size = "Usage: dh size [font size] - Your current size is %u pixel",
-font = "Usage: dh font [font name] - You are currently using %q",
-opacity = "Usage: dh opacity [0-100]%% - Opacity is currently at %u%%",
-padding = "Usage: dh padding [size] - Padding is currently %u pixels",
-bgcolor = "Usage: dh bgcolor [Red] [Green] [Blue] - Background color - Example: 255 0 0 is red",
-stroke = "Usage: dh stroke [width] - Stroke width is currently %u pixels",
-stopacity = "Usage: dh stopacity [0-100]%% - Stroke opacity is currently at %u%%",
-stcolor = "Usage: dh stcolor [Red] [Green] [Blue] - Stroke color - Example: 255 0 0 is red",
-posx = "Usage: dh posx [x] - Current window position is x=%u",
-posy = "Usage: dh posy [y] - Current window position is y=%u",
-ll = "Usage: dh ll create: Creates a light luggage profile to lot all dynamis currency.'"
+help = {
+	size = 'Usage: dh size [font size] - Your current size is %u pixel',
+	font = 'Usage: dh font [font name] - You are currently using %q',
+	opacity = 'Usage: dh opacity [0-100]%% - Opacity is currently at %u%%',
+	padding = 'Usage: dh padding [size] - Padding is currently %u pixels',
+	bgcolor = 'Usage: dh bgcolor [red] [green] [Blue] - Background color - Example: 255 0 0 is red',
+	stroke = 'Usage: dh stroke [width] - Stroke width is currently %u pixels',
+	stopacity = 'Usage: dh stopacity [0-100]%% - Stroke opacity is currently at %u%%',
+	stcolor = 'Usage: dh stcolor [red] [green] [Blue] - Stroke color - Example: 255 0 0 is red',
+	posx = 'Usage: dh posx [x] - Current window position is x=%u',
+	posy = 'Usage: dh posy [y] - Current window position is y=%u',
 }
 
 function printHelp(command,val)
     if not command and not val then
-        windower.add_to_chat(159,'\nDynamisHelper v2.0')
+        windower.add_to_chat(159,'DynamisHelper v' .. tostring(_addon.version))
         windower.add_to_chat(159,'dh size [number]: Change the font size.')
         windower.add_to_chat(159,'dh font [Arial, Tahoma, Times "Open Sans" ...]: Change the font.')
         windower.add_to_chat(159,'dh posx [pixel]: Position on the X axis in pixel.')
         windower.add_to_chat(159,'dh posy [pixel]: Position on the Y axis in pixel.')
-        windower.add_to_chat(159,'dh bgcolor [Red] [Green] [Blue] - Background color - Example: 255 0 0 is red')
+        windower.add_to_chat(159,'dh bgcolor [red] [green] [Blue] - Background color - Example: 255 0 0 is red')
         windower.add_to_chat(159,'dh opacity bg_alpha: Opacity (0-255) of the background.')
         windower.add_to_chat(159,'dh visible: Toggle addon window.')
         windower.add_to_chat(159,'dh bold: Toggle bold text.')
         windower.add_to_chat(159,'dh padding [size]: Padding of the text window.')
         windower.add_to_chat(159,'dh stroke [width]: Stroke width of the text.')
         windower.add_to_chat(159,'dh stopacity [0-100]%: Stroke opacity.')
-        windower.add_to_chat(159,'dh stcolor [Red] [Green] [Blue] - Stroke color - Example: 255 0 0 is red')
+        windower.add_to_chat(159,'dh stcolor [red] [green] [Blue] - Stroke color - Example: 255 0 0 is red')
 
         -- compatibility commands ---------------------------------------------
         windower.add_to_chat(159,'dh ll create: Creates a light luggage profile to lot all dynamis currency.')
@@ -336,50 +288,47 @@ function printHelp(command,val)
     end
 end
 
--------------------------------------------------------------------------------
--- Process options and save settings ------------------------------------------
--------------------------------------------------------------------------------
 windower.register_event('addon command',function (command, ...)
     command = command and command:lower() or 'help'
     local options = {...}
-    if command == "help" then
+    if command == 'help' then
         printHelp()
         return
-    elseif command:lower() == "visible" then
+    elseif command == 'visible' then
         if window:visible() then
             window:hide()
         else
             window:show()
         end
-    elseif command == "size" then
+    elseif command == 'size' then
         if options[1] and tonumber(options[1]) then
             window:size(options[1])
             config.save(settings, 'all')
         else
             printHelp(command,settings.window.text.size)
         end
-    elseif command == "font" then
+    elseif command == 'font' then
         if options[1] then
             window:font(options[1])
             config.save(settings, 'all')
         else
             printHelp(command,settings.window.text.font)
         end
-    elseif command == "posx" then
+    elseif command == 'posx' then
         if options[1] then
             window:pos_x(options[1])
             config.save(settings, 'all')
         else
             printHelp(command,window:pos_x())
         end
-    elseif command == "posy" then
+    elseif command == 'posy' then
         if options[1] then
             window:pos_y(options[1])
             config.save(settings, 'all')
         else
             printHelp(command,window:pos_y())
         end
-    elseif command == "opacity" then
+    elseif command == 'opacity' then
         if options[1] and tonumber(options[1]) then
             local opacity = math.abs(tonumber(options[1]))
             if opacity > 100 then opacity = 100 end
@@ -388,14 +337,14 @@ windower.register_event('addon command',function (command, ...)
         else
             printHelp(command,window:bg_transparency()*100)
         end
-    elseif command == "padding" then
+    elseif command == 'padding' then
         if options[1] then
             window:pad(options[1])
             config.save(settings, 'all')
         else
             printHelp(command,window:pad())
         end
-    elseif command == "bold" then
+    elseif command == 'bold' then
         if window:bold() then
             window:bold(false)
             config.save(settings, 'all')
@@ -403,21 +352,21 @@ windower.register_event('addon command',function (command, ...)
             window:bold(true)
             config.save(settings, 'all')
         end
-    elseif command == "bgcolor" then
+    elseif command == 'bgcolor' then
         if options[3] then
             window:bg_color(options[1],options[2],options[3])
             config.save(settings, 'all')
         else
-            printHelp(command,"")
+            printHelp(command,'')
         end
-    elseif command == "stroke" then
+    elseif command == 'stroke' then
         if options[1] and tonumber(options[1]) then
             window:stroke_width(options[1])
             config.save(settings, 'all')
         else
             printHelp(command,window:stroke_width())
         end
-    elseif command == "stopacity" then
+    elseif command == 'stopacity' then
         if options[1] and tonumber(options[1]) then
             local stopacity = math.abs(tonumber(options[1]))
             if stopacity > 100 then stopacity = 100 end
@@ -426,24 +375,16 @@ windower.register_event('addon command',function (command, ...)
         else
             printHelp(command,window:stroke_transparency()*100)
         end
-    elseif command == "stcolor" then
+    elseif command == 'stcolor' then
         if options[3] then
             window:stroke_color(options[1],options[2],options[3])
             config.save(settings, 'all')
         else
-            printHelp(command,"")
-        end
-    elseif command == "ll" then
-        if options[1] and options[1]:lower() == "create" then
-            player = windower.ffxi.get_player()['name']
-            io.open(windower.addon_path..'../../plugins/ll/dynamis-'..player..'.txt',"w"):write('if item is 1452, 1453, 1455, 1456, 1449, 1450 then lot'):close()
-            windower.send_command('ll profile dynamis-'..player..'.txt')
-        else
-            printHelp(command,"none")
+            printHelp(command,'')
         end
     -- End of compatibility commands---------------------------------------
-    elseif command == "save" then
-        config.save(settings, 'all')
+    elseif command == 'save' then
+        config.save(settings)
     else
         printHelp()
     end
