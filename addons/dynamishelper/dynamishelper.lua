@@ -74,23 +74,23 @@ yellow = "\\cs(255,255,0)"
 
 current_mob = nil
 current_proc = nil
-obj_time = 0
+time_remaining_in_seconds = 0
 end_time = 0
 
 window = texts.new(" ",settings.window,settings)
 window:hide()
-w = T{}
+state = {}
 
 function init_currency()
     for currency in currencies:it() do
-        w[currency] = 0
+        state[currency] = 0
     end
 end
 init_currency()
 
 function init_granules()
     for granule in granules:it() do
-        w[granule] = 0
+        state[granule] = 0
     end
 end
 init_granules()
@@ -102,7 +102,7 @@ function init_window()
     window:appendline('${current_mob|(unknown)}\n' .. green .. '${current_proc|(none)}')
     window:appendline('\\cr————————————————————')
     for currency in currencies:it() do
-        if w[currency] > 0 then
+        if state[currency] > 0 then
             showCurrenciesDivider = true
             if currency == 'Ordelle Bronzepiece' or currency == 'Montiont Silverpiece' then
                 window:appendline(currency .. ': ${' .. currency .. '|0}')
@@ -119,7 +119,7 @@ function init_window()
         window.appendline(window,'\\cr————————————————————')
     end
     for granule in granules:it() do
-        if(w[granule] == 1) then
+        if(state[granule] == 1) then
             window.appendline(window, green..granule)
         else
             window.appendline(window, red..granule)
@@ -129,13 +129,13 @@ end
 init_window()
 
 windower.register_event('prerender', function()
-	if obj_time < 1 or obj_time == end_time - os.time() then
+    if time_remaining_in_seconds < 1 or time_remaining_in_seconds == end_time - os.time() then
         return
     end
-	
-	obj_time = end_time - os.time()
-	w.time = os.date('!%H:%M:%S', obj_time)
-	window:update(w)
+
+    time_remaining_in_seconds = end_time - os.time()
+    state.time = os.date('!%H:%M:%S', time_remaining_in_seconds)
+    window:update(state)
 end)
 
 windower.register_event('zone change', function(zone)
@@ -168,23 +168,26 @@ windower.register_event('incoming text',function (original, new, color)
             return new, color
         end
     end
-    if string.find(original,'remaining in Dynamis.') then
-        obj_time = (tonumber(original:match('%d+')) * 60)
-        end_time = os.time() + obj_time
+    if original:endswith('You have %d+ minutes (Earth time) remaining in Dynamis.') then
+        time_remaining_in_seconds = tonumber(original:match('%d+')) * 60
+        end_time = os.time() + time_remaining_in_seconds
+        state.time = os.date('!%H:%M:%S', end_time)
     end
-    if string.find(original,'will be expelled from Dynamis') then
-        obj_time = (tonumber(original:match('%d+')) * 60)
-        end_time = os.time() + obj_time
+    if original:match('will be expelled from Dynamis in %d+ minutes') then
+        time_remaining_in_seconds = tonumber(original:match('%d+')) * 60
+        end_time = os.time() + time_remaining_in_seconds
+        state.time = os.date('!%H:%M:%S', end_time)
     end
-    if string.find(original,'Your stay in Dynamis has been extended by %d+ minutes.') then
-        end_time = end_time + (tonumber(original:match('%d+')) * 60)
-        w.time = os.date('!%H:%M:%S', end_time)
+    if original:match('Your stay in Dynamis has been extended by %d+ minutes.') then
+        time_remaining_in_seconds = time_remaining_in_seconds + (tonumber(original:match('%d+')) * 60)
+        end_time = end_time + time_remaining_in_seconds
+        state.time = os.date('!%H:%M:%S', end_time)
     end
     item = original:match('Obtained key item: ..(%w+ %w+ %w+ %w+)..\46')
     if item ~= nil then
         for granule in granules:it() do
             if item == granule:lower() then
-                w[granule] = 1
+                state[granule] = 1
                 init_window()
             end
         end
@@ -202,8 +205,8 @@ windower.register_event('incoming text',function (original, new, color)
     if item ~= nil then
         for currency in currencies:it() do
             if item == currency:lower() then
-            w[currency] = w[currency] + 1
-            init_window()
+                state[currency] = state[currency] + 1
+                init_window()
             end
         end
     end
@@ -216,7 +219,7 @@ windower.register_event('target change', function(targ_index)
     if targ_index ~= 0 then
         mob = windower.ffxi.get_mob_by_index(targ_index)
         current_mob = mob.name
-        w.current_mob = current_mob
+        state.current_mob = current_mob
         setproc()
     end
 end)
@@ -240,25 +243,25 @@ function setproc()
         end
     end
     if current_proc == 'ja' then
-        w.current_proc = 'Job Ability'
+        state.current_proc = 'Job Ability'
     elseif current_proc == 'magic' then
-        w.current_proc = 'Magic'
+        state.current_proc = 'Magic'
     elseif current_proc == 'ws' then
-        w.current_proc = 'Weapon Skill'
+        state.current_proc = 'Weapon Skill'
     end
 end
 
 help = {
-	size = 'Usage: dh size [font size] - Your current size is %u pixel',
-	font = 'Usage: dh font [font name] - You are currently using %q',
-	opacity = 'Usage: dh opacity [0-100]%% - Opacity is currently at %u%%',
-	padding = 'Usage: dh padding [size] - Padding is currently %u pixels',
-	bgcolor = 'Usage: dh bgcolor [red] [green] [Blue] - Background color - Example: 255 0 0 is red',
-	stroke = 'Usage: dh stroke [width] - Stroke width is currently %u pixels',
-	stopacity = 'Usage: dh stopacity [0-100]%% - Stroke opacity is currently at %u%%',
-	stcolor = 'Usage: dh stcolor [red] [green] [Blue] - Stroke color - Example: 255 0 0 is red',
-	posx = 'Usage: dh posx [x] - Current window position is x=%u',
-	posy = 'Usage: dh posy [y] - Current window position is y=%u',
+    size = 'Usage: dh size [font size] - Your current size is %u pixel',
+    font = 'Usage: dh font [font name] - You are currently using %q',
+    opacity = 'Usage: dh opacity [0-100]%% - Opacity is currently at %u%%',
+    padding = 'Usage: dh padding [size] - Padding is currently %u pixels',
+    bgcolor = 'Usage: dh bgcolor [red] [green] [Blue] - Background color - Example: 255 0 0 is red',
+    stroke = 'Usage: dh stroke [width] - Stroke width is currently %u pixels',
+    stopacity = 'Usage: dh stopacity [0-100]%% - Stroke opacity is currently at %u%%',
+    stcolor = 'Usage: dh stcolor [red] [green] [Blue] - Stroke color - Example: 255 0 0 is red',
+    posx = 'Usage: dh posx [x] - Current window position is x=%u',
+    posy = 'Usage: dh posy [y] - Current window position is y=%u',
 }
 
 function printHelp(command,val)
@@ -314,14 +317,14 @@ windower.register_event('addon command',function (command, ...)
         else
             printHelp(command,settings.window.text.font)
         end
-    elseif command == 'posx' then
+    elseif command == 'posx' and tonumber(options[1])  then
         if options[1] then
             window:pos_x(options[1])
             config.save(settings, 'all')
         else
             printHelp(command,window:pos_x())
         end
-    elseif command == 'posy' then
+    elseif command == 'posy' and tonumber(options[1])  then
         if options[1] then
             window:pos_y(options[1])
             config.save(settings, 'all')
@@ -337,7 +340,7 @@ windower.register_event('addon command',function (command, ...)
         else
             printHelp(command,window:bg_transparency()*100)
         end
-    elseif command == 'padding' then
+    elseif command == 'padding' and tonumber(options[1])  then
         if options[1] then
             window:pad(options[1])
             config.save(settings, 'all')
