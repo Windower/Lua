@@ -11,6 +11,7 @@ function parse_action_packet(act)
     act.actor = player_info(act.actor_id)
     act.action = get_spell(act) -- Pulls the resources line for the action
     act.actor.name = act.actor and act.actor.name and string.gsub(act.actor.name,'-', string.char(0x81,0x7C)) --fix for ffxi chat splits on trusts with -
+    targets_condensed = false
     
     if not act.action then
         return act
@@ -190,7 +191,7 @@ function parse_action_packet(act)
                 elseif m.message == 435 or m.message == 436 then m.simp_name = act.action.name..' (JAs)'
                 elseif m.message == 437 or m.message == 438 then m.simp_name = act.action.name..' (JAs and TP)'
                 elseif m.message == 439 or m.message == 440 then m.simp_name = act.action.name..' (SPs, JAs, TP, and MP)'
-                elseif T{252,265,268,269,271,272,274,275,379,650}:contains(m.message) then m.simp_name = 'Magic Burst! '..act.action.name
+                elseif T{252,265,268,269,271,272,274,275,379,650,747}:contains(m.message) then m.simp_name = 'Magic Burst! '..act.action.name
                 elseif not act.action then
                    m.simp_name = ''
                    act.action = {}
@@ -216,8 +217,13 @@ function parse_action_packet(act)
                     elseif m.status == 'weight' then m.status = 'weighed down'
                     end
                 end
+                
+                -- Some messages uses the english log version of the buff
+                if not simplify and log_form_messages:contains(m.message) then
+                    m.status = res.buffs[m.param].enl
+                end
 
---                if m.message == 93 or m.message == 273 then m.status=color_it('Vanish',color_arr['statuscol']) end
+                -- if m.message == 93 or m.message == 273 then m.status=color_it('Vanish',color_arr['statuscol']) end
 
                 -- Special Message Handling
                 if m.message == 93 or m.message == 273 then
@@ -230,6 +236,10 @@ function parse_action_packet(act)
                     targ = targ..' ('..color_it('attacks and defenses enhanced',color_arr['statuscol'])..')'
                 elseif m.message == 762 and simplify then
                     targ = targ..' ('..color_it('all status parameters boosted',color_arr['statuscol'])..')'
+                elseif m.message == 779 and simplify then
+                    targ = 'A barrier pulsates around '..targ
+                elseif m.message == 780 and simplify then
+                    targ = 'Takes aim on '..targ
                 elseif T{158,188,245,324,592,658}:contains(m.message) and simplify then
                     -- When you miss a WS or JA. Relevant for condensed battle.
                     m.status = 'Miss' --- This probably doesn't work due to the if a==nil statement below.
@@ -268,6 +278,32 @@ function parse_action_packet(act)
                     end
                 end
                 
+                if col == 'D' or grammar_numb_msg:contains(m.message) then
+                    msg = grammatical_number_fix(msg, (m.cparam or m.param))
+                end
+                
+                local count = ''
+                if m.message == 377 and act.actor_id == Self.id then
+                    parse_quantity = true
+                    item_quantity.id = act.action.item2_id
+                    count = '${count}'
+                end
+                
+                if not simplify then
+                    if act.action.item_id or act.action.item2_id then
+                        msg = item_article_fix(act.action.item_id,act.action.item2_id,msg)
+                    end
+                    if common_nouns:contains(act.actor.id) then
+                        msg = actor_noun(msg)
+                    end
+                    if plural_entities:contains(act.actor.id) then
+                        msg = plural_actor(msg)
+                    end
+                    if targets_condensed or plural_entities:contains(v.target[1].id) then
+                        msg = plural_target(msg)
+                    end
+                end
+                
                 local reaction_lookup = reaction_offsets[act.category] and (m.reaction - reaction_offsets[act.category]) or 0
                 local has_line_break = string.find(res.action_messages[m.message].en, '${lb}') and true or false
                 local prefix = (not has_line_break or simplify) and S{1,3,4,6,11,13,14,15}:contains(act.category) and (bit.band(m.unknown,1)==1 and "Cover! " or "")
@@ -285,11 +321,11 @@ function parse_action_packet(act)
                                 ..(reaction_lookup == 4 and "Blocked! " or "")
                                 ..(reaction_lookup == 2 and "Guarded! " or "")
                                 ..(reaction_lookup == 3 and S{3,4,6,11,13,14,15}:contains(act.category) and "Parried! " or "") or "" --Unused? They are send the same as missed
-                windower.add_to_chat(color,prefix..make_condensedamage_number(m.number)..( (msg or tostring(m.message))
+                local message = prefix..make_condensedamage_number(m.number)..( clean_msg((msg or tostring(m.message))
                     :gsub('${spell}',color_it(act.action.spell or 'ERROR 111',color_arr.spellcol))
                     :gsub('${ability}',color_it(act.action.ability or 'ERROR 112',color_arr.abilcol))
                     :gsub('${item}',color_it(act.action.item or 'ERROR 113',color_arr.itemcol))
-                    :gsub('${item2}',color_it(act.action.item2 or 'ERROR 121',color_arr.itemcol))
+                    :gsub('${item2}',count..color_it(act.action.item2 or 'ERROR 121',color_arr.itemcol))
                     :gsub('${weapon_skill}',color_it(act.action.weapon_skill or 'ERROR 114',color_arr.wscol))
                     :gsub('${abil}',m.simp_name or 'ERROR 115')
                     :gsub('${numb}',numb or 'ERROR 116')
@@ -299,6 +335,11 @@ function parse_action_packet(act)
                     :gsub('${number}',act.action.number or m.param)
                     :gsub('${status}',m.status or 'ERROR 120')
                     :gsub('${gil}',m.param..' gil')))
+                    if m.message == 377 and act.actor_id == Self.id then
+                        send_delayed_message:schedule(0.5,color,message)
+                    else
+                        windower.add_to_chat(color,message)
+                    end
                     if not non_block_messages:contains(m.message) then
                         m.message = 0
                     end
@@ -311,16 +352,20 @@ function parse_action_packet(act)
                 elseif m.add_effect_message > 384 and m.add_effect_message < 399 then m.simp_add_name = skillchain_arr[m.add_effect_message-384]
                 elseif m.add_effect_message > 766 and m.add_effect_message < 769 then m.simp_add_name = skillchain_arr[m.add_effect_message-752]
                 elseif m.add_effect_message > 768 and m.add_effect_message < 771 then m.simp_add_name = skillchain_arr[m.add_effect_message-754]
-                elseif m.add_effect_message ==603 then m.simp_add_name = 'TH'
-                elseif m.add_effect_message ==776 then m.simp_add_name = 'AE: Chainbound'
+                elseif m.add_effect_message == 603 then m.simp_add_name = 'AE: TH'
+                elseif m.add_effect_message == 605 then m.simp_add_name = 'AE: Death'
+                elseif m.add_effect_message == 776 then m.simp_add_name = 'AE: Chainbound'
                 else m.simp_add_name = 'AE'
                 end
                 local msg,numb = simplify_message(m.add_effect_message)
+                if not simplify and common_nouns:contains(act.actor.id) then
+                    msg = actor_noun(msg)
+                end
                 if m.add_effect_fields.status then numb = m.add_effect_status else numb = pref_suf((m.cadd_effect_param or m.add_effect_param),m.add_effect_message,act.actor.damage,col) end
                 if not act.action then
 --                    windower.add_to_chat(color, 'act.action==nil : '..m.message..' - '..m.add_effect_message..' - '..msg)
                 else
-                    windower.add_to_chat(color,make_condensedamage_number(m.add_effect_number)..(msg
+                    windower.add_to_chat(color,make_condensedamage_number(m.add_effect_number)..(clean_msg(msg
                         :gsub('${spell}',act.action.spell or 'ERROR 127')
                         :gsub('${ability}',act.action.ability or 'ERROR 128')
                         :gsub('${item}',act.action.item or 'ERROR 129')
@@ -331,7 +376,7 @@ function parse_action_packet(act)
                         :gsub('${target}',targ)
                         :gsub('${lb}','\7')
                         :gsub('${number}',m.add_effect_param)
-                        :gsub('${status}',m.add_effect_status or 'ERROR 178')))
+                        :gsub('${status}',m.add_effect_status or 'ERROR 178'))))
                         if not non_block_messages:contains(m.add_effect_message) then
                             m.add_effect_message = 0
                         end
@@ -361,8 +406,11 @@ function parse_action_packet(act)
                 end
 
                 local msg = simplify_message(m.spike_effect_message)
+                if not simplify and common_nouns:contains(act.actor.id) then
+                    msg = actor_noun(msg)
+                end
                 if m.spike_effect_fields.status then numb = m.spike_effect_status else numb = pref_suf((m.cspike_effect_param or m.spike_effect_param),m.spike_effect_message,actor.damage,col) end
-                windower.add_to_chat(color,make_condensedamage_number(m.spike_effect_number)..(msg
+                windower.add_to_chat(color,make_condensedamage_number(m.spike_effect_number)..(clean_msg(msg
                     :gsub('${spell}',act.action.spell or 'ERROR 142')
                     :gsub('${ability}',act.action.ability or 'ERROR 143')
                     :gsub('${item}',act.action.item or 'ERROR 144')
@@ -373,10 +421,10 @@ function parse_action_packet(act)
                     :gsub((simplify and '${actor}' or '${target}'),targ)
                     :gsub('${lb}','\7')
                     :gsub('${number}',m.spike_effect_param)
-                    :gsub('${status}',m.spike_effect_status or 'ERROR 150')))
-                    if not non_block_messages:contains(m.spike_effect_message) then
-                        m.spike_effect_message = 0
-                    end
+                    :gsub('${status}',m.spike_effect_status or 'ERROR 150'))))
+                if not non_block_messages:contains(m.spike_effect_message) then
+                    m.spike_effect_message = 0
+                end
             end
         end
     end
@@ -386,11 +434,44 @@ end
 
 function pref_suf(param,msg_ID,actor_dmg,col)
     local outstr = (col == 'D' or dmg_drain_msg:contains(msg_ID)) and color_it(tostring(param),color_arr[actor_dmg]) or tostring(param)
-    if res.action_messages[msg_ID] and res.action_messages[msg_ID].prefix then
-        outstr = res.action_messages[msg_ID].prefix..' '..outstr
-    end
-    if res.action_messages[msg_ID] and res.action_messages[msg_ID].suffix then
-        outstr = outstr..' '..res.action_messages[msg_ID].suffix
+    local msg = res.action_messages[msg_ID] or nil
+    if msg then
+        if msg.prefix then
+            outstr = msg.prefix..' '..outstr
+        end
+        if msg.suffix then
+            if msg.suffix == 'shadow' and param ~= 1 then
+                outstr = outstr..' shadows'
+            elseif msg.suffix == 'Petra' and param ~= 1 then
+                outstr = outstr..' Petras'
+            elseif msg.suffix == 'effects disappears' and param ~= 1 then
+                outstr = outstr..' effects disappear'
+            elseif msg_ID == 641 then
+                outstr = outstr..' 1 attribute drained'
+            elseif msg.suffix == 'attributes drained' and param == 1 then
+                outstr = outstr..' attribute drained'
+            elseif msg.suffix == 'status effect drained' and param ~= 1 then
+                outstr = outstr..' status effects drained'
+            elseif msg.suffix == 'status ailments disappears' and param ~= 1 then
+                outstr = outstr..' status ailments disappear'
+            elseif msg.suffix == 'status ailments absorbed' and param == 1 then
+                outstr = outstr..' status ailment absorbed'
+            elseif msg.suffix == 'status ailments healed' and param == 1 then
+                outstr = outstr..' status ailment healed'
+            elseif msg.suffix == 'status benefits absorbed' and param == 1 then
+                outstr = outstr..' status benefit absorbed'
+            elseif msg.suffix == 'status effects removed' and param == 1 then
+                outstr = outstr..' status effect removed'
+            elseif msg.suffix == 'magic effects drained' and param == 1 then
+                outstr = outstr..' magic effect drained'
+            elseif msg.suffix == 'magical effects received' and param == 1 then
+                outstr = outstr..' magical effect received'
+            elseif msg.suffix == 'magical effects copied' and param == 1 then
+                outstr = outstr..' magical effect copied'
+            else
+                outstr = outstr..' '..msg.suffix
+            end
+        end
     end
     return outstr
 end
@@ -399,7 +480,7 @@ function simplify_message(msg_ID)
     local msg = res.action_messages[msg_ID][language]
     local fields = fieldsearch(msg)
 
-    if simplify and not T{23,64,133,139,140,204,210,211,212,213,214,350,442,516,531,557,565,582,674}:contains(msg_ID) then
+    if simplify and not T{23,64,133,204,210,211,212,213,214,350,442,516,531,557,565,582}:contains(msg_ID) then
         if T{93,273,522,653,654,655,656,85,284,75,114,156,189,248,283,312,323,336,351,355,408,422,423,425,453,659,158,245,324,658}:contains(msg_ID) then
             fields.status = true
         end
@@ -419,6 +500,10 @@ function simplify_message(msg_ID)
         if T{129,152,153,160,161,162,163,164,165,166,167,168,229,244,652}:contains(msg_ID) then
             fields.actor  = true
             fields.target = true
+        end
+        
+        if msg_ID == 139 then
+            fields.number = true
         end
 
         local Despoil_msg = {[593] = 'Attack Down', [594] = 'Defense Down', [595] = 'Magic Atk. Down', [596] = 'Magic Def. Down', [597] = 'Evasion Down', [598] = 'Accuracy Down', [599] = 'Slow',}
@@ -485,13 +570,20 @@ function assemble_targets(actor,targs,category,msg)
     
     for i,v in pairs(targets) do
         local name
+        local article = common_nouns:contains(v.id) and not simplify and 'The ' or ''
         local numb = condensetargetname and samename[v.name] > 1 and ' {'..samename[v.name]..'}' or ''
         if i == 1 then
             name = color_it(v.name,color_arr[v.owner or v.type])
-            out_str = out_str..name..numb
+            out_str = out_str..article..name..numb
+            if samename[v.name] > 1 then
+                targets_condensed = true
+            else
+                targets_condensed = false
+            end
         else
+            targets_condensed = true
             name = color_it(v.name,color_arr[v.owner or v.type])
-            out_str = conjunctions(out_str,name..numb,#targets,i)
+            out_str = conjunctions(out_str,article..name..numb,#targets,i)
         end
     end
     out_str =  string.gsub(out_str,'-', string.char(0x81,0x7C)) --fix for ffxi chat splits on trusts with -
@@ -659,6 +751,9 @@ function get_spell(act)
             if spell then
                 spell.name = color_it(spell[language],color_arr.abilcol)
                 spell.ability = color_it(spell[language],color_arr.abilcol)
+                if msg_ID == 139 then
+                    spell.number = 'Nothing'
+                end
             end
         elseif fields.weapon_skill then
             if abil_ID > 256 then -- WZ_RECOVER_ALL is used by chests in Limbus
@@ -707,19 +802,25 @@ function get_spell(act)
 
         if fields.item then
             if T{125,593,594,595,596,597,598,599}:contains(msg_ID) then
-                spell.item = color_it(res.items[effect_val]['english_log'], color_arr.itemcol)
+                local item_article = not simplify and add_item_article(effect_val) or ''
+                spell.item = color_it(item_article..res.items[effect_val]['english_log'], color_arr.itemcol)
+                spell.item_id = res.items[effect_val].id
             else
                 spell = res.items[abil_ID]
+                local item_article = not simplify and add_item_article(spell.id) or ''
                 if spell then
-                    spell.name = color_it(spell['english_log'],color_arr.itemcol)
-                    spell.item = color_it(spell['english_log'],color_arr.itemcol)
+                    spell.name = color_it(item_article..spell['english_log'],color_arr.itemcol)
+                    spell.item = color_it(item_article..spell['english_log'],color_arr.itemcol)
+                    spell.item_id = abil_ID
                 end
             end
         end
         
         if fields.item2 then
-            local tempspell = res.items[effect_val]
-            spell.item2 = color_it(tempspell.english_log,color_arr.itemcol)
+            local item_article = not simplify and add_item_article(effect_val) or ''
+            local tempspell = (msg_ID == 377 or msg_ID == 674) and res.items_grammar[effect_val] and res.items_grammar[effect_val].plural or item_article..res.items[effect_val].english_log
+            spell.item2 = color_it(tempspell,color_arr.itemcol)
+            spell.item2_id = effect_val
             if fields.number then
                 spell.number = act.targets[1].actions[1].add_effect_param
             end
