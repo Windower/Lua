@@ -168,43 +168,37 @@ windower.register_event('incoming text',function (original, new, color)
             return new, color
         end
     end
-    if original:endswith('You have %d+ minutes (Earth time) remaining in Dynamis.') then
+    if original:find('%d+ minutes %(Earth time%) remaining in Dynamis') then
         time_remaining_in_seconds = tonumber(original:match('%d+')) * 60
         end_time = os.time() + time_remaining_in_seconds
         state.time = os.date('!%H:%M:%S', end_time)
+        init_window()
     end
-    if original:match('will be expelled from Dynamis in %d+ minutes') then
+    if original:find('will be expelled from Dynamis in %d+ minutes') then
         time_remaining_in_seconds = tonumber(original:match('%d+')) * 60
         end_time = os.time() + time_remaining_in_seconds
         state.time = os.date('!%H:%M:%S', end_time)
+        init_window()
     end
-    if original:match('Your stay in Dynamis has been extended by %d+ minutes.') then
-        time_remaining_in_seconds = time_remaining_in_seconds + (tonumber(original:match('%d+')) * 60)
-        end_time = end_time + time_remaining_in_seconds
+    if original:find('Your stay in Dynamis has been extended by %d+ minutes.') then
+        additionnal_time_in_seconds = (tonumber(original:match('%d+')) * 60)
+        end_time = end_time + additionnal_time_in_seconds
         state.time = os.date('!%H:%M:%S', end_time)
+        init_window()
     end
     item = original:match('Obtained key item: ..(%w+ %w+ %w+ %w+)..\46')
     if item ~= nil then
         for granule in granules:it() do
-            if item == granule:lower() then
+            if item:lower() == granule:lower() then
                 state[granule] = 1
                 init_window()
             end
         end
     end
-    item = original:match('%w+ obtains an? ..(%w+ %w+ %w+ %w+)..\46')
-    if item == nil then
-        item = original:match('%w+ obtains an? ..(%w+ %w+ %w+)..\46')
-        if item == nil then
-            item = original:match('%w+ obtains an? ..(%w+%-%w+ %w+)..\46')
-            if item == nil then
-                item = original:match('%w+ obtains an? ..(%w+ %w+)..\46')
-            end
-        end
-    end
+    item = original:match(player .. ' obtains an? ..([%w-%s]+)..\46')
     if item ~= nil then
         for currency in currencies:it() do
-            if item == currency:lower() then
+            if item:lower() == currency:lower() then
                 state[currency] = state[currency] + 1
                 init_window()
             end

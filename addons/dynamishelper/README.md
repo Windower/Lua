@@ -16,4 +16,3 @@ Commands:
 * visible - toggle addon display.
 * position pos_x pos_y - position of addon window in pixels from the top left of the screen.
 * opacity bg_alpha - opacity (0-255) of the background.
-* ll create - Creates and loads a light luggage profile that will automatically lot currency.
