@@ -107,7 +107,7 @@ function show_bags()
         for _, item in ipairs(windower.ffxi.get_items(bag)) do
             local slip_id = slips.get_slip_id_by_item_id(item.id)
 
-            if slip_id and item_id ~= 0 then
+            if slip_id and item.id ~= 0 then
                 n = n + 1
                 windower.add_to_chat(207, 'slip %02d: %s %s':format(slips.get_slip_number_by_id(slip_id), bag, res.items[item.id].name:color(258)))
             end
