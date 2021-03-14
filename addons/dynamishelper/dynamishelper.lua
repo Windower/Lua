@@ -86,16 +86,15 @@ function init_currency()
         state[currency] = 0
     end
 end
-init_currency()
 
 function init_granules()
     for granule in granules:it() do
         state[granule] = 0
     end
 end
-init_granules()
 
 function init_window()
+    texts.clear(window)
     local showCurrenciesDivider = false
     window:text(yellow .. 'Time remaining: ${time|initializing...}')
     window:appendline('\\cr————————————————————')
@@ -126,7 +125,6 @@ function init_window()
         end
     end
 end
-init_window()
 
 windower.register_event('prerender', function()
     if time_remaining_in_seconds < 1 or time_remaining_in_seconds == end_time - os.time() then
@@ -138,23 +136,20 @@ windower.register_event('prerender', function()
     window:update(state)
 end)
 
-windower.register_event('zone change', function(zone)
-    if proc_zones:contains(zone) then
+windower.register_event('zone change', 'load', 'login', function()
+    local info = windower.ffxi.get_info()
+    
+    if info.logged_in then
+        player = windower.ffxi.get_player().name
+    end
+    
+    if proc_zones:contains(info.zone) then
         init_currency()
         init_granules()
+        init_window()
         window:show()
     else
         window:hide()
-    end
-end)
-
-if proc_zones:contains(windower.ffxi.get_info().zone) then
-    window:show()
-end
-
-windower.register_event('load', 'login', function()
-    if windower.ffxi.get_info().logged_in then
-        player = windower.ffxi.get_player().name
     end
 end)
 
@@ -172,19 +167,19 @@ windower.register_event('incoming text',function (original, new, color)
         time_remaining_in_seconds = tonumber(original:match('%d+')) * 60
         end_time = os.time() + time_remaining_in_seconds
         state.time = os.date('!%H:%M:%S', end_time)
-        init_window()
+        window:update(state)
     end
     if original:find('will be expelled from Dynamis in %d+ minutes') then
         time_remaining_in_seconds = tonumber(original:match('%d+')) * 60
         end_time = os.time() + time_remaining_in_seconds
         state.time = os.date('!%H:%M:%S', end_time)
-        init_window()
+        window:update(state)
     end
     if original:find('Your stay in Dynamis has been extended by %d+ minutes.') then
         additionnal_time_in_seconds = (tonumber(original:match('%d+')) * 60)
         end_time = end_time + additionnal_time_in_seconds
         state.time = os.date('!%H:%M:%S', end_time)
-        init_window()
+        window:update(state)
     end
     item = original:match('Obtained key item: ..(%w+ %w+ %w+ %w+)..\46')
     if item ~= nil then
@@ -192,6 +187,7 @@ windower.register_event('incoming text',function (original, new, color)
             if item:lower() == granule:lower() then
                 state[granule] = 1
                 init_window()
+                break
             end
         end
     end
@@ -201,6 +197,7 @@ windower.register_event('incoming text',function (original, new, color)
             if item:lower() == currency:lower() then
                 state[currency] = state[currency] + 1
                 init_window()
+                break
             end
         end
     end
@@ -215,6 +212,7 @@ windower.register_event('target change', function(targ_index)
         current_mob = mob.name
         state.current_mob = current_mob
         setproc()
+        window:update(state)
     end
 end)
 
