@@ -199,7 +199,7 @@ function parse_action_packet(act)
                 end
 
                 -- Debuff Application Messages
-                if message_map[82]:contains(m.message) then
+                if simplify and message_map[82]:contains(m.message) then
                     if m.status == 'Evasion Down' then
                         m.message = 237
                     end
