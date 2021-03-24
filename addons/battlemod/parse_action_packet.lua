@@ -10,7 +10,7 @@ function parse_action_packet(act)
     end
     act.actor = player_info(act.actor_id)
     act.action = get_spell(act) -- Pulls the resources line for the action
-    act.actor.name = act.actor and act.actor.name and string.gsub(act.actor.name,'-', string.char(0x81,0x7C)) --fix for ffxi chat splits on trusts with -
+    act.actor.name = act.actor and act.actor.name and string.gsub(act.actor.name,'[- ]', {['-'] = string.char(0x81,0x7C), [' '] = string.char(0x81,0x3F)}) --fix for ffxi chat splits on trusts with - and spaces
     targets_condensed = false
     
     if not act.action then
@@ -329,7 +329,9 @@ function parse_action_packet(act)
                     :gsub('${weapon_skill}',color_it(act.action.weapon_skill or 'ERROR 114',color_arr.wscol))
                     :gsub('${abil}',m.simp_name or 'ERROR 115')
                     :gsub('${numb}',numb or 'ERROR 116')
-                    :gsub('${actor}',color_it((act.actor.name or 'ERROR 117' ) .. (act.actor.owner_name or "") ,color_arr[act.actor.owner or act.actor.type]))
+                    :gsub('${actor}\'s',color_it(act.actor.name or 'ERROR 117',color_arr[act.actor.owner or act.actor.type])..'\'s'..act.actor.owner_name)
+                    :gsub('${actor}',color_it(act.actor.name or 'ERROR 117',color_arr[act.actor.owner or act.actor.type])..act.actor.owner_name)
+                    :gsub('${target}\'s',targ)
                     :gsub('${target}',targ)
                     :gsub('${lb}','\7'..prefix2)
                     :gsub('${number}',act.action.number or m.param)
@@ -358,8 +360,16 @@ function parse_action_packet(act)
                 else m.simp_add_name = 'AE'
                 end
                 local msg,numb = simplify_message(m.add_effect_message)
-                if not simplify and common_nouns:contains(act.actor.id) then
-                    msg = actor_noun(msg)
+                if not simplify then
+                    if common_nouns:contains(act.actor.id) then
+                        msg = actor_noun(msg)
+                    end
+                    if plural_entities:contains(act.actor.id) then
+                        msg = plural_actor(msg)
+                    end
+                    if targets_condensed or plural_entities:contains(v.target[1].id) then
+                        msg = plural_target(msg)
+                    end
                 end
                 if m.add_effect_fields.status then numb = m.add_effect_status else numb = pref_suf((m.cadd_effect_param or m.add_effect_param),m.add_effect_message,act.actor.damage,col) end
                 if not act.action then
@@ -372,7 +382,9 @@ function parse_action_packet(act)
                         :gsub('${weapon_skill}',act.action.weapon_skill or 'ERROR 130')
                         :gsub('${abil}',m.simp_add_name or act.action.name or 'ERROR 131')
                         :gsub('${numb}',numb or 'ERROR 132')
-                        :gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
+                        :gsub('${actor}\'s',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type])..'\'s'..act.actor.owner_name)
+                        :gsub('${actor}',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type])..act.actor.owner_name)
+                        :gsub('${target}\'s',targ)
                         :gsub('${target}',targ)
                         :gsub('${lb}','\7')
                         :gsub('${number}',m.add_effect_param)
@@ -406,8 +418,16 @@ function parse_action_packet(act)
                 end
 
                 local msg = simplify_message(m.spike_effect_message)
-                if not simplify and common_nouns:contains(act.actor.id) then
-                    msg = actor_noun(msg)
+                if not simplify then
+                    if common_nouns:contains(act.actor.id) then
+                        msg = actor_noun(msg)
+                    end
+                    if plural_entities:contains(act.actor.id) then
+                        msg = plural_actor(msg)
+                    end
+                    if targets_condensed or plural_entities:contains(v.target[1].id) then
+                        msg = plural_target(msg)
+                    end
                 end
                 if m.spike_effect_fields.status then numb = m.spike_effect_status else numb = pref_suf((m.cspike_effect_param or m.spike_effect_param),m.spike_effect_message,actor.damage,col) end
                 windower.add_to_chat(color,make_condensedamage_number(m.spike_effect_number)..(clean_msg(msg
@@ -417,7 +437,9 @@ function parse_action_packet(act)
                     :gsub('${weapon_skill}',act.action.weapon_skill or 'ERROR 145')
                     :gsub('${abil}',m.simp_spike_name or act.action.name or 'ERROR 146')
                     :gsub('${numb}',numb or 'ERROR 147')
-                    :gsub((simplify and '${target}' or '${actor}'),color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type]))
+                    :gsub('${actor}\'s',color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type])..'\'s'..act.actor.owner_name)
+                    :gsub((simplify and '${target}' or '${actor}'),color_it(act.actor.name,color_arr[act.actor.owner or act.actor.type])..act.actor.owner_name)
+                    :gsub('${target}\'s',targ)
                     :gsub((simplify and '${actor}' or '${target}'),targ)
                     :gsub('${lb}','\7')
                     :gsub('${number}',m.spike_effect_param)
@@ -569,20 +591,23 @@ function assemble_targets(actor,targs,category,msg)
     end
     
     for i,v in pairs(targets) do
-        local name
-        local article = common_nouns:contains(v.id) and not simplify and 'The ' or ''
+        local name = string.gsub(v.name,' ', string.char(0x81,0x3F)) --fix for ffxi chat splits on space
+        local article = common_nouns:contains(v.id) and (not simplify or msg == 206) and 'The ' or ''
         local numb = condensetargetname and samename[v.name] > 1 and ' {'..samename[v.name]..'}' or ''
         if i == 1 then
-            name = color_it(v.name,color_arr[v.owner or v.type])
-            out_str = out_str..article..name..numb
+            name = color_it(name,color_arr[v.owner or v.type])..v.owner_name
             if samename[v.name] > 1 then
                 targets_condensed = true
             else
+                if (not simplify or msg == 206) and string.find(res.action_messages[msg][language], '${target}\'s') then
+                    name = color_it(name,color_arr[v.owner or v.type])..(plural_entities:contains(v.id) and '\'' or '\'s')..v.owner_name
+                end
                 targets_condensed = false
             end
+            out_str = out_str..article..name..numb
         else
             targets_condensed = true
-            name = color_it(v.name,color_arr[v.owner or v.type])
+            name = color_it(name,color_arr[v.owner or v.type])..v.owner_name
             out_str = conjunctions(out_str,article..name..numb,#targets,i)
         end
     end
@@ -637,7 +662,7 @@ function player_info(id)
                             dmg = 'mydmg'
                         end
                         owner = i
-                        owner_name = showownernames and ' (' .. v.mob.name .. ')'
+                        owner_name = showownernames and ' ('..color_it(v.mob.name, color_arr[owner or typ])..')'
                         break
                     elseif type(v) == 'table' and v.mob and v.mob.fellow_index and v.mob.fellow_index == player_table.index then
                         if i == 'p0' then
@@ -646,7 +671,7 @@ function player_info(id)
                             dmg = 'mydmg'
                         end
                         owner = i
-                        owner_name = showownernames and ' (' .. v.mob.name .. ')'
+                        owner_name = showownernames and ' ('..color_it(v.mob.name, color_arr[owner or typ])..')'
                         break
                     end
                 end
@@ -682,7 +707,7 @@ function player_info(id)
         end
     end
     if not typ then typ = 'debug' end
-    return {name=player_table.name,id=id,is_npc = player_table.is_npc,type=typ,damage=dmg,filter=filt,owner=(owner or nil), owner_name=(owner_name or nil),race = player_table.race}
+    return {name=player_table.name,id=id,is_npc = player_table.is_npc,type=typ,damage=dmg,filter=filt,owner=(owner or nil), owner_name=(owner_name or ''),race = player_table.race}
 end
 
 function get_spell(act)

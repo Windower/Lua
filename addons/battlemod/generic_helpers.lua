@@ -39,9 +39,10 @@ end
 function colconv(str,key)
     -- Used in the options_load() function
     local out
-    strnum = tonumber(str)
+    local strnum = tonumber(str)
     if strnum >= 256 and strnum < 509 then
         strnum = strnum - 254
+        if strnum == 4 then strnum = 3 end --color 258 can bug chatlog
         out = string.char(0x1E,strnum)
     elseif strnum >0 then
         out = string.char(0x1F,strnum)
@@ -134,7 +135,7 @@ function plural_actor(msg)
             :gsub('${actor} attains ', '${actor} attain ')
             :gsub('${actor} loses ', '${actor} lose ')
             :gsub('${actor} falls ', '${actor} fall ')
-            :gsub("${actor}'s ", '${actor} ')
+            :gsub("${actor}'s ", "${actor}' ")
             :gsub('${actor} misses ' , '${actor} miss ')
             :gsub('${actor} calls ' , '${actor} call ')
             :gsub('${actor} learns ' , '${actor} learn ')
@@ -177,7 +178,7 @@ function plural_target(msg)
             :gsub('${target} takes ', '${target} take ')
             :gsub('${target} is ', '${target} are ')
             :gsub('${target} recovers ', '${target} recover ')
-            :gsub("${target}'s ", '${target} ')
+            :gsub("${target}'s ", targets_condensed and '${target} ' or "${target}' ")
             :gsub('${target} falls ', '${target} fall ')
             :gsub('${target} uses ', '${target} use ')
             :gsub('${target} resists', '${target} resist')

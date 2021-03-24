@@ -418,16 +418,18 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                 end
             end
             outstr = (clean_msg(outstr
-                :gsub('$\123actor\125',actor_article..color_it((actor.name or '') .. (actor.owner_name or ""),color_arr[actor.owner or actor.type]))
-                :gsub('$\123status\125',status or '')
-                :gsub('$\123item\125',color_it(item or '',color_arr.itemcol))
-                :gsub('$\123target\125',target_article..color_it(target.name or '',color_arr[target.owner or target.type]))
-                :gsub('$\123spell\125',color_it(spell or '',color_arr.spellcol))
-                :gsub('$\123skill\125',color_it(skill or '',color_arr.abilcol))
-                :gsub('$\123number\125',number or '')
-                :gsub('$\123number2\125',number2 or '')
-                :gsub('$\123skill\125',skill or '')
-                :gsub('$\123lb\125','\7')))
+                :gsub('${actor}\'s',actor_article..color_it(actor.name or '',color_arr[actor.owner or actor.type])..'\'s'..actor.owner_name)
+                :gsub('${actor}',actor_article..color_it(actor.name or '',color_arr[actor.owner or actor.type])..actor.owner_name)
+                :gsub('${status}',status or '')
+                :gsub('${item}',color_it(item or '',color_arr.itemcol))
+                :gsub('${target}\'s',target_article..color_it(target.name or '',color_arr[target.owner or target.type])..'\'s'..target.owner_name)
+                :gsub('${target}',target_article..color_it(target.name or '',color_arr[target.owner or target.type])..target.owner_name)
+                :gsub('${spell}',color_it(spell or '',color_arr.spellcol))
+                :gsub('${skill}',color_it(skill or '',color_arr.abilcol))
+                :gsub('${number}',number or '')
+                :gsub('${number2}',number2 or '')
+                :gsub('${skill}',skill or '')
+                :gsub('${lb}','\7')))
             windower.add_to_chat(res.action_messages[am.message_id]['color'],outstr)
             am.message_id = false
         elseif debugging and res.action_messages[am.message_id] then 
@@ -479,8 +481,9 @@ function multi_packet(...)
     local targets = assemble_targets(multi_actor[ind],multi_targs[ind],0,multi_msg[ind])
     local outstr = targets_condensed and plural_target(res.action_messages[multi_msg[ind]][language]) or res.action_messages[multi_msg[ind]][language]
     outstr = clean_msg(outstr
-        :gsub('$\123target\125',targets)
-        :gsub('$\123status\125',ind))
+        :gsub('${target}\'s',targets)
+        :gsub('${target}',targets)
+        :gsub('${status}',ind))
     windower.add_to_chat(res.action_messages[multi_msg[ind]].color,outstr)
     multi_targs[ind] = nil
     multi_msg[ind] = nil
