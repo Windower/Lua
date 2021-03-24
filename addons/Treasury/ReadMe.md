@@ -20,6 +20,11 @@ There are a few special key words for `name`:
 * `avatarites` matches all geode items (HQ)
 * `currency` matches all Dynamis currency (all three tiers of all three kinds)
 * `seals` matches the standard seals found in the field (BS, KS, KC, HKC, SKC)
+* `detritus` matches Swart Astral Detritus and Murky Astral Detritus
+* `heroism` matches Heroism Crystal and Heroism Aggregate
+* `moldy` matches all Moldy weapons and neck items from Dynamis Divergence
+* `dynad` matches all three card types, all three medal types, and the crafting materials from Dynamis Divergence
+* `papers` matches all shards and all void items from Dynamis Divergence
 * `pool` matches your current treasure pool
 
 '//treasury lot|pass|drop clear|list`
