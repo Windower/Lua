@@ -27,11 +27,11 @@
 -- Base Extraction Code graciously provided by Trv of Windower discord
 local icon_extractor = {}
 
-local game_path = windower.pol_path.."\/..\/FINAL FANTASY XI"
+local game_path = windower.pol_path..'\/..\/FINAL FANTASY XI'
 
-local string = require 'string'
-local io = require 'io'
-local math = require 'math'
+local string = require('string')
+local io = require('io')
+local math = require('math')
 
 local concat = table.concat
 local floor = math.floor
@@ -80,7 +80,7 @@ local color_lookup = {}
 local bmp_segments = {}
 
 for i = 0, 255 do
-	color_lookup[string.char(i)] = ''
+    color_lookup[string.char(i)] = ''
 end
 
 --[[
@@ -135,9 +135,9 @@ function open_dat(dat_stats)
         icon_file = dat_stats.file
     else
         if not game_path then
-            error("ffxi_path must be set before using icon_extractor library")
+            error('ffxi_path must be set before using icon_extractor library')
         end
-        filename = game_path .. '/ROM/' .. tostring(dat_stats.dat_path) .. ".DAT"
+        filename = game_path .. '/ROM/' .. tostring(dat_stats.dat_path) .. '.DAT'
         icon_file = io.open(filename, 'rb')
         if not icon_file then return end
         dat_stats.file = icon_file
@@ -151,29 +151,29 @@ local encoded_byte_to_rgba = {}
 local alpha_encoded_to_decoded_adjusted_char = {}
 local decoded_byte_to_encoded_char = {}
 for i = 0, 255 do
-	encoded_byte_to_rgba[i] = ''
-	local n = (i % 32) * 8 + floor(i / 32)
-	encoded_to_decoded_char[char(i)] = char(n)
-	decoded_byte_to_encoded_char[n] = char(i)
-	n = n * 2
-	n = n < 256 and n or 255
-	alpha_encoded_to_decoded_adjusted_char[char(i)] = char(n)
+    encoded_byte_to_rgba[i] = ''
+    local n = (i % 32) * 8 + floor(i / 32)
+    encoded_to_decoded_char[char(i)] = char(n)
+    decoded_byte_to_encoded_char[n] = char(i)
+    n = n * 2
+    n = n < 256 and n or 255
+    alpha_encoded_to_decoded_adjusted_char[char(i)] = char(n)
 end
 local decoder = function(a, b, c, d)
-	return encoded_to_decoded_char[a]..
-		encoded_to_decoded_char[b]..
-		encoded_to_decoded_char[c]..
-		alpha_encoded_to_decoded_adjusted_char[d]
+    return encoded_to_decoded_char[a]..
+        encoded_to_decoded_char[b]..
+        encoded_to_decoded_char[c]..
+        alpha_encoded_to_decoded_adjusted_char[d]
 end
 function convert_item_icon_to_bmp(data)
-	local color_palette = string.gsub(sub(data, 1, 1024), '(.)(.)(.)(.)', decoder)
-	-- rather than decoding all 2048 bytes, decode only the palette and index it by encoded byte
-	for i = 0, 255 do
-		local offset = i * 4 + 1
-		encoded_byte_to_rgba[decoded_byte_to_encoded_char[i]] = sub(color_palette, offset, offset + 3)
-	end
+    local color_palette = string.gsub(sub(data, 1, 1024), '(.)(.)(.)(.)', decoder)
+    -- rather than decoding all 2048 bytes, decode only the palette and index it by encoded byte
+    for i = 0, 255 do
+        local offset = i * 4 + 1
+        encoded_byte_to_rgba[decoded_byte_to_encoded_char[i]] = sub(color_palette, offset, offset + 3)
+    end
 
-	return header .. string.gsub(sub(data, 1025, 2048), '(.)', function(a) return encoded_byte_to_rgba[a] end)
+    return header .. string.gsub(sub(data, 1025, 2048), '(.)', function(a) return encoded_byte_to_rgba[a] end)
 end
 
 
@@ -216,7 +216,7 @@ icon_extractor.ffxi_path = ffxi_path
 -- Offsets defined specifically for status icons
 -- * some maps use this format as well, but at 512 x 512
 function convert_buff_icon_to_bmp(data)
-	local length = byte(data, 0x282) -- The length is technically sub(0x281, 0x284), but only 0x282 is unique
+    local length = byte(data, 0x282) -- The length is technically sub(0x281, 0x284), but only 0x282 is unique
 
     if length == 16 then -- uncompressed
         data = sub(data, 0x2BE, 0x12BD)
@@ -236,7 +236,7 @@ function convert_buff_icon_to_bmp(data)
         data = sub(data, 0x2BE, 0x12BD)
     end
     
-	return header .. data
+    return header .. data
 end
 
 windower.register_event('unload', function()
