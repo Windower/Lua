@@ -39,7 +39,6 @@ local functions = require('functions')
 local packets = require('packets')
 local icon_extractor = require('icon_extractor')
 --icon_extractor.ffxi_path('C:/Program Files (x86)/PlayOnline/SquareEnix/FINAL FANTASY XI')
-require('ui_settings')
 
 local equipment_data = {
     [0] =  {slot_name = 'main',       slot_id = 0,  display_pos = 0,  item_id = 0, image = nil},
@@ -72,7 +71,35 @@ local defaults = T{
         y = 500
     },
     size = 32,
-    alpha = 230,
+    ammo_text = T{
+        alpha = 230,
+        red = 255,
+        green = 255,
+        blue = 255,
+        stroke = T{
+            width = 1,
+            alpha = 127,
+            red = 0,
+            green = 0,
+            blue = 0,
+        },
+        flags = T{
+            bold = true,
+            italic = true,
+        }
+    },
+    icon = T{
+        alpha = 230,
+        red = 255,
+        green = 255,
+        blue = 255,
+    },
+    bg = T{
+        alpha = 72,
+        red = 0,
+        green = 0,
+        blue = 0,
+    },
     show_encumbrance = true,
     show_ammo_count = true,
     hide_on_zone = true,
@@ -111,8 +138,8 @@ local function update_equipment_slot(source, slot, bag, index, item, count)
     if evdebug then
         bag = slot_data.bag_id
         index = slot_data.index
-        log("%s %s %d %d %d":format(source, slot_data.slot_name, item, bag or -1, index or -1))
-        print("%s %s %d %d %d":format(source, slot_data.slot_name, item, bag or -1, index or -1))
+        log('%s %s %d %d %d':format(source, slot_data.slot_name, item, bag or -1, index or -1))
+        print('%s %s %d %d %d':format(source, slot_data.slot_name, item, bag or -1, index or -1))
     end
     if slot_data.slot_name  == 'ammo' then
         slot_data.count = count or slot_data.count or 0
@@ -133,7 +160,7 @@ local function update_equipment_slot(source, slot, bag, index, item, count)
             end
             if windower.file_exists(icon_path) then
                 slot_data.image:path(icon_path)
-                slot_data.image:alpha(settings.alpha)
+                slot_data.image:alpha(settings.icon.alpha)
                 slot_data.image:show()
             end
         end
@@ -164,7 +191,7 @@ local function setup_ui()
         slot.image = images.new(equipment_image_settings)
         position(slot)
     end
-    update_equipment_slots("setup_ui")
+    update_equipment_slots('setup_ui')
 
     for key, slot in pairs(encumbrance_data) do
         slot.image = images.new(encumbrance_image_settings)
@@ -184,6 +211,7 @@ windower.register_event('load', function()
         config.reload(settings)
     else
         settings = config.load(defaults)
+        config.save(settings)
     end
     --Make sure icons directory exists
     if not windower.dir_exists(string.format('%sicons', windower.addon_path)) then
@@ -207,6 +235,7 @@ windower.register_event('login', function()
         config.reload(settings)
     else
         settings = config.load(defaults)
+        config.save(settings)
     end
     setup_ui()
     update_equipment_slots('login')
@@ -237,7 +266,7 @@ windower.register_event('incoming chunk', function(id, original, modified, injec
         
         if slot then
             if packet['Status'] ~= 5 then --item not equipped
-                update_equipment_slot:schedule(0, "0x%x":format(id), slot, 0, 0, 0)
+                update_equipment_slot:schedule(0, '0x%x':format(id), slot, 0, 0, 0)
                 return
             end
             if slot == 3 then --ammo
@@ -245,7 +274,7 @@ windower.register_event('incoming chunk', function(id, original, modified, injec
                 display_ammo_count(count)
             end
             local item = packet['Item']
-            update_equipment_slot:schedule(0,"0x%x":format(id), slot, bag, index, item, count)
+            update_equipment_slot:schedule(0,'0x%x':format(id), slot, bag, index, item, count)
         end
     elseif id == 0x01B then -- Job Info (Encumbrance Flags)
         local packet = packets.parse('incoming', original)
@@ -377,7 +406,7 @@ function display_ammo_count(count)
     if not settings.show_ammo_count or  not count or count <= 1 then
         ammo_count_text:hide()
     else
-        ammo_count_text:text(count and tostring(count) or "")
+        ammo_count_text:text(count and tostring(count) or '')
         ammo_count_text:show()
     end
 end
@@ -400,13 +429,13 @@ end)
 windower.register_event('addon command', function (...)
     config.reload(settings)
     coroutine.sleep(0.5)
-    local cmd  = (...) and (...):lower() or ""
+    local cmd  = (...) and (...):lower() or ''
     local cmd_args = {select(2, ...)}
 
     if cmd == 'position' or cmd == 'pos' then
         if #cmd_args < 2 then
-            error("Not enough arguments.")
-            log("Current position: "..settings.pos.x.." "..settings.pos.y)
+            error('Not enough arguments.')
+            log('Current position: '..settings.pos.x..' '..settings.pos.y)
             return
         end
 
@@ -419,8 +448,8 @@ windower.register_event('addon command', function (...)
         log('Position changed to '..settings.pos.x..', '..settings.pos.y)
     elseif cmd == 'size' then
         if #cmd_args < 1 then
-            error("Not enough arguments.")
-            log("Current size: "..settings.size)
+            error('Not enough arguments.')
+            log('Current size: '..settings.size)
             return
         end
 
@@ -432,8 +461,8 @@ windower.register_event('addon command', function (...)
         log('Size changed to '..settings.size)
     elseif cmd == 'scale' then
         if #cmd_args < 1 then
-            error("Not enough arguments.")
-            log("Current scale: "..settings.size/32)
+            error('Not enough arguments.')
+            log('Current scale: '..settings.size/32)
             return
         end
         local size = tonumber(cmd_args[1])*32
@@ -446,40 +475,78 @@ windower.register_event('addon command', function (...)
         setup_ui()
 
         log('Size changed to '..settings.size)
-    elseif cmd == 'alpha' or cmd == "opacity" then
+    elseif cmd == 'alpha' or cmd == 'opacity' then
         if #cmd_args < 1 then
-            error("Not enough arguments.")
-            log("Current alpha/opacity: "..settings.alpha.."/255 = "..settings.alpha/255)
+            error('Not enough arguments.')
+            log('Current alpha/opacity: %d/255 = %d%%':format(
+                settings.icon.alpha, math.floor(settings.icon.alpha/255*100)
+            ))
             return
         end
         local alpha = tonumber(cmd_args[1])
         if alpha <= 1 and alpha > 0 then
-            settings.alpha = math.floor(255 * (alpha))
+            settings.icon.alpha = math.floor(255 * (alpha))
         else
-            settings.alpha = math.floor(alpha)
+            settings.icon.alpha = math.floor(alpha)
         end
         config.save(settings)
 
         setup_ui()
 
-        log('Alpha/Opacity changed to '..settings.alpha..'/255')
+        log('Alpha/Opacity changed to '..settings.icon.alpha..'/255')
     elseif cmd:contains('transpar') then
         if #cmd_args < 1 then
-            error("Not enough arguments.")
-            log("Current transparency: "..(255-settings.alpha).."/255 = "..(255-settings.alpha)/255)
+            error('Not enough arguments.')
+            log('Current transparency: %d/255 = %d%%':format(
+                (255-settings.icon.alpha), math.floor((255-settings.icon.alpha)/255)*100
+            ))
             return
         end
         local transparency = tonumber(cmd_args[1])
         if transparency <= 1 and transparency > 0 then
-            settings.alpha = math.floor(255 * (1-transparency))
+            settings.icon.alpha = math.floor(255 * (1-transparency))
         else
-            settings.alpha = math.floor(255-transparency)
+            settings.icon.alpha = math.floor(255-transparency)
         end
         config.save(settings)
 
         setup_ui()
 
-        log('Transparency changed to '..255-settings.alpha..'/255')
+        log('Transparency changed to '..255-settings.icon.alpha..'/255')
+    elseif cmd == 'background' or cmd == 'bg' then
+        if #cmd_args < 1 then
+            error('Not enough arguments.')
+            log('Current BG color: RED:%d/255 GREEN:%d/255 BLUE:%d/255 ALPHA:%d/255 = %d%%':format(
+                settings.bg.red, settings.bg.green, settings.bg.blue, settings.bg.alpha, math.floor(settings.bg.alpha/255*100)
+            ))
+            return
+        elseif #cmd_args == 1 then
+            local alpha = tonumber(cmd_args[1])
+            if alpha <= 1 and alpha > 0 then
+                settings.bg.alpha = math.floor(255 * (alpha))
+            else
+                settings.bg.alpha = math.floor(alpha)
+            end
+        elseif #cmd_args >= 3 then
+            settings.bg.red = tonumber(cmd_args[1])
+            settings.bg.green = tonumber(cmd_args[2])
+            settings.bg.blue = tonumber(cmd_args[3])
+            if #cmd_args == 4 then
+                local alpha = tonumber(cmd_args[4])
+                if alpha <= 1 and alpha > 0 then
+                    settings.bg.alpha = math.floor(255 * (alpha))
+                else
+                    settings.bg.alpha = math.floor(alpha)
+                end
+            end
+        end
+        config.save(settings)
+
+        setup_ui()
+        
+        log('BG color changed to: RED:%d/255 GREEN:%d/255 BLUE:%d/255 ALPHA:%d/255 = %d%%':format(
+            settings.bg.red, settings.bg.green, settings.bg.blue, settings.bg.alpha, math.floor(settings.bg.alpha/255*100)
+        ))
     elseif cmd:contains('encumb') then
         settings.show_encumbrance = not settings.show_encumbrance
         config.save(settings)
@@ -510,10 +577,10 @@ windower.register_event('addon command', function (...)
 
         setup_ui()
 
-        log('Ammo text justification changed to '..tostring(settings.left_justify and "Left" or "Right"))
-    elseif cmd == "testenc" then
+        log('Ammo text justification changed to '..tostring(settings.left_justify and 'Left' or 'Right'))
+    elseif cmd == 'testenc' then
         display_encumbrance(0xffff)
-    elseif cmd == "debug" then
+    elseif cmd == 'debug' then
         if #cmd_args < 1 then
             local items = windower.ffxi.get_items()
             local e = windower.ffxi.get_items().equipment
@@ -525,24 +592,143 @@ windower.register_event('addon command', function (...)
                 local eind = e[v.slot_name]
                 local it = v.item_id
                 local eit = windower.ffxi.get_items(eb, eind).id
-                log("%s[%d] it=%d eit=%d b=%d eb=%d i=%d ei=%d":format(v.slot_name,i, it, eit, b, eb, ind, eind))
+                log('%s[%d] it=%d eit=%d b=%d eb=%d i=%d ei=%d':format(v.slot_name,i, it, eit, b, eb, ind, eind))
             end
-        elseif S{"1", "on", "true"}:contains(cmd_args[1]) then
+        elseif S{'1', 'on', 'true'}:contains(cmd_args[1]) then
             evdebug = true
-        elseif S{"0", "off", "false"}:contains(cmd_args[1]) then
+        elseif S{'0', 'off', 'false'}:contains(cmd_args[1]) then
             evdebug = false
         end
     else
-        log("HELP:")
-        log("ev position <xpos> <ypos>: move to position (from top left)")
-        log("ev size <pixels>: set pixel size of each item slot")
-        log("ev scale <factor>: scale multiplier each item slot (from 32px)")
-        log("ev alpha <opacity>: set opacity of display (out of 255)")
-        log("ev transparency <transparency>: inverse of alpha (out of 255)")
-        log("ev ammocount: toggles showing current ammo count")
-        log("ev encumbrance: toggles showing encumbrance Xs")
-        log("ev hideonzone: toggles hiding while crossing zone line")
-        log("ev hideoncutscene: toggles hiding when in cutscene/npc menu/etc")
-        log("ev justify: toggles between ammo text left and right justify")
+        log('HELP:')
+        log('ev position <xpos> <ypos>: move to position (from top left)')
+        log('ev size <pixels>: set pixel size of each item slot')
+        log('ev scale <factor>: scale multiplier each item slot (from 32px)')
+        log('ev alpha <opacity>: set opacity of icons (out of 255)')
+        log('ev transparency <transparency>: inverse of alpha (out of 255)')
+        log('ev background <red> <green> <blue> <alpha>: sets color and transparency of background (out of 255)')
+        log('ev ammocount: toggles showing current ammo count')
+        log('ev encumbrance: toggles showing encumbrance Xs')
+        log('ev hideonzone: toggles hiding while crossing zone line')
+        log('ev hideoncutscene: toggles hiding when in cutscene/npc menu/etc')
+        log('ev justify: toggles between ammo text left and right justify')
     end
 end)
+
+function refresh_ui_settings()
+    --Image and text settings
+    bg_image_settings = {
+        alpha = settings.bg.alpha,
+        color = {
+            alpha = settings.bg.alpha,
+            red = settings.bg.red,
+            green = settings.bg.green,
+            blue = settings.bg.blue,
+        }, 
+        pos = {
+            x = settings.pos.x,
+            y = settings.pos.y,
+        },
+        size = {
+            width = settings.size * 4,
+            height = settings.size * 4,
+        },
+        draggable = false,
+    }
+    equipment_image_settings = {
+        color = {
+            alpha = settings.icon.alpha,
+            red = settings.icon.red,
+            green = settings.icon.green,
+            blue = settings.icon.blue,
+        },
+        texture = {
+            fit = true,
+        },
+        size = {
+            width = settings.size,
+            height = settings.size,
+        },
+        draggable = false,
+    }
+    encumbrance_image_settings = {
+        color = {
+            alpha = settings.icon.alpha*0.8,
+            red = settings.icon.red,
+            green = settings.icon.green,
+            blue = settings.icon.blue,
+        },
+        texture = {
+            fit = true,
+        },
+        size = {
+            width = settings.size,
+            height = settings.size,
+        },
+        draggable = false,
+    }
+    ammo_count_text_settings = {
+        text = {
+            size = settings.size*0.27,
+            alpha = settings.ammo_text.alpha,
+            red = settings.ammo_text.red,
+            green = settings.ammo_text.green,
+            blue = settings.ammo_text.blue,
+            stroke = {
+                width = settings.ammo_text.stroke.width,
+                alpha = settings.ammo_text.stroke.alpha,
+                red = settings.ammo_text.stroke.red,
+                green = settings.ammo_text.stroke.green,
+                blue = settings.ammo_text.stroke.blue,
+            },
+        },
+        bg = {
+            alpha = 0,
+            red = 255,
+            blue = 255,
+            green = 255
+        },
+        pos = {
+            x = (windower.get_windower_settings().ui_x_res - (settings.pos.x + settings.size*4))*-1,
+            y = settings.pos.y + settings.size*0.58,
+        },
+        flags = {
+            draggable = false,
+            right = true,
+            bold = settings.ammo_text.flags.bold,
+            italic = settings.ammo_text.flags.italic,
+        },
+    }
+    ammo_count_text_settings_left_justify = {
+        text = {
+            size = settings.size*0.27,
+            alpha = settings.ammo_text.alpha,
+            red = settings.ammo_text.red,
+            green = settings.ammo_text.green,
+            blue = settings.ammo_text.blue,
+            stroke = {
+                width = settings.ammo_text.stroke.width,
+                alpha = settings.ammo_text.stroke.alpha,
+                red = settings.ammo_text.stroke.red,
+                green = settings.ammo_text.stroke.green,
+                blue = settings.ammo_text.stroke.blue,
+            },
+        },
+        bg = {
+            alpha = 0,
+            red = 255,
+            blue = 255,
+            green = 255
+        },
+        pos = {
+            x = settings.pos.x + settings.size*3,
+            y = settings.pos.y + settings.size*0.58
+        },
+        flags = {
+            draggable = false,
+            right = true,
+            bold = settings.ammo_text.flags.bold,
+            italic = settings.ammo_text.flags.italic,
+        },
+    }
+end
