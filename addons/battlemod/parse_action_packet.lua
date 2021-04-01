@@ -268,7 +268,7 @@ function parse_action_packet(act)
                 end
                 local msg,numb = simplify_message(m.message)
                 if not color_arr[act.actor.owner or act.actor.type] then windower.add_to_chat(123,'Battlemod error, missing filter:'..tostring(act.actor.owner)..' '..tostring(act.actor.type)) end
-                if m.fields.status then numb = m.status else numb = pref_suf((m.cparam or m.param),m.message,act.actor.damage,col) end
+                if m.fields.status then numb = m.status else numb = pref_suf((m.message == 674 and m.add_effect_param or m.cparam or m.param),m.message,act.actor.damage,col) end
     
                 if msg and m.message == 70 and not simplify then -- fix pronoun on parry
                     if v.target[1].race == 0 then
@@ -599,7 +599,7 @@ function assemble_targets(actor,targs,category,msg)
             if samename[v.name] > 1 then
                 targets_condensed = true
             else
-                if (not simplify or msg == 206) and string.find(res.action_messages[msg][language], '${target}\'s') then
+                if (not simplify or msg == 206) and #targets == 1 and string.find(res.action_messages[msg][language], '${target}\'s') then
                     name = color_it(name,color_arr[v.owner or v.type])..(plural_entities:contains(v.id) and '\'' or '\'s')..v.owner_name
                 end
                 targets_condensed = false
