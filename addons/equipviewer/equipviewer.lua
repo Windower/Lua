@@ -479,8 +479,8 @@ windower.register_event('addon command', function (...)
         if #cmd_args < 1 then
             error('Not enough arguments.')
             log('Current alpha/opacity: %d/255 = %d%%':format(
-                settings.icon.alpha, math.floor(settings.icon.alpha/255*100)
-            ))
+				settings.icon.alpha, math.floor(settings.icon.alpha/255*100)
+			))
             return
         end
         local alpha = tonumber(cmd_args[1])
@@ -498,8 +498,8 @@ windower.register_event('addon command', function (...)
         if #cmd_args < 1 then
             error('Not enough arguments.')
             log('Current transparency: %d/255 = %d%%':format(
-                (255-settings.icon.alpha), math.floor((255-settings.icon.alpha)/255)*100
-            ))
+				(255-settings.icon.alpha), math.floor((255-settings.icon.alpha)/255)*100
+			))
             return
         end
         local transparency = tonumber(cmd_args[1])
@@ -517,8 +517,8 @@ windower.register_event('addon command', function (...)
         if #cmd_args < 1 then
             error('Not enough arguments.')
             log('Current BG color: RED:%d/255 GREEN:%d/255 BLUE:%d/255 ALPHA:%d/255 = %d%%':format(
-                settings.bg.red, settings.bg.green, settings.bg.blue, settings.bg.alpha, math.floor(settings.bg.alpha/255*100)
-            ))
+				settings.bg.red, settings.bg.green, settings.bg.blue, settings.bg.alpha, math.floor(settings.bg.alpha/255*100)
+			))
             return
         elseif #cmd_args == 1 then
             local alpha = tonumber(cmd_args[1])
@@ -545,8 +545,8 @@ windower.register_event('addon command', function (...)
         setup_ui()
         
         log('BG color changed to: RED:%d/255 GREEN:%d/255 BLUE:%d/255 ALPHA:%d/255 = %d%%':format(
-            settings.bg.red, settings.bg.green, settings.bg.blue, settings.bg.alpha, math.floor(settings.bg.alpha/255*100)
-        ))
+			settings.bg.red, settings.bg.green, settings.bg.blue, settings.bg.alpha, math.floor(settings.bg.alpha/255*100)
+		))
     elseif cmd:contains('encumb') then
         settings.show_encumbrance = not settings.show_encumbrance
         config.save(settings)
@@ -726,7 +726,7 @@ function refresh_ui_settings()
         },
         flags = {
             draggable = false,
-            right = true,
+            right = false,
             bold = settings.ammo_text.flags.bold,
             italic = settings.ammo_text.flags.italic,
         },
