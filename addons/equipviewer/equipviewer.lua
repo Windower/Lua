@@ -25,9 +25,9 @@
         (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
         SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
-_addon.name = 'EquipViewer'
-_addon.version = '3.2.4'
-_addon.author = 'Project Tako, Rubenator'
+_addon.name = 'Equipviewer'
+_addon.version = '3.3.0'
+_addon.author = 'Tako, Rubenator'
 _addon.commands = { 'equipviewer', 'ev' }
 
 require('luau')
@@ -591,10 +591,10 @@ windower.register_event('addon command', function (...)
         log('HELP:')
         log('ev position <xpos> <ypos>: move to position (from top left)')
         log('ev size <pixels>: set pixel size of each item slot')
-        log('ev scale <factor>: scale multiplier each item slot (from 32px)')
+        log('ev scale <factor>: scale multiplier for each item slot (from 32px)')
         log('ev alpha <opacity>: set opacity of icons (out of 255)')
         log('ev transparency <transparency>: inverse of alpha (out of 255)')
-        log('ev background <red> <green> <blue> <alpha>: sets color and transparency of background (out of 255)')
+        log('ev background <red> <green> <blue> <alpha>: sets color and opacity of background (out of 255)')
         log('ev ammocount: toggles showing current ammo count')
         log('ev encumbrance: toggles showing encumbrance Xs')
         log('ev hideonzone: toggles hiding while crossing zone line')
