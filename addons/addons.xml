@@ -234,6 +234,13 @@
     <support>http://www.ffxiah.com/player/Phoenix/Zohno</support>
   </addon>
   <addon>
+    <name>Equipviewer</name>
+    <author>Tako, Rubenator</author>
+    <description>Displays current equipment grid on screen. Also can show current Ammo count and current Encumbrance.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://discord.gg/b275nMv</support>
+  </addon>
+  <addon>
     <name>eval</name>
     <author>Aureus</author>
     <description>Allows developers to run arbitrary lua code in the console.</description>
