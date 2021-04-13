@@ -90,17 +90,17 @@ end
 --]]
 
 local item_dat_map = {
-    [1]={min=1, max=4095, dat_path='118/106', offset=-1},
-    [2]={min=4096, max=8191, dat_path='118/107', offset=0},
-    [3]={min=8192, max=8703, dat_path='118/110', offset=0},
-    [4]={min=8704, max=10239, dat_path='301/115', offset=0},
-    [5]={min=10240, max=16383, dat_path='118/109', offset=0},
-    [6]={min=16384, max=23039, dat_path='118/108', offset=0},
-    [7]={min=23040, max=28671, dat_path='286/73', offset=0},
-    [8]={min=28672, max=29695, dat_path='217/21', offset=0},
-    [9]={min=29696, max=30719, dat_path='288/80', offset=0},
-    [10]={min=61440, max=61951, dat_path='288/67', offset=0},
-    [11]={min=65535, max=65535, dat_path='174/48', offset=0},
+    [1]={min=0x0001, max=0x0FFF, dat_path='118/106', offset=-1}, -- General Items
+    [2]={min=0x1000, max=0x1FFF, dat_path='118/107', offset=0}, -- Usable Items
+    [3]={min=0x2000, max=0x21FF, dat_path='118/110', offset=0}, -- Automaton Items
+    [4]={min=0x2200, max=0x27FF, dat_path='301/115', offset=0}, -- General Items 2
+    [5]={min=0x2800, max=0x3FFF, dat_path='118/109', offset=0}, -- Armor Items
+    [6]={min=0x4000, max=0x59FF, dat_path='118/108', offset=0}, -- Weapon Items
+    [7]={min=0x5A00, max=0x6FFF, dat_path='286/73', offset=0}, -- Armor Items 2
+    [8]={min=0x7000, max=0x73FF, dat_path='217/21', offset=0}, -- Maze Items, Basic Items
+    [9]={min=0x7400, max=0x77FF, dat_path='288/80', offset=0}, -- Instinct Items
+    [10]={min=0xF000, max=0xF1FF, dat_path='288/67', offset=0}, -- Monipulator Items
+    [11]={min=0xFFFF, max=0xFFFF, dat_path='174/48', offset=0}, -- Gil
 }
 
 local item_by_id = function (id, output_path)
