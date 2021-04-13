@@ -65,36 +65,36 @@ end
 local ammo_count_text = nil
 local bg_image = nil
 
-local defaults = T{
-    pos = T{
+local defaults = {
+    pos = {
         x = 500,
         y = 500
     },
     size = 32,
-    ammo_text = T{
+    ammo_text = {
         alpha = 230,
         red = 255,
         green = 255,
         blue = 255,
-        stroke = T{
+        stroke = {
             width = 1,
             alpha = 127,
             red = 0,
             green = 0,
             blue = 0,
         },
-        flags = T{
+        flags = {
             bold = true,
             italic = true,
         }
     },
-    icon = T{
+    icon = {
         alpha = 230,
         red = 255,
         green = 255,
         blue = 255,
     },
-    bg = T{
+    bg = {
         alpha = 72,
         red = 0,
         green = 0,
@@ -106,13 +106,14 @@ local defaults = T{
     hide_on_cutscene = true,
     left_justify = false,
 }
-settings = nil
+settings = config.load(defaults)
+config.save(settings)
 local last_encumbrance_bitfield = 0
 
 -- gets the currently equipped item data for the slot information provided
-local function get_equipped_item(slotName, slotId, bag, index)
+function get_equipped_item(slotName, slotId, bag, index)
     if not bag or not index then -- from memory
-        local equipment = windower.ffxi.get_items().equipment
+        local equipment = windower.ffxi.get_items('equipment')
         bag = equipment[string.format('%s_bag', slotName)]
         index = equipment[slotName]
         if equipment_data[slotId] then
@@ -128,7 +129,7 @@ local function get_equipped_item(slotName, slotId, bag, index)
 end
 
 -- desc: Updates the ui object(s) for the given slot
-local function update_equipment_slot(source, slot, bag, index, item, count)
+function update_equipment_slot(source, slot, bag, index, item, count)
     local slot_data = equipment_data[slot]
     slot_data.bag_id = bag or slot_data.bag_id
     slot_data.index = index or slot_data.index
@@ -172,14 +173,14 @@ local function update_equipment_slot(source, slot, bag, index, item, count)
 end
 
 -- Updates the texture for all slots if it's a different piece of equipment
-local function update_equipment_slots(source)
+function update_equipment_slots(source)
     for slot in pairs(equipment_data) do
         update_equipment_slot(source, slot)
     end
 end
 
 -- Sets up the image and text ui objects for our equipment
-local function setup_ui()
+function setup_ui()
     refresh_ui_settings()
     destroy()
     
@@ -207,12 +208,6 @@ end
 
 -- Called when the addon is first loaded.
 windower.register_event('load', function()
-    if settings then
-        config.reload(settings)
-    else
-        settings = config.load(defaults)
-        config.save(settings)
-    end
     --Make sure icons directory exists
     if not windower.dir_exists(string.format('%sicons', windower.addon_path)) then
         windower.create_dir(string.format('%sicons', windower.addon_path))
@@ -231,12 +226,6 @@ end)
 
 -- Called whenever character logs in.
 windower.register_event('login', function()
-    if settings then
-        config.reload(settings)
-    else
-        settings = config.load(defaults)
-        config.save(settings)
-    end
     setup_ui()
     update_equipment_slots('login')
 end)
@@ -479,8 +468,8 @@ windower.register_event('addon command', function (...)
         if #cmd_args < 1 then
             error('Not enough arguments.')
             log('Current alpha/opacity: %d/255 = %d%%':format(
-				settings.icon.alpha, math.floor(settings.icon.alpha/255*100)
-			))
+                settings.icon.alpha, math.floor(settings.icon.alpha/255*100)
+            ))
             return
         end
         local alpha = tonumber(cmd_args[1])
@@ -498,8 +487,8 @@ windower.register_event('addon command', function (...)
         if #cmd_args < 1 then
             error('Not enough arguments.')
             log('Current transparency: %d/255 = %d%%':format(
-				(255-settings.icon.alpha), math.floor((255-settings.icon.alpha)/255)*100
-			))
+                (255-settings.icon.alpha), math.floor((255-settings.icon.alpha)/255)*100
+            ))
             return
         end
         local transparency = tonumber(cmd_args[1])
@@ -517,8 +506,8 @@ windower.register_event('addon command', function (...)
         if #cmd_args < 1 then
             error('Not enough arguments.')
             log('Current BG color: RED:%d/255 GREEN:%d/255 BLUE:%d/255 ALPHA:%d/255 = %d%%':format(
-				settings.bg.red, settings.bg.green, settings.bg.blue, settings.bg.alpha, math.floor(settings.bg.alpha/255*100)
-			))
+                settings.bg.red, settings.bg.green, settings.bg.blue, settings.bg.alpha, math.floor(settings.bg.alpha/255*100)
+            ))
             return
         elseif #cmd_args == 1 then
             local alpha = tonumber(cmd_args[1])
@@ -545,8 +534,8 @@ windower.register_event('addon command', function (...)
         setup_ui()
         
         log('BG color changed to: RED:%d/255 GREEN:%d/255 BLUE:%d/255 ALPHA:%d/255 = %d%%':format(
-			settings.bg.red, settings.bg.green, settings.bg.blue, settings.bg.alpha, math.floor(settings.bg.alpha/255*100)
-		))
+            settings.bg.red, settings.bg.green, settings.bg.blue, settings.bg.alpha, math.floor(settings.bg.alpha/255*100)
+        ))
     elseif cmd:contains('encumb') then
         settings.show_encumbrance = not settings.show_encumbrance
         config.save(settings)
@@ -582,8 +571,7 @@ windower.register_event('addon command', function (...)
         display_encumbrance(0xffff)
     elseif cmd == 'debug' then
         if #cmd_args < 1 then
-            local items = windower.ffxi.get_items()
-            local e = windower.ffxi.get_items().equipment
+            local e = windower.ffxi.get_items('equipment')
             for i=0,15 do
                 local v = equipment_data[i]
                 local b = e[string.format('%s_bag', v.slot_name)]
