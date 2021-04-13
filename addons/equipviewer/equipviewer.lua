@@ -111,7 +111,7 @@ config.save(settings)
 local last_encumbrance_bitfield = 0
 
 -- gets the currently equipped item data for the slot information provided
-function get_equipped_item(slotName, slotId, bag, index)
+local function get_equipped_item(slotName, slotId, bag, index)
     if not bag or not index then -- from memory
         local equipment = windower.ffxi.get_items('equipment')
         bag = equipment[string.format('%s_bag', slotName)]
@@ -129,7 +129,7 @@ function get_equipped_item(slotName, slotId, bag, index)
 end
 
 -- desc: Updates the ui object(s) for the given slot
-function update_equipment_slot(source, slot, bag, index, item, count)
+local function update_equipment_slot(source, slot, bag, index, item, count)
     local slot_data = equipment_data[slot]
     slot_data.bag_id = bag or slot_data.bag_id
     slot_data.index = index or slot_data.index
@@ -173,14 +173,14 @@ function update_equipment_slot(source, slot, bag, index, item, count)
 end
 
 -- Updates the texture for all slots if it's a different piece of equipment
-function update_equipment_slots(source)
+local function update_equipment_slots(source)
     for slot in pairs(equipment_data) do
         update_equipment_slot(source, slot)
     end
 end
 
 -- Sets up the image and text ui objects for our equipment
-function setup_ui()
+local function setup_ui()
     refresh_ui_settings()
     destroy()
     
