@@ -22,7 +22,7 @@
         (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
         SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
--- icon_extractor v1.0.1
+-- icon_extractor v1.1.0
 -- Written by Rubenator of Leviathan
 -- Base Extraction Code graciously provided by Trv of Windower discord
 local icon_extractor = {}
@@ -79,7 +79,7 @@ local header = 'BM' .. file_size .. reserved1 .. reserved2 .. starting_address
 local color_lookup = {}
 local bmp_segments = {}
 
-for i = 0, 255 do
+for i = 0x000, 0x0FF do
     color_lookup[string.char(i)] = ''
 end
 
@@ -109,7 +109,7 @@ local item_by_id = function (id, output_path)
     
     local id_offset = dat_stats.min + dat_stats.offset
     icon_file:seek('set', (id - id_offset) * 0xC00 + 0x2BD)
-    local data = icon_file:read(2048)
+    local data = icon_file:read(0x800)
 
     bmp = convert_item_icon_to_bmp(data)
 
@@ -150,13 +150,13 @@ local encoded_to_decoded_char = {}
 local encoded_byte_to_rgba = {}
 local alpha_encoded_to_decoded_adjusted_char = {}
 local decoded_byte_to_encoded_char = {}
-for i = 0, 255 do
+for i = 0x000, 0x0FF do
     encoded_byte_to_rgba[i] = ''
-    local n = (i % 32) * 8 + floor(i / 32)
+    local n = (i % 0x20) * 0x8 + floor(i / 0x20)
     encoded_to_decoded_char[char(i)] = char(n)
     decoded_byte_to_encoded_char[n] = char(i)
-    n = n * 2
-    n = n < 256 and n or 255
+    n = n * 0x2
+    n = n < 0x100 and n or 0x0FF
     alpha_encoded_to_decoded_adjusted_char[char(i)] = char(n)
 end
 local decoder = function(a, b, c, d)
@@ -166,19 +166,19 @@ local decoder = function(a, b, c, d)
         alpha_encoded_to_decoded_adjusted_char[d]
 end
 function convert_item_icon_to_bmp(data)
-    local color_palette = string.gsub(sub(data, 1, 1024), '(.)(.)(.)(.)', decoder)
+    local color_palette = string.gsub(sub(data, 0x001, 0x400), '(.)(.)(.)(.)', decoder)
     -- rather than decoding all 2048 bytes, decode only the palette and index it by encoded byte
-    for i = 0, 255 do
-        local offset = i * 4 + 1
-        encoded_byte_to_rgba[decoded_byte_to_encoded_char[i]] = sub(color_palette, offset, offset + 3)
+    for i = 0x000, 0x0FF do
+        local offset = i * 0x4 + 0x1
+        encoded_byte_to_rgba[decoded_byte_to_encoded_char[i]] = sub(color_palette, offset, offset + 0x3)
     end
 
-    return header .. string.gsub(sub(data, 1025, 2048), '(.)', function(a) return encoded_byte_to_rgba[a] end)
+    return header .. string.gsub(sub(data, 0x401, 0x800), '(.)', function(a) return encoded_byte_to_rgba[a] end)
 end
 
 
 local buff_dat_map = {
-    [1]={min=0, max=1024, dat_path='119/57', offset=0},
+    [1]={min=0x000, max=0x400, dat_path='119/57', offset=0},
 }
 function find_buff_dat_map(id)
     for _,stats in pairs(buff_dat_map) do
@@ -220,13 +220,13 @@ function convert_buff_icon_to_bmp(data)
 
     if length == 16 then -- uncompressed
         data = sub(data, 0x2BE, 0x12BD)
-        data = string.gsub(data, '(...)\128', '%1\255') -- All of the alpha bytes are currently 0 or 0x80.
+        data = string.gsub(data, '(...)\x80', '%1\xFF') -- All of the alpha bytes are currently 0 or 0x80.
     elseif length == 08 then -- color table
         local color_palette = sub(data, 0x2BE, 0x6BD)
-        color_palette = string.gsub(color_palette, '(...)\128', '%1\255')
+        color_palette = string.gsub(color_palette, '(...)\x80', '%1\xFF')
     
-        local n = 0
-        for i = 1, 1024, 4 do
+        local n = 0x0
+        for i = 1, 0x400, 0x4 do
             color_lookup[char(n)] = sub(color_palette, i, i + 3)
             n = n + 1
         end
