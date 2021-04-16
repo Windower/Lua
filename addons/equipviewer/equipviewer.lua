@@ -26,7 +26,7 @@
         SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 _addon.name = 'Equipviewer'
-_addon.version = '3.3.0'
+_addon.version = '3.3.1'
 _addon.author = 'Tako, Rubenator'
 _addon.commands = { 'equipviewer', 'ev' }
 
@@ -38,7 +38,6 @@ local texts = require('texts')
 local functions = require('functions')
 local packets = require('packets')
 local icon_extractor = require('icon_extractor')
---icon_extractor.ffxi_path('C:/Program Files (x86)/PlayOnline/SquareEnix/FINAL FANTASY XI')
 
 local equipment_data = {
     [0] =  {slot_name = 'main',       slot_id = 0,  display_pos = 0,  item_id = 0, image = nil},
@@ -108,6 +107,9 @@ local defaults = {
 }
 settings = config.load(defaults)
 config.save(settings)
+if settings.game_path then
+    icon_extractor.ffxi_path(settings.game_path)
+end
 local last_encumbrance_bitfield = 0
 
 -- gets the currently equipped item data for the slot information provided
@@ -420,8 +422,28 @@ windower.register_event('addon command', function (...)
     coroutine.sleep(0.5)
     local cmd  = (...) and (...):lower() or ''
     local cmd_args = {select(2, ...)}
+    print(cmd)
+    if cmd == "gamepath" or cmd == "game_path" then
+        if #cmd_args == 0 then
+            error("Must provide path.")
+            log('Current Path: %s':format(
+                "\""..settings.game_path.."\"" or "(Default): \""..windower.pol_path.."\/..\/FINAL FANTASY XI\""
+            ))
+            return
+        end
+        local path = table.concat(cmd_args, " ")
+        if path:lower() == "default" then
+            settings.game_path = nil
+        else
+            settings.game_path = table.concat(cmd_args, " ")
+        end
+        config.save(settings)
+        icon_extractor.ffxi_path(settings.game_path)
+        
+        setup_ui()
 
-    if cmd == 'position' or cmd == 'pos' then
+        log('game_path set to "%s"':format(path))
+    elseif cmd == 'position' or cmd == 'pos' then
         if #cmd_args < 2 then
             error('Not enough arguments.')
             log('Current position: '..settings.pos.x..' '..settings.pos.y)
@@ -631,7 +653,7 @@ function refresh_ui_settings()
             blue = settings.icon.blue,
         },
         texture = {
-            fit = true,
+            fit = false,
         },
         size = {
             width = settings.size,
@@ -647,7 +669,7 @@ function refresh_ui_settings()
             blue = settings.icon.blue,
         },
         texture = {
-            fit = true,
+            fit = false,
         },
         size = {
             width = settings.size,
