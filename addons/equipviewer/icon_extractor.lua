@@ -22,12 +22,13 @@
         (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
         SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
--- icon_extractor v1.1.0
+-- icon_extractor v1.1.1
 -- Written by Rubenator of Leviathan
 -- Base Extraction Code graciously provided by Trv of Windower discord
 local icon_extractor = {}
 
-local game_path = windower.pol_path..'\/..\/FINAL FANTASY XI'
+local game_path_default = windower.pol_path..'\/..\/FINAL FANTASY XI'
+local game_path = game_path_default
 
 local string = require('string')
 local io = require('io')
@@ -138,8 +139,11 @@ function open_dat(dat_stats)
             error('ffxi_path must be set before using icon_extractor library')
         end
         filename = game_path .. '/ROM/' .. tostring(dat_stats.dat_path) .. '.DAT'
-        icon_file = io.open(filename, 'rb')
-        if not icon_file then return end
+        icon_file, err = io.open(filename, 'rb')
+        if not icon_file then
+            error(err)
+            return
+        end
         dat_stats.file = icon_file
     end
     return icon_file
@@ -207,7 +211,8 @@ icon_extractor.buff_by_id = buff_by_id
 
 
 local ffxi_path = function(location)
-    game_path = location
+    game_path = location or game_path_default
+    close_dats()
 end
 icon_extractor.ffxi_path = ffxi_path
 
@@ -239,17 +244,23 @@ function convert_buff_icon_to_bmp(data)
     return header .. data
 end
 
-windower.register_event('unload', function()
+function close_dats()
     for _,dat in pairs(item_dat_map) do
         if dat and dat.file then
             dat.file:close()
+            dat.file = nil
         end
     end
     for _,dat in pairs(buff_dat_map) do
         if dat and dat.file then
             dat.file:close()
+            dat.file = nil
         end
     end
+end
+
+windower.register_event('unload', function()
+    close_dats()
 end);
 
 return icon_extractor
