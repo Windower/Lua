@@ -141,7 +141,6 @@ function open_dat(dat_stats)
         filename = game_path .. '/ROM/' .. tostring(dat_stats.dat_path) .. '.DAT'
         icon_file, err = io.open(filename, 'rb')
         if not icon_file then
-            print(err)
             error(err)
             return
         end
