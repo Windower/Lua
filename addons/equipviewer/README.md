@@ -22,7 +22,8 @@
 9. hideonzone: toggles hiding while crossing zone lines (default is on/true)
 10. hideoncutscene: toggles hiding when in cutscene/npc menu/etc (default is on/true)
 11. justify: toggles between ammo text being right or left justifed (default is right justified)
-12. help: displays explanations of each command
+12. game_path <path>: sets path to FFXI folder where you want dats extracted from. Defaults to the "Final Fantasy XI" folder next to the folder containing the launcher (ussually POL.exe).
+13. help: displays explanations of each command
 	
 ### Example Commands
 ```
