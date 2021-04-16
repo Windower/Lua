@@ -22,12 +22,12 @@
         (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
         SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
--- icon_extractor v1.1.1
+-- icon_extractor v1.1.2
 -- Written by Rubenator of Leviathan
 -- Base Extraction Code graciously provided by Trv of Windower discord
 local icon_extractor = {}
 
-local game_path_default = windower.pol_path..'\/..\/FINAL FANTASY XI'
+local game_path_default = windower.ffxi_path
 local game_path = game_path_default
 
 local string = require('string')
