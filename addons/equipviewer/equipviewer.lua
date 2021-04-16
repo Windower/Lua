@@ -422,7 +422,6 @@ windower.register_event('addon command', function (...)
     coroutine.sleep(0.5)
     local cmd  = (...) and (...):lower() or ''
     local cmd_args = {select(2, ...)}
-    print(cmd)
     if cmd == "gamepath" or cmd == "game_path" then
         if #cmd_args == 0 then
             error("Must provide path.")
