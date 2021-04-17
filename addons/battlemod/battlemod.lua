@@ -253,8 +253,8 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 ------- ITEM QUANTITY -------
     if id == 0x020 and parse_quantity then
         --local packet = packets.parse('incoming', original)
-        local item = original:unpack("H",0x0D)
-        local count = original:unpack("I",0x05)
+        local item = original:unpack('H',0x0D)
+        local count = original:unpack('I',0x05)
         if item == 0 then return end
         if item_quantity.id == item then
             item_quantity.count = count..' '
@@ -262,9 +262,9 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 
 ------- NOUNS AND PLURAL ENTITIES -------    
     elseif id == 0x00E then
-        local mob_id = original:unpack("I",0x05)
-        local mask = original:unpack("C",0x0B)
-        local chat_info = original:unpack("C",0x28)
+        local mob_id = original:unpack('I',0x05)
+        local mask = original:unpack('C',0x0B)
+        local chat_info = original:unpack('C',0x28)
         if bit.band(mask,4) == 4 then
             if bit.band(chat_info,32) == 0 and not common_nouns:contains(mob_id) then
                 table.insert(common_nouns, mob_id)
@@ -286,14 +286,14 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 ------- ACTION MESSAGE -------
     elseif id == 0x29 then
         local am = {}
-        am.actor_id = original:unpack("I",0x05)
-        am.target_id = original:unpack("I",0x09)
-        am.param_1 = original:unpack("I",0x0D)
-        am.param_2 = original:unpack("H",0x11)%2^9 -- First 7 bits
-        am.param_3 = math.floor(original:unpack("I",0x11)/2^5) -- Rest
-        am.actor_index = original:unpack("H",0x15)
-        am.target_index = original:unpack("H",0x17)
-        am.message_id = original:unpack("H",0x19)%2^15 -- Cut off the most significant bit
+        am.actor_id = original:unpack('I',0x05)
+        am.target_id = original:unpack('I',0x09)
+        am.param_1 = original:unpack('I',0x0D)
+        am.param_2 = original:unpack('H',0x11)%2^9 -- First 7 bits
+        am.param_3 = math.floor(original:unpack('I',0x11)/2^5) -- Rest
+        am.actor_index = original:unpack('H',0x15)
+        am.target_index = original:unpack('H',0x17)
+        am.message_id = original:unpack('H',0x19)%2^15 -- Cut off the most significant bit
         
         local actor = player_info(am.actor_id)
         local target = player_info(am.target_id)
@@ -318,16 +318,17 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                 windower.add_to_chat(color, msg)
             else
                 local msg = res.action_messages[am.message_id][language]
+                msg = grammatical_number_fix(msg, number, am.message_id)
                 if plural_entities:contains(am.actor_id) then
-                    msg = plural_actor(msg)
+                    msg = plural_actor(msg, am.message_id)
                 end
                 if plural_entities:contains(am.target_id) then
-                    msg = plural_target(msg)
+                    msg = plural_target(msg, am.message_id)
                 end
                 local msg = clean_msg(msg
                     :gsub('${status}',status or '')
                     :gsub('${target}',target_article..targ)
-                    :gsub('${number}',number or ''))
+                    :gsub('${number}',number or ''), am.message_id)
                 windower.add_to_chat(color, msg)
             end
         elseif am.message_id == 206 and condensetargets then -- Wears off messages
@@ -363,10 +364,10 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             local item,status,spell,skill,number,number2
             local outstr = res.action_messages[am.message_id][language]
             if plural_entities:contains(am.actor_id) then
-                outstr = plural_actor(outstr)
+                outstr = plural_actor(outstr, am.message_id)
             end
             if plural_entities:contains(am.target_id) then
-                outstr = plural_target(outstr)
+                outstr = plural_target(outstr, am.message_id)
             end
             
             local fields = fieldsearch(outstr)
@@ -429,7 +430,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                 :gsub('${number}',number or '')
                 :gsub('${number2}',number2 or '')
                 :gsub('${skill}',skill or '')
-                :gsub('${lb}','\7')))
+                :gsub('${lb}','\7'), am.message_id))
             windower.add_to_chat(res.action_messages[am.message_id]['color'],outstr)
             am.message_id = false
         elseif debugging and res.action_messages[am.message_id] then 
@@ -445,8 +446,8 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
 
 ------------ SYNTHESIS ANIMATION --------------
     elseif id == 0x030 and crafting then
-        if windower.ffxi.get_player().id == original:unpack("I",5) or windower.ffxi.get_mob_by_target('t') and windower.ffxi.get_mob_by_target('t').id == original:unpack("I",5) then
-            local crafter_name = (windower.ffxi.get_player().id == original:unpack("I",5) and windower.ffxi.get_player().name) or windower.ffxi.get_mob_by_target('t').name
+        if windower.ffxi.get_player().id == original:unpack('I',5) or windower.ffxi.get_mob_by_target('t') and windower.ffxi.get_mob_by_target('t').id == original:unpack('I',5) then
+            local crafter_name = (windower.ffxi.get_player().id == original:unpack('I',5) and windower.ffxi.get_player().name) or windower.ffxi.get_mob_by_target('t').name
             local result = original:byte(13)
             if result == 0 then
                 windower.add_to_chat(8,' ------------- NQ Synthesis ('..crafter_name..') -------------')
@@ -479,11 +480,11 @@ end)
 function multi_packet(...)
     local ind = table.concat({...},' ')
     local targets = assemble_targets(multi_actor[ind],multi_targs[ind],0,multi_msg[ind])
-    local outstr = targets_condensed and plural_target(res.action_messages[multi_msg[ind]][language]) or res.action_messages[multi_msg[ind]][language]
+    local outstr = targets_condensed and plural_target(res.action_messages[multi_msg[ind]][language], multi_msg[ind]) or res.action_messages[multi_msg[ind]][language]
     outstr = clean_msg(outstr
         :gsub('${target}\'s',targets)
         :gsub('${target}',targets)
-        :gsub('${status}',ind))
+        :gsub('${status}',ind), multi_msg[ind])
     windower.add_to_chat(res.action_messages[multi_msg[ind]].color,outstr)
     multi_targs[ind] = nil
     multi_msg[ind] = nil

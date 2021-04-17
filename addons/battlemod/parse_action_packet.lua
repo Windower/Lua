@@ -278,10 +278,6 @@ function parse_action_packet(act)
                     end
                 end
                 
-                if col == 'D' or grammar_numb_msg:contains(m.message) then
-                    msg = grammatical_number_fix(msg, (m.cparam or m.param))
-                end
-                
                 local count = ''
                 if m.message == 377 and act.actor_id == Self.id then
                     parse_quantity = true
@@ -290,6 +286,9 @@ function parse_action_packet(act)
                 end
                 
                 if not simplify then
+                    if col == 'D' or grammar_numb_msg:contains(m.message) then
+                        msg = grammatical_number_fix(msg, (m.cparam or m.param), m.message)
+                    end
                     if act.action.item_id or act.action.item2_id then
                         msg = item_article_fix(act.action.item_id,act.action.item2_id,msg)
                     end
@@ -297,30 +296,30 @@ function parse_action_packet(act)
                         msg = actor_noun(msg)
                     end
                     if plural_entities:contains(act.actor.id) then
-                        msg = plural_actor(msg)
+                        msg = plural_actor(msg, m.message)
                     end
                     if targets_condensed or plural_entities:contains(v.target[1].id) then
-                        msg = plural_target(msg)
+                        msg = plural_target(msg, m.message)
                     end
                 end
                 
                 local reaction_lookup = reaction_offsets[act.category] and (m.reaction - reaction_offsets[act.category]) or 0
                 local has_line_break = string.find(res.action_messages[m.message].en, '${lb}') and true or false
-                local prefix = (not has_line_break or simplify) and S{1,3,4,6,11,13,14,15}:contains(act.category) and (bit.band(m.unknown,1)==1 and "Cover! " or "")
-                                ..(bit.band(m.unknown,4)==4 and "Magic Burst! " or "") --Used on Swipe/Lunge MB
-                                ..(bit.band(m.unknown,8)==8 and "Immunobreak! " or "") --Unused? Displayed directly on message
-                                ..(bit.band(m.unknown,16)==16 and "Critical Hit! " or "") --Unused? Crits have their own message
-                                ..(reaction_lookup == 4 and "Blocked! " or "")
-                                ..(reaction_lookup == 2 and "Guarded! " or "")
-                                ..(reaction_lookup == 3 and S{3,4,6,11,13,14,15}:contains(act.category) and "Parried! " or "") or "" --Unused? They are send the same as missed
-                local prefix2 = has_line_break and S{1,3,4,6,11,13,14,15}:contains(act.category) and (bit.band(m.unknown,1)==1 and "Cover! " or "")
-                                ..(bit.band(m.unknown,2)==2 and "Resist! " or "")
-                                ..(bit.band(m.unknown,4)==4 and "Magic Burst! " or "") --Used on Swipe/Lunge MB
-                                ..(bit.band(m.unknown,8)==8 and "Immunobreak! " or "") --Unused? Displayed directly on message
-                                ..(bit.band(m.unknown,16)==16 and "Critical Hit! " or "") --Unused? Crits have their own message
-                                ..(reaction_lookup == 4 and "Blocked! " or "")
-                                ..(reaction_lookup == 2 and "Guarded! " or "")
-                                ..(reaction_lookup == 3 and S{3,4,6,11,13,14,15}:contains(act.category) and "Parried! " or "") or "" --Unused? They are send the same as missed
+                local prefix = (not has_line_break or simplify) and S{1,3,4,6,11,13,14,15}:contains(act.category) and (bit.band(m.unknown,1)==1 and 'Cover! ' or '')
+                                ..(bit.band(m.unknown,4)==4 and 'Magic Burst! ' or '') --Used on Swipe/Lunge MB
+                                ..(bit.band(m.unknown,8)==8 and 'Immunobreak! ' or '') --Unused? Displayed directly on message
+                                ..(bit.band(m.unknown,16)==16 and 'Critical Hit! ' or '') --Unused? Crits have their own message
+                                ..(reaction_lookup == 4 and 'Blocked! ' or '')
+                                ..(reaction_lookup == 2 and 'Guarded! ' or '')
+                                ..(reaction_lookup == 3 and S{3,4,6,11,13,14,15}:contains(act.category) and 'Parried! ' or '') or '' --Unused? They are send the same as missed
+                local prefix2 = has_line_break and S{1,3,4,6,11,13,14,15}:contains(act.category) and (bit.band(m.unknown,1)==1 and 'Cover! ' or '')
+                                ..(bit.band(m.unknown,2)==2 and 'Resist! ' or '')
+                                ..(bit.band(m.unknown,4)==4 and 'Magic Burst! ' or '') --Used on Swipe/Lunge MB
+                                ..(bit.band(m.unknown,8)==8 and 'Immunobreak! ' or '') --Unused? Displayed directly on message
+                                ..(bit.band(m.unknown,16)==16 and 'Critical Hit! ' or '') --Unused? Crits have their own message
+                                ..(reaction_lookup == 4 and 'Blocked! ' or '')
+                                ..(reaction_lookup == 2 and 'Guarded! ' or '')
+                                ..(reaction_lookup == 3 and S{3,4,6,11,13,14,15}:contains(act.category) and 'Parried! ' or '') or '' --Unused? They are send the same as missed
                 local message = prefix..make_condensedamage_number(m.number)..( clean_msg((msg or tostring(m.message))
                     :gsub('${spell}',color_it(act.action.spell or 'ERROR 111',color_arr.spellcol))
                     :gsub('${ability}',color_it(act.action.ability or 'ERROR 112',color_arr.abilcol))
@@ -336,7 +335,7 @@ function parse_action_packet(act)
                     :gsub('${lb}','\7'..prefix2)
                     :gsub('${number}',act.action.number or m.param)
                     :gsub('${status}',m.status or 'ERROR 120')
-                    :gsub('${gil}',m.param..' gil')))
+                    :gsub('${gil}',m.param..' gil'), m.message))
                     if m.message == 377 and act.actor_id == Self.id then
                         send_delayed_message:schedule(0.5,color,message)
                     else
@@ -361,14 +360,17 @@ function parse_action_packet(act)
                 end
                 local msg,numb = simplify_message(m.add_effect_message)
                 if not simplify then
+                    if col == 'D' or grammar_numb_msg:contains(m.add_effect_message) then
+                        msg = grammatical_number_fix(msg, (m.cparam or m.param), m.add_effect_message)
+                    end
                     if common_nouns:contains(act.actor.id) then
                         msg = actor_noun(msg)
                     end
                     if plural_entities:contains(act.actor.id) then
-                        msg = plural_actor(msg)
+                        msg = plural_actor(msg, m.add_effect_message)
                     end
                     if targets_condensed or plural_entities:contains(v.target[1].id) then
-                        msg = plural_target(msg)
+                        msg = plural_target(msg, m.add_effect_message)
                     end
                 end
                 if m.add_effect_fields.status then numb = m.add_effect_status else numb = pref_suf((m.cadd_effect_param or m.add_effect_param),m.add_effect_message,act.actor.damage,col) end
@@ -388,7 +390,7 @@ function parse_action_packet(act)
                         :gsub('${target}',targ)
                         :gsub('${lb}','\7')
                         :gsub('${number}',m.add_effect_param)
-                        :gsub('${status}',m.add_effect_status or 'ERROR 178'))))
+                        :gsub('${status}',m.add_effect_status or 'ERROR 178'), m.add_effect_message)))
                         if not non_block_messages:contains(m.add_effect_message) then
                             m.add_effect_message = 0
                         end
@@ -419,14 +421,17 @@ function parse_action_packet(act)
 
                 local msg = simplify_message(m.spike_effect_message)
                 if not simplify then
+                    if col == 'D' or grammar_numb_msg:contains(m.spike_effect_message) then
+                        msg = grammatical_number_fix(msg, (m.cparam or m.param), m.spike_effect_message)
+                    end
                     if common_nouns:contains(act.actor.id) then
                         msg = actor_noun(msg)
                     end
                     if plural_entities:contains(act.actor.id) then
-                        msg = plural_actor(msg)
+                        msg = plural_actor(msg, m.spike_effect_message)
                     end
                     if targets_condensed or plural_entities:contains(v.target[1].id) then
-                        msg = plural_target(msg)
+                        msg = plural_target(msg, m.spike_effect_message)
                     end
                 end
                 if m.spike_effect_fields.status then numb = m.spike_effect_status else numb = pref_suf((m.cspike_effect_param or m.spike_effect_param),m.spike_effect_message,actor.damage,col) end
@@ -443,7 +448,7 @@ function parse_action_packet(act)
                     :gsub((simplify and '${actor}' or '${target}'),targ)
                     :gsub('${lb}','\7')
                     :gsub('${number}',m.spike_effect_param)
-                    :gsub('${status}',m.spike_effect_status or 'ERROR 150'))))
+                    :gsub('${status}',m.spike_effect_status or 'ERROR 150'), m.spike_effect_message)))
                 if not non_block_messages:contains(m.spike_effect_message) then
                     m.spike_effect_message = 0
                 end
@@ -555,9 +560,9 @@ function simplify_message(msg_ID)
             msg = line_noability
         elseif line_notarget and fields.actor and fields.number then
             if msg_ID == 798 then --Maneuver message
-                msg = line_notarget.."%"
+                msg = line_notarget..'%'
             elseif msg_ID == 799 then --Maneuver message with overload
-                msg = line_notarget.."% (${actor} overloaded)"
+                msg = line_notarget..'% (${actor} overloaded)'
             else
                 msg = line_notarget
             end
@@ -862,37 +867,37 @@ function color_filt(col,is_me)
     --Depends on whether or not the target is you, the same as using in-game colors
     -- Returns a color code for windower.add_to_chat()
     -- Does not currently support a Debuff/Buff distinction
-    if col == "D" then -- Damage
+    if col == 'D' then -- Damage
         if is_me then
             return 28
         else
             return 20
         end
-    elseif col == "M" then -- Misses
+    elseif col == 'M' then -- Misses
         if is_me then
             return 29
         else
             return 21
         end
-    elseif col == "H" then -- Healing
+    elseif col == 'H' then -- Healing
         if is_me then
             return 30
         else
             return 22
         end
-    elseif col == "B" then -- Beneficial effects
+    elseif col == 'B' then -- Beneficial effects
         if is_me then
             return 56
         else
             return 60
         end
-    elseif col == "DB" then -- Detrimental effects (I don't know how I'd split these)
+    elseif col == 'DB' then -- Detrimental effects (I don't know how I'd split these)
         if is_me then
             return 57
         else
             return 61
         end
-    elseif col == "R" then -- Resists
+    elseif col == 'R' then -- Resists
         if is_me then
             return 59
         else

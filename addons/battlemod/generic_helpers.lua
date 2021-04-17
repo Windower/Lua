@@ -84,7 +84,7 @@ end
 
 function fieldsearch(message)
     local fieldarr = {}
-    string.gsub(message,"{(.-)}", function(a) fieldarr[a] = true end)
+    string.gsub(message,'{(.-)}', function(a) fieldarr[a] = true end)
     return fieldarr
 end
 
@@ -124,114 +124,223 @@ function actor_noun(msg)
     return msg
 end
 
-function plural_actor(msg)
+function plural_actor(msg, msg_id)
     if msg then
-        msg = msg
-            :gsub('${actor} hits ', '${actor} hit ')
-            :gsub('${actor} casts ', '${actor} cast ')
-            :gsub('${actor} starts ', '${actor} start ')
-            :gsub('${actor} defeats ', '${actor} defeat ')
-            :gsub('${actor} gains ', '${actor} gain ')
-            :gsub('${actor} attains ', '${actor} attain ')
-            :gsub('${actor} loses ', '${actor} lose ')
-            :gsub('${actor} falls ', '${actor} fall ')
-            :gsub("${actor}'s ", "${actor}' ")
-            :gsub('${actor} misses ' , '${actor} miss ')
-            :gsub('${actor} calls ' , '${actor} call ')
-            :gsub('${actor} learns ' , '${actor} learn ')
-            :gsub('${actor} uses ' , '${actor} use ')
-            :gsub('${actor} is ' , '${actor} are ')
-            :gsub('${actor} takes ' , '${actor} take ')
-            :gsub('${actor} does ' , '${actor} do ')
-            :gsub('${actor} lacks ' , '${actor} lack ')
-            :gsub('${actor} redies ' , '${actor} ready ')
-            :gsub('${actor} earns ' , '${actor} earn ')
-            :gsub('${actor} scores ' , '${actor} score ')
-            :gsub('${actor} successfully removes ' , '${actor} successfully remove ')
-            :gsub('${actor} achieves ' , '${actor} achieve ')
-            :gsub('${actor} mugs ' , '${actor} mug ')
-            :gsub('${actor} steals ' , '${actor} steal ')
-            :gsub('${actor} fails ' , '${actor} fail ')
-            :gsub(' but finds nothing' , ' but find nothing')
-            :gsub(' and finds ${item}' , ' and find ${item}')
-            :gsub('${actor} recovers ' , '${actor} recover ')
-            :gsub('${ability}, but misses' , '${ability}, but miss')
-            :gsub(' but misses ${target}' , ' but miss ${target}')
-            :gsub('${actor} covers ' , '${actor} cover ')
-            :gsub('${actor} already has ' , '${actor} already have ')
-            :gsub('${actor} attempts ' , '${actor} attempt ')
-            :gsub(' but lacks ' , ' but lack ')
-            :gsub('${actor} destroys ' , '${actor} destroy ')
-            :gsub('${actor} absorbs ' , '${actor} absorb ')
-            :gsub('${actor} eats ' , '${actor} eat ')
-            :gsub('${actor} leads ' , '${actor} lead ')
-            :gsub('${actor} has ' , '${actor} have ')
-            :gsub('${actor} obtains ' , '${actor} obtain ')
-            :gsub(' and finds ${number}' , ' and find ${number}')
+        if msg_id == 6 then
+            msg = msg:gsub('${actor} defeats ', '${actor} defeat ')
+        elseif msg_id == 9 then
+            msg = msg:gsub('${actor} attains ', '${actor} attain ')
+        elseif msg_id == 10 then
+            msg = msg:gsub('${actor} loses ', '${actor} lose ')
+        elseif msg_id == 11 then
+            msg = msg:gsub('${actor} falls ', '${actor} fall ')
+        elseif msg_id == 19 then
+            msg = msg:gsub('${actor} calls ' , '${actor} call ')
+        elseif msg_id == 35 then
+            msg = msg:gsub('${actor} lacks ' , '${actor} lack ')
+        elseif msg_id == 67 then
+            msg = msg:gsub('${actor} scores ' , '${actor} score ')
+        elseif msg_id == 124 then
+            msg = msg:gsub('${actor} achieves ' , '${actor} achieve ')
+        elseif msg_id == 129 then
+            msg = msg:gsub('${actor} mugs ' , '${actor} mug ')
+        elseif msg_id == 244 then
+            msg = msg:gsub('${actor} fails ' , '${actor} fail ')
+        elseif msg_id == 311 then
+            msg = msg:gsub('${actor} covers ' , '${actor} cover ')
+        elseif msg_id == 315 then
+            msg = msg:gsub('${actor} already has ' , '${actor} already have ')
+        elseif msg_id ==411 then
+            msg = msg
+                :gsub('${actor} attempts ' , '${actor} attempt ')
+                :gsub(' but lacks ' , ' but lack ')
+        elseif msg_id == 536 then
+            msg = msg:gsub('${actor} takes ' , '${actor} take ')
+        elseif msg_id == 563 then
+            msg = msg:gsub('${actor} destroys ' , '${actor} destroy ')
+        elseif msg_id == 772 then
+            msg = msg:gsub('${actor} stands ', '${actor} stand ')
+        elseif replacements_map.actor.hits:contains(msg_id) then
+            msg = msg:gsub('${actor} hits ', '${actor} hit ')
+        elseif replacements_map.actor.misses:contains(msg_id) then
+            msg = msg:gsub('${actor} misses ' , '${actor} miss ')
+        elseif replacements_map.actor.starts:contains(msg_id) then
+            msg = msg:gsub('${actor} starts ', '${actor} start ')
+        elseif replacements_map.actor.casts:contains(msg_id) then
+            msg = msg:gsub('${actor} casts ', '${actor} cast ')
+            if msg_id == 83 then
+                msg = msg:gsub('${actor} successfully removes ' , '${actor} successfully remove ')
+            elseif msg_id == 572 or msg_id == 642 then
+                msg = msg:gsub('${actor} absorbs ' , '${actor} absorb ')
+            end
+        elseif replacements_map.actor.readies:contains(msg_id) then
+            msg = msg:gsub('${actor} readies ' , '${actor} ready ')
+        elseif replacements_map.actor.recovers:contains(msg_id) then
+            msg = msg:gsub('${actor} recovers ' , '${actor} recover ')
+        elseif replacements_map.actor.gains:contains(msg_id) then
+            msg = msg:gsub('${actor} gains ', '${actor} gain ')
+        elseif replacements_map.actor.apos:contains(msg_id) then
+            msg = msg:gsub('${actor}\'s ', '${actor}\' ')
+            if msg_id == 33 then
+                msg = msg:gsub('${actor} takes ' , '${actor} take ')
+            elseif msg_id == 606 then
+                msg = msg:gsub('${actor} recovers ' , '${actor} recover ')
+            elseif msg_id == 799 then
+                msg = msg:gsub('${actor} is ' , '${actor} are ')
+            end
+        elseif replacements_map.actor.uses:contains(msg_id) then
+            msg = msg:gsub('${actor} uses ' , '${actor} use ')
+            if msg_id == 122 then
+                msg = msg:gsub('${actor} recovers ' , '${actor} recover ')
+            elseif msg_id == 123 then
+                msg = msg:gsub('${actor} successfully removes ' , '${actor} successfully remove ')
+            elseif msg_id == 126 or msg_id == 136 or msg_id == 528 then
+                msg = msg:gsub('${actor}\'s ', '${actor}\' ')
+            elseif msg_id == 137 or msg_id == 153 then
+                msg = msg:gsub('${actor} fails ' , '${actor} fail ')
+            elseif msg_id == 139 then
+                msg = msg:gsub(' but finds nothing' , ' but find nothing')
+            elseif msg_id == 140 then
+                msg = msg:gsub(' and finds a ${item2}' , ' and find a ${item2}')
+            elseif msg_id == 158 then
+                msg = msg:gsub('${ability}, but misses' , '${ability}, but miss')
+            elseif msg_id == 585 then
+                msg = msg:gsub('${actor} is ' , '${actor} are ')
+            elseif msg_id == 674 then
+                msg = msg:gsub(' and finds ${number}' , ' and find ${number}')
+            elseif msg_id == 780 then
+                msg = msg:gsub('${actor} takes ' , '${actor} take ')
+            elseif replacements_map.actor.steals:contains(msg_id) then
+                msg = msg:gsub('${actor} steals ' , '${actor} steal ')
+            elseif replacements_map.actor.butmissestarget:contains(msg_id) then
+                msg = msg:gsub(' but misses ${target}' , ' but miss ${target}')
+            end
+        elseif replacements_map.actor.is:contains(msg_id) then
+            msg = msg:gsub('${actor} is ' , '${actor} are ')
+        elseif replacements_map.actor.learns:contains(msg_id) then
+            msg = msg:gsub('${actor} learns ' , '${actor} learn ')
+        elseif replacements_map.actor.has:contains(msg_id) then
+            msg = msg:gsub('${actor} has ' , '${actor} have ')
+        elseif replacements_map.actor.obtains:contains(msg_id) then
+            msg = msg:gsub('${actor} obtains ' , '${actor} obtain ')
+        elseif replacements_map.actor.does:contains(msg_id) then
+            msg = msg:gsub('${actor} does ' , '${actor} do ')
+        elseif replacements_map.actor.leads:contains(msg_id) then
+            msg = msg:gsub('${actor} leads ' , '${actor} lead ')
+        elseif replacements_map.actor.eats:contains(msg_id) then
+            msg = msg:gsub('${actor} eats ' , '${actor} eat ')
+            if msg_id == 604 then
+                msg = msg:gsub(' but finds nothing' , ' but find nothing')
+            end
+        elseif replacements_map.actor.earns:contains(msg_id) then
+            msg = msg:gsub('${actor} earns ' , '${actor} earn ')
+        end
     end
     return msg
 end
 
-function plural_target(msg)
+function plural_target(msg, msg_id)
     if msg then
-        msg = msg
-            :gsub('${target} takes ', '${target} take ')
-            :gsub('${target} is ', '${target} are ')
-            :gsub('${target} recovers ', '${target} recover ')
-            :gsub("${target}'s ", targets_condensed and '${target} ' or "${target}' ")
-            :gsub('${target} falls ', '${target} fall ')
-            :gsub('${target} uses ', '${target} use ')
-            :gsub('${target} resists', '${target} resist')
-            :gsub('${target} vanishes', '${target} vanish')
-            :gsub('${target} receives ', '${target} receive ')
-            :gsub('${target} seems ${skill}', '${target} seem ${skill}')
-            :gsub('${lb}It seems to have ', '${lb}They seem to have ')
-            :gsub('${target} gains ', '${target} gain ')
-            :gsub('${target} evades', '${target} evade')
-            :gsub('${target} regains ', '${target} regain ')
-            :gsub('${target} narrowly escapes ', '${target} narrowly escape ')
-            :gsub('${target} obtains ', '${target} obtain ')
-            :gsub('${target} learns ', '${target} learn ')
-            :gsub('${target} loses ', '${target} lose ')
-            :gsub('${target} was ', '${target} were ')
-            :gsub('${target} has ', '${target} have ')
-            :gsub('${target} completely resists ', '${target} completely resist ')
-            :gsub('${target} now has ', '${target} now have ')
-            :gsub('${target} feels ', '${target} feel ')
-            :gsub('${target} stands ', '${target} stand ')
+        if msg_id == 282 then
+            msg = msg:gsub('${target} evades', '${target} evade')
+        elseif msg_id == 359 then
+            msg = msg:gsub('${target} narrowly escapes ', '${target} narrowly escape ')
+        elseif msg_id == 419 then
+            msg = msg:gsub('${target} learns ', '${target} learn ')
+        elseif msg_id == 671 then
+            msg = msg:gsub('${target} now has ', '${target} now have ')
+        elseif msg_id == 764 then
+            msg = msg:gsub('${target} feels ', '${target} feel ')
+        elseif replacements_map.target.takes:contains(msg_id) then
+            msg = msg:gsub('${target} takes ', '${target} take ')
+            if msg_id == 197 then
+                msg = msg:gsub('${target} resists', '${target} resist')
+            end
+        elseif replacements_map.target.is:contains(msg_id) then
+            msg = msg:gsub('${target} is ', '${target} are ')
+        elseif replacements_map.target.recovers:contains(msg_id) then
+            msg = msg:gsub('${target} recovers ', '${target} recover ')
+        elseif replacements_map.target.apos:contains(msg_id) then --coincidence in 439 and 440
+            msg = msg:gsub('${target}\'s ', targets_condensed and '${target} ' or '${target}\' ')
+            if msg_id == 439 or msg_id == 440 then
+                msg = msg:gsub('${target} regains ', '${target} regain ')
+            end
+        elseif replacements_map.target.falls:contains(msg_id) then
+            msg = msg:gsub('${target} falls ', '${target} fall ')
+        elseif replacements_map.target.uses:contains(msg_id) then
+            msg = msg:gsub('${target} uses ', '${target} use ')
+        elseif replacements_map.target.resists:contains(msg_id) then
+            msg = msg:gsub('${target} resists', '${target} resist')
+        elseif replacements_map.target.vanishes:contains(msg_id) then
+            msg = msg:gsub('${target} vanishes', '${target} vanish')
+        elseif replacements_map.target.receives:contains(msg_id) then
+            msg = msg:gsub('${target} receives ', '${target} receive ')
+        elseif replacements_map.target.seems:contains(msg_id) then
+            msg = msg:gsub('${target} seems ${skill}', '${target} seem ${skill}')
+            if msg_id ~= 174 then
+                msg = msg:gsub('${lb}It seems to have ', '${lb}They seem to have ')
+            end
+        elseif replacements_map.target.gains:contains(msg_id) then
+            msg = msg:gsub('${target} gains ', '${target} gain ')
+        elseif replacements_map.target.regains:contains(msg_id) then
+            msg = msg:gsub('${target} regains ', '${target} regain ')
+        elseif replacements_map.target.obtains:contains(msg_id) then
+            msg = msg:gsub('${target} obtains ', '${target} obtain ')
+        elseif replacements_map.target.loses:contains(msg_id) then
+            msg = msg:gsub('${target} loses ', '${target} lose ')
+        elseif replacements_map.target.was:contains(msg_id) then
+            msg = msg:gsub('${target} was ', '${target} were ')
+        elseif replacements_map.target.has:contains(msg_id) then
+            msg = msg:gsub('${target} has ', '${target} have ')
+        elseif replacements_map.target.compresists:contains(msg_id) then
+            msg = msg:gsub('${target} completely resists ', '${target} completely resist ')
+        end
     end
     return msg
 end
 
-function clean_msg(msg)
+function clean_msg(msg, msg_id)
     if msg then
         msg = msg
             :gsub(' The ', ' the ')
-        msg = msg
-            :gsub('%. the ', '. The ')
             :gsub(': the ', ': The ')
             :gsub('! the ', '! The ')
+        if replacements_map.the.point:contains(msg_id) then
+            msg = msg:gsub('%. the ', '. The ')
+        end
     end
     return msg
 end
 
-function grammatical_number_fix(msg, number)
+function grammatical_number_fix(msg, number, msg_id)
     if msg then
         if number == 1 then
-            msg = msg
-                :gsub(' points', ' point')
-                :gsub('${number} Ballista Points', '${number} Ballista Point')
-                :gsub('healed of ${number} status ailments', 'healed of ${number} status ailment')
-                :gsub('magical effects from', 'magical effect from')
+            if replacements_map.number.points:contains(msg_id) then
+                msg = msg:gsub(' points', ' point')
+            elseif msg_id == 411 then
+                msg = msg:gsub('${number} Ballista Points', '${number} Ballista Point')
+            elseif msg_id == 589 then
+                msg = msg:gsub('healed of ${number} status ailments', 'healed of ${number} status ailment')
+            elseif msg_id == 778 then
+                msg = msg:gsub('magical effects from', 'magical effect from')
+            end
         else
-            msg = msg
-                :gsub(' absorbs', ' absorb')
-                :gsub(' Petra', ' Petras')
-                :gsub('disappears', 'disappear')
-                :gsub('attributes is', 'attributes are')
-                :gsub('status effect is', 'status effects are')
-                :gsub('piece', 'pieces')
-                :gsub('Finishing move now ', 'Finishing moves now ')
+            if replacements_map.number.absorbs:contains(msg_id) then
+                msg = msg:gsub(' absorbs', ' absorb')
+            elseif msg_id == 133 then
+                msg = msg:gsub(' Petra', ' Petras')
+            elseif replacements_map.number.attributes:contains(msg_id) then
+                msg = msg:gsub('attributes is', 'attributes are')
+            elseif replacements_map.number.status:contains(msg_id) then
+                msg = msg:gsub('status effect is', 'status effects are')
+            elseif msg_id == 557 then
+                msg = msg:gsub('piece', 'pieces')
+            elseif msg_id == 560 then
+                msg = msg:gsub('Finishing move now ', 'Finishing moves now ')
+            end
+            if replacements_map.number.disappears:contains(msg_id) then
+                msg = msg:gsub('disappears', 'disappear')
+            end
         end
     end
     return msg
