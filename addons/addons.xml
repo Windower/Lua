@@ -649,6 +649,13 @@
     <support>https://discord.gg/b275nMv</support>
   </addon>
   <addon>
+    <name>Stubborn</name>
+    <author>Arico</author>
+    <description>An addon to block accidental calls for help.</description>
+    <bugtracker>https://github.com/ianandersonlol/stubborn/issues</bugtracker>
+    <support>https://discord.gg/b275nMv</support>
+  </addon>
+  <addon>
     <name>subTarget</name>
     <author>Sebyg666</author>
     <description>Enhances the usage of the send addon by allowing a stal or stpc or st target to be sent as the spell recipient. This removes the need for multiple macros for the same spell.</description>
