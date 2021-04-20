@@ -198,7 +198,7 @@ slot_map.back = 15
 
 
 
-gearswap_disabled = true
+gearswap_disabled = false
 seen_0x063_type9 = false
 delay_0x063_v9 = false
 not_sent_out_equip = {}
