@@ -130,7 +130,6 @@ require 'flow'
 require 'triggers'
 
 initialize_packet_parsing()
-gearswap_disabled = false
 
 windower.register_event('load',function()
     windower.debug('load')
