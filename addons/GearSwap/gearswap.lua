@@ -136,6 +136,11 @@ windower.register_event('load',function()
     windower.debug('load')
     refresh_globals()
     
+    if not file.exists('data\\default.lua') then
+        file.new('data\\default.lua',true):write('-- this file was generated automatically and can be safely overwritten.')
+        print('GearSwap: A default user profile (default.lua) has been created.')
+    end
+
     if world.logged_in then
         refresh_user_env()
         if debugging.general then windower.send_command('@unload spellcast;') end
