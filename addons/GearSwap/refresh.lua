@@ -79,7 +79,7 @@ function load_user_files(job_id,user_file)
     end
     
     current_file = nil
-    gearswap_disabled = true
+    -- gearswap_disabled = true
     sets = nil
     user_env = nil
     unhandled_command_events = {}
@@ -108,7 +108,7 @@ function load_user_files(job_id,user_file)
     
     if not path then
         current_file = nil
-        gearswap_disabled = true
+        -- gearswap_disabled = true
         sets = nil
         return
     end
@@ -151,16 +151,16 @@ function load_user_files(job_id,user_file)
     user_env['_G'] = user_env
     
     -- Try to load data/<name>_<main job>.lua
-    local funct, err = loadfile(path)
+    local funct, err = path and loadfile(path) or function() end
     
     -- If the file cannot be loaded, print the error and load the default.
-    if funct == nil then
+    if err then
         print('User file problem: '..err)
         current_file = nil
-        gearswap_disabled = true
+        -- gearswap_disabled = true
         sets = nil
         return
-    else
+    elseif filename then
         current_file = filename
         print('GearSwap: Loaded your '..current_file..' file!')
     end
@@ -172,7 +172,7 @@ function load_user_files(job_id,user_file)
     
     if not status then
         error('GearSwap: File failed to load: \n'..plugin)
-        gearswap_disabled = true
+        -- gearswap_disabled = true
         sets = nil
         return nil
     end
