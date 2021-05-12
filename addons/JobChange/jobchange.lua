@@ -41,8 +41,8 @@ packets = require('packets')
 res = require ('resources')
 
 local temp_jobs =  T { 'NIN', 'DNC', 'WAR', 'MNK', 'WHM', 'BLM', 'RDM', 'THF' } 
-local mog_zones = S { 'Selbina', 'Mhaura', 'Tavnazian Safehold', 'Nashmau', 'Rabao', 'Kazham', 'Norg'}
-local moogles = S { 'Moogle', 'Nomad Moogle', 'Green Thumb Moogle' }
+local mog_zones = S { 'Selbina', 'Mhaura', 'Tavnazian Safehold', 'Nashmau', 'Rabao', 'Kazham', 'Norg', 'Walk of Echoes [P1]', 'Walk of Echoes [P2]' }
+local moogles = S { 'Moogle', 'Nomad Moogle', 'Green Thumb Moogle', 'Pilgrim Moogle' }
 
 local log = function(msg)
     windower.add_to_chat(4,'JobChange: '..msg)
