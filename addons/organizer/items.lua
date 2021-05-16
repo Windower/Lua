@@ -30,9 +30,21 @@ local bags = {}
 local item_tab = {}
 
 local function validate_bag(bag_table)
-    if (bag_table.access == 'Everywhere' or (bag_table.access == 'Mog House' and windower.ffxi.get_info().mog_house)) and
-        windower.ffxi.get_bag_info(bag_table.id) then
-        return true
+    if type(bag_table) == 'table' and windower.ffxi.get_bag_info(bag_table.id) then 
+        if bag_table.access == 'Everywhere' then
+            return true
+        elseif bag_table.access == 'Mog House' then 
+            if windower.ffxi.get_info().mog_house then
+                return true
+            end
+            
+            for i = 0, 0x3FF do
+                local t = windower.ffxi.get_mob_by_index(i)
+                if t and (t.name == 'Nomad Moogle' or t.name == 'Pilgrim Moogle') and t.valid_target and t.distance < 36 then
+                    return true
+                end
+            end
+        end
     end
     return false
 end
