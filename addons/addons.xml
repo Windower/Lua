@@ -15,7 +15,7 @@
     <name>AEcho</name>
     <description>Automatically uses echo drops when you get silenced. Also, uses send to send a message to an alt that you got debuffed.</description>
     <author>Nitrous (Shiva)</author>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
@@ -30,13 +30,13 @@
     <author>Byrth</author>
     <description>Stores tells that you receive for later recall.</description>
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>AutoControl</name>
     <description>Automated automaton equipment setting and burden tracker.</description>
     <author>Nitrous (Shiva)</author>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
     <addon>
@@ -44,7 +44,7 @@
     <author>Chiaia</author>
     <description>Automatically hits the enter key twice when first starting so you don't timeout on the warning message.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>autoinvite</name>
@@ -58,7 +58,7 @@
     <author>Arcon</author>
     <description>Automatically joins or declines party invites. Configurable with blacklist/whitelist mode and auto-decline settings.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>AutoRA</name>
@@ -70,7 +70,7 @@
     <name>AzureSets</name>
     <description>Automated blue magic spell setting.</description>
     <author>Nitrous (Shiva)</author>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
@@ -85,14 +85,14 @@
     <author>Byrth</author>
     <description>Customizes battle chat messages.</description>
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>BattleStations</name>
     <author>Sjshovan (Apogee)</author>
     <description>Change or remove the default battle music.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>Blist</name>
@@ -120,13 +120,13 @@
     <author>Byrth</author>
     <description>Mimics the cancel plugin, but also accepts buff names instead of just IDs.</description>
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>cBlock</name>
     <description>Blacklist addon for FFOChat.</description>
     <author>Nitrous (Shiva)</author>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
@@ -148,7 +148,7 @@
     <author>Arcon</author>
     <description>Allows opening links posted into the FFXI chat.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>ChatPorter</name>
@@ -162,14 +162,14 @@
     <author>Arcon</author>
     <description>Displays an on-screen clock in a custom format with options to display several different time zones.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>ConsoleBG</name>
     <author>Arcon</author>
     <description>Displays a dark (by default) background behind the Windower console to make it more readable.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>digger</name>
@@ -183,14 +183,14 @@
     <author>Chiaia</author>
     <description>Helps warp you to Reisenjima using (Dim) Rings.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>Distance</name>
     <author>Arcon</author>
     <description>Shows the distance to your current target.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>DistancePlus</name>
@@ -204,7 +204,7 @@
     <author>Cair</author>
     <description>Emulates BlinkMeNot functionality. Allows for customization of gear display for you or anyone else.</description>
     <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>DynamisHelper</name>
@@ -238,28 +238,28 @@
     <author>Tako, Rubenator</author>
     <description>Displays current equipment grid on screen. Also can show current Ammo count and current Encumbrance.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>eval</name>
     <author>Aureus</author>
     <description>Allows developers to run arbitrary lua code in the console.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>FastCS</name>
     <author>Cair</author>
     <description>Dramatically speeds up cutscenes by disabling the frame rate cap. Requires the config plugin.</description>
     <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>FFOColor</name>
     <author>Nitrous (Shiva)</author>
     <description>Allows you to show FFOChat text in one of the 5 game chat channels. As well as specify colors for the text</description>
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>findAll</name>
@@ -293,7 +293,7 @@
     <author>Byrth</author>
     <description>Enables instant linkshell chat after zoning.</description>
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>InfoBar</name>
@@ -307,7 +307,7 @@
     <author>Cair</author>
     <description>Replaces outgoing text prefixed by % with respective game information.</description>
     <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>Itemizer</name>
@@ -335,14 +335,14 @@
     <author>Arcon</author>
     <description>Allows opening links to certain websites from within the game, with an optional search parameter.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>Logger</name>
     <author>Arcon</author>
     <description>Logs the chat log to a file.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>Lookup</name>
@@ -356,26 +356,26 @@
     <author>Arcon</author>
     <description>Automatically passes an item on all accounts if lotted by another.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>MacroChanger</name>
     <author>Banggugyangu</author>
     <description>Automatically switches Macro Book and Page according to job changes.</description>
     <bugtracker>https://github.com/banggugyangu/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>MobCompass</name>
     <description>A compass to show your position relative to the target (not players) for geo and has a setup for Sneak attack</description>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>MountMuzzle</name>
     <author>Sjshovan (Apogee)</author>
     <description>Change or remove the default mount music.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>MountRoulette</name>
@@ -395,7 +395,7 @@
     <name>Nostrum</name>
     <description>Creates a click-able on-screen macro to help avoid targeting problems while curing.</description>
     <author>trv</author>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
     <bugtracker>https://github.com/trv6/Lua/issues</bugtracker>
   </addon>
   <addon>
@@ -403,12 +403,12 @@
     <author>Glarin of Asura</author>
     <description>Tracks and displays the Current Floor, Time Remaining, Objective, Floors Completed, Reward Rate, and Potenial Tokens.</description>
     <bugtracker>https://github.com/GlarinAsura/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>obiaway</name>
     <description>Automatically collect and remove elemental obi based on day/weather/storm conditions.</description>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>Omen</name>
@@ -421,14 +421,14 @@
     <name>OhShi</name>
     <description>Keeps track of various event related things. Such as, VW proc messages, mob casting, mob tp moves, TH procs and cor rolls, as well as others.</description>
     <author>Nitrous (Shiva)</author>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
     <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
   </addon>
   <addon>
     <name>Organizer</name>
     <description>A multi-purpose inventory management solution. Similar to GearCollector.</description>
     <author>Byrth, Rooks</author>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
   </addon>
   <addon>
@@ -436,21 +436,21 @@
     <author>Byrth</author>
     <description>Temporary addon that fixes a null pointer animation error with pets that is causing crashes.</description>
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>PetSchool</name>
     <author>Banggugyangu</author>
     <description>A helper addon for PUPs using spellcast, it informs spellcast of pet casting (healing or nuking).</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>PetTP</name>
     <author>SnickySnacks</author>
     <description>Tracks pet vitals (HP/TP/MP)</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>plasmon</name>
@@ -464,14 +464,14 @@
     <author>Byrth</author>
     <description>Allows you to specify which plugins and addons will be used with which characters.</description>
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
     </addon>
   <addon>
     <name>PointWatch</name>
     <author>Byrth</author>
     <description>Allows you to monitor your XP/CP gains and keep track of the Dynamis time limit.</description>
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>porter</name>
@@ -506,20 +506,20 @@
     <author>Byrth</author>
     <description>Should request spawn packets for players / mobile NPCs that failed to spawn.</description>
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>Respond</name>
     <author>Byrth</author>
     <description>Respond to tells and FFOchat PMs using //r.</description>
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>Rhombus</name>
     <description>Creates a highly customizable, click-able, on-screen menu.</description>
     <author>trv</author>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
     <bugtracker>https://github.com/trv6/Lua/issues</bugtracker>
   </addon>
   <addon>
@@ -527,7 +527,7 @@
     <author>Cair</author>
     <description>Lets you save your Records of Eminence objectives to profiles for easily swapping out objectives.</description>
     <bugtracker>https://github.com/cairface/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>RollTracker</name>
@@ -548,14 +548,14 @@
     <author>Banggugyangu</author>
     <description>Informs Spellcast about changes to Sneak Attack and Trick Attack status.</description>
     <bugtracker>https://github.com/banggugyangu/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>Scoreboard</name>
     <author>Suji</author>
     <description>Basic in-game damage parser. It displays live DPS and works even when chat filters are enabled.</description>
     <bugtracker>https://github.com/jerryhebert/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>setbgm</name>
@@ -569,7 +569,7 @@
     <author>Byrth</author>
     <description>Applys spellcast-like command completion (interpretation and target completion) to commands. Includes emotes, /check, and /pcmd.</description>
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>Silence</name>
@@ -590,14 +590,14 @@
     <author>Byrth</author>
     <description>Sends commands between windower instances using IPC.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>SetTarget</name>
     <author>Arcon</author>
     <description>Sets the target to a given ID.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>SpeedChecker</name>
@@ -646,7 +646,14 @@
     <author>Ihm</author>
     <description>A simple helper addon for Spellcast for Scholar Stratagems. It will automatically calculate the number of stratagems you have and push them into spellcast variables.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
+  </addon>
+  <addon>
+    <name>Stubborn</name>
+    <author>Arico</author>
+    <description>An addon to block accidental calls for help.</description>
+    <bugtracker>https://github.com/ianandersonlol/stubborn/issues</bugtracker>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>subTarget</name>
@@ -660,21 +667,21 @@
     <author>Arcon</author>
     <description>Displays information about your current target in memory.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>Text</name>
     <author>Arcon</author>
     <description>Allows creating and manipulating on-screen text objects through Windower commands.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>Treasury</name>
     <author>Arcon</author>
     <description>Lots or passes items based on configurable lists, drops unwanted items from the inventory and automatically stacks items when they drop.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>thtracker</name>
@@ -695,14 +702,14 @@
     <author>Arcon</author>
     <description>Shows a target's HP percentage next to their health bar as well as party/alliance members's TP.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>translate</name>
     <author>Byrth</author>
     <description>Gives a rough JP->EN translation using the resources and custom dictionaries.</description>
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>TreasurePool</name>
@@ -716,7 +723,7 @@
     <author>Arcon</author>
     <description>Updates and reloads all plugins and addons when typing //update.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>VisibleFavor</name>
@@ -744,7 +751,7 @@
     <author>Arcon</author>
     <description>A file-based macro engine</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>zonetimer</name>
@@ -807,7 +814,7 @@
     <author>Auk</author>
     <description>Tracks and displays debuffs on your current target.</description>
     <bugtracker>https://github.com/aukon/Lua/issues</bugtracker>
-    <support>https://discord.gg/b275nMv</support>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
     <name>Tab</name>

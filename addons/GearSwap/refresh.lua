@@ -79,7 +79,6 @@ function load_user_files(job_id,user_file)
     end
     
     current_file = nil
-    gearswap_disabled = true
     sets = nil
     user_env = nil
     unhandled_command_events = {}
@@ -108,7 +107,6 @@ function load_user_files(job_id,user_file)
     
     if not path then
         current_file = nil
-        gearswap_disabled = true
         sets = nil
         return
     end
@@ -157,7 +155,6 @@ function load_user_files(job_id,user_file)
     if funct == nil then
         print('User file problem: '..err)
         current_file = nil
-        gearswap_disabled = true
         sets = nil
         return
     else
@@ -172,7 +169,6 @@ function load_user_files(job_id,user_file)
     
     if not status then
         error('GearSwap: File failed to load: \n'..plugin)
-        gearswap_disabled = true
         sets = nil
         return nil
     end
