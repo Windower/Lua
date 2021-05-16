@@ -426,7 +426,7 @@ windower.register_event('addon command', function (...)
         if #cmd_args == 0 then
             error("Must provide path.")
             log('Current Path: %s':format(
-                "\""..settings.game_path.."\"" or "(Default): \""..windower.pol_path.."\/..\/FINAL FANTASY XI\""
+                "\""..settings.game_path.."\"" or "(Default): \""..windower.ffxi_path
             ))
             return
         end
