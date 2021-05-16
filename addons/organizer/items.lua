@@ -36,6 +36,8 @@ local function validate_bag(bag_table)
         elseif bag_table.access == 'Mog House' then 
             if windower.ffxi.get_info().mog_house then
                 return true
+            elseif bag_table.english == 'Storage' then -- Storage is never available at Nomad/Pilgrim Moogles
+                return false
             end
             
             for i = 0, 0x3FF do
