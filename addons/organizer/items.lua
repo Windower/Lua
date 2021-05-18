@@ -36,16 +36,20 @@ local function validate_bag(bag_table)
         elseif bag_table.access == 'Mog House' then 
             if windower.ffxi.get_info().mog_house then
                 return true
-            elseif bag_table.english == 'Storage' then -- Storage is never available at Nomad/Pilgrim Moogles
+            elseif bag_table.english == 'Storage' then -- Storage is not available at Nomad Moogles
                 return false
             end
-            
-            for i = 0, 0x3FF do
-                local t = windower.ffxi.get_mob_by_index(i)
-                if t and (t.name == 'Nomad Moogle' or t.name == 'Pilgrim Moogle') and t.valid_target and t.distance < 36 then
-                    return true
+                
+            local m = {'Nomad Moogle', 'Pilgrim Moogle'}
+            for _, name in pairs(m) do
+                for index, _ in pairs(windower.ffxi.get_mob_list(name)) do
+                    local t = windower.ffxi.get_mob_by_index(index)
+                    if t and t.valid_target and t.distance < 36 then
+                        return true
+                    end
                 end
             end
+            
         end
     end
     return false
