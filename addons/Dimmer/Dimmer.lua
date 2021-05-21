@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.]]
 
 _addon.name = 'Dimmer'
 _addon.author = 'Chiaia'
-_addon.version = '1.1'
+_addon.version = '1.1.1'
 _addon.commands = {'dim','dimmer'}
 
 
