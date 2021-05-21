@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.]]
 
 _addon.name = 'MyHome'
 _addon.author = 'from20020516'
-_addon.version = '1.1'
+_addon.version = '1.1.1'
 _addon.commands = {'myhome','mh','warp'}
 
 require('logger')
