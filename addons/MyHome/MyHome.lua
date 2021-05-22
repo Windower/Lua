@@ -40,12 +40,17 @@ item_info = {
     [3]={id=4181,japanese='呪符デジョン',english='"Instant Warp"'}}
 
 function search_item()
+    if windower.ffxi.get_player().status > 1 then
+        log('You cannot use items at this time.')
+        return
+    end
+
     local item_array = {}
     local bags = {0,8,10,11,12} --inventory,wardrobe1-4
     local get_items = windower.ffxi.get_items
     for i=1,#bags do
         for _,item in ipairs(get_items(bags[i])) do
-            if item.id > 0 then
+            if item.id > 0  then
                 item_array[item.id] = item
                 item_array[item.id].bag = bags[i]
             end
@@ -54,7 +59,8 @@ function search_item()
     for index,stats in pairs(item_info) do
         local item = item_array[stats.id]
         local set_equip = windower.ffxi.set_equip
-        if item and windower.ffxi.get_bag_info(item.bag).enabled then
+        local bag_enabled = windower.ffxi.get_bag_info(item.bag).enabled 
+        if item and bag_enabled then
             local ext = extdata.decode(item)
             local enchant = ext.type == 'Enchanted Equipment'
             local recast = enchant and ext.charges_remaining > 0 and math.max(ext.next_use_time+18000-os.time(),0)
@@ -79,6 +85,8 @@ function search_item()
                 windower.chat.input('/item '..windower.to_shift_jis(stats[lang])..' <me>')
                 break;
             end
+        elseif not bag_enabled then
+            log('You cannot access '..stats[lang]..' at this time.')
         else
             log('You don\'t have '..stats[lang]..'.')
         end
