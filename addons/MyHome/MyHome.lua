@@ -50,7 +50,7 @@ function search_item()
     local get_items = windower.ffxi.get_items
     for i=1,#bags do
         for _,item in ipairs(get_items(bags[i])) do
-            if item.id > 0  then
+            if item.id > 0 then
                 item_array[item.id] = item
                 item_array[item.id].bag = bags[i]
             end
