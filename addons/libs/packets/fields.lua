@@ -1774,9 +1774,10 @@ func.incoming[0x028].target_base = L{
 
 func.incoming[0x028].action_base = L{
     {ctype='bit[5]',            label='Reaction'},                              -- 00:0
-    {ctype='bit[11]',           label='Animation'},                             -- 00:5
-    {ctype='bit[5]',            label='Effect'},                                -- 02:0
-    {ctype='bit[6]',            label='Stagger'},                               -- 02:5
+    {ctype='bit[12]',           label='Animation'},                             -- 00:5
+    {ctype='bit[4]',            label='Effect'},                                -- 02:1   Particle effects: bit 1 finishing blow, bit 2 critical hit, bit 3 hit not connected, bit 4 effect follow up (I have only seen in jishnu's radiance)
+    {ctype='bit[3]',            label='Stagger'},                               -- 02:5   head moving animation when getting hit, the value seems to be set based on dmg done, more dmg more bits sets (not sure if raw or percentage)
+    {ctype='bit[3]',            label='Knockback'},                             -- 03:0   Knockback effect, the more value the more distance
     {ctype='bit[17]',           label='Param'},                                 -- 03:3
     {ctype='bit[10]',           label='Message'},                               -- 06:2
     {ctype='bit[31]',           label='_unknown'},                              -- 07:4 --Message Modifier? If you get a complete (Resist!) this is set to 2 otherwise a regular Resist is 0.
