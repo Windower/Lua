@@ -1369,7 +1369,7 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned char',     label='Linkshell Blue'},                        -- 26
     {ctype='unsigned char',     label='_flags1'},                               -- 27   0x80 Autogroup flag
     {ctype='unsigned char',     label='_flags2'},                               -- 28   0x01 puts your weapon on hand, 0x02 Request flag, 
-    {ctype='unsigned char',     label='Ballista Stuff'},                        -- 29   Same pattern than incoming 0x037 packet
+    {ctype='unsigned char',     label='PvP Stuff'},                             -- 29   Same pattern than incoming 0x037 packet
     {ctype='unsigned char',     label='_flags3'},                               -- 2A   0x20 Sneak Effect flag, 0x80 New Adventurer flag
     {ctype='unsigned char',     label='_flags4'},                               -- 2B   0x01 Mentor flag
     {ctype='data[4]',           label='_unknown6'},                             -- 2C
@@ -2088,7 +2088,7 @@ enums.indi = {
     -- 0x08 -- Terror flag
     -- 0x10 -- No obvious effect
     
-    Ballista stuff:
+    PvP stuff:
     -- 0x0020 -- No obvious effect
     -- 0x0040 -- San d'Oria ballista flag
     -- 0x0060 -- Bastok ballista flag
@@ -2097,8 +2097,8 @@ enums.indi = {
     -- 0x00C0 -- Gryphons team icon
     -- 0x0100 -- Belligerency icon (used in monstrosity)
     -- 0x0200 -- Has some effect
-    -- 0x0400 -- Some red icon, I don't know where is used (ballista related?)
-    -- 0x0420 -- Some blue icon, I don't know where is used (ballista related?)
+    -- 0x0400 -- Pankration red icon
+    -- 0x0420 -- Pankration blue icon
     -- 0x0800 -- and I still don't D:<
     -- 0x1000 -- and I still don't D:<
     
@@ -2129,7 +2129,7 @@ fields.incoming[0x037] = L{
     {ctype='bit[3]',            label='_flags5'},                               -- 34   
     {ctype='bit[16]',           label='Pet Index',          fn=index},          -- 34   From 0x08 of byte 0x34 to 0x04 of byte 0x36
     {ctype='bit[2]',            label='_flags6'},                               -- 36
-    {ctype='bit[9]',            label='Ballista Stuff'},                        -- 36   Ballista flags here also makes appear the score, but it is probably modified in a ballista specific packet.
+    {ctype='bit[9]',            label='PvP Stuff'},                             -- 36   Ballista flags here also makes appear the score, but it is probably modified in a ballista specific packet.
     {ctype='bit[8]',            label='_flags7'},                               -- 37   0x04 Request Flag, 0x08 Trial Flag, x10 Sneak Effect, 0x20 New Adventurer Flag, 0x40 Mentor Flag
     {ctype='bit[26]',           label='_unknown1'},                             -- 38   No obvious effect from any of these
     {ctype='unsigned int',      label='Time offset?',       fn=time},           -- 3C   For me, this is the number of seconds in 66 hours
