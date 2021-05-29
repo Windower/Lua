@@ -117,9 +117,10 @@ local function act_to_string(original,act)
         offset = offset + 36
         for n = 1,act.targets[i].action_count do
             react = assemble_bit_packed(react,act.targets[i].actions[n].reaction,offset,offset+5)
-            react = assemble_bit_packed(react,act.targets[i].actions[n].animation,offset+5,offset+16)
-            react = assemble_bit_packed(react,act.targets[i].actions[n].effect,offset+16,offset+21)
-            react = assemble_bit_packed(react,act.targets[i].actions[n].stagger,offset+21,offset+27)
+            react = assemble_bit_packed(react,act.targets[i].actions[n].animation,offset+5,offset+17)
+            react = assemble_bit_packed(react,act.targets[i].actions[n].effect,offset+17,offset+21)
+            react = assemble_bit_packed(react,act.targets[i].actions[n].stagger,offset+21,offset+24)
+            react = assemble_bit_packed(react,act.targets[i].actions[n].knockback,offset+24,offset+27)
             react = assemble_bit_packed(react,act.targets[i].actions[n].param,offset+27,offset+44)
             react = assemble_bit_packed(react,act.targets[i].actions[n].message,offset+44,offset+54)
             react = assemble_bit_packed(react,act.targets[i].actions[n].unknown,offset+54,offset+85)
