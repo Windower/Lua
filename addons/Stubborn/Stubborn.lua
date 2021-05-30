@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. --]]
 _addon.name = 'Stubborn'
 _addon.author = 'Arico'
 _addon.version = '1'
-_addon.command = {'stubborn','cfh'}
+_addon.commands = {'stubborn','cfh'}
 
 require('logger')
 packets = require('packets')
