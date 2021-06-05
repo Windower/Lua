@@ -702,13 +702,15 @@ end
 
 function initialize_packet_parsing()
     for i,v in pairs(parse.i) do
-        local lastpacket = windower.packets.last_incoming(i)
-        if lastpacket then
-            v(lastpacket)
-        end
-        if i == 0x63 and lastpacket and lastpacket:byte(5) ~= 9 then
-            -- Not receiving an accurate buff line on load because the wrong 0x063 packet was sent last
+        if i ~= 0x028 then
+            local lastpacket = windower.packets.last_incoming(i)
+            if lastpacket then
+                v(lastpacket)
+            end
+            if i == 0x63 and lastpacket and lastpacket:byte(5) ~= 9 then
+                -- Not receiving an accurate buff line on load because the wrong 0x063 packet was sent last
             
+            end
         end
     end
 end
