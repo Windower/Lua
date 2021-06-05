@@ -511,7 +511,7 @@ ActionPacket.open_listener(action_handler)
             else
                 result = actor
             end
-            if(pet)then
+            if pet then
                 result = '('..owner..')'..' '..pet
             end
         else
