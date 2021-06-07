@@ -73,6 +73,8 @@ windower.register_event('load',function()
     
     if player and player.status == 4 then
         windower.send_command("config FrameRateDivisor 0")
+    else
+        disable()
     end
     
 end)
