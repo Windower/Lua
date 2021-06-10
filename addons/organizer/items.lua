@@ -39,7 +39,7 @@ do
         moogles = {}
     end
     
-    nomad_moogle = function(wipe)
+    nomad_moogle = function()
         if #moogles == 0 then
             for _,name in ipairs(names) do
                 local npcs = windower.ffxi.get_mob_list(name)
@@ -56,11 +56,6 @@ do
                 return true
             end
         end
---            \   ^__^
---             \  (oo)\_______
---                (__)\       )\/\
---                    ||----w |
---                    ||     ||        
         return false
     end
 end
