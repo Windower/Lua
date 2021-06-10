@@ -29,6 +29,48 @@ local items = {}
 local bags = {}
 local item_tab = {}
 
+local nomad_moogle
+do
+    local names = {'Nomad Moogle', 'Pilgrim Moogle'}
+    local moogles = {}
+    
+    nomad_moogle = function(wipe)
+        if wipe then
+            moogles = {}
+            return
+        end
+
+        if type(next(moogles)) == 'nil' then
+            for _,name in ipairs(names) do
+                local npcs = windower.ffxi.get_mob_list(name)
+                for index in pairs(npcs) do
+                    table.insert(moogles,{['index'] = index})
+                end
+            end
+        end
+        
+        local player = windower.ffxi.get_mob_by_target('me')
+        for _,moogle in pairs(moogles) do
+            if not moogle.x then
+                local t = windower.ffxi.get_mob_by_index(moogle.index)
+                moogle.x, moogle.y = t.x, t.y
+            end
+            if moogle.x then
+                local dx = player.x - moogle.x
+                local dy = player.y - moogle.y
+                if dx*dx+dy*dy < 36 then
+                    return true
+                end
+            end
+        end
+        return false
+    end
+end
+
+windower.register_event('zone change',function() 
+    nomad_moogle('wipe') 
+end)
+
 local function validate_bag(bag_table)
     if type(bag_table) == 'table' and windower.ffxi.get_bag_info(bag_table.id) then 
         if bag_table.access == 'Everywhere' then
@@ -36,20 +78,9 @@ local function validate_bag(bag_table)
         elseif bag_table.access == 'Mog House' then 
             if windower.ffxi.get_info().mog_house then
                 return true
-            elseif bag_table.english == 'Storage' then -- Storage is not available at Nomad Moogles
-                return false
+            elseif nomad_moogle() and bag_table.english ~= 'Storage' then -- Storage is not available at Nomad Moogles
+                return true
             end
-                
-            local m = {'Nomad Moogle', 'Pilgrim Moogle'}
-            for _, name in pairs(m) do
-                for index, _ in pairs(windower.ffxi.get_mob_list(name)) do
-                    local t = windower.ffxi.get_mob_by_index(index)
-                    if t and t.valid_target and t.distance < 36 then
-                        return true
-                    end
-                end
-            end
-            
         end
     end
     return false
