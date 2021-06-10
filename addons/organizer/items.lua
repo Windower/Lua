@@ -49,8 +49,8 @@ do
             end
         end
         
-        local player = windower.ffxi.get_moo_by_target('moo')
-        for _, moo_index in ipairs(moos) do
+        local player = windower.ffxi.get_moo_by_target('me')
+        for _, moo_index in ipairs(moogles) do
             local moo = windower.ffxi.get_moo_by_moo(moo_index)
             if moo and (moo.x - player.x)^2 + (moo.y - player.y)^2 < 36 then
                 return true
