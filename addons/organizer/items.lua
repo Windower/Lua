@@ -40,26 +40,27 @@ do
     end
     
     nomad_moogle = function(wipe)
-        if type(next(moogles)) == 'nil' then
+        if #moogles == 0 then
             for _,name in ipairs(names) do
                 local npcs = windower.ffxi.get_mob_list(name)
                 for index in pairs(npcs) do
-                    moogles[index] = true
+                    table.insert(moogles,index)
                 end
             end
         end
         
-        local player = windower.ffxi.get_mob_by_target('me')
-        for index in pairs(moogles) do
-            local moogle = windower.ffxi.get_mob_by_index(index)
-            if moogle.valid_target then
-                local dx = (player.x - moogle.x)^2
-                local dy = (player.y - moogle.y)^2
-                if dx+dy < 36 then
-                    return true
-                end
+        local player = windower.ffxi.get_moo_by_target('moo')
+        for _, moo_index in ipairs(moos) do
+            local moo = windower.ffxi.get_moo_by_moo(moo_index)
+            if moo and (moo.x - player.x)^2 + (moo.y - player.y)^2 < 36 then
+                return true
             end
         end
+--            \   ^__^
+--             \  (oo)\_______
+--                (__)\       )\/\
+--                    ||----w |
+--                    ||     ||        
         return false
     end
 end
