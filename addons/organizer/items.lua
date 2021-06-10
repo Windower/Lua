@@ -53,9 +53,11 @@ do
         for _,moogle in pairs(moogles) do
             if not moogle.x then
                 local t = windower.ffxi.get_mob_by_index(moogle.index)
-                moogle.x, moogle.y, moogle.valid_target = t.x, t.y, t.valid_target
+                if t.valid_target then
+                    moogle.x, moogle.y = t.x, t.y
+                end
             end
-            if moogle.x and moogle.valid_target then
+            if moogle.x then
                 local dx = player.x - moogle.x
                 local dy = player.y - moogle.y
                 if dx*dx+dy*dy < 36 then
@@ -64,6 +66,7 @@ do
             end
         end
         return false
+
     end
 end
 
