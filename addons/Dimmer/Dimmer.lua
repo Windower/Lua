@@ -55,11 +55,12 @@ function search_item()
     
     for bag_id in pairs(res_bags:equippable(true)) do
         local bag = get_items(bag_id)
+        local bag_enabled = windower.ffxi.get_bag_info(bag_id).enabled
         for _,item in ipairs(bag) do
             if item.id > 0  then
                 item_array[item.id] = item
                 item_array[item.id].bag = bag_id
-                item_array[item.id].bag_enabled = windower.ffxi.get_bag_info(bag_id).enabled
+                item_array[item.id].bag_enabled = bag_enabled
             end
         end
     end
