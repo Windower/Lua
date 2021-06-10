@@ -30,48 +30,42 @@ local bags = {}
 local item_tab = {}
 
 local nomad_moogle
+local clear_moogles
 do
     local names = {'Nomad Moogle', 'Pilgrim Moogle'}
     local moogles = {}
     
+    clear_moogles = function()
+        moogles = {}
+    end
+    
     nomad_moogle = function(wipe)
-        if wipe then
-            moogles = {}
-            return
-        end
-
         if type(next(moogles)) == 'nil' then
             for _,name in ipairs(names) do
                 local npcs = windower.ffxi.get_mob_list(name)
                 for index in pairs(npcs) do
-                    table.insert(moogles,{['index'] = index})
+                    moogles[index] = true
                 end
             end
         end
         
         local player = windower.ffxi.get_mob_by_target('me')
-        for _,moogle in pairs(moogles) do
-            if not moogle.x then
-                local t = windower.ffxi.get_mob_by_index(moogle.index)
-                if t.valid_target then
-                    moogle.x, moogle.y = t.x, t.y
-                end
-            end
-            if moogle.x then
-                local dx = player.x - moogle.x
-                local dy = player.y - moogle.y
-                if dx*dx+dy*dy < 36 then
+        for index in pairs(moogles) do
+            local moogle = windower.ffxi.get_mob_by_index(index)
+            if moogle.valid_target then
+                local dx = (player.x - moogle.x)^2
+                local dy = (player.y - moogle.y)^2
+                if dx+dy < 36 then
                     return true
                 end
             end
         end
         return false
-
     end
 end
 
 windower.register_event('zone change',function() 
-    nomad_moogle('wipe') 
+    clear_moogles()
 end)
 
 local function validate_bag(bag_table)
