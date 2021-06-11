@@ -1,6 +1,6 @@
 _addon.name = 'Treasury'
 _addon.author = 'Ihina'
-_addon.version = '1.2.1.1'
+_addon.version = '1.3.1.1'
 _addon.commands = {'treasury', 'tr'}
 
 res = require('resources')
@@ -15,6 +15,7 @@ defaults.Drop = S{}
 defaults.AutoDrop = false
 defaults.AutoStack = true
 defaults.Delay = 0
+defaults.DisableOnZone = false
 defaults.Verbose = false
 
 settings = config.load(defaults)
@@ -236,6 +237,13 @@ end)
 
 windower.register_event('load', force_check:cond(table.get-{'logged_in'} .. windower.ffxi.get_info))
 
+windower.register_event('zone change',function()
+    if settings.DisableOnZone then
+        settings.AutoDrop = false
+        log:schedule(5,'Zone changed - AutoDrop disabled.')
+    end
+end)
+
 windower.register_event('addon command', function(command1, command2, ...)
     local args = L{...}
     local global = false
@@ -308,6 +316,16 @@ windower.register_event('addon command', function(command1, command2, ...)
         config.save(settings)
         log('AutoDrop %s':format(settings.AutoDrop and 'enabled' or 'disabled'))
 
+    elseif command1 == 'disableonzone' then
+        if command2 then
+            settings.DisableOnZone = bool_values[command2:lower()]
+        else
+            settings.DisableOnZone = not settings.DisableOnZone
+        end
+
+        config.save(settings)
+        log('DisableOnZone %s':format(settings.DisableOnZone and 'enabled' or 'disabled'))
+
     elseif command1 == 'autostack' then
         if command2 then
             settings.AutoStack = bool_values[command2:lower()]
@@ -348,6 +366,7 @@ windower.register_event('addon command', function(command1, command2, ...)
         print('    \\cs(255,255,255)lotall|passall\\cr - Lots/Passes all items currently in the pool')
         print('    \\cs(255,255,255)clearall\\cr - Removes lotting/passing/dropping settings for this character')
         print('    \\cs(255,255,255)autodrop [on|off]\\cr - Enables/disables (or toggles) the auto-drop setting')
+        print('    \\cs(255,255,255)disableonzone [on|off]\\cr - Enables/disables (or toggles) auto-disabling the autodrop setting when changing zones')
         print('    \\cs(255,255,255)verbose [on|off]\\cr - Enables/disables (or toggles) the verbose setting')
         print('    \\cs(255,255,255)autostack [on|off]\\cr - Enables/disables (or toggles) the autostack feature')
         print('    \\cs(255,255,255)delay <value>\\cr - Allows you to change the delay of actions (default: 0)')
