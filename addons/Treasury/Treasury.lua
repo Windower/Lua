@@ -240,7 +240,6 @@ windower.register_event('load', force_check:cond(table.get-{'logged_in'} .. wind
 windower.register_event('zone change',function()
     if settings.DisableOnZone then
         settings.AutoDrop = false
-        log:schedule(5,'Zone changed - AutoDrop disabled.')
     end
 end)
 
