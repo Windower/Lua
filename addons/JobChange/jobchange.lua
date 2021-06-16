@@ -64,14 +64,23 @@ local find_conflict = function(job_name, p)
     end
 end
 
+injected_poke = false
 local poke = function(npc)
    local p = packets.new('outgoing', 0x1a, {
       ["Target"] = npc.id,
       ["Target Index"] = npc.index,
       })
+      injected_poke = true
       packets.inject(p) 
 end
-
+windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
+   local p = packets.parse('incoming',data)
+	if id == 0x02E and injected_poke then
+	   injected_poke = false
+      return true
+   end
+end)
+   
 local find_temp_job = function(p)
     for _, job_name in ipairs(temp_jobs) do
         if not find_conflict(job_name, p) and p.jobs[job_name:upper()] > 0 then 
