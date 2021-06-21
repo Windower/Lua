@@ -139,7 +139,7 @@ windower.register_event('job change',function ()
         else
             log('Job changed to ' .. job .. ' - switched to Book: ' .. book .. ' and Page: ' .. page)
             windower.chat.input('/macro book ' .. book)
-            coroutine.sleep(0.2)
+            coroutine.sleep(1.2)
             windower.chat.input('/macro set ' .. page)
         end
     elseif globaldisable == 1 then
