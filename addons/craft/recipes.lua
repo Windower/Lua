@@ -66,6 +66,29 @@ return {
             "Ra'Kaznar Ingot",
         },
     },
+    ["Abyss Scythe"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Dark Matter",
+            "Tartarian Chain",
+            "Cypress Log",
+            "Moldy Scythe",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Obsidian Crystal",
+        },
+    },
+    ["Abyssal Beads"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Waktza Crest",
+            "Dark Matter",
+            "Khoma Thread",
+            "Obsidian Crystal",
+            "Moldy Necklace",
+        },
+    },
     ["Accelerator"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -770,6 +793,19 @@ return {
             "Earth Anima",
             "Water Anima",
             "Dark Anima",
+        },
+    },
+    ["Altana's Repast"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Holy Water",
+            "Holy Water",
+            "Cursed Beverage",
+            "Cursed Soup",
+            "Orc Offering",
+            "Quadav Offering",
+            "Yagudo Offering",
+            "Goblin Offering",
         },
     },
     ["Alumine Brayettes"] = {
@@ -1631,7 +1667,7 @@ return {
         ["ingredients"] = {
             "Darksteel Ingot",
             "Adaman Ingot",
-            "Electrum Ingot",
+            "Ebony Lumber",
             "Bismuth Ingot",
         },
     },
@@ -1728,6 +1764,26 @@ return {
             "F. Glass Sheet",
         },
     },
+    ["Arcanoclutch"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Mythril Sheet",
+            "Ice Bead",
+            "Homncl. Nerves",
+            "Plasma Oil",
+            "High Ebonite",
+        },
+    },
+    ["Arcanoclutch II"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Platinum Sheet",
+            "Ice Bead",
+            "Homncl. Nerves",
+            "Plasma Oil",
+            "High Ebonite",
+        },
+    },
     ["Ardent Jadeite"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
@@ -1768,6 +1824,29 @@ return {
             "Eltoro Leather",
             "Baking Soda",
             "Platinum Silk",
+        },
+    },
+    ["Argute Staff"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Plovid Effluvium",
+            "Dark Matter",
+            "Khoma Thread",
+            "Moldy Staff",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Moonstone Crystal",
+        },
+    },
+    ["Argute Stole"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Yggdreant Bole",
+            "Dark Matter",
+            "Cypress Log",
+            "Moonstone Crystal",
+            "Moldy Stole",
         },
     },
     ["Arhat's Gi"] = {
@@ -2103,6 +2182,29 @@ return {
             "Butterfly Axe",
         },
     },
+    ["Assassin's Gorget"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Cehuetzi Pelt",
+            "Dark Matter",
+            "S. Faulpie Leather",
+            "Peridot Crystal",
+            "Moldy Gorget",
+        },
+    },
+    ["Assassin's Knife"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Macuil Horn",
+            "Dark Matter",
+            "Ruthenium Ore",
+            "Moldy Dagger",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Peridot Crystal",
+        },
+    },
     ["Astragalos"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
@@ -2161,6 +2263,17 @@ return {
             "Walnut Lumber",
             "Mahogany Lbr.",
             "Gold Ingot",
+        },
+    },
+    ["Aurgelmir Orb"] = {
+        ["crystal"] = "Wind Crystal",
+        ["ingredients"] = {
+            "Black Ink",
+            "Beastman Blood",
+            "Cyan Coral",
+            "Cyan Coral",
+            "Cyan Coral",
+            "Wyrm Ash",
         },
     },
     ["Aurora Mantle"] = {
@@ -2279,6 +2392,36 @@ return {
             "Polyflan Paper",
         },
     },
+    ["Automaton Oil +1"] = {
+        ["crystal"] = "Water Crystal",
+        ["ingredients"] = {
+            "Olive Oil",
+            "Olive Oil",
+            "Plasma Oil",
+            "Polyflan Paper",
+        },
+    },
+    ["Automaton Oil +2"] = {
+        ["crystal"] = "Water Crystal",
+        ["ingredients"] = {
+            "Olive Oil",
+            "Olive Oil",
+            "Olive Oil",
+            "Plasma Oil",
+            "Polyflan Paper",
+        },
+    },
+    ["Automaton Oil +3"] = {
+        ["crystal"] = "Water Crystal",
+        ["ingredients"] = {
+            "Olive Oil",
+            "Olive Oil",
+            "Olive Oil",
+            "Olive Oil",
+            "Plasma Oil",
+            "Polyflan Paper",
+        },
+    },
     ["Awning"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
@@ -2390,6 +2533,29 @@ return {
             "Iron Sheet",
         },
     },
+    ["Bagua Charm"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Cehuetzi Claw",
+            "Dark Matter",
+            "Cyan Coral",
+            "Emerald Crystal",
+            "Moldy Charm",
+        },
+    },
+    ["Bagua Wand"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Dark Matter",
+            "Tartarian Chain",
+            "Cypress Log",
+            "Moldy Club",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Emerald Crystal",
+        },
+    },
     ["Bahadur"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -2443,6 +2609,14 @@ return {
         ["ingredients"] = {
             "Rock Salt",
             "Moval. Water",
+        },
+    },
+    ["Balder Earring"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Ruthenium Ingot",
+            "Ruthenium Ingot",
+            "Wyrm Ash",
         },
     },
     ["Balik Sandvici"] = {
@@ -2575,6 +2749,29 @@ return {
             "Ash Lumber",
             "Ash Lumber",
             "Gold Ingot",
+        },
+    },
+    ["Bard's Charm"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Cehuetzi Claw",
+            "Dark Matter",
+            "Cyan Coral",
+            "Alexandrite Crystal",
+            "Moldy Charm",
+        },
+    },
+    ["Bard's Knife"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Macuil Horn",
+            "Dark Matter",
+            "Ruthenium Ore",
+            "Moldy Dagger",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Alexandrite Crystal",
         },
     },
     ["Barnacle"] = {
@@ -3096,6 +3293,16 @@ return {
         ["ingredients"] = {
             "Ram Horn",
             "Ram Horn",
+        },
+    },
+    ["Beastmaster Collar"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Cehuetzi Claw",
+            "Dark Matter",
+            "Cyan Coral",
+            "Topaz Crystal",
+            "Moldy Collar",
         },
     },
     ["Beaugreen Saute"] = {
@@ -7667,6 +7874,7 @@ return {
         ["ingredients"] = {
             "Selbina Butter",
             "Bbl. Chocolate",
+            "Bbl. Chocolate",
             "Iron Bread",
             "Bird Egg",
         },
@@ -7859,6 +8067,29 @@ return {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Gelid Aggregate",
+        },
+    },
+    ["Cleric's Torque"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Waktza Crest",
+            "Dark Matter",
+            "Khoma Thread",
+            "Seedstone Crystal",
+            "Moldy Torque",
+        },
+    },
+    ["Cleric's Wand"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Dark Matter",
+            "Tartarian Chain",
+            "Cypress Log",
+            "Moldy Club",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Seedstone Crystal",
         },
     },
     ["Clerisy Strap"] = {
@@ -8340,6 +8571,29 @@ return {
             "Rosewood Lbr.",
             "Rosewood Lbr.",
             "Rosewood Lbr.",
+        },
+    },
+    ["Commodore Charm"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Cehuetzi Claw",
+            "Dark Matter",
+            "Cyan Coral",
+            "Jadeite Crystal",
+            "Moldy Charm",
+        },
+    },
+    ["Commodore's Knife"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Macuil Horn",
+            "Dark Matter",
+            "Ruthenium Ore",
+            "Moldy Dagger",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Jadeite Crystal",
         },
     },
     ["Composite Bow"] = {
@@ -10498,6 +10752,22 @@ return {
             "Bone Knife",
         },
     },
+    ["Debahocho"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Iron Ingot",
+            "Willow Lumber",
+        },
+    },
+    ["Decaying Broth"] = {
+        ["crystal"] = "Water Crystal",
+        ["ingredients"] = {
+            "Mercury",
+            "Flan Meat",
+            "Distilled Water",
+            "Rotten Meat",
+        },
+    },
     ["Deductive Brocade Obi"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
@@ -11121,6 +11391,16 @@ return {
             "D. Fruit au Lait",
         },
     },
+    ["Dragoon's Collar"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Cehuetzi Claw",
+            "Dark Matter",
+            "Cyan Coral",
+            "Andalusite Crystal",
+            "Moldy Collar",
+        },
+    },
     ["Dresser"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
@@ -11190,6 +11470,29 @@ return {
             "Dark Adaman",
             "Dark Adaman",
             "Workshop Anvil",
+        },
+    },
+    ["Duelist's Sword"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Plovid Flesh",
+            "Dark Matter",
+            "Khoma Thread",
+            "Moldy Sword",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Pyrope Crystal",
+        },
+    },
+    ["Duelist's Torque"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Waktza Crest",
+            "Dark Matter",
+            "Khoma Thread",
+            "Pyrope Crystal",
+            "Moldy Torque",
         },
     },
     ["Dull Gold Thread"] = {
@@ -12389,6 +12692,29 @@ return {
             "Light Anima",
         },
     },
+    ["Etoile Gorget"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Cehuetzi Pelt",
+            "Dark Matter",
+            "S. Faulpie Leather",
+            "Sunstone Crystal",
+            "Moldy Gorget",
+        },
+    },
+    ["Etoile Knife"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Macuil Horn",
+            "Dark Matter",
+            "Ruthenium Ore",
+            "Moldy Dagger",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Sunstone Crystal",
+        },
+    },
     ["Etourdissante"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -13125,6 +13451,18 @@ return {
             "Leath. Kit 20",
         },
     },
+    ["Fisherman's Feast"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Tonosama R.Ball",
+            "Sausage",
+            "Sausage",
+            "Salmon Rice Ball",
+            "Apkallu Egg",
+            "Graubg. Lettuce",
+            "Winterflower",
+        },
+    },
     ["Fisherman's Gloves"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
@@ -13520,6 +13858,15 @@ return {
             "Dark Anima",
         },
     },
+    ["Frizzante Broth"] = {
+        ["crystal"] = "Water Crystal",
+        ["ingredients"] = {
+            "Gelatin",
+            "Hare Meat",
+            "Karakul Meat",
+            "Ziz Meat",
+        },
+    },
     ["Frog Lure"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -13570,6 +13917,29 @@ return {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Aluminum Ingot",
+        },
+    },
+    ["Futhark Claymore"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Defiant Scarf",
+            "Dark Matter",
+            "Niobium Ore",
+            "Moldy G. Sword",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Apatite Crystal",
+        },
+    },
+    ["Futhark Torque"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Waktza Crest",
+            "Dark Matter",
+            "Khoma Thread",
+            "Apatite Crystal",
+            "Moldy Torque",
         },
     },
     ["Gaia Doublet"] = {
@@ -13902,6 +14272,15 @@ return {
             "Platinum Sheet",
             "Sheep Leather",
             "Mercury",
+        },
+    },
+    ["Gerdr Belt"] = {
+        ["crystal"] = "Earth Crystal",
+        ["ingredients"] = {
+            "Ocl. Chain",
+            "Faulpie Leather",
+            "Faulpie Leather",
+            "Wyrm Ash",
         },
     },
     ["Ghillie Earring"] = {
@@ -15383,6 +15762,12 @@ return {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Tiger Leather",
+        },
+    },
+    ["Hard Leather Ring 2"] = {
+        ["crystal"] = "Wind Crystal",
+        ["ingredients"] = {
+            "Leath. Kit 60",
         },
     },
     ["Hard-boiled Egg"] = {
@@ -18579,6 +18964,16 @@ return {
             "Elm Lumber",
         },
     },
+    ["Knight's Beads"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Waktza Crest",
+            "Dark Matter",
+            "Khoma Thread",
+            "Diamond Crystal",
+            "Moldy Necklace",
+        },
+    },
     ["Knight's Sword"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -18654,6 +19049,19 @@ return {
             "Gold Ingot",
             "Mercury",
             "Diamond Knuckles",
+        },
+    },
+    ["Koga Shinobi-Gatana"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Macuil Plating",
+            "Dark Matter",
+            "Ruthenium Ore",
+            "Moldy Katana",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Tanzanite Crystal",
         },
     },
     ["Kohlrouladen"] = {
@@ -19131,12 +19539,6 @@ return {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Dhalmel Leather",
-        },
-    },
-    ["Leather Ring 2"] = {
-        ["crystal"] = "Wind Crystal",
-        ["ingredients"] = {
-            "Leath. Kit 60",
         },
     },
     ["Leather Shield"] = {
@@ -19873,6 +20275,19 @@ return {
             "Water Tank",
         },
     },
+    ["Loudspeaker V"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Treant Bulb",
+            "Treant Bulb",
+            "Baking Soda",
+            "Colibri Beak",
+            "F. Glass Sheet",
+            "F. Glass Sheet",
+            "F. Glass Sheet",
+            "Water Tank",
+        },
+    },
     ["Love Chocolate"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
@@ -20098,6 +20513,26 @@ return {
             "Rock Salt",
             "San d'Or. Carrot",
             "Gabbrath Meat",
+        },
+    },
+    ["Magniplug"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Mythril Sheet",
+            "Fire Bead",
+            "Homncl. Nerves",
+            "Plasma Oil",
+            "High Ebonite",
+        },
+    },
+    ["Magniplug II"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Platinum Sheet",
+            "Fire Bead",
+            "Homncl. Nerves",
+            "Plasma Oil",
+            "High Ebonite",
         },
     },
     ["Maharaja's Belt"] = {
@@ -21050,6 +21485,19 @@ return {
             "Pomodoro Sauce",
         },
     },
+    ["Melee Fists"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Hades' Claw",
+            "Dark Matter",
+            "S. Faulpie Leather",
+            "Moldy Weapon",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Sapphire Crystal",
+        },
+    },
     ["Mellow Bird Broth"] = {
         ["crystal"] = "Water Crystal",
         ["ingredients"] = {
@@ -21366,6 +21814,29 @@ return {
             "Glass Fiber",
         },
     },
+    ["Mirage Stole"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Yggdreant Bole",
+            "Dark Matter",
+            "Cypress Log",
+            "Lapis Lazuli Crystal",
+            "Moldy Stole",
+        },
+    },
+    ["Mirage Sword"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Plovid Flesh",
+            "Dark Matter",
+            "Khoma Thread",
+            "Moldy Sword",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Lapis Lazuli Crystal",
+        },
+    },
     ["Misericorde"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -21653,6 +22124,29 @@ return {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
             "Molybden. Ingot",
+        },
+    },
+    ["Monk's Nodowa"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Yggdreant Root",
+            "Dark Matter",
+            "Azure Leaf",
+            "Sapphire Crystal",
+            "Moldy Nodowa",
+        },
+    },
+    ["Monster Axe"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Macuil Plating",
+            "Dark Matter",
+            "S. Faulpie Leather",
+            "Moldy Axe",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Topaz Crystal",
         },
     },
     ["Mont Blanc"] = {
@@ -22636,6 +23130,16 @@ return {
         ["ingredients"] = {
             "Painite",
             "Gold Earring +1",
+        },
+    },
+    ["Ninja Nodowa"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Yggdreant Root",
+            "Dark Matter",
+            "Azure Leaf",
+            "Tanzanite Crystal",
+            "Moldy Nodowa",
         },
     },
     ["Niobium Ingot"] = {
@@ -23728,6 +24232,19 @@ return {
             "Wyvern Skin",
             "H.Q. Coeurl Hide",
             "H.Q. Coeurl Hide",
+        },
+    },
+    ["Pantin Fists"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Hades' Claw",
+            "Dark Matter",
+            "S. Faulpie Leather",
+            "Moldy Weapon",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Sardonyx Crystal",
         },
     },
     ["Papillion"] = {
@@ -25272,6 +25789,14 @@ return {
             "Triturator",
         },
     },
+    ["Pristine Sap"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Divine Sap",
+            "Holy Water",
+            "Holy Water",
+        },
+    },
     ["Pro-Ether"] = {
         ["crystal"] = "Water Crystal",
         ["ingredients"] = {
@@ -25394,6 +25919,16 @@ return {
             "Rock Salt",
             "Selbina Milk",
             "Distilled Water",
+        },
+    },
+    ["Pup. Collar"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Cehuetzi Claw",
+            "Dark Matter",
+            "Cyan Coral",
+            "Sardonyx Crystal",
+            "Moldy Collar",
         },
     },
     ["Purple Earring"] = {
@@ -25894,6 +26429,15 @@ return {
             "Rock Salt",
             "Baking Soda",
             "Distilled Water",
+        },
+    },
+    ["Rancid Broth"] = {
+        ["crystal"] = "Water Crystal",
+        ["ingredients"] = {
+            "Frigorifish",
+            "Frigorifish",
+            "Frigorifish",
+            "Frigorifish",
         },
     },
     ["Ranging Knife"] = {
@@ -26826,7 +27370,7 @@ return {
             "Alabaligi",
         },
     },
-    ["Roasted Almond"] = {
+    ["Roasted Almonds"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
             "Almond",
@@ -27544,6 +28088,13 @@ return {
             "Vongola Clam",
         },
     },
+    ["Salted Dragonfly Trout"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Rock Salt",
+            "Dragonfly Trout",
+        },
+    },
     ["Salted Hare"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -27611,6 +28162,16 @@ return {
         ["ingredients"] = {
             "R. Bgd. Leather",
             "Barbarian's Belt",
+        },
+    },
+    ["Samurai's Nodowa"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Yggdreant Root",
+            "Dark Matter",
+            "Azure Leaf",
+            "Amber Crystal",
+            "Moldy Nodowa",
         },
     },
     ["San d'Orian Bandana"] = {
@@ -27806,6 +28367,19 @@ return {
             "Cotton Thread",
             "Cotton Cloth",
             "Cotton Cloth",
+        },
+    },
+    ["Saotome-no-tachi"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Macuil Plating",
+            "Dark Matter",
+            "Ruthenium Ore",
+            "Moldy G. Katana",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Amber Crystal",
         },
     },
     ["Sapara"] = {
@@ -28166,6 +28740,16 @@ return {
             "Platinum Gear",
         },
     },
+    ["Scope IV"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Glass Fiber",
+            "Artificial Lens",
+            "Artificial Lens",
+            "A.U Brass Sheet",
+            "Ocl. Gearbox",
+        },
+    },
     ["Scorpion Arrow"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
@@ -28276,6 +28860,38 @@ return {
             "Linen Cloth",
             "Ram Leather",
             "Scorpion Shell",
+        },
+    },
+    ["Scout's Bolt"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Dark Matter",
+            "Moldy Bolt",
+            "Relic Adaman",
+            "Malachite Crystal",
+        },
+    },
+    ["Scout's Crossbow"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Macuil Plating",
+            "Dark Matter",
+            "Cyan Coral",
+            "Moldy Crossbow",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Malachite Crystal",
+        },
+    },
+    ["Scout's Gorget"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Cehuetzi Pelt",
+            "Dark Matter",
+            "S. Faulpie Leather",
+            "Malachite Crystal",
+            "Moldy Gorget",
         },
     },
     ["Scutum"] = {
@@ -29908,6 +30524,18 @@ return {
             "Osseous Serum",
         },
     },
+    ["Skrymir Cord"] = {
+        ["crystal"] = "Earth Crystal",
+        ["ingredients"] = {
+            "Silver Thread",
+            "Gold Thread",
+            "Khoma Thread",
+            "Khoma Thread",
+            "Khoma Thread",
+            "Khoma Thread",
+            "Wyrm Ash",
+        },
+    },
     ["Slacks"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
@@ -30514,6 +31142,29 @@ return {
             "Distilled Water",
         },
     },
+    ["Sorcerer's Staff"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Plovid Effluvium",
+            "Dark Matter",
+            "Khoma Thread",
+            "Moldy Staff",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Iolite Crystal",
+        },
+    },
+    ["Sorcerer's Stole"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Yggdreant Bole",
+            "Dark Matter",
+            "Cypress Log",
+            "Iolite Crystal",
+            "Moldy Stole",
+        },
+    },
     ["Soshi"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
@@ -31019,6 +31670,16 @@ return {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
             "Platinum Sheet",
+            "Sieglinde Putty",
+            "High Ebonite",
+            "Black Ghost",
+            "Water Tank",
+        },
+    },
+    ["Stabilizer V"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Ocl. Sheet",
             "Sieglinde Putty",
             "High Ebonite",
             "Black Ghost",
@@ -31563,6 +32224,29 @@ return {
             "Koenigs Belt",
         },
     },
+    ["Summoner's Collar"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Cehuetzi Claw",
+            "Dark Matter",
+            "Cyan Coral",
+            "Rutile Crystal",
+            "Moldy Collar",
+        },
+    },
+    ["Summoner's Staff"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Plovid Effluvium",
+            "Dark Matter",
+            "Khoma Thread",
+            "Moldy Staff",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Rutile Crystal",
+        },
+    },
     ["Sun Earring"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
@@ -32101,6 +32785,16 @@ return {
             "Darksteel Ingot",
             "Mythril Coil",
             "Mythril Coil",
+            "Ocl. Gearbox",
+        },
+    },
+    ["Tension Spring V"] = {
+        ["crystal"] = "Earth Crystal",
+        ["ingredients"] = {
+            "Slime Oil",
+            "Darksteel Ingot",
+            "Golden Coil",
+            "Golden Coil",
             "Ocl. Gearbox",
         },
     },
@@ -32830,6 +33524,16 @@ return {
             "F. Glass Sheet",
         },
     },
+    ["Tranquilizer IV"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Ocl. Sheet",
+            "Sieglinde Putty",
+            "Homncl. Nerves",
+            "Plasma Oil",
+            "F. Glass Sheet",
+        },
+    },
     ["Transfixion Sphere"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
@@ -32915,6 +33619,19 @@ return {
             "Mohbwa Cloth",
         },
     },
+    ["Tropical Crepe"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "San d'Or. Flour",
+            "Selbina Butter",
+            "Maple Sugar",
+            "Kitron",
+            "Persikos",
+            "Bird Egg",
+            "Uleguerand Milk",
+            "Felicifruit",
+        },
+    },
     ["Tropical Punches"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
@@ -32936,6 +33653,16 @@ return {
             "Rye Flour",
             "Distilled Water",
             "Alabaligi",
+        },
+    },
+    ["Truesights"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Platinum Sheet",
+            "Wind Bead",
+            "Homncl. Nerves",
+            "Plasma Oil",
+            "High Ebonite",
         },
     },
     ["Trumpet Ring"] = {
@@ -33127,6 +33854,14 @@ return {
             "Macuil Horn",
             "Ruthenium Ore",
             "Ruthenium Ingot",
+        },
+    },
+    ["Turpid Broth"] = {
+        ["crystal"] = "Water Crystal",
+        ["ingredients"] = {
+            "Gelatin",
+            "Yawning Catfish",
+            "Warthog Meat",
         },
     },
     ["Turquoise Earring"] = {
@@ -33529,6 +34264,19 @@ return {
             "Chestnut Lumber",
             "Sieglinde Putty",
             "Glass Sheet",
+        },
+    },
+    ["Valor Sword"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Plovid Flesh",
+            "Dark Matter",
+            "Khoma Thread",
+            "Moldy Sword",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Diamond Crystal",
         },
     },
     ["Vampire Juice"] = {
@@ -34830,6 +35578,16 @@ return {
             "Oak Cudgel",
         },
     },
+    ["Warrior's Beads"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Waktza Crest",
+            "Dark Matter",
+            "Khoma Thread",
+            "Ruby Crystal",
+            "Moldy Necklace",
+        },
+    },
     ["Warrior's Belt"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
@@ -34841,6 +35599,19 @@ return {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Leath. Kit 25",
+        },
+    },
+    ["Warrior's Chopper"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Plovid Flesh",
+            "Dark Matter",
+            "Khoma Thread",
+            "Moldy Great Axe",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Ruby Crystal",
         },
     },
     ["Warthog Stewpot"] = {
@@ -35639,7 +36410,7 @@ return {
             "Selbina Milk",
             "Yagudo Cherry",
             "White Honey",
-            "Roasted Almond",
+            "Roasted Almonds",
         },
     },
     ["Wivre Gorget"] = {
@@ -36041,6 +36812,19 @@ return {
             "Wyrdstrand",
             "Wyrdstrand",
             "Wyrdstrand",
+        },
+    },
+    ["Wyrm Lance"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Defiant Scarf",
+            "Dark Matter",
+            "Cypress Log",
+            "Moldy Polearm",
+            "Ratnaraj",
+            "Relic Adaman",
+            "Relic Adaman",
+            "Andalusite Crystal",
         },
     },
     ["Wyvern Helm"] = {
@@ -36527,6 +37311,15 @@ return {
         ["ingredients"] = {
             "Thunder Coral",
             "Darksteel Cap",
+        },
+    },
+    ["Zestful Sap"] = {
+        ["crystal"] = "Lightng. Crystal",
+        ["ingredients"] = {
+            "Maple Sugar",
+            "Maple Sugar",
+            "Maple Sugar",
+            "Urunday Log",
         },
     },
     ["Zinc Oxide"] = {

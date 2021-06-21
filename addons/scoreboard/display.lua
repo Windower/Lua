@@ -109,7 +109,7 @@ function Display:build_scoreboard_header()
     if self.db:empty() then
         labels = '\n'
     else
-        labels = '%23s%7s%9s\n':format('Tot', 'Pct', 'DPS')
+        labels = '%32s%7s%9s\n':format('Tot', 'Pct', 'DPS')
     end
 
     local dps_status
@@ -201,7 +201,7 @@ function Display:update()
             else
                 percent = '(0%)'
             end
-            display_table:append('%-16s%7d%8s %7s':format(v[1], v[2], percent, dps))
+            display_table:append('%-25s%7d%8s %7s':format(v[1], v[2], percent, dps))
         end
         alli_damage = alli_damage + v[2] -- gather this even for players not displayed
         player_lines = player_lines + 1
@@ -413,7 +413,7 @@ end
 return Display
 
 --[[
-Copyright © 2013-2014, Jerry Hebert
+Copyright Â© 2013-2014, Jerry Hebert
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

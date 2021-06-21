@@ -54,7 +54,7 @@ for i,v in pairs(res.bags) do
     bag_string_lookup[to_windower_bag_api(v.en)]=i
 end
     
-bstpet_range = {min=672,max=782} -- Range of the JA resource devoted to BST jugpet abilities
+bstpet_range = {min=672,max=798} -- Range of the JA resource devoted to BST jugpet abilities
     
 delay_map_to_action_type = {['Ability']=3,['Magic']=20,['Ranged Attack']=10,['Item']=10,['Monster Move']=10,['Interruption']=3}
     
@@ -198,7 +198,7 @@ slot_map.back = 15
 
 
 
-gearswap_disabled = true
+gearswap_disabled = false
 seen_0x063_type9 = false
 delay_0x063_v9 = false
 not_sent_out_equip = {}

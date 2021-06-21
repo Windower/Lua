@@ -36,7 +36,7 @@ return {
             { name = "Self-Destruct", points = 2, cost = 3, id = 533 },
             { name = "Cold Wave", points = 1, cost = 1, id = 535 },
             { name = "Light of Penance", points = 2, cost = 5, id = 634 },
-            { name = "Voracious Trunk", points = 3, cost = 4, id = 576 },
+            { name = "Voracious Trunk", points = 3, cost = 4, id = 579 },
             { name = "Actinic Burst", points = 4, cost = 4, id = 612 },
             { name = "Plasma Charge", points = 4, cost = 5, id = 615 },
             { name = "Winds of Promy.", points = 4, cost = 5, id = 681 },

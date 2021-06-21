@@ -36,7 +36,7 @@ res = require 'resources'
 slips = require 'slips'
 
 _addon.name = 'porter'
-_addon.version = '1.20200419'
+_addon.version = '1.20210302'
 _addon.command = 'porter'
 _addon.author = 'Zohno'
 
@@ -83,15 +83,17 @@ function show_slip(slip_number, slip_page, owned_only)
             end
 
             for item_position, item_id in ipairs(slip_items) do
-                local is_contained = player_slip_items:contains(item_id)
+				if item_id ~= 0 then
+					local is_contained = player_slip_items:contains(item_id)
 
-                if owned_only == false or owned_only == true and is_contained == true then
-                    windower.add_to_chat(
-                        55,
-                        ('slip '..printable_slip_number..'/page '..tostring(slip_page and slip_page or math.ceil(item_position / 16)):lpad('0', 2)..':'):color(259)..' '..
-                        res.items[item_id].name:color(is_contained and 258 or 261)
-                    )
-                end
+					if owned_only == false or owned_only == true and is_contained == true then
+						windower.add_to_chat(
+							55,
+							('slip '..printable_slip_number..'/page '..tostring(slip_page and slip_page or math.ceil(item_position / 16)):lpad('0', 2)..':'):color(259)..' '..
+							res.items[item_id].name:color(is_contained and 258 or 261)
+						)
+					end
+				end
             end
         end
     end
@@ -105,7 +107,7 @@ function show_bags()
         for _, item in ipairs(windower.ffxi.get_items(bag)) do
             local slip_id = slips.get_slip_id_by_item_id(item.id)
 
-            if slip_id then
+            if slip_id and item.id ~= 0 then
                 n = n + 1
                 windower.add_to_chat(207, 'slip %02d: %s %s':format(slips.get_slip_number_by_id(slip_id), bag, res.items[item.id].name:color(258)))
             end

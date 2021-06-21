@@ -33,7 +33,7 @@
 local messages = {
     z15  = {
         name = 'Abyssea - Konschtat',
-        offset = 7312,
+        offset = 7315,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_update = 9,
@@ -50,7 +50,7 @@ local messages = {
     },
     z132 = {
         name = 'Abyssea - La Theine',
-        offset = 7312,
+        offset = 7315,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_update = 9,
@@ -67,7 +67,7 @@ local messages = {
     },
     z45  = {
         name = 'Abyssea - Tahrongi',
-        offset = 7312,
+        offset = 7315,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_update = 9,
@@ -84,7 +84,7 @@ local messages = {
     },
     z215 = {
         name = 'Abyssea - Attohwa',
-        offset = 7212,
+        offset = 7215,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_update = 9,
@@ -101,7 +101,7 @@ local messages = {
     },
     z216 = {
         name = 'Abyssea - Misareaux',
-        offset = 7312,
+        offset = 7315,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_update = 9,
@@ -118,7 +118,7 @@ local messages = {
     },
     z217 = {
         name = 'Abyssea - Vunkerl',
-        offset = 7312,
+        offset = 7315,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_update = 9,
@@ -135,7 +135,7 @@ local messages = {
     },
     z218 = {
         name = 'Abyssea - Altepa',
-        offset = 7312,
+        offset = 7315,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_update = 9,
@@ -152,7 +152,7 @@ local messages = {
     },
     z254 = {
         name = 'Abyssea - Grauberg',
-        offset = 7312,
+        offset = 7315,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_update = 9,
@@ -169,7 +169,7 @@ local messages = {
     },
     z253 = {
         name = 'Abyssea - Uleguerand',
-        offset = 7212,
+        offset = 7215,
         pearl_ebon_gold_silvery = 0,
         azure_ruby_amber = 1,
         visitant_status_update = 9,

@@ -29,10 +29,52 @@ local items = {}
 local bags = {}
 local item_tab = {}
 
+local nomad_moogle
+local clear_moogles
+do
+    local names = {'Nomad Moogle', 'Pilgrim Moogle'}
+    local moogles = {}
+    
+    clear_moogles = function()
+        moogles = {}
+    end
+    
+    nomad_moogle = function()
+        if #moogles == 0 then
+            for _,name in ipairs(names) do
+                local npcs = windower.ffxi.get_mob_list(name)
+                for index in pairs(npcs) do
+                    table.insert(moogles,index)
+                end
+            end
+        end
+        
+        local player = windower.ffxi.get_mob_by_target('me')
+        for _, moo_index in ipairs(moogles) do
+            local moo = windower.ffxi.get_mob_by_index(moo_index)
+            if moo and (moo.x - player.x)^2 + (moo.y - player.y)^2 < 36 then
+                return true
+            end
+        end
+        return false
+    end
+end
+
+windower.register_event('zone change',function() 
+    clear_moogles()
+end)
+
 local function validate_bag(bag_table)
-    if (bag_table.access == 'Everywhere' or (bag_table.access == 'Mog House' and windower.ffxi.get_info().mog_house)) and
-        windower.ffxi.get_bag_info(bag_table.id) then
-        return true
+    if type(bag_table) == 'table' and windower.ffxi.get_bag_info(bag_table.id) then 
+        if bag_table.access == 'Everywhere' then
+            return true
+        elseif bag_table.access == 'Mog House' then 
+            if windower.ffxi.get_info().mog_house then
+                return true
+            elseif nomad_moogle() and bag_table.english ~= 'Storage' then -- Storage is not available at Nomad Moogles
+                return true
+            end
+        end
     end
     return false
 end
@@ -42,7 +84,7 @@ local function validate_id(id)
 end
 
 local function wardrobecheck(bag_id,id)
-    return bag_id~=8 or (bag_id == 8 and res.items[id] and (res.items[id].type == 4 or res.items[id].type == 5) )
+    return _static.wardrobe_ids[bag_id]==nil or ( res.items[id] and (res.items[id].type == 4 or res.items[id].type == 5) )
 end
 
 function Items.new(loc_items,bool)
@@ -351,7 +393,7 @@ end
 function item_tab:put_away(usable_bags)
     org_debug("move", "Putting away "..res.items[self.id].english)
     local current_items = self._parent._parent
-    usable_bags = usable_bags or {1,9,4,2,5,6,7,8}
+    usable_bags = usable_bags or _static.usable_bags
     local bag_free
     for _,v in ipairs(usable_bags) do
         local bag_max = windower.ffxi.get_bag_info(v).max

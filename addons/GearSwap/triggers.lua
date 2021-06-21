@@ -186,7 +186,7 @@ parse.i[0x028] = function (data)
         
     --print(((res[unpackedaction.resource] or {})[unpackedaction.spell_id] or {}).english,unpackedaction.type,unpackedaction.value,unpackedaction.interruption)
     local temp_player_mob_table,temp_pet,pet_id = windower.ffxi.get_mob_by_index(player.index)
-    if temp_player_mob_table.pet_index then
+    if temp_player_mob_table and temp_player_mob_table.pet_index then
         temp_pet = windower.ffxi.get_mob_by_index(temp_player_mob_table.pet_index)
         if temp_pet then
             pet_id = temp_pet.id

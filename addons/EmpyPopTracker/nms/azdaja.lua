@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 return {
     name = 'Azdaja',
+    collectable = 3292, --Azdaja's Horn
+    collectable_target_count = 75,
     pops = { {
         id = 1531, --Vacant Bugard Eye
         type = 'key item',

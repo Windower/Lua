@@ -1,5 +1,5 @@
 --[[
-A library to facilitate packet usage 
+A library to facilitate packet usage
 ]]
 
 _libs = _libs or {}
@@ -296,7 +296,7 @@ end
 -- If data is a string it parses an existing packet, otherwise it will create
 -- a new packet table for injection. In that case, data can ba an optional
 -- table containing values to initialize the packet to.
--- 
+--
 -- Example usage
 --  Injection:
 --      local packet = packets.new('outgoing', 0x050, {
@@ -310,7 +310,7 @@ end
 --      packet['Inventory Index'] = 27  -- 27th item in the inventory
 --      packet['Equipment Slot'] = 15   -- 15th slot, left ring
 --      packets.inject(packet)
--- 
+--
 --  Parsing:
 --      windower.register_event('outgoing chunk', function(id, data)
 --          if id == 0x0B6 then -- outgoing /tell

@@ -34,10 +34,11 @@ require 'tables'
 require 'lists'
 require 'functions'
 config = require 'config'
+slips = require 'slips'
 
 _addon.name = 'Organizer'
 _addon.author = 'Byrth, maintainer: Rooks'
-_addon.version = 0.20200328
+_addon.version = 0.20210610
 _addon.commands = {'organizer','org'}
 
 _static = {
@@ -55,7 +56,9 @@ _static = {
         wardrobe2=10,
         wardrobe3=11,
         wardrobe4=12,
-    }
+    },
+    wardrobe_ids = {[8]=true,[10]=true,[11]=true,[12]=true},
+    usable_bags = {1,9,4,2,5,6,7,8,10,11,12}
 }
 
 _global = {
@@ -183,8 +186,10 @@ function options_load( )
             slip_lists = require('slips')
             for slip_id,slip_list in pairs(slip_lists.items) do
                 for item_id in slip_list:it() do
-                    _retain[item_id] = "moogle slip"
-                    org_debug("settings", "Adding ("..res.items[item_id].english..') to slip retain list')
+                    if item_id ~= 0 then
+                        _retain[item_id] = "moogle slip"
+                        org_debug("settings", "Adding ("..res.items[item_id].english..') to slip retain list')
+                    end
                 end
             end
         end
@@ -204,8 +209,7 @@ function options_load( )
 		
         if(settings.retain.slips == true) then
             org_verbose("Slips set to retain")
-            slips = {29312,29313,29314,29315,29316,29317,29318,29319,29320,29321,29322,29323,29324,29325,29326,29327,29328,29329,29330,29331,29332,29333,29334,29335,29336,29337,29338,29339}
-            for _,slips_id in pairs(slips) do
+            for _,slips_id in pairs(slips.storages) do
                 _retain[slips_id] = "slips"
                 org_debug("settings", "Adding ("..res.items[slips_id].english..') to slip retain list')
             end

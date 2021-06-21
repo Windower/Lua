@@ -29,8 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 _addon.name     = 'craft'
-_addon.author   = 'Mojo'
-_addon.version  = '1.1.0'
+_addon.author   = 'Mojo, Recipes provided by BG-Wiki.com'
+_addon.version  = '1.1.2'
 _addon.commands = {'craft'}
 
 require('chat')
@@ -106,6 +106,7 @@ local exceptions = {
     ['Ice Card'] = 9765,
     ['Wind Card'] = 9766,
     ['Earth Card'] = 9767,
+    ['Lightning Card'] = 9768,
     ['Water Card'] = 9769,
     ['Light Card'] = 9770,
     ['Dark Card'] = 9771,
@@ -210,7 +211,7 @@ Notes:
   displayed on FFXIAH.
 ]]
 
-local function validate(npcs, bypass_distance)
+local function validate(npcs)
     zone = windower.ffxi.get_info()['zone']
     local valid = false
     for _, npc in pairs(npcs) do
@@ -218,7 +219,7 @@ local function validate(npcs, bypass_distance)
             valid = true
             local mob = windower.ffxi.get_mob_by_name(npc.name)
             if mob then
-                if (math.sqrt(mob.distance) < 6) or bypass_distance then
+                if (math.sqrt(mob.distance) < 6) then
                     return mob, npc
                 end
             end
@@ -231,7 +232,7 @@ end
 
 local function get_support(id, data)
     if (id == 0x34) and conditions['support'] then
-        local mob, npc = validate(support_npcs, true)
+        local mob, npc = validate(support_npcs)
         local p = packets.new('outgoing', 0x5b, {
             ["Target"] = mob.id,
             ["Option Index"] = 1,
@@ -777,6 +778,33 @@ local function handle_command(cmd, ...)
         error("Unknown command %s":format(cmd))
     end
 end
+
+-- This is here so if a player does a legitimate synth the result is not displayed twice, since results are only hidden on injected synthesis.
+windower.register_event('outgoing chunk', function(id, original, modified, injected, blocked)
+    if id == 0x096 and injected then
+        injected_synth = true
+    end
+end)
+
+windower.register_event('incoming chunk', function(id, original, modified, injected, blocked)
+    if id == 0x06F and injected_synth then
+        local p = packets.parse('incoming',original)
+        if p['Result'] == 0 or p['Result'] == 2 then
+            local item = res.items[p['Item']].english
+            windower.add_to_chat(121, 'You synthesized: \30\02%s\30\01.':format(item))
+            injected_synth = false	
+        end
+        if p['Result'] == 1 or p['Result'] == 5 then
+            windower.add_to_chat(121,'Your synthesis has failed and your crystal is lost.')
+            for i=1, 8 do 
+                if p['Lost Item '..i] ~= 0 then 
+                    windower.add_to_chat(121, 'You lost: \30\02%s\30\01.':format(res.items[p['Lost Item '..i]].english)) 
+                end 
+            end
+            injected_synth = false
+        end
+    end
+end)
 
 windower.register_event('addon command', handle_command)
 windower.register_event('outgoing chunk', display_crafting_packet)

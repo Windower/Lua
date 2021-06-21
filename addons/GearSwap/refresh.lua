@@ -79,7 +79,6 @@ function load_user_files(job_id,user_file)
     end
     
     current_file = nil
-    gearswap_disabled = true
     sets = nil
     user_env = nil
     unhandled_command_events = {}
@@ -108,7 +107,6 @@ function load_user_files(job_id,user_file)
     
     if not path then
         current_file = nil
-        gearswap_disabled = true
         sets = nil
         return
     end
@@ -157,7 +155,6 @@ function load_user_files(job_id,user_file)
     if funct == nil then
         print('User file problem: '..err)
         current_file = nil
-        gearswap_disabled = true
         sets = nil
         return
     else
@@ -172,7 +169,6 @@ function load_user_files(job_id,user_file)
     
     if not status then
         error('GearSwap: File failed to load: \n'..plugin)
-        gearswap_disabled = true
         sets = nil
         return nil
     end
@@ -425,30 +421,21 @@ function weather_update(id)
     world.real_weather = res.weather[id][language]
     world.real_weather_element = res.elements[res.weather[id].element][language]
     world.real_weather_intensity = res.weather[world.real_weather_id].intensity
-    local buff = false
     if buffactive[178] then
-        buff = true
         world.weather_id = 4
     elseif buffactive[179] then
-        buff = true
         world.weather_id = 12
     elseif buffactive[180] then
-        buff = true
         world.weather_id = 10
     elseif buffactive[181] then
-        buff = true
         world.weather_id = 8
     elseif buffactive[182] then
-        buff = true
         world.weather_id = 14
     elseif buffactive[183] then
-        buff = true
         world.weather_id = 6
     elseif buffactive[184] then
-        buff = true
         world.weather_id = 16
     elseif buffactive[185] then
-        buff = true
         world.weather_id = 18
     elseif buffactive[589] then
         world.weather_id = 5
@@ -466,9 +453,6 @@ function weather_update(id)
         world.weather_id = 17
     elseif buffactive[596] then
         world.weather_id = 19
-    end
-    if buff and world.weather_id == world.real_weather_id then
-        world.weather_id = world.weather_id + 1
     end
     world.weather = res.weather[world.weather_id][language]
     world.weather_element = res.elements[res.weather[world.weather_id].element][language]

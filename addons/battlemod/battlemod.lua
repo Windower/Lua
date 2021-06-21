@@ -12,7 +12,7 @@ require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
 
-_addon.version = '3.26'
+_addon.version = '3.30'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth, maintainer: SnickySnacks'
 _addon.commands = {'bm','battlemod'}
@@ -24,7 +24,7 @@ end)
 
 windower.register_event('login',function (name)
     if debugging then windower.debug('login') end
-    windower.send_command('@wait 10;lua i battlemod options_load;')
+    options_load:schedule(10)
 end)
 
 windower.register_event('addon command', function(command, ...)
@@ -41,6 +41,9 @@ windower.register_event('addon command', function(command, ...)
         elseif command:lower() == 'targetnumber' then
             targetnumber = not targetnumber
             windower.add_to_chat(121,'Battlemod: Target Number flipped! - '..tostring(targetnumber))
+        elseif command:lower() == 'condensetargetname' then
+            condensetargetname = not condensetargetname
+            windower.add_to_chat(121,'Battlemod: Target Name Condensation flipped! - '..tostring(condensetargetname))                                                                
         elseif command:lower() == 'swingnumber' then
             swingnumber = not swingnumber
             windower.add_to_chat(121,'Battlemod: Round Number flipped! - '..tostring(swingnumber))
@@ -67,6 +70,12 @@ windower.register_event('addon command', function(command, ...)
         elseif command:lower() == 'condensetargets' then
             condensetargets = not condensetargets
             windower.add_to_chat(121,'Battlemod: Condensed Targets flipped! - '..tostring(condensetargets))
+        elseif command:lower() == 'showownernames' then
+            showownernames = not showownernames
+            windower.add_to_chat(121,'Battlemod: Show pet owner names flipped! - '..tostring(showownernames))
+        elseif command:lower() == 'crafting' then
+            crafting = not crafting
+            windower.add_to_chat(121,'Battlemod: Display crafting results flipped! - '..tostring(crafting))
         elseif command:lower() == 'colortest' then
             local counter = 0
             local line = ''
@@ -90,19 +99,22 @@ windower.register_event('addon command', function(command, ...)
         elseif command:lower() == 'help' then
             print('   :::   '.._addon.name..' ('.._addon.version..')   :::')
             print('Toggles: (* subtoggles)')
-            print('           1. simplify         --- Condenses battle text using custom messages ('..tostring(simplify)..')')
-            print('           2. condensetargets  --- Collapse similar messages with multiple targets ('..tostring(condensetargets)..')')
-            print('               * targetnumber  --- Toggle target number display ('..tostring(targetnumber)..')')
-            print('               * oxford        --- Toggle use of oxford comma ('..tostring(oxford)..')')
-            print('               * commamode     --- Toggle comma-only mode ('..tostring(commamode)..')')
-            print('           3. condensedamage   --- Condenses damage messages within attack rounds ('..tostring(condensedamage)..')')
-            print('               * swingnumber   --- Show # of attack rounds ('..tostring(swingnumber)..')')
-            print('               * sumdamage     --- Sums condensed damage, if false damage is comma separated ('..tostring(sumdamage)..')')
-            print('               * condensecrits --- Condenses critical hits and normal hits together ('..tostring(condensecrits)..')')
-            print('           4. cancelmulti      --- Cancles multiple consecutive identical lines ('..tostring(cancelmulti)..')')
-            print('Utilities: 1. colortest        --- Shows the 509 possible colors for use with the settings file')
-            print('           2. reload           --- Reloads settings file')
-            print('           3. unload           --- Unloads Battlemod')
+            print('           1. simplify              - Condenses battle text using custom messages ('..tostring(simplify)..')')
+            print('           2. condensetargets       - Collapse similar messages with multiple targets ('..tostring(condensetargets)..')')
+            print('               * targetnumber       - Toggle target number display ('..tostring(targetnumber)..')')
+            print('               * condensetargetname - Toggle target name condensation ('..tostring(condensetargetname)..')')
+            print('               * oxford             - Toggle use of oxford comma ('..tostring(oxford)..')')
+            print('               * commamode          - Toggle comma-only mode ('..tostring(commamode)..')')
+            print('           3. condensedamage        - Condenses damage messages within attack rounds ('..tostring(condensedamage)..')')
+            print('               * swingnumber        - Show # of attack rounds ('..tostring(swingnumber)..')')
+            print('               * sumdamage          - Sums condensed damage if true, comma-separated if false ('..tostring(sumdamage)..')')
+            print('               * condensecrits      - Condenses critical hits and normal hits together ('..tostring(condensecrits)..')')
+            print('           4. cancelmulti           - Cancels multiple consecutive identical lines ('..tostring(cancelmulti)..')')
+            print('           5. showonernames         - Shows the name of the owner on pet messages ('..tostring(showownernames)..')')
+            print('           6. crafting              - Enables early display of crafting results ('..tostring(crafting)..')')
+            print('Utilities: 1. colortest             - Shows the 509 possible colors for use with the settings file')
+            print('           2. reload                - Reloads settings file')
+            print('           3. unload                - Unloads Battlemod')
         end
     end
 end)
@@ -137,12 +149,10 @@ windower.register_event('incoming text',function (original, modified, color, col
         local item = string.char(0x1E)
         if not bm_message(original) then
             if original:endswith(endline) then --allow add_to_chat messages with the modes we blocking
-                blocked = true
-                return blocked
+                return true
             end
         elseif original:endswith(endline) and string.find(original, item) then --block items action messages
-            blocked = true
-            return blocked
+            return true
         end
     end
     
@@ -239,21 +249,57 @@ ActionPacket.open_listener(parse_action_packet)
 
 windower.register_event('incoming chunk',function (id,original,modified,is_injected,is_blocked)
     if debugging then windower.debug('incoming chunk '..id) end
+    
+------- ITEM QUANTITY -------
+    if id == 0x020 and parse_quantity then
+        --local packet = packets.parse('incoming', original)
+        local item = original:unpack('H',0x0D)
+        local count = original:unpack('I',0x05)
+        if item == 0 then return end
+        if item_quantity.id == item then
+            item_quantity.count = count..' '
+        end
 
-------- ACTION MESSAGE -------    
-    if id == 0x29 then
+------- NOUNS AND PLURAL ENTITIES -------    
+    elseif id == 0x00E then
+        local mob_id = original:unpack('I',0x05)
+        local mask = original:unpack('C',0x0B)
+        local chat_info = original:unpack('C',0x28)
+        if bit.band(mask,4) == 4 then
+            if bit.band(chat_info,32) == 0 and not common_nouns:contains(mob_id) then
+                table.insert(common_nouns, mob_id)
+            elseif bit.band(chat_info,64) == 64 and not plural_entities:contains(mob_id) then
+                table.insert(plural_entities, mob_id)
+            elseif bit.band(chat_info,64) == 0 and plural_entities:contains(mob_id) then --Gears can change their grammatical number when they lose 2 gear?
+                for i, v in pairs(plural_entities) do
+                    if v == mob_id then
+                        table.remove(plural_entities, i)
+                        break
+                    end
+                end
+            end
+        end
+    elseif id == 0x00B then --Reset tables on Zoning
+        common_nouns = T{}
+        plural_entities = T{}
+        
+------- ACTION MESSAGE -------
+    elseif id == 0x29 then
         local am = {}
-        am.actor_id = original:unpack("I",0x05)
-        am.target_id = original:unpack("I",0x09)
-        am.param_1 = original:unpack("I",0x0D)
-        am.param_2 = original:unpack("H",0x11)%2^9 -- First 7 bits
-        am.param_3 = math.floor(original:unpack("I",0x11)/2^5) -- Rest
-        am.actor_index = original:unpack("H",0x15)
-        am.target_index = original:unpack("H",0x17)
-        am.message_id = original:unpack("H",0x19)%2^15 -- Cut off the most significant bit
+        am.actor_id = original:unpack('I',0x05)
+        am.target_id = original:unpack('I',0x09)
+        am.param_1 = original:unpack('I',0x0D)
+        am.param_2 = original:unpack('H',0x11)%2^9 -- First 7 bits
+        am.param_3 = math.floor(original:unpack('I',0x11)/2^5) -- Rest
+        am.actor_index = original:unpack('H',0x15)
+        am.target_index = original:unpack('H',0x17)
+        am.message_id = original:unpack('H',0x19)%2^15 -- Cut off the most significant bit
         
         local actor = player_info(am.actor_id)
         local target = player_info(am.target_id)
+        local actor_article = common_nouns:contains(am.actor_id) and 'The ' or ''
+        local target_article = common_nouns:contains(am.target_id) and 'The ' or ''
+        targets_condensed = false
         
         -- Filter these messages
         if not check_filter(actor,target,0,am.message_id) then return true end
@@ -272,9 +318,17 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                 windower.add_to_chat(color, msg)
             else
                 local msg = res.action_messages[am.message_id][language]
+                msg = grammatical_number_fix(msg, number, am.message_id)
+                if plural_entities:contains(am.actor_id) then
+                    msg = plural_actor(msg, am.message_id)
+                end
+                if plural_entities:contains(am.target_id) then
+                    msg = plural_target(msg, am.message_id)
+                end
+                local msg = clean_msg(msg
                     :gsub('${status}',status or '')
-                    :gsub('${target}',targ)
-                    :gsub('${number}',number or '')
+                    :gsub('${target}',target_article..targ)
+                    :gsub('${number}',number or ''), am.message_id)
                 windower.add_to_chat(color, msg)
             end
         elseif am.message_id == 206 and condensetargets then -- Wears off messages
@@ -295,7 +349,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             if not multi_targs[status] and not stat_ignore:contains(am.param_1) then
                 multi_targs[status] = {}
                 multi_targs[status][1] = target
-                windower.send_command('@wait 0.5;lua i battlemod multi_packet '..status)
+                multi_packet:schedule(0.5, status)
             elseif not (stat_ignore:contains(am.param_1)) then
                 multi_targs[status][#multi_targs[status]+1] = target
             else
@@ -303,16 +357,23 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             -- Sneak, Invis, etc. that you don't want to see on a delay
                 multi_targs[status] = {}
                 multi_targs[status][1] = target
-                windower.send_command('@lua i battlemod multi_packet '..status)
+                multi_packet(status)
             end
             am.message_id = false
         elseif passed_messages:contains(am.message_id) then
             local item,status,spell,skill,number,number2
+            local outstr = res.action_messages[am.message_id][language]
+            if plural_entities:contains(am.actor_id) then
+                outstr = plural_actor(outstr, am.message_id)
+            end
+            if plural_entities:contains(am.target_id) then
+                outstr = plural_target(outstr, am.message_id)
+            end
             
-            local fields = fieldsearch(res.action_messages[am.message_id][language])
+            local fields = fieldsearch(outstr)
             
             if fields.status then
-                if log_form_debuffs:contains(am.param_1) then
+                if log_form_messages:contains(am.message_id) then
                     status = res.buffs[am.param_1].english_log
                 else
                     status = nf(res.buffs[am.param_1],language)
@@ -357,17 +418,19 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                     skill = 'to be level '..am.param_1..' ('..ratings_arr[am.param_2-63]..')'
                 end
             end
-            local outstr = (res.action_messages[am.message_id][language]
-                :gsub('$\123actor\125',color_it((actor.name or '') .. (actor.owner_name or ""),color_arr[actor.owner or actor.type]))
-                :gsub('$\123status\125',status or '')
-                :gsub('$\123item\125',color_it(item or '',color_arr.itemcol))
-                :gsub('$\123target\125',color_it(target.name or '',color_arr[target.owner or target.type]))
-                :gsub('$\123spell\125',color_it(spell or '',color_arr.spellcol))
-                :gsub('$\123skill\125',color_it(skill or '',color_arr.abilcol))
-                :gsub('$\123number\125',number or '')
-                :gsub('$\123number2\125',number2 or '')
-                :gsub('$\123skill\125',skill or '')
-                :gsub('$\123lb\125','\7'))
+            outstr = (clean_msg(outstr
+                :gsub('${actor}\'s',actor_article..color_it(actor.name or '',color_arr[actor.owner or actor.type])..'\'s'..actor.owner_name)
+                :gsub('${actor}',actor_article..color_it(actor.name or '',color_arr[actor.owner or actor.type])..actor.owner_name)
+                :gsub('${status}',status or '')
+                :gsub('${item}',color_it(item or '',color_arr.itemcol))
+                :gsub('${target}\'s',target_article..color_it(target.name or '',color_arr[target.owner or target.type])..'\'s'..target.owner_name)
+                :gsub('${target}',target_article..color_it(target.name or '',color_arr[target.owner or target.type])..target.owner_name)
+                :gsub('${spell}',color_it(spell or '',color_arr.spellcol))
+                :gsub('${skill}',color_it(skill or '',color_arr.abilcol))
+                :gsub('${number}',number or '')
+                :gsub('${number2}',number2 or '')
+                :gsub('${skill}',skill or '')
+                :gsub('${lb}','\7'), am.message_id))
             windower.add_to_chat(res.action_messages[am.message_id]['color'],outstr)
             am.message_id = false
         elseif debugging and res.action_messages[am.message_id] then 
@@ -382,9 +445,9 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
         end
 
 ------------ SYNTHESIS ANIMATION --------------
-    elseif id == 0x030 then
-        if windower.ffxi.get_player().id == original:unpack("I",5) or windower.ffxi.get_mob_by_target('t') and windower.ffxi.get_mob_by_target('t').id == original:unpack("I",5) then
-            local crafter_name = (windower.ffxi.get_player().id == original:unpack("I",5) and windower.ffxi.get_player().name) or windower.ffxi.get_mob_by_target('t').name
+    elseif id == 0x030 and crafting then
+        if windower.ffxi.get_player().id == original:unpack('I',5) or windower.ffxi.get_mob_by_target('t') and windower.ffxi.get_mob_by_target('t').id == original:unpack('I',5) then
+            local crafter_name = (windower.ffxi.get_player().id == original:unpack('I',5) and windower.ffxi.get_player().name) or windower.ffxi.get_mob_by_target('t').name
             local result = original:byte(13)
             if result == 0 then
                 windower.add_to_chat(8,' ------------- NQ Synthesis ('..crafter_name..') -------------')
@@ -396,8 +459,8 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                 windower.add_to_chat(8,'Craftmod: Unhandled result '..tostring(result))
             end
         end
-    elseif id == 0x06F then
-        if original:byte(5) == 0 then
+    elseif id == 0x06F and crafting then
+        if original:byte(5) == 0 or original:byte(5) == 12 then
             local result = original:byte(6)
             if result == 1 then
                 windower.add_to_chat(8,' -------------- HQ Tier 1! --------------')
@@ -417,9 +480,11 @@ end)
 function multi_packet(...)
     local ind = table.concat({...},' ')
     local targets = assemble_targets(multi_actor[ind],multi_targs[ind],0,multi_msg[ind])
-    local outstr = res.action_messages[multi_msg[ind]][language]
-        :gsub('$\123target\125',targets)
-        :gsub('$\123status\125',ind)
+    local outstr = targets_condensed and plural_target(res.action_messages[multi_msg[ind]][language], multi_msg[ind]) or res.action_messages[multi_msg[ind]][language]
+    outstr = clean_msg(outstr
+        :gsub('${target}\'s',targets)
+        :gsub('${target}',targets)
+        :gsub('${status}',ind), multi_msg[ind])
     windower.add_to_chat(res.action_messages[multi_msg[ind]].color,outstr)
     multi_targs[ind] = nil
     multi_msg[ind] = nil

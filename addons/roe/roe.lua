@@ -242,7 +242,7 @@ local cmd_handlers = {
     list = list,
     set = set,
     unset = unset,
-    setting = handle_setting,
+    settings = handle_setting,
     blacklist = blacklist,
     help = help,
 }

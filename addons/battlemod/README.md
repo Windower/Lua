@@ -8,16 +8,23 @@ Battlemod, packet version
 
 Abbreviation: //bm
 
-Commands:  
+Commands:
+
 Toggles:  
-* simplify - Condenses battle text using custom messages, Default = True
-* condensetargets - Collapse similar messages with multiple targets, Default = True
-** targetnumber - Toggle condensed target number display, Default = True
-* condensedamage - Collapses similar damage messages with the same target, Default = True
-** swingnumber - Toggle condensed damage number display, Default = True
-* cancelmulti - Cancels multiple consecutive identical lines, Default = True
-* oxford - Toggle use of oxford comma, Default = True
-* commamode - Toggle comma-only mode, Default = False
+* simplify - Condenses battle text using custom messages (Default: True)
+* condensetargets - Collapse similar messages with multiple targets (Default: True)
+    * targetnumber - Toggle condensed target number display (Default: True)
+    * condensetargetname - Toggle target name condensation (Default: False)
+    * oxford - Toggle use of oxford comma (Default: True)
+    * commamode - Toggle comma-only mode (Default: False)
+* condensedamage - Collapses similar damage messages with the same target (Default: True)
+    * swingnumber - Toggle condensed damage number display (Default: True)
+    * sumdamage - Sums condensed damage if true, comma-separated if false (Default: True)
+    * condensecrits - Condenses critical hits and normal hits together (Default: False)
+* cancelmulti - Cancels multiple consecutive identical lines (Default: True)
+* showonernames - Shows the name of the owner on pet messages (Default: False)
+* crafting - Toggle early display of crafting results (Default: True)
+
 Utilities:  
 * colortest - Shows the 509 possible colors for use with the settings file
 * reload - Reloads the settings file

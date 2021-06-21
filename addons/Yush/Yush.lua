@@ -1,5 +1,5 @@
 _addon.author = 'Arcon'
-_addon.version = '2.1.1.1'
+_addon.version = '2.2.0.0'
 _addon.language = 'English'
 _addon.command = 'yush'
 
@@ -107,6 +107,8 @@ check = function(keyset)
         if key <= keyset then
             if type(val) == 'string' then
                 windower.send_command(val)
+            elseif type(val) == 'function' then
+                val()
             else
                 current = val
                 stack:append(current)
@@ -126,7 +128,7 @@ parse_binds = function(fbinds, top)
     rawset(names, top, rawget(_innerG._names, fbinds))
     for key, val in pairs(fbinds) do
         key = S(key:split('+')):map(string.lower)
-        if type(val) == 'string' then
+        if type(val) == 'string' or type(val) == 'function' then
             rawset(top, key, val)
         else
             local sub = {}
@@ -138,29 +140,26 @@ end
 
 windower.register_event('load', 'login', 'job change', 'logout', function()
     local player = windower.ffxi.get_player()
-    local file, path
+    local file, path, filename, filepath, err
     local basepath = windower.addon_path .. 'data/'
     if player then
-        for filepath in L{
+        for filepath_template in L{
             {path = 'name_main_sub.lua',    format = '%s\'s %s/%s'},
             {path = 'name_main.lua',        format = '%s\'s %s'},
             {path = 'name.lua',             format = '%s\'s'},
+            {path = 'binds.lua',            format = '"binds"'},
         }:it() do
-            path = filepath.format:format(player.name, player.main_job, player.sub_job or '')
-            file = loadfile(basepath .. filepath.path:gsub('name', player.name):gsub('main', player.main_job):gsub('sub', player.sub_job or ''))
-
-            if file then
+            path = filepath_template.format:format(player.name, player.main_job, player.sub_job or '')
+            filename = filepath_template.path:gsub('name', player.name):gsub('main', player.main_job):gsub('sub', player.sub_job or '')
+            filepath = basepath .. filename
+            if windower.file_exists(filepath) then
+                file, err = loadfile(filepath)
                 break
             end
         end
     end
 
-    if not file then
-        path = 'binds.lua'
-        file = loadfile(basepath .. path)
-    end
-
-    if file then
+    if file and not err then
         _innerG._names = {}
         _innerG._binds = {}
         binds = {}
@@ -181,8 +180,11 @@ windower.register_event('load', 'login', 'job change', 'logout', function()
         reset()
 
         print('Yush: Loaded %s Lua file':format(path))
+    elseif err then
+        print('\nYush: Error loading file: '..err:gsub('\\','/'))
     elseif player then
         print('Yush: No matching file found for %s (%s%s)':format(player.name, player.main_job, player.sub_job and '/' .. player.sub_job or ''))
+
     end
 end)
 

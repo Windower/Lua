@@ -1,4 +1,4 @@
---Copyright (c) 2014~2015, Byrthnoth
+--Copyright (c) 2014~2020, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'Translate'
-_addon.version = '0.150811'
+_addon.version = '2.0.0.0'
 _addon.author = 'Byrth'
 _addon.commands = {'trans','translate'}
 
@@ -70,7 +70,7 @@ red_close = string.char(0xEF,0x28)
 green_col = ''--string.char(0x1E,2)
 rcol = ''--string.char(0x1E,1)
 
-
+local temp_str
 
 function to_a_code(num)
     local first_byte,second_byte = math.floor(num/256),num%256
@@ -196,18 +196,18 @@ trans_list['\.'] = nil
 
 windower.register_event('incoming chunk',function(id,orgi,modi,is_injected,is_blocked)
     if id == 0x17 and not is_injected and not is_blocked then
-        local out_text = modi:unpack('z',0x19)
+        local out_text = modi:unpack('z',0x18)
         
         out_text = translate_phrase(out_text)
         
         if not out_text then return end
         
-        if show_original then windower.add_to_chat(8,modi:sub(9,0x18):unpack('z',1)..'[Original]: '..modi:unpack('z',0x19)) end
+        if show_original then windower.add_to_chat(8,modi:sub(9,0x17):unpack('z',1)..'[Original]: '..modi:unpack('z',0x18)) end
         while #out_text > 0 do
-            local boundary = get_boundary_length(out_text,150)
-            local len = math.ceil((boundary+1+24)/2) -- Make sure there is at least one nul after the string
-            local out_pack = string.char(0x17,len)..modi:sub(3,0x18)..out_text:sub(1,boundary)
-            
+            local boundary = get_boundary_length(out_text,151)
+            local len = math.ceil((boundary+1+23)/2) -- Make sure there is at least one nul after the string
+            local out_pack = string.char(0x17,len)..modi:sub(3,0x17)..out_text:sub(1,boundary)
+
             -- zero pad it
             while #out_pack < len*2 do
                 out_pack = out_pack..string.char(0)
@@ -324,68 +324,21 @@ end)
 
 windower.register_event('incoming text',function(org,mod,ocol,mcol,blk)
     if not blk and ocol == 204 then
-        local ret = translate_phrase(org)
-        if os.clock()-search_comment.ts>0.4 then
-            search_comment = {ts = os.clock(), reg = L{}, translated = false}
-        end
+        local ret = translate_phrase(mod)
+        temp_str = ret or org
         if ret then
-            if not search_comment.reg:contains(ret) then
-                search_comment.translated = true
-                search_comment.reg:append(ret)
-                windower.add_to_chat(204,ret)
-                coroutine.yield(true)
-                if show_original then
-                    coroutine.sleep(0.3)
-                    if search_comment.translated then windower.add_to_chat(8,'[Original]: '..org) end
-                end
-            end
-        elseif not search_comment.reg:contains(org) then
-            search_comment.reg:append(org)
-            windower.add_to_chat(204,org)
-            coroutine.yield(true)
             if show_original then
-                coroutine.sleep(0.3)
-                if search_comment.translated then windower.add_to_chat(8,'[Original]: '..org) end
+                windower.add_to_chat:schedule(0.3, 8,'[Original]: '..org)
             end
+            mod = ret
+            if org == temp_str then
+                blk = true 
+                temp_str = ''
+            end
+            return blk and blk or mod
         end
     end
 end)
-
-    
-function print_set(set,title)
-    if not set then
-        if title then
-            windower.add_to_chat(123,'GearSwap: print_set error '..title..' set is nil.')
-        else
-            windower.add_to_chat(123,'GearSwap: print_set error, set is nil.')
-        end
-        return
-    end
-    if title then
-        windower.add_to_chat(1,'------------------------- '..tostring(title)..' -------------------------')
-    else
-        windower.add_to_chat(1,'----------------------------------------------------------------')
-    end
-    if #set == table.length(set) then
-        for i,v in ipairs(set) do
-            if type(v) == 'table' and v.name then
-                windower.add_to_chat(8,tostring(i)..' '..tostring(v))
-            else
-                windower.add_to_chat(8,tostring(i)..' '..tostring(v))
-            end
-        end
-    else
-        for i,v in pairs(set) do
-            if type(v) == 'table' and v.name then
-                windower.add_to_chat(8,tostring(i)..' '..tostring(v))
-            else
-                windower.add_to_chat(8,tostring(i)..' '..tostring(v))
-            end
-        end
-    end
-    windower.add_to_chat(1,'----------------------------------------------------------------')
-end
-
 
 function unescape(str)
     return (str:gsub('%%([%%%%^%$%*%(%)%.%+%?%-%]%[])','%1'))

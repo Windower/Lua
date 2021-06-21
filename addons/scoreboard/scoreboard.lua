@@ -479,44 +479,46 @@ end
 
 ActionPacket.open_listener(action_handler)
 
-function find_pet_owner_name(actionpacket)
-    local pet = windower.ffxi.get_mob_by_id(actionpacket:get_id())
-    local party = windower.ffxi.get_party()
-    
-    local name = nil
-    
-    for _, member in pairs(party) do
-        if type(member) == 'table' and member.mob then
-            if member.mob.pet_index and member.mob.pet_index> 0 and pet.index == member.mob.pet_index then
-                name = member.mob.name
-                break
+    function find_pet_owner_name(actionpacket)
+        local pet = windower.ffxi.get_mob_by_id(actionpacket:get_id())
+        local party = windower.ffxi.get_party()
+        
+        local name = nil
+        
+        for _, member in pairs(party) do
+            if type(member) == 'table' and member.mob then
+                if member.mob.pet_index and member.mob.pet_index> 0 and pet.index == member.mob.pet_index then
+                    name = member.mob.name
+                    break
+                end
             end
         end
+        return name, pet.name
     end
-    return name
-end
 
-function create_mob_name(actionpacket)
-    local actor = actionpacket:get_actor_name()
-    local result = ''
-    local owner = find_pet_owner_name(actionpacket)
-    if owner ~= nil then
-        if string.len(actor) > 8 then
-            result = string.sub(actor, 1, 7)..'.'
+    function create_mob_name(actionpacket)
+        local actor = actionpacket:get_actor_name()
+        local result = ''
+        local owner, pet = find_pet_owner_name(actionpacket)
+        if owner ~= nil then
+            if string.len(actor) > 8 then
+                result = string.sub(actor, 1, 7)..'.'
+            else
+                result = actor
+            end
+            if settings.combinepets then
+                result = ''
+            else
+                result = actor
+            end
+            if pet then
+                result = '('..owner..')'..' '..pet
+            end
         else
-            result = actor
+            return actor
         end
-        if settings.combinepets then
-            result = 'Pets'
-        else
-            result = actor
-        end
-        result = result..' ('..string.sub(owner, 1, 3)..'.)'
-    else
-        return actor
+        return result
     end
-    return result
-end
 
 config.register(settings, function(settings)
     update_dps_clock:loop(settings.UpdateFrequency)
