@@ -60,7 +60,7 @@ windower.register_event('incoming chunk',function (id,original,modified,injected
             local lvl = mobinfo['Param 1']
             
             -- gets mob level
-            if lvl > 2147483647 then
+            if lvl > 0x7FFFFFFF then
                 lvl = -1
             end
             
