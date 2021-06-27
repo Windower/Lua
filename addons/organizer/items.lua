@@ -29,10 +29,52 @@ local items = {}
 local bags = {}
 local item_tab = {}
 
+local nomad_moogle
+local clear_moogles
+do
+    local names = {'Nomad Moogle', 'Pilgrim Moogle'}
+    local moogles = {}
+    
+    clear_moogles = function()
+        moogles = {}
+    end
+    
+    nomad_moogle = function()
+        if #moogles == 0 then
+            for _,name in ipairs(names) do
+                local npcs = windower.ffxi.get_mob_list(name)
+                for index in pairs(npcs) do
+                    table.insert(moogles,index)
+                end
+            end
+        end
+        
+        local player = windower.ffxi.get_mob_by_target('me')
+        for _, moo_index in ipairs(moogles) do
+            local moo = windower.ffxi.get_mob_by_index(moo_index)
+            if moo and (moo.x - player.x)^2 + (moo.y - player.y)^2 < 36 then
+                return true
+            end
+        end
+        return false
+    end
+end
+
+windower.register_event('zone change',function() 
+    clear_moogles()
+end)
+
 local function validate_bag(bag_table)
-    if (bag_table.access == 'Everywhere' or (bag_table.access == 'Mog House' and windower.ffxi.get_info().mog_house)) and
-        windower.ffxi.get_bag_info(bag_table.id) then
-        return true
+    if type(bag_table) == 'table' and windower.ffxi.get_bag_info(bag_table.id) then 
+        if bag_table.access == 'Everywhere' then
+            return true
+        elseif bag_table.access == 'Mog House' then 
+            if windower.ffxi.get_info().mog_house then
+                return true
+            elseif nomad_moogle() and bag_table.english ~= 'Storage' then -- Storage is not available at Nomad Moogles
+                return true
+            end
+        end
     end
     return false
 end

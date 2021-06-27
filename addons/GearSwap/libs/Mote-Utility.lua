@@ -527,7 +527,7 @@ function set_macro_page(set,book)
             add_to_chat(123,'Error setting macro page: Macro book ('..tostring(book)..') must be between 1 and 20.')
             return
         end
-        send_command('@input /macro book '..tostring(book)..';wait .1;input /macro set '..tostring(set))
+        send_command('@input /macro book '..tostring(book)..';wait 1.1;input /macro set '..tostring(set))
     else
         send_command('@input /macro set '..tostring(set))
     end

@@ -27,11 +27,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.]]
 
 _addon.name = 'MyHome'
 _addon.author = 'from20020516'
-_addon.version = '1.1'
+_addon.version = '1.1.1'
 _addon.commands = {'myhome','mh','warp'}
 
 require('logger')
 extdata = require('extdata')
+res_bags = require('resources').bags
+
+log_flag = true
 
 lang = string.lower(windower.ffxi.get_info().language)
 item_info = {
@@ -40,21 +43,28 @@ item_info = {
     [3]={id=4181,japanese='呪符デジョン',english='"Instant Warp"'}}
 
 function search_item()
+    if windower.ffxi.get_player().status > 1 then
+        log('You cannot use items at this time.')
+        return
+    end
+
     local item_array = {}
-    local bags = {0,8,10,11,12} --inventory,wardrobe1-4
     local get_items = windower.ffxi.get_items
-    for i=1,#bags do
-        for _,item in ipairs(get_items(bags[i])) do
-            if item.id > 0 then
+    local set_equip = windower.ffxi.set_equip
+    
+    for bag_id in pairs(res_bags:equippable(true)) do
+        local bag = get_items(bag_id)
+        for _,item in ipairs(bag) do
+            if item.id > 0  then
                 item_array[item.id] = item
-                item_array[item.id].bag = bags[i]
+                item_array[item.id].bag = bag_id
+                item_array[item.id].bag_enabled = bag.enabled
             end
         end
     end
     for index,stats in pairs(item_info) do
         local item = item_array[stats.id]
-        local set_equip = windower.ffxi.set_equip
-        if item then
+        if item and item.bag_enabled then
             local ext = extdata.decode(item)
             local enchant = ext.type == 'Enchanted Equipment'
             local recast = enchant and ext.charges_remaining > 0 and math.max(ext.next_use_time+18000-os.time(),0)
@@ -63,7 +73,6 @@ function search_item()
             if usable or ext.type == 'General' then
                 if enchant and item.status ~= 5 then --not equipped
                     set_equip(item.slot,stats.slot,item.bag)
-                    log_flag = true
                     repeat --waiting cast delay
                         coroutine.sleep(1)
                         local ext = extdata.decode(get_items(item.bag,item.slot))
@@ -79,6 +88,8 @@ function search_item()
                 windower.chat.input('/item '..windower.to_shift_jis(stats[lang])..' <me>')
                 break;
             end
+        elseif item and not item.bag_enabled then
+            log('You cannot access '..stats[lang]..' from ' .. res_bags[item.bag].name ..' at this time.')
         else
             log('You don\'t have '..stats[lang]..'.')
         end

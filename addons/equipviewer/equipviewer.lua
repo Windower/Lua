@@ -256,7 +256,7 @@ windower.register_event('incoming chunk', function(id, original, modified, injec
         end
         
         if slot then
-            if packet['Status'] ~= 5 then --item not equipped
+            if packet['Status'] ~= 5 and packet['Count'] == 0 then --item not equipped
                 update_equipment_slot:schedule(0, '0x%x':format(id), slot, 0, 0, 0)
                 return
             end
