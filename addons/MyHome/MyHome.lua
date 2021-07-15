@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.]]
 
 _addon.name = 'MyHome'
 _addon.author = 'from20020516'
-_addon.version = '1.1.1'
+_addon.version = '1.1.2'
 _addon.commands = {'myhome','mh','warp'}
 
 require('logger')
@@ -71,7 +71,7 @@ function search_item()
             local usable = recast and recast == 0
             log(stats[lang],usable and '' or recast and recast..' sec recast.')
             if usable or ext.type == 'General' then
-                if enchant and item.status ~= 5 then --not equipped
+                if enchant and item.status ~= 5 and item.slot then --not equipped
                     set_equip(item.slot,stats.slot,item.bag)
                     repeat --waiting cast delay
                         coroutine.sleep(1)
