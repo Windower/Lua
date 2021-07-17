@@ -41,7 +41,6 @@ do
     end
     
     local poke_moogle = function(npc)
-        print('poking', npc.name)
         local p = packets.new('outgoing', 0x1a, {
             ["Target"] = npc.id,
             ["Target Index"] = npc.index,
@@ -51,7 +50,6 @@ do
         packets.inject(p)
         repeat 
             coroutine.sleep(0.4)
-            print('waitan')
         until not block_menu
     end
     
@@ -61,7 +59,6 @@ do
                 local npcs = windower.ffxi.get_mob_list(name)
                 for index in pairs(npcs) do
                     table.insert(moogles,index)
-                    print(name,index)
                 end
             end
         end
@@ -81,7 +78,6 @@ do
     
     windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
         if id == 0x02E and block_menu then
-            print('moogle poked, menu blocked')        
             block_menu = false
             return true
         end
