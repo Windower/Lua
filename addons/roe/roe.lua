@@ -27,7 +27,7 @@
 
 _addon = {}
 _addon.name = 'ROE'
-_addon.version = '1.0'
+_addon.version = '1.1'
 _addon.author = "Cair"
 _addon.commands = {'roe'}
 
@@ -206,12 +206,12 @@ local function blacklist(add_remove,id)
             settings.blacklist:add(id)
             notice('roe quest %d added to the blacklist':format(id))
         elseif add_remove == 'remove' then
-			if id >= 4008 and id <= 4021 then
-				return
-			else
-				settings.blacklist:remove(id)
-				notice('roe quest %d removed from the blacklist':format(id))
-			end
+	    if id >= 4008 and id <= 4021 then
+                return
+	    else
+	    settings.blacklist:remove(id)
+	    notice('roe quest %d removed from the blacklist':format(id))
+	    end
         else
             error('`blacklist` specify \'add\' or \'remove\'')
         end
