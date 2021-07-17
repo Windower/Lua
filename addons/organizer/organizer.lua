@@ -24,17 +24,18 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-res = require 'resources'
-files = require 'files'
-require 'pack'
-Items = require 'items'
-extdata = require 'extdata'
-logger = require 'logger'
-require 'tables'
-require 'lists'
-require 'functions'
-config = require 'config'
-slips = require 'slips'
+res = require('resources')
+files = require('files')
+require('pack')
+Items = require('items')
+extdata = require('extdata')
+logger = require('logger')
+require('tables')
+require('lists')
+require('functions')
+config = require('config')
+slips = require('slips')
+packets = require('packets')
 
 _addon.name = 'Organizer'
 _addon.author = 'Byrth, maintainer: Rooks'
@@ -243,6 +244,11 @@ windower.register_event('addon command',function(...)
         return
     end
 
+    local moogle = nomad_moogle()
+    if moogle then
+        org_debug("command", "Using '" .. moogle .. "' for Mog House interaction")
+    end
+    
     local bag = 'all'
     if inp[1] and (_static.bag_ids[inp[1]:lower()] or inp[1]:lower() == 'all') then
         bag = table.remove(inp,1):lower()
@@ -299,6 +305,11 @@ windower.register_event('addon command',function(...)
         windower.send_command('input /heal')
     end
 
+    if moogle then
+        clear_moogle()
+        org_debug("command", "Clearing '" .. moogle .. "' status")
+    end
+    
     org_debug("command", "Organizer complete")
 
 end)
