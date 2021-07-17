@@ -76,7 +76,7 @@ do
         return false
     end
     
-    windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
+    windower.register_event('incoming chunk',function(id)
         if id == 0x02E and block_menu then
             block_menu = false
             return true
