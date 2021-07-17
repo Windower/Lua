@@ -35,6 +35,7 @@ require 'lists'
 require 'functions'
 config = require 'config'
 slips = require 'slips'
+packets = require 'packets'
 
 _addon.name = 'Organizer'
 _addon.author = 'Byrth, maintainer: Rooks'
@@ -243,6 +244,11 @@ windower.register_event('addon command',function(...)
         return
     end
 
+    local moogle = nomad_moogle()
+    if moogle then
+        org_debug("command","Using '" .. mog .. "' for Mog House interaction")
+    end
+    
     local bag = 'all'
     if inp[1] and (_static.bag_ids[inp[1]:lower()] or inp[1]:lower() == 'all') then
         bag = table.remove(inp,1):lower()
@@ -299,6 +305,11 @@ windower.register_event('addon command',function(...)
         windower.send_command('input /heal')
     end
 
+    if moogle then
+        clear_moogle()
+        org_debug("command","Clearing '" .. moogle .. "' status")
+    end
+    
     org_debug("command", "Organizer complete")
 
 end)
