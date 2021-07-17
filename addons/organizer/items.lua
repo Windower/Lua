@@ -29,14 +29,30 @@ local items = {}
 local bags = {}
 local item_tab = {}
 
-local nomad_moogle
-local clear_moogles
 do
     local names = {'Nomad Moogle', 'Pilgrim Moogle'}
     local moogles = {}
+    local poked = false
+    local block_menu = false
     
     clear_moogles = function()
         moogles = {}
+        poked = false
+    end
+    
+    local poke_moogle = function(npc)
+        print('poking', npc.name)
+        local p = packets.new('outgoing', 0x1a, {
+            ["Target"] = npc.id,
+            ["Target Index"] = npc.index,
+            })
+        poked = true
+        block_menu = true
+        packets.inject(p)
+        repeat 
+            coroutine.sleep(0.4)
+            print('waitan')
+        until not block_menu
     end
     
     nomad_moogle = function()
@@ -45,6 +61,7 @@ do
                 local npcs = windower.ffxi.get_mob_list(name)
                 for index in pairs(npcs) do
                     table.insert(moogles,index)
+                    print(name,index)
                 end
             end
         end
@@ -53,11 +70,22 @@ do
         for _, moo_index in ipairs(moogles) do
             local moo = windower.ffxi.get_mob_by_index(moo_index)
             if moo and (moo.x - player.x)^2 + (moo.y - player.y)^2 < 36 then
-                return true
+                if not poked then
+                    poke_moogle(moo)
+                end
+                return moo.name
             end
         end
         return false
     end
+    
+    windower.register_event('incoming chunk',function(id,data,modified,injected,blocked)
+        if id == 0x02E and block_menu then
+            print('moogle poked, menu blocked')        
+            block_menu = false
+            return true
+        end
+    end)
 end
 
 windower.register_event('zone change',function() 
