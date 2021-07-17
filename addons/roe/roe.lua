@@ -206,7 +206,7 @@ local function blacklist(add_remove,id)
             settings.blacklist:add(id)
             notice('roe quest %d added to the blacklist':format(id))
         elseif add_remove == 'remove' then
-			if not id >= 4008 and not id <= 4021 then
+			if id >= 4008 and id <= 4021 then
 				return
 			else
 				settings.blacklist:remove(id)
