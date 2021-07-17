@@ -246,7 +246,7 @@ windower.register_event('addon command',function(...)
 
     local moogle = nomad_moogle()
     if moogle then
-        org_debug("command","Using '" .. mog .. "' for Mog House interaction")
+        org_debug("command","Using '" .. moogle .. "' for Mog House interaction")
     end
     
     local bag = 'all'
