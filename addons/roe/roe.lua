@@ -27,7 +27,7 @@
 
 _addon = {}
 _addon.name = 'ROE'
-_addon.version = '1.0'
+_addon.version = '1.1'
 _addon.author = "Cair"
 _addon.commands = {'roe'}
 
@@ -70,6 +70,7 @@ local function accept_roe(id)
     id = tonumber(id)
     
     if not id or _roe.complete[id] or _roe.active[id] then return end
+    if id and id >= 4008 and id <= 4021 then return end
     
     local p = packets.new('outgoing', 0x10c, {['RoE Quest'] = id })
     packets.inject(p)
@@ -206,8 +207,12 @@ local function blacklist(add_remove,id)
             settings.blacklist:add(id)
             notice('roe quest %d added to the blacklist':format(id))
         elseif add_remove == 'remove' then
-            settings.blacklist:remove(id)
-            notice('roe quest %d removed from the blacklist':format(id))
+	    if id >= 4008 and id <= 4021 then
+                return
+	    else
+	    settings.blacklist:remove(id)
+	    notice('roe quest %d removed from the blacklist':format(id))
+	    end
         else
             error('`blacklist` specify \'add\' or \'remove\'')
         end
