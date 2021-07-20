@@ -27,11 +27,12 @@
 
 _addon.name = 'THTracker'
 _addon.author = 'Krizz'
-_addon.version = 1.1
+_addon.version = 1.2
 _addon.commands = {'thtracker', 'th'}
 
 config = require ('config')
 texts = require ('texts')
+packets = require('packets')
 require('logger')
 
 defaults = {}
@@ -51,7 +52,9 @@ defaults.bg.blue = 30
 
 settings = config.load(defaults)
 
-th = texts.new('No current mob', settings)
+th = texts.new('${th_string}', settings)
+
+local th_table = {}
 
 windower.register_event('addon command', function(command, ...)
     command = command and command:lower()
@@ -74,33 +77,49 @@ windower.register_event('addon command', function(command, ...)
     end
 end)
 
-windower.register_event('incoming text', function(original, new, color)
-    original = original:strip_format()
-    local name, count = original:match('Additional effect: Treasure Hunter effectiveness against[%s%a%a%a]- (.*) increases to (%d+).')
-    
-    if name and count then
-        name = name.gsub(name, "the ", "")
-        mob = name
-        th:text(' '..name..'\n TH: '..count);
-        th:show()
+windower.register_event('incoming chunk', function(id, data)
+    if id == 0x028 then
+        local packet = packets.parse('incoming', data)
+        if packet.Category == 1 and packet['Target 1 Action 1 Has Added Effect'] and packet['Target 1 Action 1 Added Effect Message'] == 603 then
+            th_table[packet['Target 1 ID']] = 'TH: '..packet['Target 1 Action 1 Added Effect Param']
+            update_text()
+        elseif packet.Category == 3 and packet['Target 1 Action 1 Message'] == 608 then
+            th_table[packet['Target 1 ID']] = 'TH: '..packet['Target 1 Action 1 Param']
+            update_text()
+        end
+    elseif id == 0x038 then
+        local packet = packets.parse('incoming', data)
+        if th_table[packet['Mob']] and packet['Type'] == 'kesu' then
+            th_table[packet['Mob']] = nil
+            update_text()
+        end
+    elseif id == 0x00E then
+        local packet = packets.parse('incoming', data)
+        if th_table[packet['NPC']] and packet['Status'] == 0 and packet['HP %'] == 100 then
+            th_table[packet['NPC']] = nil
+            update_text()
+        end
     end
-
-    local deadmob = original:match('%w+ defeats[%s%a%a%a]- (.*).')
-    
-    if deadmob then
-        deadmob = deadmob.gsub(deadmob, "the ", "")
-    end
-    
-    if deadmob == mob then
-        
-        th:text('No current mob')
-        th:hide()
-        mob = nil
-    end
-
 end)
 
 windower.register_event('zone change', function()
-    th:text('No current mob')
-    th:hide()
+    th_table = {}
+    update_text()
 end)
+
+windower.register_event('target change', function()
+    update_text()
+end)
+
+function update_text()
+    local current_string
+    local target = windower.ffxi.get_mob_by_target('st') or windower.ffxi.get_mob_by_target('t')
+    if target and th_table[target.id] then
+        current_string = target.name..'\n '..th_table[target.id]
+        th:show()
+    else
+        current_string = ''
+        th:hide()
+    end
+    th.th_string = current_string
+end
