@@ -306,7 +306,7 @@ windower.register_event('addon command',function(...)
     end
 
     if moogle then
-        clear_moogle()
+        clear_moogles()
         org_debug("command", "Clearing '" .. moogle .. "' status")
     end
     
