@@ -39,7 +39,7 @@ packets = require('packets')
 
 _addon.name = 'Organizer'
 _addon.author = 'Byrth, maintainer: Rooks'
-_addon.version = 0.20210610
+_addon.version = 0.20210721
 _addon.commands = {'organizer','org'}
 
 _static = {
@@ -306,7 +306,7 @@ windower.register_event('addon command',function(...)
     end
 
     if moogle then
-        clear_moogle()
+        clear_moogles()
         org_debug("command", "Clearing '" .. moogle .. "' status")
     end
     
