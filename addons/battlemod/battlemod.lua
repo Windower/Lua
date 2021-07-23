@@ -12,7 +12,7 @@ require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
 
-_addon.version = '3.30'
+_addon.version = '3.31'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth, maintainer: SnickySnacks'
 _addon.commands = {'bm','battlemod'}
@@ -76,6 +76,18 @@ windower.register_event('addon command', function(command, ...)
         elseif command:lower() == 'crafting' then
             crafting = not crafting
             windower.add_to_chat(121,'Battlemod: Display crafting results flipped! - '..tostring(crafting))
+      elseif command:lower() == 'showblocks' then
+            showblocks = not showblocks
+            windower.add_to_chat(121,'Battlemod: Show blocks with shield flipped! - '..tostring(showblocks))
+        elseif command:lower() == 'showguards' then
+            showguards = not showguards
+            windower.add_to_chat(121,'Battlemod: Show guarding on hits flipped! - '..tostring(showguards))
+        elseif command:lower() == 'showcritws' then
+            showcritws = not showcritws
+            windower.add_to_chat(121,'Battlemod: Show critical hit on ws/mob tp flipped! - '..tostring(showcritws))
+        elseif command:lower() == 'showrollinfo' then
+            showrollinfo = not showrollinfo
+            windower.add_to_chat(121,'Battlemod: Show lucky/unlucky rolls flipped! - '..tostring(showrollinfo))
         elseif command:lower() == 'colortest' then
             local counter = 0
             local line = ''
@@ -112,6 +124,10 @@ windower.register_event('addon command', function(command, ...)
             print('           4. cancelmulti           - Cancels multiple consecutive identical lines ('..tostring(cancelmulti)..')')
             print('           5. showonernames         - Shows the name of the owner on pet messages ('..tostring(showownernames)..')')
             print('           6. crafting              - Enables early display of crafting results ('..tostring(crafting)..')')
+            print('           7. showblocks            - Shows if a hit was blocked with shield ('..tostring(showblocks)..')')
+            print('           8. showguards            - Shows if a hit was guarded ('..tostring(showguards)..')')
+            print('           9. showcritws            - Shows if a ws or mob ability was a critical hit (shows on multihit if atleast 1 hit was a crit) ('..tostring(showcritws)..')')
+            print('           10. showrollinfo         - Shows lucky/unlucky rolls ('..tostring(showrollinfo)..')')
             print('Utilities: 1. colortest             - Shows the 509 possible colors for use with the settings file')
             print('           2. reload                - Reloads settings file')
             print('           3. unload                - Unloads Battlemod')
@@ -127,7 +143,7 @@ windower.register_event('incoming text',function (original, modified, color, col
         a,z = string.find(original,'Equipment changed')
         
         if a and not block_equip then
-            windower.send_command('@wait 1;lua i battlemod flip_block_equip')
+            flip_block_equip:schedule(1)
             block_equip = true
         elseif a and block_equip then
             modified = true
@@ -138,7 +154,7 @@ windower.register_event('incoming text',function (original, modified, color, col
         c,z = string.find(original,'You must close the currently open window to use that command')
         
         if (a or b or c) and not block_cannot then
-            windower.send_command('@wait 1;lua i battlemod flip_block_cannot')
+            flip_block_cannot:schedule(1)
             block_cannot = true
         elseif (a or b or c) and block_cannot then
             modified = true
