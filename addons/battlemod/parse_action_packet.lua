@@ -54,7 +54,7 @@ function parse_action_packet(act)
 
                         if r.message ~= 0 and m.message ~= 0 then
                             if m.message == r.message or (condensecrits and S{1,67}:contains(m.message) and S{1,67}:contains(r.message)) then 
-                                if (m.effect == r.effect) or (S{1,67}:contains(m.message) and S{0,2,4}:contains(m.effect) and S{0,2,4}:contains(r.effect)) then  -- combine kicks and crits
+                                if (m.effect == r.effect) or (S{1,67}:contains(m.message) and S{0,1,2,3}:contains(m.effect) and S{0,1,2,3}:contains(r.effect)) then  -- combine kicks and crits
                                      if m.reaction == r.reaction then --or (S{8,10}:contains(m.reaction) and S{8,10}:contains(r.reaction)) then  -- combine hits and guards
 --                                        windower.add_to_chat(8, 'Condensed: '..m.message..':'..r.message..' - '..m.effect..':'..r.effect..' - '..m.reaction..':'..r.reaction)
                                         r.number = r.number + 1
@@ -303,23 +303,11 @@ function parse_action_packet(act)
                     end
                 end
                 
+                local roll = showrollinfo and act.category == 6 and corsair_rolls[act.param] and corsair_rolls[act.param][m.param] or ''
                 local reaction_lookup = reaction_offsets[act.category] and (m.reaction - reaction_offsets[act.category]) or 0
                 local has_line_break = string.find(res.action_messages[m.message].en, '${lb}') and true or false
-                local prefix = (not has_line_break or simplify) and S{1,3,4,6,11,13,14,15}:contains(act.category) and (bit.band(m.unknown,1)==1 and 'Cover! ' or '')
-                                ..(bit.band(m.unknown,4)==4 and 'Magic Burst! ' or '') --Used on Swipe/Lunge MB
-                                ..(bit.band(m.unknown,8)==8 and 'Immunobreak! ' or '') --Unused? Displayed directly on message
-                                ..(bit.band(m.unknown,16)==16 and 'Critical Hit! ' or '') --Unused? Crits have their own message
-                                ..(reaction_lookup == 4 and 'Blocked! ' or '')
-                                ..(reaction_lookup == 2 and 'Guarded! ' or '')
-                                ..(reaction_lookup == 3 and S{3,4,6,11,13,14,15}:contains(act.category) and 'Parried! ' or '') or '' --Unused? They are send the same as missed
-                local prefix2 = has_line_break and S{1,3,4,6,11,13,14,15}:contains(act.category) and (bit.band(m.unknown,1)==1 and 'Cover! ' or '')
-                                ..(bit.band(m.unknown,2)==2 and 'Resist! ' or '')
-                                ..(bit.band(m.unknown,4)==4 and 'Magic Burst! ' or '') --Used on Swipe/Lunge MB
-                                ..(bit.band(m.unknown,8)==8 and 'Immunobreak! ' or '') --Unused? Displayed directly on message
-                                ..(bit.band(m.unknown,16)==16 and 'Critical Hit! ' or '') --Unused? Crits have their own message
-                                ..(reaction_lookup == 4 and 'Blocked! ' or '')
-                                ..(reaction_lookup == 2 and 'Guarded! ' or '')
-                                ..(reaction_lookup == 3 and S{3,4,6,11,13,14,15}:contains(act.category) and 'Parried! ' or '') or '' --Unused? They are send the same as missed
+                local prefix = (not has_line_break or simplify) and get_prefix(act.category, m.effect, m.message, m.unknown, reaction_lookup) or ''
+                local prefix2 = has_line_break and get_prefix(act.category, m.effect, m.message, m.unknown, reaction_lookup) or ''
                 local message = prefix..make_condensedamage_number(m.number)..( clean_msg((msg or tostring(m.message))
                     :gsub('${spell}',color_it(act.action.spell or 'ERROR 111',color_arr.spellcol))
                     :gsub('${ability}',color_it(act.action.ability or 'ERROR 112',color_arr.abilcol))
@@ -327,13 +315,13 @@ function parse_action_packet(act)
                     :gsub('${item2}',count..color_it(act.action.item2 or 'ERROR 121',color_arr.itemcol))
                     :gsub('${weapon_skill}',color_it(act.action.weapon_skill or 'ERROR 114',color_arr.wscol))
                     :gsub('${abil}',m.simp_name or 'ERROR 115')
-                    :gsub('${numb}',numb or 'ERROR 116')
+                    :gsub('${numb}',numb..roll or 'ERROR 116')
                     :gsub('${actor}\'s',color_it(act.actor.name or 'ERROR 117',color_arr[act.actor.owner or act.actor.type])..'\'s'..act.actor.owner_name)
                     :gsub('${actor}',color_it(act.actor.name or 'ERROR 117',color_arr[act.actor.owner or act.actor.type])..act.actor.owner_name)
                     :gsub('${target}\'s',targ)
                     :gsub('${target}',targ)
                     :gsub('${lb}','\7'..prefix2)
-                    :gsub('${number}',act.action.number or m.param)
+                    :gsub('${number}',(act.action.number or m.param)..roll)
                     :gsub('${status}',m.status or 'ERROR 120')
                     :gsub('${gil}',m.param..' gil'), m.message))
                     if m.message == 377 and act.actor_id == Self.id then
@@ -654,7 +642,7 @@ function player_info(id)
     
     if not filt then
         if player_table.is_npc then
-            if player_table.index>1791 then
+            if player_table.index>1791 or player_table.charmed then
                 typ = 'other_pets'
                 filt = 'other_pets'
                 owner = 'other'
@@ -712,7 +700,7 @@ function player_info(id)
         end
     end
     if not typ then typ = 'debug' end
-    return {name=player_table.name,id=id,is_npc = player_table.is_npc,type=typ,damage=dmg,filter=filt,owner=(owner or nil), owner_name=(owner_name or ''),race = player_table.race}
+    return {name=player_table.monstrosity_name or player_table.name,id=id,is_npc = player_table.is_npc,type=typ,damage=dmg,filter=filt,owner=(owner or nil), owner_name=(owner_name or ''),race = player_table.race}
 end
 
 function get_spell(act)
@@ -906,6 +894,17 @@ function color_filt(col,is_me)
     else
         return col
     end
+end
+
+function get_prefix(category, effect, message, unknown, reaction_lookup)
+    local prefix = S{1,3,4,6,11,13,14,15}:contains(category) and (bit.band(unknown,1)==1 and 'Cover! ' or '')
+                    ..(bit.band(unknown,4)==4 and 'Magic Burst! ' or '') --Used on Swipe/Lunge MB
+                    ..(bit.band(unknown,8)==8 and 'Immunobreak! ' or '') --Unused? Displayed directly on message
+                    ..(showcritws and bit.band(effect,2)==2 and S{1,3,11}:contains(category) and message~=67 and 'Critical Hit! ' or '') --Unused? Crits have their own message
+                    ..(showblocks and reaction_lookup == 4 and 'Blocked! ' or '')
+                    ..(showguards and reaction_lookup == 2 and 'Guarded! ' or '')
+                    ..(reaction_lookup == 3 and S{3,4,6,11,13,14,15}:contains(category) and 'Parried! ' or '') --Unused? They are send the same as missed
+    return prefix
 end
 
 function condense_actions(action_array)
