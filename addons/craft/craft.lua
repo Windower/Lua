@@ -1,5 +1,5 @@
 --[[
-Craft v1.1.0
+Craft v1.1.3
 
 Copyright © 2017 Mojo
 All rights reserved.
@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name     = 'craft'
 _addon.author   = 'Mojo, Recipes provided by BG-Wiki.com'
-_addon.version  = '1.1.2'
+_addon.version  = '1.1.3'
 _addon.commands = {'craft'}
 
 require('chat')
