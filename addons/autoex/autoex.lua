@@ -69,14 +69,14 @@ local parse = function(content)
             local t = T{c:match(captures['import'])}
             
             if t and t[1] then
-                events['import'] = {name="import", file=t[1]}
+                table.insert(events, {name="import", file=t[1]})
             end
 
         elseif c:match(captures['event']) then
             local t = T{c:match(captures['event'])}
 
             if t and t[1] and t[2] and t[3] and t[4] then
-                events[t[1]] = {name=t[1], silent=t[2], once=t[3], command=t[4]}
+                table.insert(events, {name=t[1]:lower(), silent=t[2]:lower(), once=t[3]:lower(), command=t[4]:lower()})
             end
 
         end
@@ -135,6 +135,9 @@ windower.register_event('addon command', function(...)
             end
             events.helpers['convert'](table.concat(fname, ' '))
 
+        elseif command == 'migrate' and commands[2] then
+            events.helpers['migrate']()
+
         elseif command == 'load' and commands[2] then
             local fname = {}
             for i=2, #commands do
@@ -179,6 +182,21 @@ events.helpers['convert'] = function(filename)
     if f:exists() then
         local n = files.new(('/settings/%s.lua'):format(filename))
         n:write(('return %s'):format(T(parse(f)):tovstring()))
+
+    end
+
+end
+
+events.helpers['migrate'] = function(filename)
+    if not filename then
+        return false
+    end
+    
+    local f = files.new(('../../plugins/AutoExec/%s.xml'):format('AutoExec.xml'))
+    if f:exists() then
+        local n = files.new(('/settings/%s.lua'):format(filename))
+        n:write(('return %s'):format(T(parse(f)):tovstring()))
+
     end
 
 end
@@ -270,7 +288,7 @@ events.helpers['build'] = function()
     if imports and #imports > 0 then
 
         for _,v in ipairs(imports) do
-
+            
             if v.name then
                 local split = v.name:split('_')
                 
@@ -386,17 +404,17 @@ events.helpers['chat'] = function(event, command, silent, once)
     local once = once == 'true' and true or false
     local silent = silent == 'true' and true or false
     local split = event:split('_')
-
+    
     if event and command and split[2] and split[3] and split[4] then
         local m = split[2]
         local player = split[3]
         local find = split[4]
-
+        
         events.registered[event] = {event=event, id=windower.register_event('chat message', function(message, sender, mode)
             local chats = res.chat
-
-            if m and player and find and chats[mode] and windower.wc_match(message:lower(), m:lower()) then
-                local command = command:gsub('{SENDER}', sender):gsub('{MODE}', chats[mode].en)
+            
+            if m and player and find and chats[mode] and windower.wc_match(chats[mode].en:lower(), m:lower()) then
+                local command = command:gsub('{SENDER}', sender):gsub('{MODE}', chats[mode].en):gsub('{MATCH}', find)
 
                 if windower.wc_match(sender:lower(), player:lower()) and windower.wc_match(message:lower(), find:lower()) then
                     windower.send_command(command)
@@ -1077,7 +1095,7 @@ events.helpers['lowhp'] = function(event, command, silent, once)
         events.registered[event] = {event=event, id=windower.register_event('hpp change', function(new, old)
             local command = command:gsub('{NEW}', new):gsub('{OLD}', old)
             
-            if new and old and old >= 20 and new < 20 then
+            if new and old and old >= 40 and new < 20 then
                 windower.send_command(command)
 
                 if once then
@@ -1106,7 +1124,7 @@ events.helpers['criticalhp'] = function(event, command, silent, once)
         events.registered[event] = {event=event, id=windower.register_event('hpp change', function(new, old)
             local command = command:gsub('{NEW}', new):gsub('{OLD}', old)
             
-            if new and old and old >= 5 and new < 5 then
+            if new and old and old >= 20 and new < 5 then
                 windower.send_command(command)
 
                 if once then
@@ -1225,7 +1243,7 @@ events.helpers['lowmp'] = function(event, command, silent, once)
         events.registered[event] = {event=event, id=windower.register_event('mpp change', function(new, old)
             local command = command:gsub('{NEW}', new):gsub('{OLD}', old)
             
-            if new and old and old >= 20 and new < 20 then
+            if new and old and old >= 40 and new < 20 then
                 windower.send_command(command)
 
                 if once then
@@ -1254,7 +1272,7 @@ events.helpers['criticalmp'] = function(event, command, silent, once)
         events.registered[event] = {event=event, id=windower.register_event('mpp change', function(new, old)
             local command = command:gsub('{NEW}', new):gsub('{OLD}', old)
             
-            if new and old and old >= 5 and new < 5 then
+            if new and old and old >= 20 and new < 5 then
                 windower.send_command(command)
 
                 if once then
