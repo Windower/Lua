@@ -8,7 +8,7 @@
 //ax reload: Reloads the addon. *(Also accepts `r` and `rl`)*  
 //ax help: Displays information about the addon in the Windower console. *(Also accepts `h`)*  
 
-## Loading:
+## Loading: 
 The addon by default now stores `Autoex` list by character name. If another file is wished to be used, then load that filename instead.
 
 ## Exmple Events:
@@ -38,185 +38,195 @@ return {
 ## Events: *All values are case-insensitive.*
  * ### Login: `login_<name>`
    * Triggers when a character is logged in.
+     * `<name>`: Players name.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="echo {NAME} logged in!"
  
  * ### Logout: `logout_<name>`
    * Triggers when a character is logged out.
+     * `<name>`: Players name.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged out.
      * Example: \["command"\]="echo {NAME} logged out!"
  
  * ### Chat: `chat_<mode>_<sender>_<match>`
-   * Triggers when a character `<sender>`.
+   * Triggers when a character `<sender>`, sends a chat message with the specified `<mode>` and a mathching string `<match>`.
+     * `<mode>`: String name of the chat mode. [Chat](https://github.com/Windower/Resources/blob/master/resources_data/chat.lua)
+     * `<sender>`: Person that sent the message.
+     * `<match>`: A string representation of the word to look for in the senders message.
    * **String Interpolation:**
-     * {NAME} - Name of the player that logged in.
-     * Example: \["command"\]="input /acmd add {SENDER}"
+     * {SENDER} - Name of the player that sent the message.
+     * {MODE} - English name of the chat mode.
+     * {MATCH} - String that was being searched for.
+     * Example: \["command"\]="echo {SENDER} sent a /{MODE}! Match Found: {MATCH}"
  
- * ### Invite: `login_<name>`
-   * Triggers when a character is logged in.
+ * ### Invite: `invite_<name>`
+   * Triggers when a player send you a party invite.
+     * `<sender>`: Person that sent the party invite.
    * **String Interpolation:**
-     * {NAME} - Name of the player that logged in.
-     * Example: \["command"\]="input /acmd add {SENDER}"
+     * {SENDER} - Name of the player that sent party invite.
+     * Example: \["command"\]="echo {SENDER} sent a party invite!; wait 1; input /join"
  
- * ### Examined: `login_<name>`
-   * Triggers when a character is logged in.
+ * ### Examined: `examined_<name>`
+   * Triggers when a character examines you.
+     * `<name>`: Name of the player that examined you.
    * **String Interpolation:**
-     * {NAME} - Name of the player that logged in.
-     * Example: \["command"\]="input /acmd add {SENDER}"
+     * {NAME} - Name of the player that examined you.
+     * Example: \["command"\]="input /slap {NAME}"
  
- * ### Status: `login_<name>`
+ * ### Status: `status_<name>`
+   * Triggers when a characters status changes.
+     * `<name>`: Name of the new status the player is currently in. [Statuses](https://github.com/Windower/Resources/blob/master/resources_data/statuses.lua)
+   * **String Interpolation:**
+     * {NEW} - English name of the new status.
+     * {OLD} - English name of the old status.
+     * Example: \["command"\]="echo Went from {OLD} to {NEW}"
+
+ * ### Gainbuff: `gainbuff_<name>`
+   * Triggers when a character gains a buff. *This DOES NOT include buff overwriting!*
+     * `<name>`: Name of the buff the player gained.
+   * **String Interpolation:**
+     * {NAME} - English name of the buff gained.
+     * {ID} - ID of the buff gained.
+     * Example: \["command"\]="echo Gained buff: {NAME}[{ID}]"
+
+ * ### Losebuff: `losebuff_<name>`
+   * Triggers when a character loses a buff.
+     * `<name>`: Name of the buff the player lost.
+   * **String Interpolation:**
+     * {NAME} - Name of the player that logged in.
+     * Example: \["command"\]="input /acmd add {SENDER}"
+
+ * ### Time: `time_<hh.mm>`
+   * Triggers when the game time changes.
+   * **String Interpolation:**
+     * {NAME} - Name of the player that logged in.
+     * Example: \["command"\]="input /acmd add {SENDER}"
+
+ * ### Day: `day_<name>`
+   * Triggers when a game day changes.
+   * **String Interpolation:**
+     * {NAME} - Name of the player that logged in.
+     * Example: \["command"\]="input /acmd add {SENDER}"
+
+ * ### Weather: `weather_<name>`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="input /acmd add {SENDER}"
 
- * ### Gainbuff: `login_<name>`
+ * ### Moon: `moon_<name>`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="input /acmd add {SENDER}"
 
- * ### Losebuff: `login_<name>`
+ * ### Moonpct: `moonpct_<percent>`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="input /acmd add {SENDER}"
 
- * ### Login: `login_<name>`
+ * ### Zone: `zone_<name>`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="input /acmd add {SENDER}"
 
- * ### Time: `login_<name>`
+ * ### Lvup: `lvup_<number>`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="input /acmd add {SENDER}"
 
- * ### Day: `login_<name>`
+ * ### Lvdown: `lvdown_<number>`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="input /acmd add {SENDER}"
 
- * ### Weather: `login_<name>`
+ * ### Gainexp: `gainexp_<amount>`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="input /acmd add {SENDER}"
 
- * ### Moon: `login_<name>`
+ * ### Chain: `chain_<number>`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="input /acmd add {SENDER}"
 
- * ### Moonpct: `login_<name>`
+ * ### Noammo: `noammo`
+   * Triggers when a characters ammo is no longer equipped.
+   * **String Interpolation:**
+     * NONE!
+     * Example: \["command"\]="input //gs c equip_ammo"
+
+ * ### TP: `tp_<percent>`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="input /acmd add {SENDER}"
 
- * ### Zone: `login_<name>`
+ * ### HP: `hp_<number>`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="input /acmd add {SENDER}"
 
- * ### Llup: `login_<name>`
+ * ### HPP: `hpp_<percent>`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="input /acmd add {SENDER}"
 
- * ### Lvdown: `login_<name>`
+ * ### LowHP: `lowhp`
+   * Triggers when a characters HP% drops below 20%. *Will not trigger again until above 40%*
+   * **String Interpolation:**
+     * {NEW} - New HP% value.
+     * {OLD} - Old HP% value.
+     * Example: \["command"\]="input /p HP is getting low! Currently {NEW}%"
+
+ * ### CriticalHP: `criticalhp`
+   * Triggers when a characters HP% drops below 5%. *Will not trigger again until above 20%*
+   * **String Interpolation:**
+     * {NEW} - New HP% value.
+     * {OLD} - Old HP% value.
+     * Example: \["command"\]="input /p HP is getting low! Currently {NEW}%"
+
+ * ### HPMax: `hpmax_<number>`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="input /acmd add {SENDER}"
 
- * ### Gainexp: `login_<name>`
+ * ### MP: `mp_<number>`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="input /acmd add {SENDER}"
 
- * ### Chain: `login_<name>`
+ * ### MPP: `mpp_<percent>`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="input /acmd add {SENDER}"
 
- * ### Noammo: `login_<name>`
+ * ### LowMP: `lowmp`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="input /acmd add {SENDER}"
 
- * ### TP: `login_<name>`
+ * ### CriticalMP: `criticalmp`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
      * Example: \["command"\]="input /acmd add {SENDER}"
 
- * ### HP: `login_<name>`
-   * Triggers when a character is logged in.
-   * **String Interpolation:**
-     * {NAME} - Name of the player that logged in.
-     * Example: \["command"\]="input /acmd add {SENDER}"
-
- * ### HPP: `login_<name>`
-   * Triggers when a character is logged in.
-   * **String Interpolation:**
-     * {NAME} - Name of the player that logged in.
-     * Example: \["command"\]="input /acmd add {SENDER}"
-
- * ### LowHP: `login_<name>`
-   * Triggers when a character is logged in.
-   * **String Interpolation:**
-     * {NAME} - Name of the player that logged in.
-     * Example: \["command"\]="input /acmd add {SENDER}"
-
- * ### CriticalHP: `login_<name>`
-   * Triggers when a character is logged in.
-   * **String Interpolation:**
-     * {NAME} - Name of the player that logged in.
-     * Example: \["command"\]="input /acmd add {SENDER}"
-
- * ### HPMax: `login_<name>`
-   * Triggers when a character is logged in.
-   * **String Interpolation:**
-     * {NAME} - Name of the player that logged in.
-     * Example: \["command"\]="input /acmd add {SENDER}"
-
- * ### MP: `login_<name>`
-   * Triggers when a character is logged in.
-   * **String Interpolation:**
-     * {NAME} - Name of the player that logged in.
-     * Example: \["command"\]="input /acmd add {SENDER}"
-
- * ### MPP: `login_<name>`
-   * Triggers when a character is logged in.
-   * **String Interpolation:**
-     * {NAME} - Name of the player that logged in.
-     * Example: \["command"\]="input /acmd add {SENDER}"
-
- * ### LowMP: `login_<name>`
-   * Triggers when a character is logged in.
-   * **String Interpolation:**
-     * {NAME} - Name of the player that logged in.
-     * Example: \["command"\]="input /acmd add {SENDER}"
-
- * ### CriticalMP: `login_<name>`
-   * Triggers when a character is logged in.
-   * **String Interpolation:**
-     * {NAME} - Name of the player that logged in.
-     * Example: \["command"\]="input /acmd add {SENDER}"
-
- * ### MPMax: `login_<name>`
+ * ### MPMax: `mpmax_<number>`
    * Triggers when a character is logged in.
    * **String Interpolation:**
      * {NAME} - Name of the player that logged in.
