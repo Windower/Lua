@@ -36,6 +36,7 @@ return {
 ```
 
 ## Events: *All values are case-insensitive.*
+ 
  * ### Login: `login_<name>`
    * Triggers when a character is logged in with a specified name.
      * `<name>`: Players name.
@@ -49,10 +50,36 @@ return {
    * **String Interpolation:**
      * {NAME} - Name of the player that logged out.
      * Example: \["command"\]="echo {NAME} logged out!"
+
+ * ### jobchange: `jobchange_<main>/<sub>`
+   * Triggers when a character changes to the specified jobs. *(Supports Full and Short job names)* [Jobs](https://github.com/Windower/Resources/blob/master/resources_data/jobs.lua)
+     * `<main>`: Main job specified to match.
+     * `<sub>`: Sub job specified to match.
+   * **String Interpolation:**
+     * {MAIN_FULL} - Full length English name of current main job.
+     * {MAIN_SHORT} - Shortened English name of current main job.
+     * {SUB_FULL} - Full length English name of current sub job.
+     * {SUB_SHORT} - Shortened English name of current sub job.
+     * {MAIN_LV} - Current level of the main job.
+     * {SUB_LV} - Current level of the sub job.
+     * Example: \["command"\]="echo Current Job: {MAIN_SHORT}{MAIN_LV}/{SUB_FULL}{SUB_LV}."
+
+ * ### jobchangefull: `jobchangefull_<main><main_level>/<sub><sub_level>`
+   * Triggers when a character is logged out with a specified name. *(Supports Full and Short job names)* [Jobs](https://github.com/Windower/Resources/blob/master/resources_data/jobs.lua)
+     * `<main>`: Main job specified to match.
+     * `<sub>`: Sub job specified to match.
+   * **String Interpolation:**
+     * {MAIN_FULL} - Full length English name of current main job.
+     * {MAIN_SHORT} - Shortened English name of current main job.
+     * {SUB_FULL} - Full length English name of current sub job.
+     * {SUB_SHORT} - Shortened English name of current sub job.
+     * {MAIN_LV} - Current level of the main job.
+     * {SUB_LV} - Current level of the sub job.
+     * Example: \["command"\]="echo Current Job: {MAIN_SHORT}{MAIN_LV}/{SUB_FULL}{SUB_LV}."
  
  * ### Chat: `chat_<mode>_<sender>_<match>`
-   * Triggers when a character `<sender>`, sends a chat message with the specified `<mode>` and a matching string `<match>`.
-     * `<mode>`: String name of the chat mode. [Chat](https://github.com/Windower/Resources/blob/master/resources_data/chat.lua)
+   * Triggers when a character `<sender>`, sends a chat message with the specified `<mode>` and a matching string `<match>`. [Chat](https://github.com/Windower/Resources/blob/master/resources_data/chat.lua)
+     * `<mode>`: String name of the chat mode.
      * `<sender>`: Person that sent the message.
      * `<match>`: A string representation of the word to look for in the senders message.
    * **String Interpolation:**
@@ -76,24 +103,24 @@ return {
      * Example: \["command"\]="input /slap {NAME}"
  
  * ### Status: `status_<name>`
-   * Triggers when a characters status changes and matches a specified status.
-     * `<name>`: Name of the new status the player is currently in. [Statuses](https://github.com/Windower/Resources/blob/master/resources_data/statuses.lua)
+   * Triggers when a characters status changes and matches a specified status. [Statuses](https://github.com/Windower/Resources/blob/master/resources_data/statuses.lua)
+     * `<name>`: Name of the new status the player is currently in.
    * **String Interpolation:**
      * {NEW} - English name of the new status.
      * {OLD} - English name of the old status.
      * Example: \["command"\]="echo Went from {OLD} to {NEW}"
 
  * ### Gainbuff: `gainbuff_<name>`
-   * Triggers when a character gains a specified buff. *This DOES NOT include buff overwriting!*
-     * `<name>`: Name of the buff the player gained. [Buffs](https://github.com/Windower/Resources/blob/master/resources_data/buffs.lua)
+   * Triggers when a character gains a specified buff. *This DOES NOT include buff overwriting!* [Buffs](https://github.com/Windower/Resources/blob/master/resources_data/buffs.lua)
+     * `<name>`: Name of the buff the player gained.
    * **String Interpolation:**
      * {NAME} - English name of the buff gained.
      * {ID} - ID of the buff gained.
      * Example: \["command"\]="echo Gained buff: {NAME}[{ID}]"
 
  * ### Losebuff: `losebuff_<name>`
-   * Triggers when a character loses a specified buff.
-     * `<name>`: Name of the buff the player lost. [Buffs](https://github.com/Windower/Resources/blob/master/resources_data/buffs.lua)
+   * Triggers when a character loses a specified buff. [Buffs](https://github.com/Windower/Resources/blob/master/resources_data/buffs.lua)
+     * `<name>`: Name of the buff the player lost.
    * **String Interpolation:**
      * {NAME} - English name of the buff lost.
      * {ID} - ID of the buff lost.
@@ -112,24 +139,24 @@ return {
      * Example: \["command"\]="echo Time changed from {OLD_HOUR}:{OLD_MINUTES} to (NEW_HOUR}:{NEW_MINUTES}."
 
  * ### Day: `day_<name>`
-   * Triggers when a game day changes and matches a specified day name.
-     * `<name>`: Name of the day changing too. [Days](https://github.com/Windower/Resources/blob/master/resources_data/days.lua)
+   * Triggers when a game day changes and matches a specified day name. [Days](https://github.com/Windower/Resources/blob/master/resources_data/days.lua)
+     * `<name>`: Name of the day changing too.
    * **String Interpolation:**
      * {NEW} - English name of the day changed too.
      * {OLD} - English name of the day changed from.
      * Example: \["command"\]="input /p What a glorious new {NEW}!"
 
  * ### Weather: `weather_<name>`
-   * Triggers when a weather changes and matches a specified name.
-     * `<name>`: Name of the weather being changed too. [Weather](https://github.com/Windower/Resources/blob/master/resources_data/weather.lua)
+   * Triggers when a weather changes and matches a specified name. [Weather](https://github.com/Windower/Resources/blob/master/resources_data/weather.lua)
+     * `<name>`: Name of the weather being changed too.
    * **String Interpolation:**
      * {NEW} - English name of the new weather.
      * {OLD} - English name of the previous weather.
      * Example: \["command"\]="echo Weather changed from {OLD} to {NEW}."
 
  * ### Moon: `moon_<name>`
-   * Triggers when the moon changes and is a specified phase.
-     * `<name>`: The Name of the moon being changed too. [Moon Phases](https://github.com/Windower/Resources/blob/master/resources_data/moon_phases.lua)
+   * Triggers when the moon changes and is a specified phase. [Moon Phases](https://github.com/Windower/Resources/blob/master/resources_data/moon_phases.lua)
+     * `<name>`: The Name of the moon being changed too.
    * **String Interpolation:**
      * {NEW} - English name of the new moon phase.
      * {OLD} - English name of the old moon phase.
@@ -143,8 +170,8 @@ return {
      * Example: \["command"\]="echo Moon is at {PERCENT}%!"
 
  * ### Zone: `zone_<name>`
-   * Triggers when a character zones in to a specified zone.
-     * `<name>`: The Name of the zone currently being entered. [Zones](https://github.com/Windower/Resources/blob/master/resources_data/zones.lua)
+   * Triggers when a character zones in to a specified zone. [Zones](https://github.com/Windower/Resources/blob/master/resources_data/zones.lua)
+     * `<name>`: The Name of the zone currently being entered.
    * **String Interpolation:**
      * {NEW} - English name of the new zone.
      * {OLD} - English name of the previous zone.
@@ -262,3 +289,23 @@ return {
    * **String Interpolation:**
      * {NEW} - The current amount of MP%.
      * {OLD} - The previous amount of MP%.
+
+ * ### HPP\<76%: `hpplt76`
+   * Triggers when a characters HP% is less than 76%.
+   * **String Interpolation:**
+     * `NONE!`
+
+ * ### HPP\>75%: `hppgt75`
+   * Triggers when a characters HP% is greater than 75%.
+   * **String Interpolation:**
+     * `NONE!`
+
+ * ### MPP\<50%: `mpplt50`
+   * Triggers when a characters MP% is less than 50%.
+   * **String Interpolation:**
+     * `NONE!`
+
+ * ### MPP\>49%: `mppgt49`
+   * Triggers when a characters MP% is greater than 49%.
+   * **String Interpolation:**
+     * `NONE!`
