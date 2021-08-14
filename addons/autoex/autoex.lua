@@ -93,7 +93,7 @@ local isSilent = function(silent, ...)
     if silent then
         return true
     end
-    print(('%s registered! Command: <%s> [ Once: %s ]'):format(t[1]:upper(), t[2], tostring(t[2])))
+    print(('%s :: Command ► <%s> [ Once: %s ]'):format(t[1]:upper(), t[2], tostring(t[3]):upper()))
 
 end
     
@@ -142,12 +142,12 @@ end)
 
 windower.register_event('addon command', function(...)
     local commands = T{...}
-    local command = commando.string[1] or false
+    local command = commands[1] or false
 
     if command then
         local command = command:lower()
 
-        if command == 'convert' and commando.string[2] then
+        if command == 'convert' and commands[2] then
             local fname = {}
             for i=2, #commands do
                 table.insert(fname, commands[i])
@@ -157,7 +157,7 @@ windower.register_event('addon command', function(...)
         elseif command == 'migrate' then
             events.helpers['migrate']()
 
-        elseif command == 'load' and commando.string[2] then
+        elseif command == 'load' and commands[2] then
             local fname = {}
             for i=2, #commands do
                 table.insert(fname, commands[i])
@@ -203,6 +203,9 @@ events.helpers['convert'] = function(filename)
         local n = files.new(('/settings/%s.lua'):format(filename))
         n:write(('return %s'):format(T(parse(f)):tovstring()))
 
+    else
+        print('That file does not exist!')
+
     end
 
 end
@@ -214,7 +217,7 @@ events.helpers['migrate'] = function()
         n:write(('return %s'):format(T(parse(f)):tovstring()))
     
     else
-        print("Didn't find file!")
+        print("Could not find 'AutoExec.xml' in plugins folder!")
 
     end
 
@@ -237,6 +240,9 @@ events.helpers['load'] = function(filename)
             events.helpers.build()
 
         end
+
+    else
+        print('Unable to load that file!')
 
     end
 
@@ -280,6 +286,10 @@ events.helpers['build'] = function()
                     
                     if events.logic[name] then
                         events.helpers['create'](map[name], v.name, v.command, v.silent, v.once, name)
+
+                    else
+                        print(string.format('%s is not a valid event! [ v.name ]', tostring(name)))
+
                     end
 
                 elseif name:lower() == 'import' and v.file then
@@ -369,8 +379,15 @@ events.helpers['create'] = function(register, event, command, silent, once, matc
             end)}
             isSilent(silent, event, command, once)
 
+            if not events.registered[name] then
+                print(string.format('Failed to register event! [ %s / %s ]', tostring(register), tostring(event)))
+            end
+
         end
-        table.print(events.registered)
+
+    else
+        print(string.format('Failed to create event! [ %s / %s ]', tostring(register), tostring(event)))
+
     end    
 
 end
