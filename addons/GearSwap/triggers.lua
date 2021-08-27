@@ -44,8 +44,8 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
     windower.debug('outgoing text')
     if gearswap_disabled then return modified end
     
-    local splitline = windower.from_shift_jis(windower.convert_auto_trans(modified)):gsub(' <wait %d+>',''):gsub('"(.-)"',function(str)
-            return str:gsub(' ',string.char(7))
+    local splitline = windower.from_shift_jis(windower.convert_auto_trans(modified)):gsub('<wait[%s%d%.]*>',''):gsub('"(.-)"',function(str)
+            return ' '..str:gsub(' ',string.char(7))..' '
         end):split(' '):filter(-'')
     
     if splitline.n == 0 then return end
