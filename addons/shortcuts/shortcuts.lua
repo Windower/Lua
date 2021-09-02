@@ -117,10 +117,16 @@ default_aliases = {
     cw5="Curing Waltz V",
     hw="Healing Waltz"
 }
+default_settings = {
+    include_items = false,
+}
 
-aliases = config.load('data\\aliases.xml',default_aliases)
+aliases = config.load('data/aliases.xml', default_aliases)
+settings = config.load('data/settings.xml', default_settings)
 config.save(aliases)
+config.save(settings)
 setmetatable(aliases,nil)
+setmetatable(settings,nil)
 
 
 require 'statics'
@@ -166,12 +172,12 @@ windower.register_event('outgoing text',function(original,modified)
     if modified:sub(1,1) ~= '/' then return modified end
     debug_chat('outgoing_text: '..modified..' '..tostring(windower.ffxi.get_mob_by_target('st')))
     temp_org = temp_org:gsub(' <wait %d+>',''):sub(2)
-    
+
     if logging then
         logfile:write('\n\n',tostring(os.clock()),'temp_org: ',temp_org,'\nModified: ',modified)
         logfile:flush()
     end
-    
+
     -- If it's the command that was just sent, blank lastsent and pass it through with only the changes applied by other addons
     if modified == lastsent then
         lastsent = ''
@@ -218,11 +224,11 @@ function command_logic(original,modified)
         potential_targ = splitline[splitline.n]
     end
     local a,b,spell = string.find(original,'"(.-)"')
-    
+
     if unhandled_list[command] then
         return modified,true
     end
-    
+
     if spell then
         spell = spell:lower()
     elseif splitline.n == 3 then
@@ -232,17 +238,17 @@ function command_logic(original,modified)
 			spell = splitline[2]..' '..splitline[3]
 		end
     end
-    
+
     if targ_reps[potential_targ] then
         potential_targ = targ_reps[potential_targ]
     end
-    
+
     if ignore_list[command] then -- If the command is legitimate and on the blacklist, return it unaltered.
         lastsent = ''
         return modified,true
     elseif command2_list[command] and not valid_target(potential_targ,true) then
         -- If the command is legitimate and requires target completion but not ability interpretation
-        
+
         if not command2_list[command].args then -- If there are not any secondary commands
             local temptarg = valid_target(potential_targ) or target_make(command2_list[command]) -- Complete the target or make one.
             if temptarg ~= '<me>' then -- These commands, like emotes, check, etc., don't need to default to <me>
@@ -253,7 +259,7 @@ function command_logic(original,modified)
 
             debug_chat('258: input '..lastsent)
             if logging then
-                logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(162) ',lastsent)     
+                logfile:write('\n\n',tostring(os.clock()),'Original: ',original,'\n(162) ',lastsent)
                 logfile:flush()
             end
             windower.send_command('@input '..lastsent)
@@ -339,24 +345,49 @@ end
 ---- Sends a command if the command needs to be changed.
 -----------------------------------------------------------------------------------
 function interp_text(splitline,offset,modified)
-    local temptarg,abil
-    local no_targ_abil = strip(table.concat(splitline,' ',1+offset,splitline.n))
-        
-    if validabils[no_targ_abil] then
-        abil = no_targ_abil
+    -- Assume there was not a target suffix on the command.
+    local preliminary_action_name = table.concat(splitline,' ',1+offset,splitline.n)
+    local preliminary_action_name_normalized_as_item = strip_non_alphanumeric_keep_plus(preliminary_action_name)
+    local preliminary_action_name_normalized_as_nonitem = strip_non_alphanumeric_convert_digits_to_roman(preliminary_action_name)
+
+    -- Note: The normalized 'item' name is almost strictly more specific than
+    -- the normalized 'nonitem' name, and thus the former must be searched
+    -- before the latter to avoid falsely matching the wrong entry.
+    local temporary_target_name, normalized_preliminary_action_name
+    if validabils[preliminary_action_name_normalized_as_item] then
+        normalized_preliminary_action_name = preliminary_action_name_normalized_as_item
+    elseif validabils[preliminary_action_name_normalized_as_nonitem] then
+        normalized_preliminary_action_name = preliminary_action_name_normalized_as_nonitem
     elseif splitline.n > 1 then
-        temptarg = valid_target(targ_reps[splitline[splitline.n]] or splitline[splitline.n])
+        temporary_target_name = valid_target(targ_reps[splitline[splitline.n]] or splitline[splitline.n])
     end
-    
-    if temptarg then abil = _raw.table.concat(splitline,' ',1+offset,splitline.n-1)
-    elseif not abil then abil = _raw.table.concat(splitline,' ',1+offset,splitline.n) end
 
-    local strippedabil = strip(abil) -- Slug the ability
+    -- Compute a better name to look up based on the result of the above.
+    local finalized_action_name = normalized_preliminary_action_name
+    if temporary_target_name then
+        finalized_action_name = _raw.table.concat(splitline,' ',1+offset,splitline.n-1)
+    elseif not normalized_preliminary_action_name then
+        finalized_action_name = _raw.table.concat(splitline,' ',1+offset,splitline.n)
+    end
 
-    if validabils[strippedabil] then
-        local options,nonoptions,num_opts, r_line = {},{},0
+    -- Re-normalize the action name, but using the finalized name
+    local finalized_action_name_normalized_as_item = strip_non_alphanumeric_keep_plus(finalized_action_name)
+    local finalized_action_name_normalized_as_nonitem = strip_non_alphanumeric_convert_digits_to_roman(finalized_action_name)
+
+    -- Note: The normalized 'item' name is almost strictly more specific than
+    -- the normalized 'nonitem' name, and thus the former must be searched
+    -- before the latter to avoid falsely matching the wrong entry.
+    local actions_by_normalized_name
+    if validabils[finalized_action_name_normalized_as_item] then
+        actions_by_normalized_name = validabils[finalized_action_name_normalized_as_item]
+    else
+        actions_by_normalized_name = validabils[finalized_action_name_normalized_as_nonitem]
+    end
+
+    if actions_by_normalized_name then
+        local options,nonoptions,num_opts = {},{},0
         local player = windower.ffxi.get_player()
-        for v in validabils[strippedabil]:it() do
+        for v in actions_by_normalized_name:it() do
             if check_usability(player,v.res,v.id) then
                 options[v.res] = v.id
                 num_opts = num_opts + 1
@@ -364,29 +395,54 @@ function interp_text(splitline,offset,modified)
                 nonoptions[v.res] = v.id
             end
         end
-        if num_opts > 0 then
-            -- If there are usable options then prioritize:
-            -- Prefix, if given -> Spells -> Job Abilities -> Weapon Skills -> Monster Skills
-            r_line = res[(offset == 1 and options[command_list[splitline[1]]] and command_list[splitline[1]]) or (options.spells and 'spells') or (options.job_abilities and 'job_abilities') or (options.weapon_skills and 'weapon_skills') or (options.monster_skills and 'monster_skills') or (options.mounts and 'mounts')][options[command_list[splitline[1]]] or options.spells or options.job_abilities or options.weapon_skills or options.monster_skills or options.mounts]
-        elseif num_opts == 0 then
-            r_line = res[(offset == 1 and nonoptions[command_list[splitline[1]]] and command_list[splitline[1]]) or (nonoptions.spells and 'spells') or (nonoptions.weapon_skills and 'weapon_skills') or (nonoptions.job_abilities and 'job_abilities') or (nonoptions.monster_skills and 'monster_skills') or (nonoptions.mounts and 'mounts')][nonoptions[command_list[splitline[1]]] or nonoptions.spells or nonoptions.weapon_skills or nonoptions.job_abilities or nonoptions.monster_skills or nonoptions.mounts]
+
+        -- If there are usable options then prioritize:
+        -- Prefix, if given -> Spells -> Job Abilities -> Weapon Skills -> Monster Skills
+        local r_type,r_idx,r_line
+        local opts_to_use = num_opts > 0 and options or nonoptions
+        if offset == 1 and opts_to_use[command_list[splitline[1]]] then
+            r_type = command_list[splitline[1]]
+        else
+            r_type = (opts_to_use.spells       and 'spells')
+                or (opts_to_use.job_abilities  and 'job_abilities')
+                or (opts_to_use.weapon_skills  and 'weapon_skills')
+                or (opts_to_use.monster_skills and 'monster_skills')
+                or (opts_to_use.mounts         and 'mounts')
+                or (opts_to_use.items          and 'items')
         end
-        
+        if opts_to_use[command_list[splitline[1]]] then
+            r_idx = opts_to_use[command_list[splitline[1]]]
+        else
+            r_idx = opts_to_use.spells
+                or opts_to_use.job_abilities
+                or opts_to_use.weapon_skills
+                or opts_to_use.monster_skills
+                or opts_to_use.mounts
+                or opts_to_use.items
+        end
+        r_line = res[r_type][r_idx]
+
+        -- Modify r_line to contain 'prefix' for items.
+        if r_line and not r_line.prefix and r_type == 'items' then
+            r_line = r_line:copy()
+            r_line.prefix = '/item'
+        end
+
         local targets = table.reassign({},r_line.targets)
-        
+
         -- Handling for abilities that change potential targets.
         if r_line.skill == 40 and r_line.cast_time == 8 and L(player.buffs):contains(409) then
-            targets.Party = true -- Pianissimo changes the target list of 
+            targets.Party = true -- Pianissimo changes the target list of
         elseif r_line.skill == 44 and r_line.en:find('Indi-') and L(player.buffs):contains(584) then
             targets.Party = true -- Indi- spells can be cast on others when Entrust is up
         end
-        
+
         local abil_name = r_line.english -- Remove spaces at the end of the ability name.
         while abil_name:sub(-1) == ' ' do
             abil_name = abil_name:sub(1,-2)
         end
-        
-        local out_tab = {prefix = in_game_res_commands[r_line.prefix:gsub("/","")], name = abil_name, target = temptarg or target_make(targets)}
+
+        local out_tab = {prefix = in_game_res_commands[r_line.prefix:gsub("/","")], name = abil_name, target = temporary_target_name or target_make(targets)}
         if not out_tab.prefix then print('Could not find prefix',r_line.prefix) end
         lastsent = out_tab.prefix..' "'..out_tab.name..'" '..out_tab.target
         if logging then
