@@ -2492,6 +2492,7 @@ enums['buy stat'] = {
     [0x01] = 'Success',
     [0x02] = 'Placing',
     [0xC5] = 'Failed',
+    [0xE5] = 'Cannot Bid'
 }
 
 -- 0x0A, 0x0B and 0x0D could probably be combined, the fields seem the same.
