@@ -217,7 +217,7 @@ local function update_offset(zone_id)
             if byte(f:read(1)) > 0 then
                 local f = io.open(ftable, 'rb')
                 local offset = 2*dat_id
-				f:seek('set', offset)
+                f:seek('set', offset)
                 local dat = f:read(2)
                 f:close()
 
@@ -249,10 +249,14 @@ local function update_offset(zone_id)
         local f = io.open(path, 'rb')
         local dat = f:read('*a')
         f:close()
-        local id = dialog.get_entry_id(dat, search_phrase)
-        if not id then return end -- ruh roh
+        local res = dialog.get_ids_matching_entry(dat, search_phrase)
+        if res.n ~= 1 then
+            print('In pointwatch/message_ids.lua: matched multiple entries')
+            print('Could not update message ID.')
+            return
+        end
 
-        messages['z'..tostring(zone_id)].offset = id
+        messages['z'..tostring(zone_id)].offset = res[1]
         t[zone_id] = nil
     end
 end

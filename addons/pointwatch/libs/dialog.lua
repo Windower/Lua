@@ -24,11 +24,24 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+-- This library was written to help find the ID of a known
+-- action message corresponding to an entry in the dialog tables.
+-- While the IDs can be collected in-game, they occasionally
+-- change and would otherwise need to be manually updated.
+-- It can also be used to find and decode an entry given the ID.
+
+-- Common parameters:
+-- dat: The entire content of the zone dialog DAT file
+-- i.e. local dat = io.open('path/to/dialog/DAT', 'rb'):read('*a')
+-- entry: The string you are looking for. If you do not know the
+-- entire string, use dev_find_substring.
+
 local xor = require('bit').bxor
 require('pack')
-local unpack = require('string').unpack
-local pack = require('string').pack
-local find = require('string').find
+local string = require('string')
+local unpack = string.unpack
+local pack = string.pack
+local find = string.find
 
 local dialog = {}
 
@@ -49,33 +62,59 @@ local function binary_search(pos, dat, n)
             r = m
         end
     end
-    return l-2
-    -- -1 since we want the index to the left of where "pos" would be placed
-    -- another -1 to convert to 0-indexing
+    return l-2 -- we want the index to the left of where "pos" would be placed
+end
+
+local function plain_text_gmatch(text, substring, n)
+    n = n or 1
+    return function()
+        local pos = find(text, substring, n, true)
+        if pos then n = pos + 1 end
+        return pos
+    end
 end
 
 function dialog.dev_get_offset(dat, id) -- sanity check function
-    return decode(unpack('<I', dat, 5+4*id))
+    return string.format('%x', decode(unpack('<I', dat, 5+4*id)))
 end
 
--- The goal is generally to get the ID of some entry to the
--- dialog tables. The difficulty is that the IDs occasionally
--- change. However, if you have the full entry string, you can
--- work backwards to get the ID.
--- dat: The entire content of the zone dialog DAT file
--- entry: The string you are looking for. It would be best to
--- pass the entire string, but this will technically work as
--- long as you get the first character correct and include 
--- enough of the entry for the string to be unique.
--- If you do not know the entire string, use dev_find_substring.
-function dialog.get_entry_id(dat, entry)
-    local pos = find(dat, entry)
-    if not pos then print('The given encoded text was not found within the file.') return end
-    pos = pack('<I', encode(pos-5))
-    local id = find(dat, pos)
-    if not id then print('The position of the text does not match any of the defined offsets.', pos) return end
+-- Returns an array-like table containing every ID which matched
+-- the given entry.
+-- An important note about this function: The tables contain an
+-- enormous number of duplicate entries. Additionally, some short
+-- entries can occur as substrings of longer entries. Results
+-- which fall into the second case should be filtered out.
+-- If you are dealing with the first case, it may help to look at
+-- any other messages which were received at the same time.
+function dialog.get_ids_matching_entry(dat, entry)
+    local last_offset = decode(unpack('<I', dat, 5))
+    local res = {}
+    local n = 0
+    local start = 5
+    for i in plain_text_gmatch(dat, entry, last_offset) do
+        local encoded_pos = pack('<I', encode(i-5))
+        local offset = find(dat, encoded_pos, start, true)
+        if offset then
+            offset = offset-1
+            local next_pos
+            if offset > last_offset then
+                break
+            elseif offset == last_offset then
+                next_pos = #dat+1
+            else
+                next_pos = decode(unpack('<I', dat, offset+5))+5
+            end
 
-    return (id-5)/4
+            if next_pos-i == #entry then
+                n = n + 1
+                res[n] = (offset-4)/4
+            end
+            start = offset+1
+        end
+    end
+    res.n = n
+
+    return res
 end
 
 -- This function is intended to be used only during development
@@ -84,31 +123,42 @@ end
 -- things like placeholders or pauses and it is unlikely you
 -- will know the entire content of the entry you're looking for
 -- from the get-go.
--- TODO it would be cool if you could pass a pattern
+-- Returns an array-like table which contains the ID of every entry
+-- containing a given substring.
 function dialog.dev_find_substring(dat, substring)
-    local pos = find(dat, dialog.encode_string(substring))
-    if not pos then print('No results for ', substring) return end
+    local last_offset = decode(unpack('<I', dat, 5)) + 5
+    local res = {}
+    local pos = find(dat, dialog.encode_string(substring), last_offset, true)
+    local n = 0
+    for i in plain_text_gmatch(dat, substring, last_offset) do
+        n = n + 1
+        res[n] = i
+    end
+    if res.n == 0 then print('No results for ', substring) return end
+    local entry_count = (last_offset-5)/4
+    for i = 1, n do
+        res[i] = binary_search(res[i]-1, dat, entry_count)
+    end
+    res.n = n
 
-    return binary_search(pos-1, dat, decode(unpack('<I', dat, 5))/4)
+    return res
 end
 
--- Once you get the ID from dev_find_substring, you should get
--- the full entry.
+-- Returns the encoded entry from a given dialog table. If you
+-- want to decode the entry, use dialog.decode_string.
 function dialog.get_entry(dat, id)
     local entry_count = decode(unpack('<I', dat, 5))/4
-    local offset, next_offset
-    if id + 1 == entry_count then -- TODO I'm not sure this is a valid entry
-        offset, next_offset = unpack('<I', dat, 4*id+5), #dat
-        offset = decode(offset)+5
-    else
-        offset, next_offset = unpack('<II', dat, 4*id+5)
-        offset, next_offset = decode(offset)+5, decode(next_offset)+4
+    local offset, next_offset = unpack('<II', dat, 4*id+5)
+    offset, next_offset = decode(offset)+5, decode(next_offset)+5
+    if id == entry_count-1 then
+        next_offset = #dat+1
     end
-    return string.sub(dat, offset, next_offset)
+
+    return string.sub(dat, offset, next_offset-1)
 end
 
--- Finally, you should serialize the entry so that you can
--- simply pass the full string to get_entry_id in the future.
+-- Creates a serialized representation of a string which can
+-- be copied and pasted into the contents of an addon.
 function dialog.serialize(entry)
     return 'string.char('
         .. string.sub(string.gsub(entry, '.', function(c)
@@ -116,7 +166,6 @@ function dialog.serialize(entry)
         end), 1, -2)
         ..')'
 end
-
 
 function dialog.encode_string(s)
     return string.gsub(s, '.', function(c)
