@@ -144,7 +144,7 @@ function equip_sets(swap_type,ts,...)
     end
     
     if player.race ~= 'Precomposed NPC' then
-        -- Short circuits the routine and gets out  before equip processing
+        -- Short circuits the routine and gets out before equip processing
         -- if there's no swapping to be done because the user is a monster.
         
         for v,i in pairs(default_slot_map) do
@@ -202,6 +202,10 @@ function equip_sets(swap_type,ts,...)
                     windower.packets.inject_outgoing(0x50,chunk)
                 end
             end
+        end
+    else
+        if swap_type == 'midcast' and command_registry[ts] and command_registry[ts].proposed_packet and not _settings.demo_mode then
+            windower.packets.inject_outgoing(command_registry[ts].proposed_packet:byte(1),command_registry[ts].proposed_packet)
         end
     end
     
