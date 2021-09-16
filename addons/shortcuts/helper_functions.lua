@@ -182,7 +182,7 @@ function check_usability(player,resource,id)
         return true
     elseif L(windower.ffxi.get_abilities()[resource] or {}):contains(id) then
         return true
-    elseif resource == 'monster_abilities' and player.main_job_id == 23 and (res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[id] or 0) <= player.main_job_level then
+    elseif resource == 'monster_skills' and player.main_job_id == 23 and (res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[id] or 0) <= player.main_job_level then
         return true
     elseif resource == 'mounts' and math.floor((windower.packets.last_incoming(0x0AE):byte(math.floor(id/8)+5)%2^(id%8+1))/2^(id%8)) == 1 then
         return true

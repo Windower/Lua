@@ -36,7 +36,7 @@ validabils = {}
 
 -- List of valid prefixes to be interpreted with the resources. The values currently have no use.
 command_list = {['ja']='job_abilities',['jobability']='job_abilities',['so']='spells',['song']='spells',['ma']='spells',['magic']='spells',['nin']='spells',['ninjutsu']='spells',
-	['ra']='Ranged Attack',['range']='Ranged Attack',['throw']='Ranged Attack',['shoot']='Ranged Attack',['monsterskill']='monster_abilities',['ms']='monster_abilities',
+	['ra']='Ranged Attack',['range']='Ranged Attack',['throw']='Ranged Attack',['shoot']='Ranged Attack',['monsterskill']='monster_skills',['ms']='monster_skills',
 	['ws']='weapon_skills',['weaponskill']='weapon_skills',['item']='Ability',['pet']='job_abilities',['mo']='mounts',['mount']='mounts'}
     
 in_game_res_commands = {['ja']='/ja',['jobability']='/ja',['pet']='/ja',
@@ -208,5 +208,5 @@ end
 validabils_it('spells')
 validabils_it('job_abilities')
 validabils_it('weapon_skills')
-validabils_it('monster_abilities')
+validabils_it('monster_skills')
 validabils_it('mounts')
