@@ -92,7 +92,7 @@ for i,v in pairs(res.weapon_skills) do
     make_entry(v,i)
 end
 
-for i,v in pairs(res.monster_abilities) do
+for i,v in pairs(res.monster_skills) do
     v.type = 'MonsterSkill'
     make_entry(v,i)
 end

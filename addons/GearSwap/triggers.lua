@@ -81,15 +81,15 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
         elseif temp_mob_arr then
             refresh_globals()
             
-            local r_line, find_monster_ability
+            local r_line, find_monster_skill
             
-            function find_monster_ability(abil)
+            function find_monster_skill(abil)
                 local line = false
                 if player.species and player.species.tp_moves then
                     -- Iterates over currently available monster TP moves instead of using validabils
                     for i,v in pairs(player.species.tp_moves) do
-                        if res.monster_abilities[i][language]:lower() == abil then
-                            line = copy_entry(res.monster_abilities[i])
+                        if res.monster_skills[i][language]:lower() == abil then
+                            line = copy_entry(res.monster_skills[i])
                             break
                         end
                     end
@@ -100,8 +100,8 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
             if unified_prefix == '/ma' then
                 r_line = copy_entry(res.spells[validabils[language][unified_prefix][abil]])
                 storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
-            elseif unified_prefix == '/ms' and find_monster_ability(abil) then
-                r_line = find_monster_ability(abil)
+            elseif unified_prefix == '/ms' and find_monster_skill(abil) then
+                r_line = find_monster_skill(abil)
                 storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
             elseif unified_prefix == '/ws' then
                 r_line = copy_entry(res.weapon_skills[validabils[language][unified_prefix][abil]])
