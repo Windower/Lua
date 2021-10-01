@@ -1,5 +1,5 @@
 **Author:**  Snaps<br>
-**Version:**  1.0<br>
+**Version:**  1.1.3<br>
 **Date:** June 13th, 2017<br>
 
 # craft #

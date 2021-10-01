@@ -146,10 +146,10 @@ end
 -- Appends an array table to the end of another array table.
 function table.extend(t, t_extend)
     if type(t_extend) ~= 'table' then
-        return t:append(t_extend)
+        return table.append(t, t_extend)
     end
     for _, val in ipairs(t_extend) do
-        t:append(val)
+        table.append(t, val)
     end
 
     return t
@@ -268,7 +268,7 @@ function table.flatten(t, recursive)
     local res = {}
     local key = 1
     local flat = {}
-    for key, val in ipairs(t) do
+    for _, val in ipairs(t) do
         if type(val) == 'table' then
             if recursive then
                 flat = table.flatten(val, recursive)

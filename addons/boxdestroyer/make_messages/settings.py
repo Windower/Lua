@@ -100,7 +100,7 @@ zones = {
     #151: 6571, # castle oztroja
     153: 6573, # the boyahda tree
     #154: 6574, # dragon's aery
-    #157: 6577, # middle delkfutt's tower
+    157: 6577, # middle delkfutt's tower
     158: 6578, # upper delkfutt's tower
     159: 6579, # temple of uggalepih
     160: 6580, # den of rancor
@@ -113,7 +113,7 @@ zones = {
     176: 6596, # sea serpent grotto
     177: 6597, # ve'lugannon palace
     178: 6598, # the shrine of ru'avitau
-    #184: 6604, # lower delkfutt's tower
+    184: 6604, # lower delkfutt's tower
     #186: 6606, # dynamis - bastok
     #187: 6607, # dynamis - windurst
     190: 6610, # king ranpere's tomb

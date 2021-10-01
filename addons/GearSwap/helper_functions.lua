@@ -682,7 +682,7 @@ function filter_pretarget(action)
         not res.monstrosity[windower.ffxi.get_mjob_data().species] or not res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[action.id] or
         not (res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[action.id] <= player.main_job_level)) then
         -- Monstrosity filtering
-        msg.debugging("Unable to execute command. You do not have access to that monsterskill ("..(res.monster_abilities[action.id][language] or action.id)..")")
+        msg.debugging("Unable to execute command. You do not have access to that monsterskill ("..(res.monster_skills[action.id][language] or action.id)..")")
         return false
     end
     
