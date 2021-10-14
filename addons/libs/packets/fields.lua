@@ -646,7 +646,7 @@ types.lockstyleset = L{
 }
 
 -- lockstyleset
-fields.outgoing[0x53] = L{
+fields.outgoing[0x053] = L{
         -- First 4 bytes are a header for the set
         {ctype='unsigned char',     label='Count'},                             -- 04
         {ctype='unsigned char',     label='Type'},                              -- 05   0 = "Stop locking style", 1 = "Continue locking style", 3 = "Lock style in this way". Might be flags?
@@ -1542,21 +1542,21 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned char',     label='Wardrobe 2 Size'},                       -- 0E
     {ctype='unsigned char',     label='Wardrobe 3 Size'},                       -- 0F
     {ctype='unsigned char',     label='Wardrobe 4 Size'},                       -- 10
-    {ctype='data[3]',           label='_padding1',          const=''},          -- 11
-    {ctype='unsigned short',    label='_dupeInventory Size'},                   -- 14   These "dupe" sizes are set to 0 if the inventory disabled.
-    {ctype='unsigned short',    label='_dupeSafe Size'},                        -- 16
-    {ctype='unsigned short',    label='_dupeStorage Size'},                     -- 18   The accumulated storage from all items (uncapped) -1
-    {ctype='unsigned short',    label='_dupeTemporary Size'},                   -- 1A
-    {ctype='unsigned short',    label='_dupeLocker Size'},                      -- 1C
+    {ctype='data[19]',          label='_padding1',          const=''},          -- 11
+    {ctype='unsigned short',    label='_dupeInventory Size'},                   -- 24   These "dupe" sizes are set to 0 if the inventory disabled.
+    {ctype='unsigned short',    label='_dupeSafe Size'},                        -- 26
+    {ctype='unsigned short',    label='_dupeStorage Size'},                     -- 28   The accumulated storage from all items (uncapped) -1
+    {ctype='unsigned short',    label='_dupeTemporary Size'},                   -- 2A
+    {ctype='unsigned short',    label='_dupeLocker Size'},                      -- 2C
     {ctype='unsigned short',    label='_dupeSatchel Size'},                     -- 2E
-    {ctype='unsigned short',    label='_dupeSack Size'},                        -- 20
-    {ctype='unsigned short',    label='_dupeCase Size'},                        -- 22
-    {ctype='unsigned short',    label='_dupeWardrobe Size'},                    -- 24
-    {ctype='unsigned short',    label='_dupeSafe 2 Size'},                      -- 26
-    {ctype='unsigned short',    label='_dupeWardrobe 2 Size'},                  -- 28
-    {ctype='unsigned short',    label='_dupeWardrobe 3 Size'},                  -- 2A   This is not set to 0 despite being disabled for whatever reason
-    {ctype='unsigned short',    label='_dupeWardrobe 4 Size'},                  -- 2C   This is not set to 0 despite being disabled for whatever reason
-    {ctype='data[6]',          label='_padding2',          const=''},           -- 2E
+    {ctype='unsigned short',    label='_dupeSack Size'},                        -- 30
+    {ctype='unsigned short',    label='_dupeCase Size'},                        -- 32
+    {ctype='unsigned short',    label='_dupeWardrobe Size'},                    -- 34
+    {ctype='unsigned short',    label='_dupeSafe 2 Size'},                      -- 36
+    {ctype='unsigned short',    label='_dupeWardrobe 2 Size'},                  -- 38
+    {ctype='unsigned short',    label='_dupeWardrobe 3 Size'},                  -- 3A   This is not set to 0 despite being disabled for whatever reason
+    {ctype='unsigned short',    label='_dupeWardrobe 4 Size'},                  -- 3C   This is not set to 0 despite being disabled for whatever reason
+    {ctype='data[22]',          label='_padding2',          const=''},          -- 3E
 }
 
 -- Finish Inventory
