@@ -58,7 +58,7 @@ local th_table = {}
 
 windower.register_event('addon command', function(command, ...)
     command = command and command:lower()
-    local args = {...}
+    local params = {...}
 
     if command == 'pos' then
         local posx, posy = tonumber(params[2]), tonumber(params[3])
