@@ -2991,7 +2991,7 @@ fields.incoming[0x061] = L{
     {ctype='bit[6]',            label='_unknown6'},                             -- 5A   No obvious function
     {ctype='unsigned int',      label='_junk1'},                                -- 5C
     {ctype='unsigned int',      label='_junk2'},                                -- 60
-    {ctype='unsigned char',     label='_unknown6'},                             -- 64
+    {ctype='unsigned char',     label='_unknown7'},                             -- 64
     {ctype='unsigned char',     label='Master Level'},                          -- 65
     {ctype='bit[1]',            label='Master Breaker'},                        -- 66
     {ctype='bit[15]',           label='_junk3'},                                -- 66
