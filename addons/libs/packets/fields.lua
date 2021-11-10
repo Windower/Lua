@@ -176,7 +176,7 @@ local function slot(val)
 end
 
 local function statuses(val)
-    return res.statuses[val].name
+    return res.statuses[val] and res.statuses[val].name or 'Unknown'
 end
 
 local function srank(val)
@@ -2989,8 +2989,14 @@ fields.incoming[0x061] = L{
     {ctype='bit[5]',            label='Unity Rank'},                            -- 58   Danger, 00ing caused my client to crash
     {ctype='bit[16]',           label='Unity Points'},                          -- 59   
     {ctype='bit[6]',            label='_unknown6'},                             -- 5A   No obvious function
-    {ctype='unsigned int',      label='_junk1'},                                -- 5B
-    {ctype='unsigned int',      label='_junk2'},                                -- 5F
+    {ctype='unsigned int',      label='_junk1'},                                -- 5C
+    {ctype='unsigned int',      label='_junk2'},                                -- 60
+    {ctype='unsigned char',     label='_unknown7'},                             -- 64
+    {ctype='unsigned char',     label='Master Level'},                          -- 65
+    {ctype='bit[1]',            label='Master Breaker'},                        -- 66
+    {ctype='bit[15]',           label='_junk3'},                                -- 66
+    {ctype='unsigned int',      label='Current Exemplar Points'},               -- 68
+    {ctype='unsigned int',      label='Required Exemplar Points'},              -- 6C
 }
 
 types.combat_skill = L{
@@ -3365,17 +3371,20 @@ func.incoming[0x0C9][0x01] = L{
     {ctype='data[3]',           label='_junk1'},                                -- 0B
     {ctype='unsigned char',     label='Icon Set Subtype'},                      -- 0E   0 = Unopened Linkshell?, 1 = Linkshell, 2 = Pearlsack, 3 = Linkpearl, 4 = Ripped Pearlsack (I think), 5 = Broken Linkpearl?
     {ctype='unsigned char',     label='Icon Set ID'},                           -- 0F   This identifies the icon set, always 2 for linkshells.
-    {ctype='bit[4]',            label='Linkshell Red'},                         -- 10   0xGR, 0x-B
-    {ctype='bit[4]',            label='Linkshell Green'},                       -- 10   
-    {ctype='bit[4]',            label='Linkshell Blue'},                        -- 11   
-    {ctype='bit[4]',            label='_junk1'},                                -- 11   
-    {ctype='unsigned char',     label='Main Job',           fn=job},            -- 12
-    {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 13
-    {ctype='data[15]',          label='Linkshell',          enc=ls_enc},        -- 14   6-bit packed
-    {ctype='unsigned char',     label='_padding1'},                             -- 23
+    {ctype='data[16]',          label='Linkshell',          enc=ls_enc},        -- 10   6-bit packed
+    {ctype='bit[4]',            label='_junk1'},                                -- 20   
+    {ctype='bit[4]',            label='Linkshell Red'},                         -- 20   0xGR, 0x-B
+    {ctype='bit[4]',            label='Linkshell Green'},                       -- 21   
+    {ctype='bit[4]',            label='Linkshell Blue'},                        -- 21   
+    {ctype='unsigned char',     label='_unknown1'},                             -- 22
+    {ctype='unsigned char',     label='Sub Job',            fn=job},            -- 23
     {ctype='unsigned char',     label='Main Job Level'},                        -- 24
     {ctype='unsigned char',     label='Sub Job Level'},                         -- 25
-    {ctype='data[42]',          label='_unknown5'},                             -- 26   At least the first two bytes and the last twelve bytes are junk, possibly more
+    {ctype='unsigned char',     label='Main Job',           fn=job},            -- 26
+    {ctype='unsigned char',     label='Master Level'},                          -- 27
+    {ctype='bit[1]',            label='Master Breaker'},                        -- 28
+    {ctype='bit[7]',            label='_junk2'},                                -- 28
+    {ctype='data[43]',          label='_unknown5'},                             -- 29   At least the first two bytes and the last twelve bytes are junk, possibly more
 }
 
 -- Bazaar Message
@@ -3457,7 +3466,10 @@ fields.incoming[0x0DD] = L{
     {ctype='unsigned char',     label='Main job level'},                        -- 23
     {ctype='unsigned char',     label='Sub job',            fn=job},            -- 24
     {ctype='unsigned char',     label='Sub job level'},                         -- 25
-    {ctype='char*',             label='Name'},                                  -- 26
+    {ctype='unsigned char',     label='Master Level'},                          -- 26
+    {ctype='bit[1]',            label='Master Breaker'},                        -- 27
+    {ctype='bit[7]',            label='_junk2'},                                -- 27
+    {ctype='char*',             label='Name'},                                  -- 28
 }
 
 -- Unnamed 0xDE packet
@@ -3486,6 +3498,9 @@ fields.incoming[0x0DF] = L{
     {ctype='unsigned char',     label='Main job level'},                        -- 21
     {ctype='unsigned char',     label='Sub job',            fn=job},            -- 22
     {ctype='unsigned char',     label='Sub job level'},                         -- 23
+    {ctype='unsigned char',     label='Master Level'},                          -- 24
+    {ctype='bit[1]',            label='Master Breaker'},                        -- 25
+    {ctype='bit[7]',            label='_junk2'},                                -- 25
 }
 
 -- Unknown packet 0x0E0: I still can't make heads or tails of the content. The packet is always 8 bytes long.

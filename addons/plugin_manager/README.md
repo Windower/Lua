@@ -1,26 +1,29 @@
-Author: Byrth
+**Author:** Byrth
 
-Version: 1.0
+**Version:** 1.0
 
-Date: 15/11/13
+**Date:** 15/11/13
 
-Plugin Manager
+# Plugin Manager
 
-Abbreviation: None
+**Abbreviation:** None
 
-Commands: None
+**Commands:** None
 
-Purpose: To allow player-customizable plugin management.
+**Purpose:** To allow player-customizable plugin management.
 
-Installation Instructions (from the Windower 4 Launcher):
+## Installation
 
-* 1 Start your copy of Windower 4 and select the "Addons" menu up top in the Launcher.
-* 2 Click the icon next to "plugin_manager"
-* 3 Log in to the game!
-* 4 Alter the settings as you wish. (An example file has been included)
-* 5 "//lua r plugin_manager" will reload and give you the new settings.
+1. Start your copy of Windower 4 and select the "Addons" menu up top in the Launcher.
+1. Click the icon next to "plugin_manager"
+1. Log in to the game!
+1. Alter the settings as you wish. (An example file has been included)
+1. `//lua r plugin_manager` will reload and give you the new settings.
 
-Settings Files:  
-The settings file for pluginmanager is one xml file with a format similar to the settings files for plugins. XML files can be opened with Notepad, edited, and closed saved safely. If you are going to "Save As..." an xml from Notepad, be sure to change "Text Documents (.txt)" to "All Files" file type and make sure the file ends in ".xml"  
+> **Note:** Plugin Manager will *not* automatically disable or unload any plugins or addons that you have enabled in the Windower launcher. Anything enabled in the launcher will be loaded for all characters, regardless of how you have configured your Plugin Manager settings.
+> If you want Plugin Manager to handle a plugin or addon, be sure to disable it in the launcher.
 
-* data/settings.xml         - contains plugins and addons specific to each character. <global> is loaded if there is not a set of plugins/addons inside tags that are a case-sensitive match to the player's name.
+## Settings Files 
+The settings file for Plugin Manager are found in a single XML file with a format similar to the settings files for plugins.
+
+* `data/settings.xml` - contains plugins and addons specific to each character. <global> is loaded if there is not a set of plugins/addons inside tags that are a case-sensitive match to the player's name.
