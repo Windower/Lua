@@ -1490,6 +1490,13 @@ fields.incoming[0x017] = function()
     end
 end()
 
+types.job_master= L{
+    {ctype='boolbit', label='Master'}
+}
+types.job_master_level= L{
+    {ctype='unsigned char', label='Master Level'}
+}
+
 -- Job Info
 fields.incoming[0x01B] = L{
     {ctype='unsigned int',      label='_unknown1'},                             -- 04   Observed value of 05
@@ -1520,44 +1527,10 @@ fields.incoming[0x01B] = L{
     {ctype='unsigned char',     label='Mastery Rank'},                          -- 66
     {ctype='unsigned char',     label='_unknown8'},                             -- 67
     {ctype='bit[1]',            label='_junk1'},                                -- 68
-    {ctype='boolbit',           label='Warrior Master'},                        -- 68   Indicates if the job is mastered, but only after receiving "Master Breaker" KI. Used to populate "Master Levels" Menu
-    {ctype='boolbit',           label='Monk Master'},                           -- 68
-    {ctype='boolbit',           label='White Mage Master'},                     -- 68
-    {ctype='boolbit',           label='Black Mage Master'},                     -- 68
-    {ctype='boolbit',           label='Red Mage Master'},                       -- 68
-    {ctype='boolbit',           label='Thief Master'},                          -- 68
-    {ctype='boolbit',           label='Paladin Master'},                        -- 68
-    {ctype='boolbit',           label='Dark Knight Master'},                    -- 69
-    {ctype='boolbit',           label='Beastmaster Master'},                    -- 69
-    {ctype='boolbit',           label='Bard Master'},                           -- 69
-    {ctype='boolbit',           label='Ranger Master'},                         -- 69
-    {ctype='boolbit',           label='Samurai Master'},                        -- 69
-    {ctype='boolbit',           label='Ninja Master'},                          -- 69
-    {ctype='boolbit',           label='Dragoon Master'},                        -- 69
-    {ctype='boolbit',           label='Summoner Master'},                       -- 69
-    {ctype='boolbit',           label='Blue Mage Master'},                      -- 6A
-    {ctype='boolbit',           label='Corsair Master'},                        -- 6A
-    {ctype='boolbit',           label='Puppetmaster Master'},                   -- 6A
-    {ctype='boolbit',           label='Dancer Master'},                         -- 6A
-    {ctype='boolbit',           label='Scholar Master'},                        -- 6A
-    {ctype='boolbit',           label='Geomancer Master'},                      -- 6A
-    {ctype='boolbit',           label='Rune Fencer Master'},                    -- 6A
+    {ref=types.job_master,      lookup={res.jobs, 0x01},  count=0x16},          -- 68
     {ctype='bit[1]',            label='_junk2'},                                -- 6A
     {ctype='unsigned short',    label='_junk3'},                                -- 6B
-    {ctype='unsigned char',     label='Warrior Master Level'},                  -- 6D
-    {ctype='unsigned char',     label='Monk Master Level'},                     -- 6E
-    {ctype='unsigned char',     label='White Mage Master Level'},               -- 6F
-    {ctype='unsigned char',     label='Black Mage Master Level'},               -- 70
-    {ctype='unsigned char',     label='Red Mage Master Level'},                 -- 71
-    {ctype='unsigned char',     label='Thief Master Level'},                    -- 72
-    {ctype='unsigned char',     label='Paladin Master Level'},                  -- 73
-    {ctype='unsigned char',     label='Dark Knight Master Level'},              -- 74
-    {ctype='unsigned char',     label='Beastmaster Master Level'},              -- 75
-    {ctype='unsigned char',     label='Bard Master Level'},                     -- 76
-    {ctype='unsigned char',     label='Dancer Master Level'},                   -- 77
-    {ctype='unsigned char',     label='Scholar Master Level'},                  -- 78
-    {ctype='unsigned char',     label='Geomancer Master Level'},                -- 79
-    {ctype='unsigned char',     label='Rune Fencer Master Level'},              -- 7A
+    {ref=types.job_master_level,lookup={res.jobs, 0x01},  count=0x16},          -- 6D
 }
 
 -- Inventory Count
