@@ -3394,7 +3394,7 @@ func.incoming[0x0C9][0x01] = L{
     {ctype='unsigned char',     label='Sub Job Level'},                         -- 25
     {ctype='unsigned char',     label='Main Job',           fn=job},            -- 26
     {ctype='unsigned char',     label='Master Level'},                          -- 27
-    {ctype='boolbit',            label='Master Breaker'},                        -- 28
+    {ctype='boolbit',           label='Master Breaker'},                        -- 28
     {ctype='bit[7]',            label='_junk2'},                                -- 28
     {ctype='data[43]',          label='_unknown5'},                             -- 29   At least the first two bytes and the last twelve bytes are junk, possibly more
 }
