@@ -1527,7 +1527,7 @@ fields.incoming[0x01B] = L{
     {ctype='unsigned char',     label='Mastery Rank'},                          -- 66
     {ctype='unsigned char',     label='_unknown8'},                             -- 67
     {ctype='bit[1]',            label='_junk1'},                                -- 68
-    {ref=types.job_master,      lookup={res.jobs, 0x01},  count=0x16},          -- 68
+    {ref=types.job_master,      lookup={res.jobs, 0x01},  count=0x16},          -- 68   Indicates if the job is mastered, but only after receiving "Master Breaker" KI. Used to populate "Master Levels" Menu
     {ctype='bit[1]',            label='_junk2'},                                -- 6A
     {ctype='unsigned short',    label='_junk3'},                                -- 6B
     {ref=types.job_master_level,lookup={res.jobs, 0x01},  count=0x16},          -- 6D
