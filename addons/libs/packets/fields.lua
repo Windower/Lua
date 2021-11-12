@@ -1490,6 +1490,13 @@ fields.incoming[0x017] = function()
     end
 end()
 
+types.job_master= L{
+    {ctype='boolbit', label='Master'}
+}
+types.job_master_level= L{
+    {ctype='unsigned char', label='Master Level'}
+}
+
 -- Job Info
 fields.incoming[0x01B] = L{
     {ctype='unsigned int',      label='_unknown1'},                             -- 04   Observed value of 05
@@ -1519,6 +1526,11 @@ fields.incoming[0x01B] = L{
     {ctype='unsigned char',     label='Mentor Icon',      fn=e+{'mentor icon'}},-- 65
     {ctype='unsigned char',     label='Mastery Rank'},                          -- 66
     {ctype='unsigned char',     label='_unknown8'},                             -- 67
+    {ctype='bit[1]',            label='_junk1'},                                -- 68
+    {ref=types.job_master,      lookup={res.jobs, 0x01},  count=0x16},          -- 68   Indicates if the job is mastered, but only after receiving "Master Breaker" KI. Used to populate "Master Levels" Menu
+    {ctype='bit[1]',            label='_junk2'},                                -- 6A
+    {ctype='unsigned short',    label='_junk3'},                                -- 6B
+    {ref=types.job_master_level,lookup={res.jobs, 0x01},  count=0x16},          -- 6D
 }
 
 -- Inventory Count
@@ -2993,7 +3005,7 @@ fields.incoming[0x061] = L{
     {ctype='unsigned int',      label='_junk2'},                                -- 60
     {ctype='unsigned char',     label='_unknown7'},                             -- 64
     {ctype='unsigned char',     label='Master Level'},                          -- 65
-    {ctype='bit[1]',            label='Master Breaker'},                        -- 66
+    {ctype='boolbit',           label='Master Breaker'},                        -- 66
     {ctype='bit[15]',           label='_junk3'},                                -- 66
     {ctype='unsigned int',      label='Current Exemplar Points'},               -- 68
     {ctype='unsigned int',      label='Required Exemplar Points'},              -- 6C
@@ -3382,7 +3394,7 @@ func.incoming[0x0C9][0x01] = L{
     {ctype='unsigned char',     label='Sub Job Level'},                         -- 25
     {ctype='unsigned char',     label='Main Job',           fn=job},            -- 26
     {ctype='unsigned char',     label='Master Level'},                          -- 27
-    {ctype='bit[1]',            label='Master Breaker'},                        -- 28
+    {ctype='boolbit',           label='Master Breaker'},                        -- 28
     {ctype='bit[7]',            label='_junk2'},                                -- 28
     {ctype='data[43]',          label='_unknown5'},                             -- 29   At least the first two bytes and the last twelve bytes are junk, possibly more
 }
@@ -3467,7 +3479,7 @@ fields.incoming[0x0DD] = L{
     {ctype='unsigned char',     label='Sub job',            fn=job},            -- 24
     {ctype='unsigned char',     label='Sub job level'},                         -- 25
     {ctype='unsigned char',     label='Master Level'},                          -- 26
-    {ctype='bit[1]',            label='Master Breaker'},                        -- 27
+    {ctype='boolbit',           label='Master Breaker'},                        -- 27
     {ctype='bit[7]',            label='_junk2'},                                -- 27
     {ctype='char*',             label='Name'},                                  -- 28
 }
@@ -3499,7 +3511,7 @@ fields.incoming[0x0DF] = L{
     {ctype='unsigned char',     label='Sub job',            fn=job},            -- 22
     {ctype='unsigned char',     label='Sub job level'},                         -- 23
     {ctype='unsigned char',     label='Master Level'},                          -- 24
-    {ctype='bit[1]',            label='Master Breaker'},                        -- 25
+    {ctype='boolbit',           label='Master Breaker'},                        -- 25
     {ctype='bit[7]',            label='_junk2'},                                -- 25
 }
 
