@@ -36,7 +36,7 @@ require('sets')
 resources = require('resources')
 config = require('config')
 settings = config.load({
-    blacklist = ''
+    blacklist = S{}
 })
 
 math.randomseed(os.time())
@@ -45,13 +45,6 @@ allowed_mounts = L{}
 possible_mounts = L{}
 for _, mount in pairs(resources.mounts) do
     possible_mounts:append(mount.name:lower())
-end
-
-blacklist = {}
-if string.len(settings.blacklist) > 0 then
-    for mount in settings.blacklist:gmatch("([^,]+)") do
-        table.insert(blacklist, mount)
-    end
 end
 
 function update_allowed_mounts()
@@ -66,8 +59,8 @@ function update_allowed_mounts()
             end)
             local mount = possible_mounts[mount_index]
 
-            -- Add this to allowed mounts if it is not already there and it is not blacklisted
-            if not allowed_mounts:contains(mount) and not S(blacklist):contains(mount) then
+            -- Add this to allowed mounts if it is not blacklisted
+            if not settings.blacklist:contains(mount) then
                 allowed_mounts_set:add(mount)
             end
         end
@@ -109,8 +102,8 @@ commands.blacklist = function(args)
 
     if not operation then
         windower.add_to_chat(8, 'Blacklisted mounts:')
-        for k, v in ipairs(blacklist) do
-            windower.add_to_chat(8, '  ' .. v)
+        for mount in settings.blacklist:it() do
+            windower.add_to_chat(8, '  ' .. mount)
         end
         return
     end
@@ -127,24 +120,24 @@ commands.blacklist = function(args)
         return
     end
 
-    if operation == 'add' and not S(blacklist):contains(mount) then
-        for k, v in ipairs(T(allowed_mounts)) do
-            if v == mount then
-                allowed_mounts:remove(k)
+    if operation == 'add' and not settings.blacklist:contains(mount) then
+        for allowed_mount, index in allowed_mounts:it() do
+            if allowed_mount == mount then
+                allowed_mounts:remove(index)
             end
         end
-        table.insert(blacklist, mount)
+        settings.blacklist:add(mount)
         windower.add_to_chat(8, 'The ' .. mount .. ' mount is now blacklisted')
-        save_settings()
+        settings:save()
     elseif operation == 'remove' then
-        for k, v in ipairs(blacklist) do
-            if v == mount then
-                table.remove(blacklist, k)
+        for blacklisted_mount in settings.blacklist:it() do
+            if blacklisted_mount == mount then
+                settings.blacklist:remove(mount)
             end
         end
         allowed_mounts:append(mount)
         windower.add_to_chat(8, 'The ' .. mount .. ' mount is no longer blacklisted')
-        save_settings()
+        settings:save()
     end
 end
 
@@ -167,8 +160,3 @@ windower.register_event('addon command', function(command, ...)
         commands.help()
     end
 end)
-
-function save_settings()
-    settings.blacklist = table.concat(blacklist, ",")
-    settings:save()
-end
