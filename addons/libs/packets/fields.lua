@@ -2719,9 +2719,9 @@ enums.quest_mission_log = {
     [0x00E8] = 'Completed Abyssea Quests',
     [0x00F0] = 'Current Adoulin Quests',
     [0x00F8] = 'Completed Adoulin Quests',
-    [0x0100] = 'Current Coalition Quests', 
-    [0x0108] = 'Completed Coalition Quests', 
-    [0xFFFF] = 'Current Missions',               
+    [0x0100] = 'Current Coalition Quests',
+    [0x0108] = 'Completed Coalition Quests',
+    [0xFFFF] = 'Current Missions',
 }
 
 -- There are 27 variations of this packet to populate different quest information.
@@ -2737,7 +2737,7 @@ fields.incoming[0x056] = function (data, type)
 end
 
 func.incoming[0x056].type = L{ 
-    {ctype='short',         label='Type',       fn=e+{'quest_mission_log'}}     -- 24
+    {ctype='unsigned short',label='Type',       fn=e+{'quest_mission_log'}}     -- 24
 }
 
 func.incoming[0x056][0x0080] = L{
