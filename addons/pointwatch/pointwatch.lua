@@ -357,8 +357,8 @@ function exp_msg(val,msg)
         end
     elseif msg == 810 then
         ep.registry[t] = (ep.registry[t] or 0) + val
-        if ep.tnl and ep.current >= ep.tnl then
-            ep.current = ep.current - ep.tnl
+        if ep.tnml and ep.current >= ep.tnml then
+            ep.current = ep.current - ep.tnml
         end
     end
     update_box()
