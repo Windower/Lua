@@ -2719,9 +2719,9 @@ enums.quest_mission_log = {
     [0x00E8] = 'Completed Abyssea Quests',
     [0x00F0] = 'Current Adoulin Quests',
     [0x00F8] = 'Completed Adoulin Quests',
-    [0x0100] = 'Current Coalition Quests',
-    [0x0108] = 'Completed Coalition Quests',
-    [0xFFFF] = 'Current Missions',
+    [0x0100] = 'Current Coalition Quests', 
+    [0x0108] = 'Completed Coalition Quests', 
+    [0xFFFF] = 'Current Missions',               
 }
 
 -- There are 27 variations of this packet to populate different quest information.
@@ -2737,7 +2737,7 @@ fields.incoming[0x056] = function (data, type)
 end
 
 func.incoming[0x056].type = L{ 
-    {ctype='unsigned short',label='Type',       fn=e+{'quest_mission_log'}}     -- 24
+    {ctype='short',         label='Type',       fn=e+{'quest_mission_log'}}     -- 24
 }
 
 func.incoming[0x056][0x0080] = L{
@@ -3045,7 +3045,14 @@ func.incoming[0x063].base = L{
 }
 
 func.incoming[0x063][0x02] = L{
-    {ctype='data[7]',           label='_flags1',            fn=bin+{7}},        -- 06   The 3rd bit of the last byte is the flag that indicates whether or not you are xp capped (blue levels)
+    {ctype='unsigned short',    label='_unknown1',          const=0x000C},      -- 06
+    {ctype='unsigned short',    label='Limit Points'},                          -- 08
+    {ctype='bit[7]',            label='Merit Points'},                          -- 0A
+    {ctype='bit[6]',            label='Assimilation'},                          -- 0A   Bonus Blue Magic Points
+    {ctype='boolbit',           label='Limit Breaker'},                         -- 0A   Level >=75 and have KI
+    {ctype='boolbit',           label='EXP Capped'},                            -- 0A
+    {ctype='boolbit',           label='Limit Point Mode'},                      -- 0A
+    {ctype='unsigned char',     label='Max Merit Points'},                      -- 0C
 }
 
 func.incoming[0x063][0x03] = L{
