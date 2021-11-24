@@ -237,7 +237,7 @@ local function update_offset(zone_id)
         if not path then print('Could not convert dat ID', dat_id) return end
 
         -- convert dialog entry to dialog ID
-        local dialog = require('libs/dialog')
+        local dialog = require('dialog')
         local search_phrase = string.char(
             158,133,214,233,243,233,244,225,238,244,160,204,233,231,232,
             244,160,201,238,244,229,238,243,233,244,249,158,129,135,208,
@@ -250,7 +250,7 @@ local function update_offset(zone_id)
         local dat = f:read('*a')
         f:close()
         local res = dialog.get_ids_matching_entry(dat, search_phrase)
-        if res.n ~= 1 then
+        if #res ~= 1 then
             print('In pointwatch/message_ids.lua: matched multiple entries')
             print('Could not update message ID.')
             return
