@@ -24,17 +24,19 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-texts = require 'texts'
-config = require 'config'
-require 'sets'
-res = require 'resources'
-require 'statics'
-messages = require 'message_ids'
-require 'pack'
+texts = require('texts')
+config = require('config')
+require('sets')
+res = require('resources')
+require('statics')
+messages = require('message_ids')
+packets = require('packets')
+require('pack')
+require('chat')
 
 _addon.name = 'PointWatch'
 _addon.author = 'Byrth'
-_addon.version = 0.150811
+_addon.version = 0.211112
 _addon.command = 'pw'
 
 settings = config.load('data\\settings.xml',default_settings)
@@ -44,31 +46,35 @@ box = texts.new('${current_string}',settings.text_box_settings,settings)
 box.current_string = ''
 box:show()
 
-initialize()
+granule_KIs = res.key_items:en(function(x) return x:endswith('granules of time') end):map(function(ki)
+    return {
+        id=ki.id,
+        type=math.floor(ki.id/0x200),
+        offset=ki.id%0x200,
+        name=ki.en:match('%w+'):ucfirst(),
+    }
+end)
 
-windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blocked)
-    if is_injected then return end
-    if id == 0x29 then -- Action Message, used in Abyssea for xp
-        local val = org:unpack('I',0xD)
-        local msg = org:unpack('H',0x19)%1024
-        exp_msg(val,msg)
-    elseif id == 0x2A then -- Resting message
+packet_initiators = L{0x02A,0x055,0x061,0x063,0x110}
+packet_handlers = {
+    [0x029] = function(org) -- Action Message, used in Abyssea for xp
+        local p = packets.parse('incoming',org)
+        exp_msg(p['Param 1'],p['Message'])
+    end,
+    [0x02A] = function(org) -- Resting message
+        local p = packets.parse('incoming',org)
         local zone = 'z'..windower.ffxi.get_info().zone
         if settings.options.message_printing then
-            print('Message ID: '..(org:unpack('H',0x1B)%2^14))
+            print('Message ID: '..p['Message ID'])
         end
         
         if messages[zone] then
-            local msg = org:unpack('H',0x1B)%2^14
+            local msg = p['Message ID']
             for i,v in pairs(messages[zone]) do
-                if tonumber(v) and v + messages[zone].offset  == msg then
-                    local param_1 = org:unpack('I',0x9)
-                    local param_2 = org:unpack('I',0xD)
-                    local param_3 = org:unpack('I',0x11)
-                    local param_4 = org:unpack('I',0x15)
-                    -- print(param_1,param_2,param_3,param_4) -- DEBUGGING STATEMENT -------------------------
+                if tonumber(v) and v + messages[zone].offset == msg then
+                    -- print(p['Param 1'],p['Param 2'],p['Param 3'],p['Param 4']) -- DEBUGGING STATEMENT -------------------------
                     if zone_message_functions[i] then
-                        zone_message_functions[i](param_1,param_2,param_3,param_4)
+                        zone_message_functions[i](p['Param 1'],p['Param 2'],p['Param 3'],p['Param 4'])
                     end
                     if i:contains("visitant_status_") then
                         abyssea.update_time = os.clock()
@@ -76,50 +82,75 @@ windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blo
                 end
             end
         end
-    elseif id == 0x2D then
-        local val = org:unpack('I',0x11)
-        local msg = org:unpack('H',0x19)%1024
-        exp_msg(val,msg)
-    elseif id == 0x55 then
-        if org:byte(0x85) == 3 then
-            local dyna_KIs = math.floor((org:byte(6)%64)/2) -- 5 bits (32, 16, 8, 4, and 2 originally -> shifted to 16, 8, 4, 2, and 1)
-            dynamis._KIs = {
-                ['Crimson'] = dyna_KIs%2 == 1,
-                ['Azure'] = math.floor(dyna_KIs/2)%2 == 1,
-                ['Amber'] = math.floor(dyna_KIs/4)%2 == 1,
-                ['Alabaster'] = math.floor(dyna_KIs/8)%2 == 1,
-                ['Obsidian'] = math.floor(dyna_KIs/16) == 1,
-            }
-            if dynamis_map[dynamis.zone] then
-                dynamis.time_limit = 3600
-                for KI,TE in pairs(dynamis_map[dynamis.zone]) do
-                    if dynamis._KIs[KI] then
-                        dynamis.time_limit = dynamis.time_limit + TE*60
+    end,
+    [0x02D] = function(org)
+        local p = packets.parse('incoming',org)
+        exp_msg(p['Param 1'],p['Message'])
+    end,
+    [0x055] = function(org)
+        local p = packets.parse('incoming',org)
+        --print(p['Type'],p['Key item available'], p['Key item available']:byte(1),p['Key item available']:byte(2))
+        for _,ki in pairs(granule_KIs) do
+            if p['Type'] == ki.type then
+                local byte = p['Key item available']:byte(math.floor(ki.offset/8)+1)
+                local flag = bit.band(bit.rshift(byte, ki.offset % 8), 1)
+                --print('byte', byte, 'offset', ki.offset % 8, 'flag', flag)
+                if flag == 1 then
+                    dynamis._KIs[ki.name] = true
+                    if dynamis_map[dynamis.zone] then
+                        dynamis.time_limit = 3600
+                        for KI,TE in pairs(dynamis_map[dynamis.zone]) do
+                            if dynamis._KIs[KI] then
+                                dynamis.time_limit = dynamis.time_limit + TE*60
+                            end
+                        end
+                        update_box()
                     end
                 end
-                update_box()
             end
         end
-    elseif id == 0x61 then
-        xp.current = org:unpack('H',0x11)
-        xp.tnl = org:unpack('H',0x13)
-        accolades.current = math.floor(org:byte(0x5A)/4) + org:byte(0x5B)*2^6 + org:byte(0x5C)*2^14
-    elseif id == 0x63 and org:byte(5) == 2 then
-        lp.current = org:unpack('H',9)
-        lp.number_of_merits = org:byte(11)%128
-        lp.maximum_merits = org:byte(0x0D)%128
-    elseif id == 0x63 and org:byte(5) == 5 then
-        local offset = windower.ffxi.get_player().main_job_id*6+13 -- So WAR (ID==1) starts at byte 19
-        cp.current = org:unpack('H',offset)
-        cp.number_of_job_points = org:unpack('H',offset+2)
-    elseif id == 0x110 then
-        sparks.current = org:unpack('I',5)
-    elseif id == 0xB and box:visible() then
+    end,
+    [0x061] = function(org)
+        local p = packets.parse('incoming',org)
+        xp.current = p['Current EXP']
+        xp.tnl = p['Required EXP']
+        accolades.current = p['Unity Points']
+        ep.current = p['Current Exemplar Points']
+        ep.tnml = p['Required Exemplar Points']
+    end,
+    [0x063] = function(org)
+        local p = packets.parse('incoming',org)
+        if p['Order'] == 2 then
+            lp.current = p['Limit Points']
+            lp.number_of_merits = p['Merit Points']
+            lp.maximum_merits = p['Max Merit Points']
+        elseif p['Order'] == 5 then
+            local job = windower.ffxi.get_player().main_job_full
+            cp.current = p[job..' Capacity Points']
+            cp.number_of_job_points = p[job..' Job Points']
+        end
+    end,
+    [0x110] = function(org)
+        local p = packets.parse('incoming',org)
+        sparks.current = p['Sparks Total']
+    end,
+    [0xB] = function(org)
         zoning_bool = true
         box:hide()
-    elseif id == 0xA and zoning_bool then
+    end,
+    [0xA] = function(org)
         zoning_bool = nil
         box:show()
+    end,
+}
+
+initialize()
+
+windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blocked)
+    if is_injected or is_blocked then return end
+    local handler = packet_handlers[id]
+    if handler then
+        handler(org,modi)
     end
 end)
 
@@ -195,6 +226,7 @@ function update_box()
     end
     cp.rate = analyze_points_table(cp.registry)
     xp.rate = analyze_points_table(xp.registry)
+    ep.rate = analyze_points_table(ep.registry)
     if dynamis.entry_time ~= 0 and dynamis.entry_time+dynamis.time_limit-os.clock() > 0 then
         dynamis.time_remaining = os.date('!%H:%M:%S',dynamis.entry_time+dynamis.time_limit-os.clock())
         dynamis.KIs = X_or_O(dynamis._KIs.Crimson)..X_or_O(dynamis._KIs.Azure)..X_or_O(dynamis._KIs.Amber)..X_or_O(dynamis._KIs.Alabaster)..X_or_O(dynamis._KIs.Obsidian)
@@ -323,6 +355,15 @@ function exp_msg(val,msg)
             -- If a merit point was not gained, 
             lp.current = math.min(lp.current,lp.tnm-1)
         end
+    elseif msg == 810 then
+        ep.registry[t] = (ep.registry[t] or 0) + val
+        if ep.tnl and ep.current >= ep.tnl then
+            ep.current = ep.current - ep.tnl
+        end
     end
     update_box()
+end
+
+function max_color(str,val,max,r,g,b)
+    return val >= max and tostring(str):text_color(r,g,b) or tostring(str) or ""
 end
