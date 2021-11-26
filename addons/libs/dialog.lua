@@ -40,7 +40,7 @@ local function binary_search(pos, dat, n)
     local l, r, m = 1, n
     while l < r do
         m = floor((l + r) / 2)
-        if decode(unpack('<I', dat, 1 + 4 * m)) < pos then
+        if decode(unpack(dat, '<I', 1 + 4 * m)) < pos then
         -- offset given by mth ID < offset to string
             l = m + 1
         else
@@ -65,9 +65,9 @@ local dialog = {}
 function dialog.entry_count(dat)
     if type(dat) == 'userdata' then
         dat:seek('set', 4)
-        return decode(unpack('<I', dat:read(4))) / 4
+        return decode(unpack(dat:read(4), '<I')) / 4
     end
-    return decode(unpack('<I', dat, 5)) / 4
+    return decode(unpack(dat, '<I', 5)) / 4
 end
 
 -- Returns an array-like table containing every ID which matched
@@ -77,10 +77,14 @@ function dialog.get_ids_matching_entry(dat, encoded_entry)
     local res = {}
     local n = 0
     if type(dat) == 'string' then
-        local last_offset = decode(unpack('<I', dat, 5))
+        local last_offset = decode(unpack(dat, '<I', 5))
         local start = 5
         for head, tail in plain_text_gmatch(dat, encoded_entry, last_offset) do
-            local encoded_pos = pack('<I', encode(head - 5))
+            local encoded_pos = encode(head - 5)
+            if encoded_pos < 0 then
+                encoded_pos = encoded_pos + 0x100000000
+            end
+            encoded_pos = pack('<I', encoded_pos)
             local offset = find(dat, encoded_pos, start, true)
             if offset then
                 offset = offset - 1
@@ -90,7 +94,7 @@ function dialog.get_ids_matching_entry(dat, encoded_entry)
                 elseif offset == last_offset then
                     next_pos = #dat + 1
                 else
-                    next_pos = decode(unpack('<I', dat, offset + 5)) + 5
+                    next_pos = decode(unpack(dat, '<I', offset + 5)) + 5
                 end
 
                 if next_pos - head == tail - head + 1 then
@@ -103,12 +107,12 @@ function dialog.get_ids_matching_entry(dat, encoded_entry)
 
     elseif type(dat) == 'userdata' then
         dat:seek('set', 4)
-        local offset = decode(unpack('<I', dat:read(4)))
+        local offset = decode(unpack(dat:read(4), '<I'))
         local entry_count = offset / 4
         local entry_length = #encoded_entry
         for i = 1, entry_count - 1 do
             dat:seek('set', 4 * i + 4)
-            local next_offset = decode(unpack('<I', dat:read(4)))
+            local next_offset = decode(unpack(dat:read(4), '<I'))
             if next_offset - offset == entry_length then
                 dat:seek('set', offset + 4)
                 if dat:read(entry_length) == encoded_entry then
@@ -137,25 +141,25 @@ end
 function dialog.get_entry(dat, id)
     local entry_count, offset, next_offset
     if type(dat) == 'string' then
-        entry_count = decode(unpack('<I', dat, 5)) / 4
+        entry_count = decode(unpack(dat, '<I', 5)) / 4
         if id == entry_count - 1 then
-            offset = decode(unpack('<I', dat, 4 * id + 5)) + 5
+            offset = decode(unpack(dat, '<I', 4 * id + 5)) + 5
             next_offset = #dat + 1
         else
-            offset, next_offset = unpack('<II', dat, 4 * id + 5)
+            offset, next_offset = unpack(dat, '<II', 4 * id + 5)
             offset, next_offset = decode(offset) + 5, decode(next_offset) + 5
         end
 
         return sub(dat, offset, next_offset - 1)
     elseif type(dat) == 'userdata' then
         dat:seek('set', 4)
-        entry_count = decode(unpack('<I', dat:read(4))) / 4
+        entry_count = decode(unpack(dat:read(4), '<I')) / 4
         dat:seek('set', 4 * id + 4)
         if id == entry_count - 1 then
-            offset = decode(unpack('<I', dat:read(4)))
+            offset = decode(unpack(dat:read(4), '<I'))
             next_offset = dat:seek('end') + 1
         else
-            offset, next_offset = unpack('<II', dat:read(8))
+            offset, next_offset = unpack(dat:read(8), '<II')
             offset, next_offset = decode(offset), decode(next_offset)
         end
 
@@ -189,10 +193,10 @@ dialog.dev = {}
 function dialog.dev.get_offset(dat, id)
     local offset
     if type(dat) == 'string' then
-        offset = unpack('<I', dat, 5 + 4 * id)
+        offset = unpack(dat, '<I', 5 + 4 * id)
     elseif type(dat) == 'userdata' then
         dat:seek('set', 4 * id  + 4)
-        offset = unpack('<I', dat:read(4))
+        offset = unpack(dat:read(4), '<I')
     end
     return format('0x%08X', decode(offset))
 end
@@ -206,7 +210,7 @@ end
 -- Returns an array-like table which contains the ID of every entry
 -- containing a given substring.
 function dialog.dev.find_substring(dat, unencoded_string)
-    local last_offset = decode(unpack('<I', dat, 5)) + 5
+    local last_offset = decode(unpack(dat, '<I', 5)) + 5
     local res = {}
     -- local pos = find(dat, unencoded_string), last_offset, true)
     local n = 0
