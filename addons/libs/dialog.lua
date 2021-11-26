@@ -80,7 +80,11 @@ function dialog.get_ids_matching_entry(dat, encoded_entry)
         local last_offset = decode(unpack(dat, '<I', 5))
         local start = 5
         for head, tail in plain_text_gmatch(dat, encoded_entry, last_offset) do
-            local encoded_pos = pack('<I', encode(head - 5))
+            local encoded_pos = encode(head - 5)
+            if encoded_pos < 0 then
+                encoded_pos = encoded_pos + 0x100000000
+            end
+            encoded_pos = pack('<I', encoded_pos)
             local offset = find(dat, encoded_pos, start, true)
             if offset then
                 offset = offset - 1
