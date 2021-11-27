@@ -2721,7 +2721,7 @@ enums.quest_mission_log = {
     [0x00F8] = 'Completed Adoulin Quests',
     [0x0100] = 'Current Coalition Quests',
     [0x0108] = 'Completed Coalition Quests',
-    [0xFFFF] = 'Current Missions',             
+    [0xFFFF] = 'Current Missions',
 }
 
 -- There are 27 variations of this packet to populate different quest information.
