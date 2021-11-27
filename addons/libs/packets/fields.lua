@@ -3045,7 +3045,14 @@ func.incoming[0x063].base = L{
 }
 
 func.incoming[0x063][0x02] = L{
-    {ctype='data[7]',           label='_flags1',            fn=bin+{7}},        -- 06   The 3rd bit of the last byte is the flag that indicates whether or not you are xp capped (blue levels)
+    {ctype='unsigned short',    label='_unknown1',          const=0x000C},      -- 06
+    {ctype='unsigned short',    label='Limit Points'},                          -- 08
+    {ctype='bit[7]',            label='Merit Points'},                          -- 0A
+    {ctype='bit[6]',            label='Assimilation'},                          -- 0A   Bonus Blue Magic Points
+    {ctype='boolbit',           label='Limit Breaker'},                         -- 0A   Level >=75 and have KI
+    {ctype='boolbit',           label='EXP Capped'},                            -- 0A
+    {ctype='boolbit',           label='Limit Point Mode'},                      -- 0A
+    {ctype='unsigned char',     label='Max Merit Points'},                      -- 0C
 }
 
 func.incoming[0x063][0x03] = L{
