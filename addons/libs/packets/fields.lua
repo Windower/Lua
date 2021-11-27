@@ -2737,7 +2737,7 @@ fields.incoming[0x056] = function (data, type)
 end
 
 func.incoming[0x056].type = L{ 
-    {ctype='short',         label='Type',       fn=e+{'quest_mission_log'}}     -- 24
+    {ctype='unsigned short',label='Type',       fn=e+{'quest_mission_log'}}     -- 24
 }
 
 func.incoming[0x056][0x0080] = L{
@@ -3041,7 +3041,7 @@ fields.incoming[0x063] = function(data, type)
 end
 
 func.incoming[0x063].base = L{
-    {ctype='unsigned short',label='Type',       fn=e+{'quest_mission_log'}}     -- 24
+    {ctype='unsigned short', label='Order'}, -- 04
 }
 
 func.incoming[0x063][0x02] = L{
