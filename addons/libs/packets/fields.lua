@@ -3041,7 +3041,7 @@ fields.incoming[0x063] = function(data, type)
 end
 
 func.incoming[0x063].base = L{
-    {ctype='unsigned short', label='Order'}, -- 04
+    {ctype='unsigned short',    label='Order'},                                 -- 04
 }
 
 func.incoming[0x063][0x02] = L{
