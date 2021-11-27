@@ -3160,13 +3160,13 @@ fields.incoming[0x070] = L{
 }
 
 -- Unity Start
--- Only observed being used for Unity fights. Also observed on DynaD and Odyssey for mask//weapon/neck/izzat progression bars.
+-- Only observed being used for Unity fights. Also observed on DynaD, Odyssey for mask//weapon/neck/izzat progression bars, Escutcheons progression and mandragora minigame.
 func.incoming[0x075] = {}
 fields.incoming[0x075] = function()
     local fields = func.incoming[0x075]
 
     return function(data, type)
-        return fields.base + (fields[type or data:byte(0x025)] or fields.default)
+        return fields.base + (fields[type] or (data:byte(0x025) > 1 and fields.bars) or fields.default)
     end
 end()
 
@@ -3197,7 +3197,7 @@ func.incoming[0x075].default = L{
     {ctype='data[135]',          label='_junk1'},                               -- 28   Seems to be junk
 }
 
-func.incoming[0x075][0x03] = L{
+func.incoming[0x075].bars = L{
     {ctype='unsigned char',     label='_unknown2'},                             -- 25
     {ctype='unsigned short',    label='_unknown3'},                             -- 26   Value changes constatly
     {ref=types.bars,            count=5},                                       -- 28
