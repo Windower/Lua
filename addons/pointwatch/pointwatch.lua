@@ -355,7 +355,7 @@ function exp_msg(val,msg)
             -- If a merit point was not gained, 
             lp.current = math.min(lp.current,lp.tnm-1)
         end
-    elseif msg == 810 then
+    elseif msg == 809 or msg == 810 then
         ep.registry[t] = (ep.registry[t] or 0) + val
         if ep.tnml and ep.current >= ep.tnml then
             ep.current = ep.current - ep.tnml
