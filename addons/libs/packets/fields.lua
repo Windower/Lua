@@ -3338,6 +3338,16 @@ fields.incoming[0x0A0] = L{
 
 --0x0AA, 0x0AC, and 0x0AE are all bitfields where the lsb indicates whether you have index 0 of the related resource.
 
+-- Moblin Maze Mongers information
+-- It appears that they anticipated a substantial expansion of the system,
+-- but field sizes here are limited to the available items.
+fields.incoming[0x0AD] = L{
+    {ctype='bit[16]',           label='Maze Vouchers'},
+    {ctype='data[6]',           label='_junk1'},
+    {ctype='bit[128]',          label='Maze Runes'},
+    {ctype='data[0x68]',        label="_junk2"},
+}
+
 -- Help Desk submenu open
 fields.incoming[0x0B5] = L{
     {ctype='data[0x14]',        label='_unknown1'},                             -- 04
