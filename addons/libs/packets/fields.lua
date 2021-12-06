@@ -1490,6 +1490,13 @@ fields.incoming[0x017] = function()
     end
 end()
 
+types.job_master= L{
+    {ctype='boolbit', label='Master'}
+}
+types.job_master_level= L{
+    {ctype='unsigned char', label='Master Level'}
+}
+
 -- Job Info
 fields.incoming[0x01B] = L{
     {ctype='unsigned int',      label='_unknown1'},                             -- 04   Observed value of 05
@@ -1519,6 +1526,11 @@ fields.incoming[0x01B] = L{
     {ctype='unsigned char',     label='Mentor Icon',      fn=e+{'mentor icon'}},-- 65
     {ctype='unsigned char',     label='Mastery Rank'},                          -- 66
     {ctype='unsigned char',     label='_unknown8'},                             -- 67
+    {ctype='bit[1]',            label='_junk1'},                                -- 68
+    {ref=types.job_master,      lookup={res.jobs, 0x01},  count=0x16},          -- 68   Indicates if the job is mastered, but only after receiving "Master Breaker" KI. Used to populate "Master Levels" Menu
+    {ctype='bit[1]',            label='_junk2'},                                -- 6A
+    {ctype='unsigned short',    label='_junk3'},                                -- 6B
+    {ref=types.job_master_level,lookup={res.jobs, 0x01},  count=0x16},          -- 6D
 }
 
 -- Inventory Count
@@ -2707,9 +2719,9 @@ enums.quest_mission_log = {
     [0x00E8] = 'Completed Abyssea Quests',
     [0x00F0] = 'Current Adoulin Quests',
     [0x00F8] = 'Completed Adoulin Quests',
-    [0x0100] = 'Current Coalition Quests', 
-    [0x0108] = 'Completed Coalition Quests', 
-    [0xFFFF] = 'Current Missions',               
+    [0x0100] = 'Current Coalition Quests',
+    [0x0108] = 'Completed Coalition Quests',
+    [0xFFFF] = 'Current Missions',
 }
 
 -- There are 27 variations of this packet to populate different quest information.
@@ -2725,7 +2737,7 @@ fields.incoming[0x056] = function (data, type)
 end
 
 func.incoming[0x056].type = L{ 
-    {ctype='short',         label='Type',       fn=e+{'quest_mission_log'}}     -- 24
+    {ctype='unsigned short',label='Type',       fn=e+{'quest_mission_log'}}     -- 24
 }
 
 func.incoming[0x056][0x0080] = L{
@@ -2993,7 +3005,7 @@ fields.incoming[0x061] = L{
     {ctype='unsigned int',      label='_junk2'},                                -- 60
     {ctype='unsigned char',     label='_unknown7'},                             -- 64
     {ctype='unsigned char',     label='Master Level'},                          -- 65
-    {ctype='bit[1]',            label='Master Breaker'},                        -- 66
+    {ctype='boolbit',           label='Master Breaker'},                        -- 66
     {ctype='bit[15]',           label='_junk3'},                                -- 66
     {ctype='unsigned int',      label='Current Exemplar Points'},               -- 68
     {ctype='unsigned int',      label='Required Exemplar Points'},              -- 6C
@@ -3033,7 +3045,14 @@ func.incoming[0x063].base = L{
 }
 
 func.incoming[0x063][0x02] = L{
-    {ctype='data[7]',           label='_flags1',            fn=bin+{7}},        -- 06   The 3rd bit of the last byte is the flag that indicates whether or not you are xp capped (blue levels)
+    {ctype='unsigned short',    label='_unknown1',          const=0x000C},      -- 06
+    {ctype='unsigned short',    label='Limit Points'},                          -- 08
+    {ctype='bit[7]',            label='Merit Points'},                          -- 0A
+    {ctype='bit[6]',            label='Assimilation'},                          -- 0A   Bonus Blue Magic Points
+    {ctype='boolbit',           label='Limit Breaker'},                         -- 0A   Level >=75 and have KI
+    {ctype='boolbit',           label='EXP Capped'},                            -- 0A
+    {ctype='boolbit',           label='Limit Point Mode'},                      -- 0A
+    {ctype='unsigned char',     label='Max Merit Points'},                      -- 0C
 }
 
 func.incoming[0x063][0x03] = L{
@@ -3319,6 +3338,16 @@ fields.incoming[0x0A0] = L{
 
 --0x0AA, 0x0AC, and 0x0AE are all bitfields where the lsb indicates whether you have index 0 of the related resource.
 
+-- Moblin Maze Mongers information
+-- It appears that they anticipated a substantial expansion of the system,
+-- but field sizes here are limited to the available items.
+fields.incoming[0x0AD] = L{
+    {ctype='bit[16]',           label='Maze Vouchers'},
+    {ctype='data[6]',           label='_junk1'},
+    {ctype='bit[128]',          label='Maze Runes'},
+    {ctype='data[0x68]',        label="_junk2"},
+}
+
 -- Help Desk submenu open
 fields.incoming[0x0B5] = L{
     {ctype='data[0x14]',        label='_unknown1'},                             -- 04
@@ -3382,7 +3411,7 @@ func.incoming[0x0C9][0x01] = L{
     {ctype='unsigned char',     label='Sub Job Level'},                         -- 25
     {ctype='unsigned char',     label='Main Job',           fn=job},            -- 26
     {ctype='unsigned char',     label='Master Level'},                          -- 27
-    {ctype='bit[1]',            label='Master Breaker'},                        -- 28
+    {ctype='boolbit',           label='Master Breaker'},                        -- 28
     {ctype='bit[7]',            label='_junk2'},                                -- 28
     {ctype='data[43]',          label='_unknown5'},                             -- 29   At least the first two bytes and the last twelve bytes are junk, possibly more
 }
@@ -3467,7 +3496,7 @@ fields.incoming[0x0DD] = L{
     {ctype='unsigned char',     label='Sub job',            fn=job},            -- 24
     {ctype='unsigned char',     label='Sub job level'},                         -- 25
     {ctype='unsigned char',     label='Master Level'},                          -- 26
-    {ctype='bit[1]',            label='Master Breaker'},                        -- 27
+    {ctype='boolbit',           label='Master Breaker'},                        -- 27
     {ctype='bit[7]',            label='_junk2'},                                -- 27
     {ctype='char*',             label='Name'},                                  -- 28
 }
@@ -3499,7 +3528,7 @@ fields.incoming[0x0DF] = L{
     {ctype='unsigned char',     label='Sub job',            fn=job},            -- 22
     {ctype='unsigned char',     label='Sub job level'},                         -- 23
     {ctype='unsigned char',     label='Master Level'},                          -- 24
-    {ctype='bit[1]',            label='Master Breaker'},                        -- 25
+    {ctype='boolbit',           label='Master Breaker'},                        -- 25
     {ctype='bit[7]',            label='_junk2'},                                -- 25
 }
 
