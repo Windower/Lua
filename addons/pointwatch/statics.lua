@@ -28,9 +28,9 @@
 --Default settings file:
 default_settings = {
     strings = {
-        default = "xp.current..'/'..xp.tnl..'XP   '..lp.current..'/'..lp.tnm..'LP ['..lp.number_of_merits..'/'..lp.maximum_merits..']   XP/hr:'..string.format('%.1f',math.floor(xp.rate/100)/10)..'k   '..cp.current..'/'..cp.tnjp..'CP ['..cp.number_of_job_points..']   CP/hr:'..string.format('%.1f',math.floor(cp.rate/100)/10)..'k'",
-        dynamis = "xp.current..'/'..xp.tnl..'XP   '..lp.current..'/'..lp.tnm..'LP ['..lp.number_of_merits..'/'..lp.maximum_merits..']   XP/hr:'..string.format('%.1f',math.floor(xp.rate/100)/10)..'k   '..cp.current..'/'..cp.tnjp..'CP ['..cp.number_of_job_points..']   '..dynamis.KIs..'  '..dynamis.time_remaining",
-        abyssea = "xp.current..'/'..xp.tnl..'XP   '..lp.current..'/'..lp.tnm..'LP ['..lp.number_of_merits..'/'..lp.maximum_merits..']   XP/hr:'..string.format('%.1f',math.floor(xp.rate/100)/10)..'k   Amber:'..(abyssea.amber or 0)..'/Azure:'..(abyssea.azure or 0)..'/Ruby:'..(abyssea.ruby or 0)..'/Pearlescent:'..(abyssea.pearlescent or 0)..'/Ebon:'..(abyssea.ebon or 0)..'/Silvery:'..(abyssea.silvery or 0)..'/Golden:'..(abyssea.golden or 0)..'/Time Remaining:'..(abyssea.time_remaining or 0)"
+        default = "string.format('%d/%dXP %sMerits XP/hr:%.1fk %sJP CP/hr:%.1fk %d/%dEP EP/hr:%.1fk',xp.current,xp.tnl,max_color('%5.2f':format(math.floor(lp.current/lp.tnm*100)/100+lp.number_of_merits),lp.current/lp.tnm+lp.number_of_merits,lp.maximum_merits,58,147,191),math.floor(xp.rate/100)/10,max_color('%6.2f':format(math.floor(cp.current/cp.tnjp*100)/100+cp.number_of_job_points),cp.current/cp.tnjp+cp.number_of_job_points,500,58,147,191),math.floor(cp.rate/100)/10,ep.current,ep.tnml,math.floor(ep.rate/100)/10)",
+        dynamis = "string.format('%d/%dXP %sMerits XP/hr:%.1fk %sJP CP/hr:%.1fk %d/%dEP %s  %s',xp.current,xp.tnl,max_color('%5.2f':format(math.floor(lp.current/lp.tnm*100)/100+lp.number_of_merits),lp.current/lp.tnm+lp.number_of_merits,lp.maximum_merits,58,147,191),math.floor(xp.rate/100)/10,max_color('%6.2f':format(math.floor(cp.current/cp.tnjp*100)/100+cp.number_of_job_points),cp.current/cp.tnjp+cp.number_of_job_points,500,58,147,191),math.floor(cp.rate/100)/10,ep.current,ep.tnml,dynamis.KIs,dynamis.time_remaining or 0)",
+        abyssea = "string.format('%d/%dXP %sMerits XP/hr:%.1fk %sJP CP/hr:%.1fk %d/%dEP Amber:%d Azure:%d Ruby:%d Pearl:%d Ebon:%d Silver: Gold:%d Time-Remaining:%d',xp.current,xp.tnl,max_color('%5.2f':format(math.floor(lp.current/lp.tnm*100)/100+lp.number_of_merits),lp.current/lp.tnm+lp.number_of_merits,lp.maximum_merits,58,147,191),math.floor(xp.rate/100)/10,max_color('%6.2f':format(math.floor(cp.current/cp.tnjp*100)/100+cp.number_of_job_points),cp.current/cp.tnjp+cp.number_of_job_points,500,58,147,191),math.floor(cp.rate/100)/10,ep.current,ep.tnml,abyssea.amber or 0,abyssea.azure or 0,abyssea.ruby or 0,abyssea.pearlescent or 0,abyssea.ebon or 0,abyssea.silvery or 0,abyssea.golden or 0,abyssea.time_remaining or 0)",
         },
     text_box_settings = {
         pos = {
@@ -110,6 +110,13 @@ function initialize()
         number_of_merits = 0,
         maximum_merits = 30,
     }
+
+    ep = {
+        registry = {},
+        current = 0,
+        rate = 0,
+        tnml = 0,
+    }
     
     sparks = {
         current = 0,
@@ -155,5 +162,13 @@ function initialize()
         cur_func = loadstring("current_string = "..settings.strings.default)
         setfenv(cur_func,_G)
     end
-    
+    for _,id in ipairs(packet_initiators) do
+        local handler = packet_handlers[id]
+        if handler then
+            local last = windower.packets.last_incoming(id)
+            if last then
+                handler(last)
+            end
+        end
+    end
 end
