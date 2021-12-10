@@ -1013,6 +1013,8 @@ models.body[27924] = { name = "Thurandaut Tabard" , enl = "thurandaut tabard", m
 models.body[27925] = { name = "Karieyh Haubert" , enl = "karieyh haubert", model = 8534} 
 models.body[27926] = { name = "Geomancy Tunic" , enl = "geomancy tunic", model = 8500} --8508 Taru M
 models.body[27927] = { name = "Runeist Coat" , enl = "runeist coat", model = 8530} 
+models.body[27854] = { name = "Mandra. Suit" , enl = "mandragora suit", model = 8568} 
+
 
 models.body[50000] = { name = "Volunteer Solider Body" , model = 8365 }
 models.body[50001] = { name = "Chasuble (Male Only)", model = 8369 }
