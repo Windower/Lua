@@ -962,6 +962,7 @@ models.head[27784] = { name = "Thurandaut Chapeau" , enl = "thurandaut chapeau",
 models.head[27785] = { name = "Karieyh Morion" , enl = "karieyh morion", model = 4438} 
 models.head[27786] = { name = "Geomancy Galero" , enl = "geomancy galero", model = 4404} 
 models.head[27787] = { name = "Runeist Bandeau" , enl = "runeist bandeau", model = 4434} 
+models.head[26705] = { name = "Mandra. Masque" , enl = "mandra masque", model = 4472} 
 
 models.head[40001] = { name = "??? Chapeau" , model = 4257 }
 models.head[40002] = { name = "Haudrale's Chapeau" , model = 4338 }
