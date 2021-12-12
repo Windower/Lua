@@ -146,7 +146,7 @@ parse = function(fields, data, index, max, lookup, depth)
                         if lookup then
                             -- Look up index name in provided table
                             local resource = lookup[1][count + lookup[2] - 1]
-                            field.label = '%s %s':format(resource and resource.name or 'Unknown %d':format(count + lookup[2] - 1), field.label)
+                            field.label = '%s %s':format(resource and resource.english or 'Unknown %d':format(count + lookup[2] - 1), field.label)
                         else
                             -- Just increment numerically
                             field.label = '%s %d':format(field.label, count)
