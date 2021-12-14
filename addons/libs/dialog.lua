@@ -198,7 +198,12 @@ function dialog.open_dat_by_zone_id(zone_id, language)
 	if language == 'english' then
 		dat_id = dat_id + 300
 	elseif language ~= 'japanese' then
-		return io.tmpfile()
+		print(
+			_addon and _addon.name or '???',
+			'Dialog library: open_dat_by_zone_id expected '
+			.. '"english" or "japanese". (Got: ' .. language .. ')'
+		)
+		return
 	end
 
     local dat_path = windower.ffxi_path
