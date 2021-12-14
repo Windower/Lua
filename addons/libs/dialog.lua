@@ -188,13 +188,18 @@ dialog.decode_string = dialog.encode_string
 
 -- If a zone has a dialog message dat file, this function will
 -- return a file descriptor for it in "read/binary" mode.
-function dialog.dat(zone_id)
+function dialog.open_dat_by_zone_id(zone_id, language)
     local dat_id
-    if zone_id < 256 then
-        dat_id = zone_id + 6420
-    else
-        dat_id = zone_id + 85335
-    end
+	if zone_id < 256 then
+		dat_id = zone_id + 6120
+	else
+		dat_id = zone_id + 85035
+	end
+	if language == 'english' then
+		dat_id = dat_id + 300
+	elseif language ~= 'japanese' then
+		return io.tmpfile()
+	end
 
     local dat_path = windower.ffxi_path
     local path
