@@ -190,21 +190,21 @@ dialog.decode_string = dialog.encode_string
 -- return a file descriptor for it in "read/binary" mode.
 function dialog.open_dat_by_zone_id(zone_id, language)
     local dat_id
-	if zone_id < 256 then
-		dat_id = zone_id + 6120
-	else
-		dat_id = zone_id + 85035
-	end
-	if language == 'english' then
-		dat_id = dat_id + 300
-	elseif language ~= 'japanese' then
-		print(
-			_addon and _addon.name or '???',
-			'Dialog library: open_dat_by_zone_id expected '
-			.. '"english" or "japanese". (Got: ' .. language .. ')'
-		)
-		return
-	end
+    if zone_id < 256 then
+        dat_id = zone_id + 6120
+    else
+        dat_id = zone_id + 85035
+    end
+    if language == 'english' then
+        dat_id = dat_id + 300
+    elseif language ~= 'japanese' then
+        print(
+            _addon and _addon.name or '???',
+            'Dialog library: open_dat_by_zone_id expected '
+            .. '"english" or "japanese". (Got: ' .. language .. ')'
+        )
+        return
+    end
 
     local dat_path = windower.ffxi_path
     local path
@@ -215,7 +215,7 @@ function dialog.open_dat_by_zone_id(zone_id, language)
     repeat
         local v = io.open(vtable, 'rb')
         v:seek('set', dat_id)
-        if byte(f:read(1)) > 0 then
+        if byte(v:read(1)) > 0 then
             local f = io.open(ftable, 'rb')
             local dat = f:read('*a')
             f:close()
