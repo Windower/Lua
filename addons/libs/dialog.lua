@@ -203,8 +203,8 @@ function dialog.dat(zone_id)
     local n = 1
     local rom = dat_path .. 'ROM/'
     repeat
-        local f = io.open(vtable, 'rb')
-        f:seek('set', dat_id)
+        local v = io.open(vtable, 'rb')
+        v:seek('set', dat_id)
         if byte(f:read(1)) > 0 then
             local f = io.open(ftable, 'rb')
             local dat = f:read('*a')
@@ -217,7 +217,7 @@ function dialog.dat(zone_id)
             
             path = rom .. tostring(dir) .. '/' .. tostring(file) .. '.DAT'
         end
-        f:close()
+        v:close()
         n = n + 1
         local d = tostring(n)
         rom = dat_path .. 'ROM' .. d .. '/'
