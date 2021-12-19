@@ -32,7 +32,7 @@ Here are the available values:
 * xp.total                = Total Experience Points gained since the last time the addon was loaded (number)
 
 * lp.current              = Current Experience Points (number from 0 to 55,999 XP)
-* lp.tnl                  = Similar to a "To Next Level", but this value is always 10,000 because that's always the number of Limit Points per merit point.
+* lp.tnm                  = Similar to a "To Next Level", but this value is always 10,000 because that's always the number of Limit Points per merit point.
 * lp.number_of_merits     = Number of merit points you have.
 * lp.maximum_merits       = Maximum number of merits you can store.
 
@@ -41,6 +41,10 @@ Here are the available values:
 * cp.total                = Total Capacity Points gained since the last time the addon was loaded (number)
 * cp.tnjp                 = Similar to a "To Next Level", but this value is always 30,000 because that's always the number of CPs per job point.
 * cp.number_of_job_points = Number of job points you currently have on your current job.
+
+* ep.current              = Current Exemplar Points
+* ep.rate                 = Current Exemplar Points gain rate per hour. This is calculated over a 10 minute window and requires at least two gains within the window.
+* ep.tnml                 = Required Exemplar Points for your next Master Level
 
 * sparks.current          = Current number of RoE Sparks (number between 0 and 50,000)
 * sparks.maximum          = Maximum number of RoE Sparks (always 50,000)
@@ -67,6 +71,7 @@ Here are the available values:
 
 
 Version History:
+0.211112 - Added ep.current, ep.rate, and ep.tnml.
 0.150811 - Changed job_points from a char to a short.
 0.150201 - Added Unity Accolades.
 0.141111 - Adjusted Pointwatch to account for a recent packet change.
