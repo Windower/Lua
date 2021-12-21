@@ -186,6 +186,67 @@ end
 
 dialog.decode_string = dialog.encode_string
 
+-- If a zone has a dialog message dat file, this function will
+-- return a file descriptor for it in "read/binary" mode.
+function dialog.open_dat_by_zone_id(zone_id, language)
+    local dat_id
+    if zone_id > 299 then
+        -- The English dialog files are currently 300 ids
+        -- ahead of the Japanese dialog files. If a zone with
+        -- id 300 or greater is added, SE will have to move to
+        -- a new range of ids which someone will need to locate.
+        print('Dialog library: zone id out of range.')
+        return
+    elseif zone_id > 255 then
+        dat_id = zone_id + 85035
+    else
+        dat_id = zone_id + 6120
+    end
+    if language == 'english' then
+        dat_id = dat_id + 300
+    elseif language ~= 'japanese' then
+        print(
+            _addon and _addon.name or '???',
+            'Dialog library: open_dat_by_zone_id expected '
+            .. '"english" or "japanese". (Got: ' .. language .. ')'
+        )
+        return
+    end
+
+    local dat_path = windower.ffxi_path
+    local path
+    local vtable = dat_path .. 'VTABLE.DAT'
+    local ftable = dat_path .. 'FTABLE.DAT'
+    local n = 1
+    local rom = dat_path .. 'ROM/'
+    repeat
+        local v = io.open(vtable, 'rb')
+        v:seek('set', dat_id)
+        if byte(v:read(1)) > 0 then
+            local f = io.open(ftable, 'rb')
+            local dat = f:read('*a')
+            f:close()
+
+            local offset = 2*dat_id+1
+            local packed_16bit = byte(dat, offset + 1) * 256 + byte(dat, offset)
+            local dir = floor(packed_16bit / 128)
+            local file = packed_16bit - dir * 128
+            
+            path = rom .. tostring(dir) .. '/' .. tostring(file) .. '.DAT'
+        end
+        v:close()
+        n = n + 1
+        local d = tostring(n)
+        rom = dat_path .. 'ROM' .. d .. '/'
+        vtable = rom .. 'VTABLE' .. d .. '.DAT'
+        ftable = rom .. 'FTABLE' .. d .. '.DAT'
+    until path or not windower.dir_exists(rom)
+
+    if path then
+        return io.open(path, 'rb')
+    end
+end
+
 dialog.dev = {}
 
 -- Returns the hex offset of the dialog entry with the given ID.
