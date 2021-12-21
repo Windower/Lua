@@ -97,8 +97,8 @@ end)
 
 windower.register_event('outgoing chunk',function(id,original,modified,injected,blocked)
     if not blocked and id == 0x0B6 then
-        local name = trim(original:sub(0x6,0x14))
-        local message = trim(original:sub(0x15))
+        local name = trim(original:sub(0x07,0x15))
+        local message = trim(original:sub(0x16))
         if recording[name:upper()] then
             recording[name:upper()][#recording[name:upper()]+1] = {message=message,outgoing=true,timestamp=os.time(),seen=true}
         else
