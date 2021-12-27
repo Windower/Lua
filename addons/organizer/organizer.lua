@@ -39,7 +39,7 @@ packets = require('packets')
 
 _addon.name = 'Organizer'
 _addon.author = 'Byrth, maintainer: Rooks'
-_addon.version = 0.20210721
+_addon.version = 0.20211226
 _addon.commands = {'organizer','org'}
 
 _static = {
@@ -555,7 +555,11 @@ function get_dump_bags()
     local dump_bags = {}
     for i,v in pairs(settings.dump_bags) do
         if i and s_to_bag(i) then
-            dump_bags[tonumber(v)] = s_to_bag(i)
+            if windower.ffxi.get_info().mog_house then
+                dump_bags[tonumber(v)] = s_to_bag(i)
+            elseif s_to_bag(i) ~= 2 then -- Storage is not available at Nomad Moogles
+                dump_bags[tonumber(v)] = s_to_bag(i)
+            end
         elseif i then
             org_error('The bag name ("'..tostring(i)..'") in dump_bags entry #'..tostring(v)..' in the ../addons/organizer/data/settings.xml file is not valid.\nValid options are '..tostring(res.bags))
             return
