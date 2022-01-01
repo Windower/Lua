@@ -65,11 +65,11 @@ packet_handlers = {
         local p = packets.parse('incoming',org)
         local zone = 'z'..windower.ffxi.get_info().zone
         if settings.options.message_printing then
-            print('Message ID: '..p['Message ID'])
+            print('Message ID: '..bit.band(p['Message ID'], 16383))
         end
         
         if messages[zone] then
-            local msg = p['Message ID']
+            local msg = bit.band(p['Message ID'], 16383)
             for i,v in pairs(messages[zone]) do
                 if tonumber(v) and v + messages[zone].offset == msg then
                     -- print(p['Param 1'],p['Param 2'],p['Param 3'],p['Param 4']) -- DEBUGGING STATEMENT -------------------------

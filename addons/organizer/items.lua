@@ -30,7 +30,7 @@ local bags = {}
 local item_tab = {}
 
 do
-    local names = {'Nomad Moogle'} -- don't add Pilgrim Moogle to this list, organizer currently does not work in Odyssey.
+    local names = {'Nomad Moogle','Pilgrim Moogle'}
     local moogles = {}
     local poked = false
     local block_menu = false

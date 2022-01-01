@@ -890,9 +890,9 @@ fields.outgoing[0x0B5] = L{
 
 -- Tell
 fields.outgoing[0x0B6] = L{
-    {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 04   00 for a normal tell -- Varying this does nothing.
-    {ctype='char[15]',          label='Target Name'},                           -- 05
-    {ctype='char*',             label='Message'},                               -- 14
+    {ctype='unsigned short',    label='_unknown1',          const=0x0003},      -- 04   03 00 for a normal tell -- Varying this did nothing.
+    {ctype='char[15]',          label='Target Name'},                           -- 06
+    {ctype='char*',             label='Message'},                               -- 15
 }
 
 -- Merit Point Increase
@@ -1792,7 +1792,7 @@ func.incoming[0x028].action_base = L{
     {ctype='bit[3]',            label='Knockback'},                             -- 03:0   Knockback effect, the more value the more distance
     {ctype='bit[17]',           label='Param'},                                 -- 03:3
     {ctype='bit[10]',           label='Message'},                               -- 06:2
-    {ctype='bit[31]',           label='_unknown'},                              -- 07:4 --Message Modifier? If you get a complete (Resist!) this is set to 2 otherwise a regular Resist is 0.
+    {ctype='bit[31]',           label='_unknown'},                              -- 07:4   Message Modifier: Cover=0x01 Resist!=0x02 Magic Burst=0x03 Immunobreak=0x04 Critical Hit=0x05
 }
 
 func.incoming[0x028].add_effect_base = L{
