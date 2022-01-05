@@ -1,25 +1,8 @@
-"""Copyright (c) 2010, 2011, 2012 SirAnthony <anthony at adsorbtion.org>
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE."""
-
 import re
 import sys
+from numbers import Number
+
+import six
 
 ERRORS = {
     'unexp_end_string': u'Unexpected end of string while parsing Lua string.',
@@ -28,6 +11,16 @@ ERRORS = {
     'mfnumber_dec_point': u'Malformed number (no digits after decimal point).',
     'mfnumber_sci': u'Malformed number (bad scientific format).',
 }
+
+def sequential(lst):
+    length = len(lst)
+    if length == 0 or lst[0] != 0:
+        return False
+    for i in range(length):
+        if i + 1 < length:
+            if lst[i] + 1 != lst[i+1]:
+                return False
+    return True
 
 
 class ParseError(Exception):
@@ -48,11 +41,8 @@ class SLPP(object):
         self.tab = '\t'
 
     def decode(self, text):
-        if not text or not isinstance(text, basestring):
+        if not text or not isinstance(text, six.string_types):
             return
-        #FIXME: only short comments removed
-        reg = re.compile('--.*$', re.M)
-        text = reg.sub('', text, 0)
         self.text = text
         self.at, self.ch, self.depth = 0, '', 0
         self.len = len(text)
@@ -68,33 +58,31 @@ class SLPP(object):
         s = ''
         tab = self.tab
         newline = self.newline
-        tp = type(obj)
+
         if isinstance(obj, str):
             s += '"%s"' % obj.replace(r'"', r'\"')
-        if isinstance(obj, unicode):
+        elif six.PY2 and isinstance(obj, unicode):
             s += '"%s"' % obj.encode('utf-8').replace(r'"', r'\"')
-        elif tp in [int, float, long, complex]:
-            s += str(obj)
-        elif tp is bool:
+        elif six.PY3 and isinstance(obj, bytes):
+            s += '"{}"'.format(''.join(r'\x{:02x}'.format(c) for c in obj))
+        elif isinstance(obj, bool):
             s += str(obj).lower()
         elif obj is None:
             s += 'nil'
-        elif tp in [list, tuple, dict]:
+        elif isinstance(obj, Number):
+            s += str(obj)
+        elif isinstance(obj, (list, tuple, dict)):
             self.depth += 1
-            if len(obj) == 0 or ( tp is not dict and len(filter(
-                    lambda x:  type(x) in (int,  float,  long) \
-                    or (isinstance(x, basestring) and len(x) < 10),  obj
-                )) == len(obj) ):
+            if len(obj) == 0 or (not isinstance(obj, dict) and len([
+                    x for x in obj
+                    if isinstance(x, Number) or (isinstance(x, six.string_types) and len(x) < 10)
+               ]) == len(obj)):
                 newline = tab = ''
             dp = tab * self.depth
             s += "%s{%s" % (tab * (self.depth - 2), newline)
-            if tp is dict:
-                contents = []
-                for k, v in obj.iteritems():
-                    if type(k) is int:
-                        contents.append(self.__encode(v))
-                    else:
-                        contents.append(dp + '%s = %s' % (k, self.__encode(v)))
+            if isinstance(obj, dict):
+                key_list = ['[%s]' if isinstance(k, Number) else '["%s"]' for k in obj.keys()]
+                contents = [dp + (key + ' = %s') % (k, self.__encode(v)) for (k, v), key in zip(obj.items(), key_list)]
                 s += (',%s' % newline).join(contents)
             else:
                 s += (',%s' % newline).join(
@@ -109,6 +97,35 @@ class SLPP(object):
                 self.next_chr()
             else:
                 break
+        self.comment()
+
+    def comment(self):
+        if self.ch == '-' and self.next_is('-'):
+            self.next_chr()
+            # TODO: for fancy comments need to improve
+            multiline = self.next_chr() and self.ch == '[' and self.next_is('[')
+            while self.ch:
+                if multiline:
+                    if self.ch == ']' and self.next_is(']'):
+                        self.next_chr()
+                        self.next_chr()
+                        self.white()
+                        break
+                # `--` is a comment, skip to next new line
+                elif re.match('\n', self.ch):
+                    self.white()
+                    break
+                self.next_chr()
+
+    def next_is(self, value):
+        if self.at >= self.len:
+            return False
+        return self.text[self.at] == value
+
+    def prev_is(self, value):
+        if self.at < 2:
+            return False
+        return self.text[self.at-2] == value
 
     def next_chr(self):
         if self.at >= self.len:
@@ -138,17 +155,20 @@ class SLPP(object):
         if end == '[':
             end = ']'
         if start in ['"',  "'",  '[']:
+            double = start=='[' and self.prev_is(start)
             while self.next_chr():
-                if self.ch == end:
+                if self.ch == end and (not double or self.next_is(end)):
                     self.next_chr()
                     if start != "[" or self.ch == ']':
+                        if double:
+                            self.next_chr()
                         return s
                 if self.ch == '\\' and start == end:
                     self.next_chr()
                     if self.ch != end:
                         s += '\\'
                 s += self.ch
-        print ERRORS['unexp_end_string']
+        raise ParseError(ERRORS['unexp_end_string'])
 
     def object(self):
         o = {}
@@ -161,7 +181,7 @@ class SLPP(object):
         if self.ch and self.ch == '}':
             self.depth -= 1
             self.next_chr()
-            return o #Exit here
+            return o  # Exit here
         else:
             while self.ch:
                 self.white()
@@ -173,13 +193,15 @@ class SLPP(object):
                     self.depth -= 1
                     self.next_chr()
                     if k is not None:
-                       o[idx] = k
-                    if not numeric_keys and len([ key for key in o if isinstance(key, (str, unicode, float,  bool,  tuple))]) == 0:
-                        ar = []
-                        for key in o:
-                           ar.insert(key, o[key])
-                        o = ar
-                    return o #or here
+                        o[idx] = k
+                    if len([key for key in o if isinstance(key, six.string_types + (float,  bool, tuple))]) == 0:
+                        so = sorted([key for key in o])
+                        if sequential(so):
+                            ar = []
+                            for key in o:
+                                ar.insert(key, o[key])
+                            o = ar
+                    return o  # or here
                 else:
                     if self.ch == ',':
                         self.next_chr()
@@ -187,7 +209,6 @@ class SLPP(object):
                     else:
                         k = self.value()
                         if self.ch == ']':
-                            numeric_keys = True
                             self.next_chr()
                     self.white()
                     ch = self.ch
@@ -200,7 +221,7 @@ class SLPP(object):
                             o[idx] = k
                         idx += 1
                         k = None
-        print ERRORS['unexp_end_table'] #Bad exit here
+        raise ParseError(ERRORS['unexp_end_table'])  # Bad exit here
 
     words = {'true': True, 'false': False, 'nil': None}
     def word(self):
@@ -259,8 +280,7 @@ class SLPP(object):
 
     def hex(self):
         n = ''
-        while self.ch and \
-            (self.ch in 'ABCDEFabcdef' or self.ch.isdigit()):
+        while self.ch and (self.ch in 'ABCDEFabcdef' or self.ch.isdigit()):
             n += self.ch
             self.next_chr()
         return n

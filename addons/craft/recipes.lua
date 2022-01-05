@@ -674,7 +674,6 @@ return {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
             "Platinum Ingot",
-            "Wool Thread",
             "Gold Thread",
             "Gold Thread",
             "Silk Cloth",
@@ -1816,7 +1815,6 @@ return {
         ["crystal"] = "Light Crystal",
         ["ingredients"] = {
             "Silver Chain",
-            "Velvet Cloth",
             "Velvet Cloth",
             "Velvet Cloth",
             "Sheep Leather",
@@ -4740,7 +4738,7 @@ return {
             "Hallowed Water",
         },
     },
-    ["Blessed Briault"] = {
+    ["Blessed Bliaut"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
             "Silver Thread",
@@ -4953,6 +4951,7 @@ return {
             "Gold Thread",
             "Gold Thread",
             "Silk Cloth",
+            "Rainbow Cloth",
             "Saruta Cotton",
             "Saruta Cotton",
             "Dragon Blood",
@@ -6672,6 +6671,7 @@ return {
         ["crystal"] = "Water Crystal",
         ["ingredients"] = {
             "Lugworm",
+            "Lugworm",
             "Shell Bug",
             "Shell Bug",
         },
@@ -7129,6 +7129,7 @@ return {
         ["ingredients"] = {
             "Gelatin",
             "Hare Meat",
+            "Hare Meat",
             "Rotten Meat",
         },
     },
@@ -7528,11 +7529,6 @@ return {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
             "Chapuli Wing",
             "Chapuli Wing",
             "Chapuli Wing",
@@ -7728,6 +7724,14 @@ return {
             "Rosewood Lbr.",
         },
     },
+    ["Chikuwa"] = {
+        ["crystal"] = "Earth Crystal",
+        ["ingredients"] = {
+            "Rock Salt",
+            "Bastore Bream",
+            "Tiger Cod",
+        },
+    },
     ["Chimera Blood"] = {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
@@ -7893,6 +7897,9 @@ return {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
             "Maple Sugar",
+            "Kukuru Bean",
+            "Kukuru Bean",
+            "Kukuru Bean",
             "Kukuru Bean",
             "Honey",
             "Selbina Milk",
@@ -8436,11 +8443,6 @@ return {
     ["Colibri Fletchings 2"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
             "Zephyr Thread",
             "Colibri Feather",
             "Colibri Feather",
@@ -9999,13 +10001,13 @@ return {
             "Dk. Ixion Ferrule",
         },
     },
-    ["Dagger"] = {
+    ["Dagger (Weapon)"] = {
         ["crystal"] = "Light Crystal",
         ["ingredients"] = {
             "Rusty Dagger",
         },
     },
-    ["Dagger 2"] = {
+    ["Dagger (Weapon) 2"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
             "Bronze Ingot",
@@ -12106,6 +12108,15 @@ return {
             "Yilanbaligi",
         },
     },
+    ["Egg Sandwich"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Selbina Butter",
+            "White Bread",
+            "Hard-boiled Egg",
+            "Graubg. Lettuce",
+        },
+    },
     ["Egg Soup"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -12824,6 +12835,8 @@ return {
             "Apple Vinegar",
             "Beastman Blood",
             "Hecteyes Eye",
+            "Hecteyes Eye",
+            "Hecteyes Eye",
             "Gelatin",
             "Frost Turnip",
             "Distilled Water",
@@ -13419,6 +13432,7 @@ return {
             "Popoto",
             "Apple Vinegar",
             "Olive Oil",
+            "Tiger Cod",
             "Tiger Cod",
             "Bird Egg",
             "Moval. Water",
@@ -14316,11 +14330,6 @@ return {
             "G. Bird Plume",
             "G. Bird Plume",
             "G. Bird Plume",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
             "Zephyr Thread",
         },
     },
@@ -15417,19 +15426,6 @@ return {
             "Distilled Water",
         },
     },
-    ["Griffon Leather 3"] = {
-        ["crystal"] = "Dark Crystal",
-        ["ingredients"] = {
-            "Win. Tea Leaves",
-            "Win. Tea Leaves",
-            "Win. Tea Leaves",
-            "Griffon Hide",
-            "Griffon Hide",
-            "Griffon Hide",
-            "Tanning Vat",
-            "Distilled Water",
-        },
-    },
     ["Grilled Hare"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -15761,13 +15757,13 @@ return {
     ["Hard Leather Ring"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Tiger Leather",
+            "Leath. Kit 60",
         },
     },
     ["Hard Leather Ring 2"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Leath. Kit 60",
+            "Tiger Leather",
         },
     },
     ["Hard-boiled Egg"] = {
@@ -16200,6 +16196,7 @@ return {
     ["Herb Paste"] = {
         ["crystal"] = "Water Crystal",
         ["ingredients"] = {
+            "Toko. Wildgrass",
             "Toko. Wildgrass",
             "La Theine Millet",
             "Lizard Egg",
@@ -19096,6 +19093,14 @@ return {
             "Bird Egg",
         },
     },
+    ["Konjak"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Seashell",
+            "Distilled Water",
+            "Konjak Tuber",
+        },
+    },
     ["Konron Hassen"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
@@ -20300,6 +20305,12 @@ return {
         ["crystal"] = "Light Crystal",
         ["ingredients"] = {
             "Bkn. Lu Rod",
+        },
+    },
+    ["Lu Shang's Fishing Rod +1"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "B. Lu. Rod +1",
         },
     },
     ["Lucent Axe"] = {
@@ -23538,6 +23549,15 @@ return {
             "Contortacle",
         },
     },
+    ["Oden"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Fish Stock",
+            "Konjak",
+            "Daikon",
+            "Chikuwa",
+        },
+    },
     ["Odorous Knife"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -23620,6 +23640,16 @@ return {
             "Flaxseed Oil",
             "Flaxseed Oil",
             "Wamoura Silk",
+        },
+    },
+    ["Omelette Sandwich"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Selbina Butter",
+            "White Bread",
+            "Apkallu Egg",
+            "Puk Egg",
+            "Graubg. Lettuce",
         },
     },
     ["Onyx"] = {
@@ -23770,6 +23800,7 @@ return {
             "San d'Or. Flour",
             "Selbina Butter",
             "Maple Sugar",
+            "Saruta Orange",
             "Saruta Orange",
             "Bird Egg",
         },
@@ -24405,6 +24436,8 @@ return {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
             "Blue Peas",
+            "Blue Peas",
+            "Blue Peas",
             "Dried Marjoram",
             "Wild Onion",
             "Distilled Water",
@@ -24443,11 +24476,6 @@ return {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
             "Peapuk Wing",
             "Peapuk Wing",
             "Peapuk Wing",
@@ -24482,6 +24510,7 @@ return {
     ["Pear au Lait"] = {
         ["crystal"] = "Water Crystal",
         ["ingredients"] = {
+            "Derfland Pear",
             "Derfland Pear",
             "Honey",
             "Selbina Milk",
@@ -25011,6 +25040,7 @@ return {
             "Rock Salt",
             "Sea Foliage",
             "Kitron",
+            "Rarab Tail",
         },
     },
     ["Pie Dough"] = {
@@ -25605,6 +25635,19 @@ return {
             "Orichalcum Lance",
         },
     },
+    ["Popo. con Queso"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "San d'Or. Flour",
+            "Selbina Butter",
+            "Popoto",
+            "Rock Salt",
+            "Danceshroom",
+            "Selbina Milk",
+            "Wild Onion",
+            "Chalaimbille",
+        },
+    },
     ["Popstar"] = {
         ["crystal"] = "Light Crystal",
         ["ingredients"] = {
@@ -25853,11 +25896,6 @@ return {
     ["Puk Fletchings 2"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
             "Zephyr Thread",
             "Puk Wing",
             "Puk Wing",
@@ -27325,6 +27363,7 @@ return {
         ["ingredients"] = {
             "Rock Salt",
             "Danceshroom",
+            "Danceshroom",
         },
     },
     ["Roast Mushroom 2"] = {
@@ -27332,12 +27371,14 @@ return {
         ["ingredients"] = {
             "Rock Salt",
             "Woozyshroom",
+            "Woozyshroom",
         },
     },
     ["Roast Mushroom 3"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
             "Rock Salt",
+            "Sleepshroom",
             "Sleepshroom",
         },
     },
@@ -28945,6 +28986,19 @@ return {
             "Coral Fragment",
         },
     },
+    ["Seafood Gratin"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "San d'Or. Flour",
+            "Selbina Butter",
+            "Rock Salt",
+            "Danceshroom",
+            "Selbina Milk",
+            "Gigant Squid",
+            "Bastore Sweeper",
+            "Chalaimbille",
+        },
+    },
     ["Seafood Paella"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -29420,6 +29474,7 @@ return {
             "Bay Leaves",
             "Rock Salt",
             "Kazham Pineapl.",
+            "Shall Shell",
             "Shall Shell",
             "Distilled Water",
         },
@@ -33734,11 +33789,6 @@ return {
     ["Tulfaire Fletchings 2"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
             "Zephyr Thread",
             "Tulfaire Feather",
             "Tulfaire Feather",
