@@ -53,7 +53,7 @@ function handle_set(cmdParams)
     
     if state_var then
         local oldVal = state_var.value
-        state_var:set(cmdParams[2])
+        state_var:set(cmdParams:slice(2):concat(' '))
         local newVal = state_var.value
         
         local descrip = state_var.description or cmdParams[1]
