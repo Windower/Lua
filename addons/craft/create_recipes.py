@@ -3,6 +3,7 @@ try:
 except ImportError:
     import urllib2
 from bs4 import BeautifulSoup
+from io import open
 from slpp import slpp as lua
 import os
 import platform
@@ -207,10 +208,10 @@ def build_recipe_string(name, crystal, ingredients):
 
 def save_recipes(recipes):
     with open('recipes.lua', 'w') as fd:
-        fd.write("return {\n")
+        fd.write(u"return {\n")
         for key in sorted(recipes):
             fd.write(build_recipe_string(key, *recipes[key]))
-        fd.write("}\n")
+        fd.write(u"}\n")
 
 def get_recipes(craft, spheres=False):
     base = "https://www.bg-wiki.com/bg/"
@@ -219,7 +220,8 @@ def get_recipes(craft, spheres=False):
         req = urllib2.Request(base + craft, headers=hdr)
         try:
             page = urllib2.urlopen(req).read()
-        except(urllib2.HTTPError, e):
+        except urllib2.HTTPError as e:
+            print(e.fp.read())
             return
         with open(name, 'w') as fd:
             fd.write(str(page))
