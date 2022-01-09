@@ -200,9 +200,9 @@ end
 
 function actionpacket:get_spell()
     local info = self:get_targets()():get_actions()():get_basic_info()
-    if rawget(info,'resource') and rawget(info,'spell_id') and rawget(rawget(res,rawget(info,'resource')),rawget(info,'spell_id')) then
+    if rawget(info,'resource') and rawget(info,'spell_id') and rawget(res[rawget(info,'resource')],rawget(info,'spell_id')) then
         local copied_line = {}
-        for i,v in pairs(rawget(rawget(res,rawget(info,'resource')),rawget(info,'spell_id'))) do
+        for i,v in pairs(rawget(res[rawget(info,'resource')],rawget(info,'spell_id'))) do
             rawset(copied_line,i,v)
         end
         setmetatable(copied_line,getmetatable(res[rawget(info,'resource')][rawget(info,'spell_id')]))
@@ -356,14 +356,6 @@ local cat_to_res_map = {['weaponskill_finish']='weapon_skills', ['spell_finish']
     ['casting_begin']='spells', ['item_begin']='items', ['mob_tp_finish']='monster_abilities',
     ['avatar_tp_finish']='job_abilities', ['job_ability_unblinkable']='job_abilities',
     ['job_ability_run']='job_abilities'}
--- This library uses rawget() to index the resources for performance reasons.
--- However, the resources library lazy-loads resources using its metatable.
--- Thus we need to index each of the required resources once to force an eager-load.
-for _,resource_name in pairs(cat_to_res_map) do
-    if not res[resource_name] then
-        print(resource_name.." not detected.")
-    end
-end
 local begin_categories = {['weaponskill_begin']=true, ['casting_begin']=true, ['item_begin']=true, ['ranged_begin']=true}
 local finish_categories = {['melee']=true,['ranged_finish']=true,['weaponskill_finish']=true, ['spell_finish']=true, ['item_finish']=true,
     ['job_ability']=true, ['mob_tp_finish']=true, ['avatar_tp_finish']=true, ['job_ability_unblinkable']=true,
