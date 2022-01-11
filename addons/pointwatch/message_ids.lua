@@ -187,20 +187,9 @@ local messages = {
 }
 
 local function update_offset(zone_id)
-    -- zone to dat ID mapping for Abyssean zones
-    local t = {
-        [15] = true,
-        [45] = true,
-        [132] = true,
-        [215] = true,
-        [216] = true,
-        [217] = true,
-        [218] = true,
-        [253] = true,
-        [254] = true,
-    }
-
-    if t[zone_id] then
+    local z_string = 'z' .. tostring(zone_id)
+    local m = messages[z_string]
+    if m and m.name then
         -- convert dialog entry to dialog ID
         local dialog = require('dialog')
         local search_phrase = string.char(
@@ -221,12 +210,17 @@ local function update_offset(zone_id)
             return
         end
 
-        messages['z'..tostring(zone_id)].offset = res[1]
-        t[zone_id] = nil
+        m.offset = res[1]
+        m.name = nil
     end
 end
 
-update_offset(windower.ffxi.get_info().zone)
+do
+    local info = windower.ffxi.get_info()
+    if info.logged_in then
+        update_offset(info.zone)
+    end
+end
 windower.register_event('zone change', update_offset)
 
 return messages
