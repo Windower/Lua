@@ -200,9 +200,9 @@ end
 
 function actionpacket:get_spell()
     local info = self:get_targets()():get_actions()():get_basic_info()
-    if rawget(info,'resource') and rawget(info,'spell_id') and rawget(rawget(res,rawget(info,'resource')),rawget(info,'spell_id')) then
+    if rawget(info,'resource') and rawget(info,'spell_id') and rawget(res[rawget(info,'resource')],rawget(info,'spell_id')) then
         local copied_line = {}
-        for i,v in pairs(rawget(rawget(res,rawget(info,'resource')),rawget(info,'spell_id'))) do
+        for i,v in pairs(rawget(res[rawget(info,'resource')],rawget(info,'spell_id'))) do
             rawset(copied_line,i,v)
         end
         setmetatable(copied_line,getmetatable(res[rawget(info,'resource')][rawget(info,'spell_id')]))

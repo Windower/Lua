@@ -38,11 +38,11 @@ windower.register_event('incoming chunk', function(id, original, modified, injec
     if injected or blocked or not offsets[id] then return end
 
     offset = offsets[id]
-    flags = original:byte(offsets[id])
+    flags = modified:byte(offsets[id])
 
     -- if any of the bits 0 through 7 are set, a bubble is shown and we want to block it.
     if bit.band(flags, 0x7F) ~= 0 then
-        packet = original:sub(1, offset - 1) .. string.char(bit.band(flags, 0x80)) .. original:sub(offset + 1) -- preserve bit 8 (Job Master stars)
+        packet = modified:sub(1, offset - 1) .. string.char(bit.band(flags, 0x80)) .. modified:sub(offset + 1) -- preserve bit 8 (Job Master stars)
         return packet
     end
 end)
