@@ -1,4 +1,4 @@
-Last Updated: 01/02/15
+Last Updated: 2022/01/13
 
 Description:
 Translate is an addon designed to automatically translate chat text and search comments from JP to EN. It creates a dictionary using the windower resources and custom-made dictionaries (../windower/addons/translate/dicts/), and replaces incoming chat lines with the matching translation in order of longest JP phrase to shortest.
@@ -10,4 +10,4 @@ This approach is not without its problems, and occasionally phrases will be tran
 
 Commands: //trans
 
-* show original - Displays the original text. Known to double-up autotranslated phrases sometimes in search comments. Reason unclear.
+* show - Toggles display of the original text. Known to double-up autotranslated phrases sometimes in search comments. Reason unclear.

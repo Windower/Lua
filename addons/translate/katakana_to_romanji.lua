@@ -47,7 +47,7 @@ katakana_to_romanji = {
     {en="wi",ja="ヰ"},
     {en="we",ja="ヱ"},
     {en="wo",ja="ヲ"},
-    
+
     {en="ga",ja="ガ"},
     {en="gi",ja="ギ"},
     {en="gu",ja="グ"},
@@ -73,9 +73,9 @@ katakana_to_romanji = {
     {en="pu",ja="プ"},
     {en="pe",ja="ペ"},
     {en="po",ja="ポ"},
-    
+
     {en="n",ja="ン"},
-    
+
     {en="kya",ja="キャ"},
     {en="kyu",ja="キュ"},
     {en="kyo",ja="キョ"},
@@ -97,7 +97,7 @@ katakana_to_romanji = {
     {en="rya",ja="リャ"},
     {en="ryu",ja="リュ"},
     {en="ryo",ja="リョ"},
-    
+
     {en="gya",ja="ギャ"},
     {en="gyu",ja="ギュ"},
     {en="gyo",ja="ギョ"},
