@@ -6,7 +6,7 @@ local dict = {
     {en="Normal",ja="普通"},
     {en="Difficult",ja="むず"},
     {en="Very Difficult",ja="とてもむず"},
-    
+
     {en="Menace",ja="メナス"},
     {en="Voidwatch",ja="ヴォッチ"},
     {en="Burrows",ja="バローズ"},
@@ -14,20 +14,19 @@ local dict = {
     {en="Ra'Kaznar Skirmish",ja="カザスカ"},
     {en="Ra'Kaznar Skirmish",ja="スカカザ"},
     {en="Ra'Kaznar Skirmish",ja="かざすか"},
-    
+
     {en="Leveling",ja="レベリング"},
     {en="Aby",ja="アビ"},
     {en="Altepa",ja="アルテパ"},
     {en="Misareaux",ja="セア ミザレオ"},
     {en="Doll",ja="ド-ル"},
-    
+
     {en="Recruiting",ja="募集"},
     {en="Check seacom for jobs",ja="サチコ参照ジョブを添えてテルください"},
     {en="Search Comment",ja="サチコ"},
     {en="Job doesn't matter",ja="ジョブ不問"},
     {en="currently",ja="現在"},
-    
-    
+
     {en="Hennetiel",ja="NTL"},
     {en="Morimar",ja="モリマ"},
     {en="Kamihr",ja="カミール"},
@@ -37,7 +36,7 @@ local dict = {
     {en="Foret",ja="水林"},
     {en="Ceizak",ja="ケイザ"},
     {en="Cirdas",ja="シルダス"},
-    
+
     {en="Trial by Fire",ja="火の試練"},
     {en="Trial by Lightning",ja="雷の試練"},
     {en="Trial by Earth",ja="土の試練"},
@@ -46,34 +45,34 @@ local dict = {
     {en="Trial by Wind",ja="風の試練"},
     {en="Leviathan",ja="リヴァイアサン"},
     {en="Levi",ja="リヴァ"},
-    
+
     {en="Tenzen",ja="てんぜん"},
     {en="Tenzen",ja="テンゼン"},
     {en="Warrior's Path",ja="武士道とは"},
-    
+
     {en="Return to Delkfutt's Tower",ja="デルクフの塔 再び"},
     {en="Return to Delkfutt's Tower",ja="テルクフの塔再び"},
     {en="Eald'narche",ja="エルド"},
     {en="Kam'lanaut",ja="カムラ"},
     {en="Stellar Fulcrum",ja="天輪"},
     {en="Celestial Nexus",ja="宿星"},
-    
+
     {en="BRD",ja="吟"},
     {en="GEO",ja="風"},
-    
+
     {en="Wanted (Battle)",ja="ウォンテッド"},
     {en="Dragonfly",ja="トンボ"},
     {en="Cost",ja="コスト"},
-    
+
     {en="Incursion",ja="インカ"},
     {en="Tryl",ja="トリル"},
-    
+
     {en="*waves*",ja="ノシ"},
     {en="Full Alliance",ja="フルアラ"},
-    
+
     {en="EIN",ja="エイン"},
     {en="Ampuole",ja="アンプル"},
-    
+
     -- These are from wiki.ffo.jp:
     {en="Hugemaw Harold",ja="ひゅーじまうへらるど"},
     {en="Bouncing Bertha",ja="ばうんしんぐばーさ"},
@@ -102,8 +101,7 @@ local dict = {
     {en="Douma Weapon",ja="どうまうぇぽん"},
     {en="King Ugoprygid",ja="きんぐうるぴじっど"},
     {en="Vedrfolnir",ja="う゛ぇどるふぉるにる"},
-    
-    
+
     {en="Ark Angel",ja="あーくえんじぇる"},
     {en="Hume",ja="ひゅーむ"},
     {en="Tarutaru",ja="たるたる"},
@@ -148,8 +146,7 @@ local dict = {
     {en="Diabolos",ja="でぃあぼろす"},
     {en="Cait Sith",ja="けっとしー"},
     {en="Atomos",ja="あともす"},
-    
-    
+
     {en="Vagary",ja="ベガリ"},
     {en="Vagary",ja="ベガリーインスペクター"},
     {en="Balamor",ja="バラモア"},
@@ -162,8 +159,11 @@ local dict = {
     {en="Hades",ja="ハデス"},
     {en="upper",ja="上位"},
     {en="lower",ja="下位"},
-    
+
     {en="Sinister Reign",ja="シニスターレイン"},
+
+    {en="Ambuscade",ja="アンバス"},
+    {en="segments",ja="セグポ"}
 }
 
 return dict

@@ -49,11 +49,15 @@ handled_resources = S{
     'items',
     'job_abilities',
     'job_traits',
+    'job_points',
     'jobs',
     'key_items',
+    'merit_points',
     'monster_abilities',
+    'monster_skills',
     'monstrosity',
     'moon_phases',
+    'mounts',
     'races',
     'regions',
     'skills',
@@ -308,17 +312,18 @@ windower.register_event('addon command', function(...)
     local commands = {...}
     if not commands[1] then return end
     if commands[1]:lower() == 'show' then
-        if commands[2] and commands[2]:lower() == 'original' then
-            show_original=not show_original
-            if show_original then
-                print('Translate: Showing the original text line.')
-            else
-                print('Translate: Hiding the original text line.')
-            end
+        show_original=not show_original
+        if show_original then
+            print('Translate: Showing the original text line.')
+        else
+            print('Translate: Hiding the original text line.')
         end
     elseif commands[1]:lower() == 'eval' and commands[2] then
         table.remove(commands,1)
         assert(loadstring(table.concat(commands, ' ')))()
+    elseif comamnds[1]:lower() == 'help' then
+        print('Translate:')
+        print('  show: toggles whether to show the original text (default: hide)')
     end
 end)
 

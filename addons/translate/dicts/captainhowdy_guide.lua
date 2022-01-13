@@ -23,7 +23,7 @@ local dict = {
     {en="They are already there",ja="もおむこおにいっています"},
     {en="Welcome back",ja="お帰りー"},
     {en="What job?",ja="すみません、私のジョブなんですか？"},
-    
+
     -- During an event section
     {en="pop",ja="わかす"},
     {en="Go ahead",ja="先にどうぞ"},
@@ -51,7 +51,7 @@ local dict = {
     {en="When is the ending?",ja="おわりますか"},
     {en="You can pop next",ja="つぎわかせていいよ"},
     --(You Find Nothing In The Riftworn Pyxis) || Tanakasan wa daikirai desuyo! || (ノ ゜Д゜)ノ三┸┸
-    
+
     -- Coming and Going
     {en="Bad",ja="だめ"},
     {en="Cheap",ja="やすい"},
@@ -92,7 +92,7 @@ local dict = {
     {en="What happened?",ja="何かあった"},
     {en="Yes, I'm coming",ja="はい行きます"},
     {en="Yes, that's right",ja="はいそうです"},
-    
+
     {en="Brb, I'm going to the store",ja="りせき、コンビニで行きます"},
     {en="Dont be late",ja="ちこくしないで"},
     {en="Don't lie",ja="うそつかないで"},
@@ -239,8 +239,7 @@ local dict = {
     {en="Wyvern",ja="飛竜"},
     {en="Pet",ja="ペット"},
     {en="Pet",ja="よぶだす"},
-    
-    
+
     -- Useful words
     {en="Synergy",ja="相乗効果"},
     {en="Carbuncle",ja="カーバンクル"},
@@ -255,8 +254,7 @@ local dict = {
     {en="Odin",ja="オーディン"},
     {en="Alexander",ja="アレキサンダー"},
     {en="Cait Sith",ja="ケット・シー"},
-    
-    
+
     {en="Weakness",ja="弱点"},
     {en="Trigger",ja="狙って"},
     {en="Blue",ja="青"},
@@ -314,8 +312,7 @@ local dict = {
     {en="Plasm farming",ja="メナポ"},
     {en="Falling asleep",ja="寝落ち"},
     {en="losing claim",ja="横取り"},
-    
-    
+
     -- 10/4/14 update
     {en="Dismemberment Brigade",ja="八つ裂き旅団"},
     {en="The Worm's Turn",ja="地竜大王"},
