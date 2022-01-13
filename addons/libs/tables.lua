@@ -563,8 +563,8 @@ function table.concat(t, delim, from, to)
 end
 
 -- Concatenates all elements with a whitespace in between.
-function table.sconcat(t)
-    return table.concat(t, ' ')
+function table.sconcat(t, ...)
+    return table.concat(t, ' ', ...)
 end
 
 -- Check if table is empty.
@@ -583,7 +583,7 @@ function table.empty(t, rec)
             end
         end
     end
-    
+
     return true
 end
 
