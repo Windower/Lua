@@ -351,6 +351,7 @@ enums['action'] = {
     [0x0E] = 'Cast Fishing Rod',
     [0x0F] = 'Switch target',
     [0x10] = 'Ranged attack',
+    [0x11] = 'Chocobo dig',
     [0x12] = 'Dismount Chocobo',
     [0x13] = 'Tractor Dialogue',
     [0x14] = 'Zoning/Appear', -- I think, the resource for this is ambiguous.
