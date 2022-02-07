@@ -208,7 +208,7 @@ windower.register_event('action', function(act)
     local player = T(windower.ffxi.get_player())
     
     if not settings.staggeronly then
-        if settings.showrolls and curact.category == 6 and res.job_abilities[extparam].type == 'CorsairRoll' then
+        if settings.showrolls and curact.category == 6 and res.job_abilities[extparam] and res.job_abilities[extparam].type == 'CorsairRoll' then
             local allyroller = false
             local selfroll = false
             for pt,member in pairs(party) do
