@@ -1579,7 +1579,7 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned short',    label='_dupeWardrobe 7 Size'},                  -- 42   This is not set to 0 despite being disabled for whatever reason
     {ctype='unsigned short',    label='_dupeWardrobe 8 Size'},                  -- 44   This is not set to 0 despite being disabled for whatever reason
     {ctype='unsigned short',    label='_dupeRecycle Bin Size'},                 -- 46
-    {ctype='data[12]',          label='_padding2',          const=''},          -- 3E
+    {ctype='data[28]',          label='_padding2',          const=''},          -- 48
 }
 
 -- Finish Inventory
