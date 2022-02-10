@@ -1582,8 +1582,9 @@ fields.incoming[0x01C] = L{
 
 -- Finish Inventory
 fields.incoming[0x01D] = L{
-    {ctype='unsigned char',     label='Flag',               const=0x01},        -- 04
-    {ctype='data[3]',           label='_junk1'},                                -- 06
+    {ctype='unsigned char',     label='Flag'},                                  -- 04   0 for bag finished updates, 1 for finished loading inventories
+    {ctype='unsigned char',     label='Bag'},                                   -- 05   18 (0x12) when flag is 1, and 18 is not a valid bag id (last bag + 1)
+    {ctype='data[6]',           label='_junk1'},                                -- 06
 }
 
 -- Modify Inventory
