@@ -57,9 +57,13 @@ _static = {
         wardrobe2=10,
         wardrobe3=11,
         wardrobe4=12,
+        wardrobe5=13,
+        wardrobe6=14,
+        wardrobe7=15,
+        wardrobe8=16,
     },
-    wardrobe_ids = {[8]=true,[10]=true,[11]=true,[12]=true},
-    usable_bags = {1,9,4,2,5,6,7,8,10,11,12}
+    wardrobe_ids = {[8]=true,[10]=true,[11]=true,[12]=true,[13]=true,[14]=true,[15]=true,[16]=true},
+    usable_bags = {1,9,4,2,5,6,7,8,10,11,12,13,14,15,16}
 }
 
 _global = {
@@ -74,7 +78,7 @@ _valid_dump = {}
 
 default_settings = {
     dump_bags = {['Safe']=1,['Safe2']=2,['Locker']=3,['Storage']=4},
-    bag_priority = {['Safe']=1,['Safe2']=2,['Locker']=3,['Storage']=4,['Satchel']=5,['Sack']=6,['Case']=7,['Inventory']=8,['Wardrobe']=9,['Wardrobe2']=10,['Wardrobe3']=11,['Wardrobe4']=12,},
+    bag_priority = {['Safe']=1,['Safe2']=2,['Locker']=3,['Storage']=4,['Satchel']=5,['Sack']=6,['Case']=7,['Inventory']=8,['Wardrobe']=9,['Wardrobe2']=10,['Wardrobe3']=11,['Wardrobe4']=12,['Wardrobe5']=13,['Wardrobe6']=14,['Wardrobe7']=15,['Wardrobe8']=16},
     item_delay = 0,
     ignore = {},
     retain = {
