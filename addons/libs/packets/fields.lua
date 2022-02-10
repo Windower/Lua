@@ -1559,7 +1559,8 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned char',     label='Wardrobe 6 Size'},                       -- 12
     {ctype='unsigned char',     label='Wardrobe 7 Size'},                       -- 13
     {ctype='unsigned char',     label='Wardrobe 8 Size'},                       -- 14
-    {ctype='data[15]',          label='_padding1',          const=''},          -- 15
+    {ctype='unsigned char',     label='Recycle Bin Size'},                      -- 15
+    {ctype='data[14]',          label='_padding1',          const=''},          -- 16
     {ctype='unsigned short',    label='_dupeInventory Size'},                   -- 24   These "dupe" sizes are set to 0 if the inventory disabled.
     {ctype='unsigned short',    label='_dupeSafe Size'},                        -- 26
     {ctype='unsigned short',    label='_dupeStorage Size'},                     -- 28   The accumulated storage from all items (uncapped) -1
@@ -1573,11 +1574,12 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned short',    label='_dupeWardrobe 2 Size'},                  -- 38
     {ctype='unsigned short',    label='_dupeWardrobe 3 Size'},                  -- 3A   This is not set to 0 despite being disabled for whatever reason
     {ctype='unsigned short',    label='_dupeWardrobe 4 Size'},                  -- 3C   This is not set to 0 despite being disabled for whatever reason
-    {ctype='unsigned short',    label='_dupeWardrobe 5 Size'},                  -- 3C   This is not set to 0 despite being disabled for whatever reason
-    {ctype='unsigned short',    label='_dupeWardrobe 6 Size'},                  -- 3C   This is not set to 0 despite being disabled for whatever reason
-    {ctype='unsigned short',    label='_dupeWardrobe 7 Size'},                  -- 3C   This is not set to 0 despite being disabled for whatever reason
-    {ctype='unsigned short',    label='_dupeWardrobe 8 Size'},                  -- 3C   This is not set to 0 despite being disabled for whatever reason
-    {ctype='data[30]',          label='_padding2',          const=''},          -- 3E
+    {ctype='unsigned short',    label='_dupeWardrobe 5 Size'},                  -- 3E   This is not set to 0 despite being disabled for whatever reason
+    {ctype='unsigned short',    label='_dupeWardrobe 6 Size'},                  -- 40   This is not set to 0 despite being disabled for whatever reason
+    {ctype='unsigned short',    label='_dupeWardrobe 7 Size'},                  -- 42   This is not set to 0 despite being disabled for whatever reason
+    {ctype='unsigned short',    label='_dupeWardrobe 8 Size'},                  -- 44   This is not set to 0 despite being disabled for whatever reason
+    {ctype='unsigned short',    label='_dupeRecycle Bin Size'},                 -- 46
+    {ctype='data[12]',          label='_padding2',          const=''},          -- 3E
 }
 
 -- Finish Inventory
