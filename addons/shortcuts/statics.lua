@@ -123,8 +123,6 @@ command2_list = {
     ['kneel']=emote_table,
     ['laugh']=emote_table,
     ['muted']=emote_table,
-    ['kneel']=emote_table,
-    ['laugh']=emote_table,
     ['no']=emote_table,
     ['nod']=emote_table,
     ['yes']=emote_table,
@@ -165,7 +163,7 @@ command2_list = {
 unhandled_list = {['p']=true,['s']=true,['sh']=true,['yell']=true,['echo']=true,['t']=true,['l']=true,['breaklinkshell']=true}
 
 -- List of commands to be ignored
-ignore_list = {['equip']=true,['raw']=true,['fish']=true,['dig']=true,['range']=true,['map']=true,['hide']=true,['jump']=true,['attackoff']=true,['quest']=true,['recruitlist']=true,['rlist']=true,['statustimer']=true}
+ignore_list = {['equip']=true,['raw']=true,['fish']=true,['dig']=true,['range']=true,['map']=true,['hide']=true,['jump']=true,['attackoff']=true,['quest']=true,['recruitlist']=true,['rlist']=true,['statustimer']=true,['recycle']=true}
 
 -- Targets to ignore and just pass through
 pass_through_targs = T{'<t>','<me>','<ft>','<scan>','<bt>','<lastst>','<r>','<pet>','<p0>','<p1>','<p2>','<p3>','<p4>',

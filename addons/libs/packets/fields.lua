@@ -351,6 +351,7 @@ enums['action'] = {
     [0x0E] = 'Cast Fishing Rod',
     [0x0F] = 'Switch target',
     [0x10] = 'Ranged attack',
+    [0x11] = 'Chocobo dig',
     [0x12] = 'Dismount Chocobo',
     [0x13] = 'Tractor Dialogue',
     [0x14] = 'Zoning/Appear', -- I think, the resource for this is ambiguous.
@@ -1554,7 +1555,12 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned char',     label='Wardrobe 2 Size'},                       -- 0E
     {ctype='unsigned char',     label='Wardrobe 3 Size'},                       -- 0F
     {ctype='unsigned char',     label='Wardrobe 4 Size'},                       -- 10
-    {ctype='data[19]',          label='_padding1',          const=''},          -- 11
+    {ctype='unsigned char',     label='Wardrobe 5 Size'},                       -- 11
+    {ctype='unsigned char',     label='Wardrobe 6 Size'},                       -- 12
+    {ctype='unsigned char',     label='Wardrobe 7 Size'},                       -- 13
+    {ctype='unsigned char',     label='Wardrobe 8 Size'},                       -- 14
+    {ctype='unsigned char',     label='Recycle Bin Size'},                      -- 15
+    {ctype='data[14]',          label='_padding1',          const=''},          -- 16
     {ctype='unsigned short',    label='_dupeInventory Size'},                   -- 24   These "dupe" sizes are set to 0 if the inventory disabled.
     {ctype='unsigned short',    label='_dupeSafe Size'},                        -- 26
     {ctype='unsigned short',    label='_dupeStorage Size'},                     -- 28   The accumulated storage from all items (uncapped) -1
@@ -1568,13 +1574,19 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned short',    label='_dupeWardrobe 2 Size'},                  -- 38
     {ctype='unsigned short',    label='_dupeWardrobe 3 Size'},                  -- 3A   This is not set to 0 despite being disabled for whatever reason
     {ctype='unsigned short',    label='_dupeWardrobe 4 Size'},                  -- 3C   This is not set to 0 despite being disabled for whatever reason
-    {ctype='data[22]',          label='_padding2',          const=''},          -- 3E
+    {ctype='unsigned short',    label='_dupeWardrobe 5 Size'},                  -- 3E   This is not set to 0 despite being disabled for whatever reason
+    {ctype='unsigned short',    label='_dupeWardrobe 6 Size'},                  -- 40   This is not set to 0 despite being disabled for whatever reason
+    {ctype='unsigned short',    label='_dupeWardrobe 7 Size'},                  -- 42   This is not set to 0 despite being disabled for whatever reason
+    {ctype='unsigned short',    label='_dupeWardrobe 8 Size'},                  -- 44   This is not set to 0 despite being disabled for whatever reason
+    {ctype='unsigned short',    label='_dupeRecycle Bin Size'},                 -- 46
+    {ctype='data[28]',          label='_padding2',          const=''},          -- 48
 }
 
 -- Finish Inventory
 fields.incoming[0x01D] = L{
-    {ctype='unsigned char',     label='Flag',               const=0x01},        -- 04
-    {ctype='data[3]',           label='_junk1'},                                -- 06
+    {ctype='unsigned char',     label='Flag'},                                  -- 04   0 for bag finished updates, 1 for finished loading inventories
+    {ctype='unsigned char',     label='Bag'},                                   -- 05   18 (0x12) when flag is 1, and 18 is not a valid bag id (last bag + 1)
+    {ctype='data[6]',           label='_junk1'},                                -- 06
 }
 
 -- Modify Inventory
@@ -2163,7 +2175,12 @@ fields.incoming[0x037] = L{
     {ctype='unsigned char',     label='Mount'},                                 -- 5B   Related to Mounts, seems to be mount id + 1, except for chocobo. The value doesn't get zeroed after dismount
     {ctype='boolbit',           label='Wardrobe 3'},                            -- 5C
     {ctype='boolbit',           label='Wardrobe 4'},                            -- 5C
-    {ctype='bit[6]',            label='_flags8'},                               -- 5C
+    {ctype='bit',               label='_unknown6'},                             -- 5C
+    {ctype='boolbit',           label='Wardrobe 5'},                            -- 5C
+    {ctype='boolbit',           label='Wardrobe 6'},                            -- 5C
+    {ctype='boolbit',           label='Wardrobe 7'},                            -- 5C
+    {ctype='boolbit',           label='Wardrobe 8'},                            -- 5C
+    {ctype='bit',               label='_flags8'},                               -- 5C
     {ctype='data[3]',           label='_junk1'},                                -- 5D
 }
 
