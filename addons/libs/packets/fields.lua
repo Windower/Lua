@@ -164,7 +164,7 @@ local function emote(val)
 end
 
 local function bag(val)
-    return res.bags[val].name
+    return res.bags[val] and res.bags[val].name or 'Unknown'
 end
 
 local function race(val)
@@ -1582,11 +1582,16 @@ fields.incoming[0x01C] = L{
     {ctype='data[28]',          label='_padding2',          const=''},          -- 48
 }
 
+types.bagbits= L{
+    {ctype='boolbit', label='Finished'}
+}
 -- Finish Inventory
 fields.incoming[0x01D] = L{
-    {ctype='unsigned char',     label='Flag'},                                  -- 04   0 for bag finished updates, 1 for finished loading inventories
-    {ctype='unsigned char',     label='Bag'},                                   -- 05   18 (0x12) when flag is 1, and 18 is not a valid bag id (last bag + 1)
-    {ctype='data[6]',           label='_junk1'},                                -- 06
+    {ctype='unsigned char',     label='Flag'},                                  -- 04   0 for bag finished updates, 1 for finished loading all bags
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 05   18 (0x12) when Flag is 1, and 18 is not a valid bag id (currently last bag + 1)
+    {ctype='data[2]',           label='_junk1'},                                -- 06
+    {ref=types.bagbits, lookup={res.bags, 0x00}, count=0x12},                   -- 08   due to the way packets are sent, false does not necsarilly mean its not Finished, true simple means that it is Finished.
+    {ctype='data[1]',           label='_junk2'},                                -- 0B
 }
 
 -- Modify Inventory
