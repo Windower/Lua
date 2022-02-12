@@ -3208,14 +3208,48 @@ fields.incoming[0x070] = L{
 }
 
 -- Unity Start
--- Only observed being used for Unity fights.
-fields.incoming[0x075] = L{
+-- Only observed being used for Unity fights. Also observed on DynaD, Odyssey for mask//weapon/neck/izzat progression bars, Escutcheons progression and mandragora minigame.
+func.incoming[0x075] = {}
+fields.incoming[0x075] = function()
+    local fields = func.incoming[0x075]
+
+    return function(data, type)
+        return fields.base + (fields[type] or (data:byte(0x025) > 1 and fields.bars) or fields.default)
+    end
+end()
+
+enums[0x075] = {
+    [0] = 'No Timer',
+    [1] = 'Timer',
+    [2] = 'Bars',
+    [3] = 'Timer and Bars',
+}
+
+types.bars = L{
+    {ctype='unsigned char',     label='Bar Progress'},                          -- 28   0xFF if inactive
+    {ctype='data[3]',           label='_unknown4'},                             -- 29   Observed 0x000000 if active, 0xFFFFF7 if inactive
+    {ctype='char[16]',          label='Bar String'},                            -- 2C   Bar 1 for mask/izzat | Bar 2 Main slot | Bar 3 Sub slot | Bar 4 Ranged slot | Bar 5 Neck slot
+}
+
+func.incoming[0x075].base = L{
     {ctype='unsigned int',      label='Fight Designation'},                     -- 04   Anything other than 0 makes a timer. 0 deletes the timer.
     {ctype='unsigned int',      label='Timestamp Offset',   fn=time},           -- 08   Number of seconds since 15:00:00 GMT 31/12/2002 (0x3C307D70)
     {ctype='unsigned int',      label='Fight Duration',     fn=time},           -- 0C
     {ctype='data[12]',          label='_unknown1'},                             -- 10   This packet clearly needs position information, but it's unclear how these bytes carry it
     {ctype='unsigned int',      label='Battlefield Radius'},                    -- 1C   Yalms*1000, so a 50 yalm battlefield would have 50,000 for this field
     {ctype='unsigned int',      label='Render Radius'},                         -- 20   Yalms*1000, so a fence that renders when you're 25 yalms away would have 25,000 for this field
+    {ctype='unsigned char',     label='Type',               fn=e+{0x075}},      -- 24   most likely a bitflag where first bit activates the timer and bit 2 activates the bars
+}
+
+func.incoming[0x075].default = L{
+    {ctype='data[135]',          label='_junk1'},                               -- 28   Seems to be junk
+}
+
+func.incoming[0x075].bars = L{
+    {ctype='unsigned char',     label='_unknown2'},                             -- 25
+    {ctype='unsigned short',    label='_unknown3'},                             -- 26   Value changes constatly
+    {ref=types.bars,            count=5},                                       -- 28
+    {ctype='data[32]',          label='_unknown5'},                             -- 8C
 }
 
 -- Party status icon update
