@@ -69,7 +69,6 @@ end)
 
 windower.register_event('outgoing text',function(org,mod,bool)
     if bool or linkshell_inventories_loaded then return end
-    windower.add_to_chat(8,'using instaLS')
     if mod:sub(1,3) == '/l ' then
         chatmode[#chatmode+1] = 0x05
         chatcolor[#chatcolor+1] = 6
