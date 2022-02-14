@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -- addon information
 
 _addon.name = 'boxdestroyer'
-_addon.version = '1.0.5'
+_addon.version = '1.0.6'
 _addon.command = 'boxdestroyer'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
@@ -48,6 +48,7 @@ config = require('config')
 defaults = {
     HighlightResult = false,
     HighlightColor = 36,
+    DisplayRemainingCombinations = false,
 }
 settings = config.load(defaults)
 -- global constants
@@ -265,39 +266,37 @@ end
 -- display helper function
 
 function display(id, chances)
-    if #box[id] == 90 then
-        windower.add_to_chat(207, 'Possible combinations: 10~99')
-    else
-        windower.add_to_chat(207, 'Possible combinations: ' .. table.concat(box[id], ' '))
+    if settings.DisplayRemainingCombinations then
+        if #box[id] == 90 then
+            windower.add_to_chat(207, 'Possible combinations: 10~99')
+        else
+            windower.add_to_chat(207, 'Possible combinations: ' .. table.concat(box[id], ' '))
+        end
     end
-    local remaining = math.floor(#box[id] / math.pow(2, (chances - 1)))
+    local probability = math.min(100, math.floor(100 * (math.pow(2, chances) - 1) / #box[id] ))
+    local remaining = math.floor(#box[id] / math.pow(2, chances - 1))
     if remaining == 0 then
         remaining = 1
     end
+
+    local guess_number = box[id][math.ceil(#box[id] / 2)]
     
     if chances == 1 and observed[id].equal then
-        -- The "equal" message (== "X") for X in 1..9 gives an unequal probability to the remaining options 
+        -- The "equal" message (== "X") for X in 1..9 gives an unequal probability to the remaining options
         -- because "XX" is twice as likely to be indicated by the "equal" message.
         -- This is too annoying to propagate to the rest of the addon, although it should be some day.
-        local printed = false
         for _,v in pairs(box[id]) do
             if math.floor(v/10) == v%10 then
-                windower.add_to_chat(207, 'Best guess: %d (%d%%)':format(v, 1 / remaining * 100))
-                printed = true
+                guess_number = v
                 break
             end
         end
-        if not printed then
-            windower.add_to_chat(207, 'Best guess: %d (%d%%)':format(box[id][math.ceil(#box[id] / 2)], 1 / remaining * 100))
-        end
-    else
-        windower.add_to_chat(207, 'best guess: %d (%d%%)':format(box[id][math.ceil(#box[id] / 2)], 1 / remaining * 100))
-        local clue_value,guess_value = calculate_odds(id,chances)
-        local result = clue_value > guess_value and remaining ~= 1 and 'examining the chest' or 'guessing ' .. '%d':format(box[id][math.ceil(#box[id] / 2)])
-        local formatted_result = settings.HighlightResult and result:color(settings.HighlightColor) or result
-        windower.add_to_chat(207, 'boxdestroyer recommends ' .. formatted_result .. '.')
     end
-    
+    local clue_value,guess_value = calculate_odds(id,chances)
+    local result = clue_value > guess_value and remaining ~= 1 and 'examining the lock' or 'guessing %d (%d%%)':format(guess_number, probability)
+    local formatted_result = settings.HighlightResult and result:color(settings.HighlightColor) or result
+    windower.add_to_chat(207, 'boxdestroyer recommends ' .. formatted_result)
+
 end
 
 -- ID obtaining helper function
