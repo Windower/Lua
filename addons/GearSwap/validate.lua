@@ -37,57 +37,57 @@ function validate(options)
     local validateType = 'sets'
     if options and #options > 0 then
         if S{'sets','set','s'}:contains(options[1]:lower()) then
-			validateType = 'sets'
+	    validateType = 'sets'
             table.remove(options,1)
         elseif S{'inventory','inv','i'}:contains(options[1]:lower()) then
             validateType = 'inventory'
             table.remove(options,1)
-		elseif S{'mogsafe','safe','ms','bank'}:contains(options[1]:lower()) then
-            validateType = 'safe'
-			table.remove(options,1)
-		elseif S{'mogsafe2','safe2','ms2','bank2'}:contains(options[1]:lower()) then
-			validateType = 'safe2'
-			table.remove(options,1)
-		elseif S{'storage','st'}:contains(options[1]:lower()) then
+	elseif S{'mogsafe','safe','ms','bank'}:contains(options[1]:lower()) then
+             validateType = 'safe'
+	    table.remove(options,1)
+	elseif S{'mogsafe2','safe2','ms2','bank2'}:contains(options[1]:lower()) then
+	    validateType = 'safe2'
+	    table.remove(options,1)
+	elseif S{'storage','st'}:contains(options[1]:lower()) then
             validateType = 'storage'
-			table.remove(options,1)
-		elseif S{'moglocker','locker','ml'}:contains(options[1]:lower()) then
-			validateType = 'locker'
-			table.remove(options,1)
-		elseif S{'mogsatchel','satchel','sa'}:contains(options[1]:lower()) then
+	    table.remove(options,1)
+	elseif S{'moglocker','locker','ml'}:contains(options[1]:lower()) then
+	    validateType = 'locker'
+	    table.remove(options,1)
+	elseif S{'mogsatchel','satchel','sa'}:contains(options[1]:lower()) then
             validateType = 'satchel'
-			table.remove(options,1)
-		elseif S{'mogsack','sack','sk'}:contains(options[1]:lower()) then
+	    table.remove(options,1)
+	elseif S{'mogsack','sack','sk'}:contains(options[1]:lower()) then
             validateType = 'sack'
-			table.remove(options,1)
-		elseif S{'mogcase','case','c'}:contains(options[1]:lower()) then
+            table.remove(options,1)
+	elseif S{'mogcase','case','c'}:contains(options[1]:lower()) then
             validateType = 'case'
-			table.remove(options,1)
-		elseif S{'wardrobe','w'}:contains(options[1]:lower()) then
+	    table.remove(options,1)
+	elseif S{'wardrobe','w'}:contains(options[1]:lower()) then
             validateType = 'wardrobe'
             table.remove(options,1)
-		elseif S{'wardrobe2','w2'}:contains(options[1]:lower()) then
+	elseif S{'wardrobe2','w2'}:contains(options[1]:lower()) then
             validateType = 'wardrobe2'
             table.remove(options,1)
-		elseif S{'wardrobe3','w3'}:contains(options[1]:lower()) then
+	elseif S{'wardrobe3','w3'}:contains(options[1]:lower()) then
             validateType = 'wardrobe3'
             table.remove(options,1)
-		elseif S{'wardrobe4','w4'}:contains(options[1]:lower()) then
+	elseif S{'wardrobe4','w4'}:contains(options[1]:lower()) then
             validateType = 'wardrobe4'
             table.remove(options,1)
-				elseif S{'wardrobe5','w5'}:contains(options[1]:lower()) then
+	elseif S{'wardrobe5','w5'}:contains(options[1]:lower()) then
             validateType = 'wardrobe5'
             table.remove(options,1)
-		elseif S{'wardrobe6','w6'}:contains(options[1]:lower()) then
+	elseif S{'wardrobe6','w6'}:contains(options[1]:lower()) then
             validateType = 'wardrobe6'
             table.remove(options,1)
-		elseif S{'wardrobe7','w7'}:contains(options[1]:lower()) then
+	elseif S{'wardrobe7','w7'}:contains(options[1]:lower()) then
             validateType = 'wardrobe7'
             table.remove(options,1)
-		elseif S{'wardrobe8','w8'}:contains(options[1]:lower()) then
+	elseif S{'wardrobe8','w8'}:contains(options[1]:lower()) then
             validateType = 'wardrobe8'
             table.remove(options,1)
-		end
+	end
     end
 	
     if validateType == 'sets' then
