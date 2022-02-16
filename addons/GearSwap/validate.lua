@@ -30,7 +30,7 @@
 
 local validate_keys = {
     sets = 'sets', set = 'sets', s = 'sets',
-    inventory = 'inventory', inv = 'inventory', i = 'inventory'
+    inventory = 'inventory', inv = 'inventory', i = 'inventory',
     mogsafe = 'safe', safe = 'safe', ms = 'safe', bank = 'safe',
     mogsafe2 = 'safe2', safe2 = 'safe2', ms2 = 'safe2', bank2 = 'safe2',
     storage = 'storage', st = 'storage',
