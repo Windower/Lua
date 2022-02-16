@@ -37,17 +37,63 @@ function validate(options)
     local validateType = 'sets'
     if options and #options > 0 then
         if S{'sets','set','s'}:contains(options[1]:lower()) then
+			validateType = 'sets'
             table.remove(options,1)
         elseif S{'inventory','inv','i'}:contains(options[1]:lower()) then
-            validateType = 'inv'
+            validateType = 'inventory'
             table.remove(options,1)
-        end
+		elseif S{'mogsafe','safe','ms','bank'}:contains(options[1]:lower()) then
+            validateType = 'safe'
+			table.remove(options,1)
+		elseif S{'mogsafe2','safe2','ms2','bank2'}:contains(options[1]:lower()) then
+			validateType = 'safe2'
+			table.remove(options,1)
+		elseif S{'storage','st'}:contains(options[1]:lower()) then
+            validateType = 'storage'
+			table.remove(options,1)
+		elseif S{'moglocker','locker','ml'}:contains(options[1]:lower()) then
+			validateType = 'locker'
+			table.remove(options,1)
+		elseif S{'mogsatchel','satchel','sa'}:contains(options[1]:lower()) then
+            validateType = 'satchel'
+			table.remove(options,1)
+		elseif S{'mogsack','sack','sk'}:contains(options[1]:lower()) then
+            validateType = 'sack'
+			table.remove(options,1)
+		elseif S{'mogcase','case','c'}:contains(options[1]:lower()) then
+            validateType = 'case'
+			table.remove(options,1)
+		elseif S{'wardrobe','w'}:contains(options[1]:lower()) then
+            validateType = 'wardrobe'
+            table.remove(options,1)
+		elseif S{'wardrobe2','w2'}:contains(options[1]:lower()) then
+            validateType = 'wardrobe2'
+            table.remove(options,1)
+		elseif S{'wardrobe3','w3'}:contains(options[1]:lower()) then
+            validateType = 'wardrobe3'
+            table.remove(options,1)
+		elseif S{'wardrobe4','w4'}:contains(options[1]:lower()) then
+            validateType = 'wardrobe4'
+            table.remove(options,1)
+				elseif S{'wardrobe5','w5'}:contains(options[1]:lower()) then
+            validateType = 'wardrobe5'
+            table.remove(options,1)
+		elseif S{'wardrobe6','w6'}:contains(options[1]:lower()) then
+            validateType = 'wardrobe6'
+            table.remove(options,1)
+		elseif S{'wardrobe7','w7'}:contains(options[1]:lower()) then
+            validateType = 'wardrobe7'
+            table.remove(options,1)
+		elseif S{'wardrobe8','w8'}:contains(options[1]:lower()) then
+            validateType = 'wardrobe8'
+            table.remove(options,1)
+		end
     end
-    
-    if validateType == 'inv' then
-        validate_inventory(options)
-    else
+	
+    if validateType == 'sets' then
         validate_sets(options)
+    else
+        validate_inventory(options, validateType)
     end
 end
 
@@ -55,11 +101,13 @@ end
 -- Functions to handle the primary logic separation.
 -------------------------------------------------------------------------------------------------------------------
 
--- Function for determining and displaying which items from a player's inventory are not in their gear sets.
-function validate_inventory(filter)
-    msg.addon_msg(123,'Checking for items in inventory that are not used in your gear sets.')
-    
-    local extra_items = search_sets_for_items_in_bag(items.inventory, filter)
+-- Function for determining and displaying which items from a player's selected repository are not in their gear sets.
+function validate_inventory(filter, repository)
+    msg.addon_msg(123,'Checking for items in '..repository..' that are not used in your gear sets.')
+	
+	--msg.addon_msg(123,items.repository)
+	
+    local extra_items = search_sets_for_items_in_bag(items[repository], filter)
     
     local display_list = get_item_names(extra_items):sort(insensitive_sort)
     display_list:map(function(item) msg.add_to_chat(120, windower.to_shift_jis((string.gsub(item, "^%l", string.upper))) ) end)
@@ -99,9 +147,8 @@ function get_item_name(item)
         elseif item.name then
             name = item.name
         end
-        
-        
-        local aug = item.aug and table.concat(item.aug,', ') or get_augment_string(item)
+
+        local aug = get_augment_string(item)
         if aug then
             name = name .. ' {' .. aug .. '}'
         end
@@ -188,9 +235,8 @@ function search_bags_for_items_in_set(gear_table, filter, missing_items, stack)
         if type(name) == 'string' and name ~= 'empty' and name ~= '' and type(i) == 'string' then
             if not slot_map[i] then
                 msg.addon_msg(123,windower.to_shift_jis(tostring(i))..' contains a "name" element but is not a valid slot.')
-            elseif tryfilter(lowercase_name(name), filter) and not find_in_equippable_inventories(name, aug) then
-                -- This is one spot where inventory names will be left hardcoded until an equippable bool is added to the resources
-                missing_items:add({name=lowercase_name(name),aug=aug})
+            elseif tryfilter(lowercase_name(name), filter) and not find_in_inv(items.inventory, name, aug) and not find_in_inv(items.wardrobe, name, aug) and not find_in_inv(items.wardrobe2, name, aug) then
+                missing_items:add(lowercase_name(name))
             end
         elseif type(name) == 'table' and name ~= empty  then
             if not stack then stack = S{} end
@@ -202,15 +248,6 @@ function search_bags_for_items_in_set(gear_table, filter, missing_items, stack)
     end
     
     return missing_items
-end
-
--- Utility function to search equippable inventories
-function find_in_equippable_inventories(name,aug)
-    for _,bag in pairs(equippable_item_bags) do
-        if find_in_inv(items[to_windower_bag_api(bag.en)], name, aug) then
-            return true
-        end
-    end
 end
 
 -- Utility function to help search sets
