@@ -334,7 +334,7 @@ function parse_action_packet(act)
                     end
             end
             if m.has_add_effect and m.add_effect_message ~= 0 and add_effect_valid[act.category] then
-                local targ = assemble_targets(act.actor,v.target,act.category,m.add_effect_message)
+                local targ = assemble_targets(act.actor,v.target,act.category,m.add_effect_message,m.has_add_effect)
                 local col = res.action_messages[m.add_effect_message].color
                 local color = color_filt(col,v.target[1].id==Self.id)
                 if m.add_effect_message > 287 and m.add_effect_message < 303 then m.simp_add_name = skillchain_arr[m.add_effect_message-287]
@@ -385,7 +385,7 @@ function parse_action_packet(act)
                 end
             end
             if m.has_spike_effect and m.spike_effect_message ~= 0 and spike_effect_valid[act.category] then
-                local targ = assemble_targets(act.actor,v.target,act.category,m.spike_effect_message)
+                local targ = assemble_targets(act.actor,v.target,act.category,m.spike_effect_message, m.has_spike_effect)
                 local col = res.action_messages[m.spike_effect_message].color
                 local color = color_filt(col,act.actor.id==Self.id)
                 
@@ -559,7 +559,7 @@ function simplify_message(msg_ID)
     return msg
 end
 
-function assemble_targets(actor,targs,category,msg)
+function assemble_targets(actor,targs,category,msg,add_effect)
     local targets = {}
     local samename = {}
     local total = 0
@@ -575,6 +575,7 @@ function assemble_targets(actor,targs,category,msg)
             end
             total = total + 1
         end
+        if add_effect then break end
     end
     local out_str
     if targetnumber and total > 1 then
