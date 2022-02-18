@@ -34,9 +34,9 @@ action_type_map = {['/ja']='Ability',['/jobability']='Ability',['/so']='Magic',[
     ['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/ms']='Ability',['/monsterskill']='Ability',
     ['/ws']='Ability',['/weaponskill']='Ability',['/item']='Item',['/pet']='Ability',['/bstpet']='Ability',['Monster']='Monster Move'}
 
-equippable_item_bags = res.bags:equippable(true)
+equippable_item_bags = {res.bags:equippable(true):extract()}
 
-usable_item_bags = equippable_item_bags:amend(res.bags:command('temporary'))
+usable_item_bags = {res.bags:with('command','temporary'), table.extract(equippable_item_bags)}
     
 bag_string_lookup = {}
 for i,v in pairs(res.bags) do
