@@ -208,8 +208,8 @@ function search_bags_for_items_in_set(gear_table, filter, missing_items, stack)
         if type(name) == 'string' and name ~= 'empty' and name ~= '' and type(i) == 'string' then
             if not slot_map[i] then
                 msg.addon_msg(123,windower.to_shift_jis(tostring(i))..' contains a "name" element but is not a valid slot.')
-            elseif tryfilter(lowercase_name(name), filter) and not find_in_inv(items.inventory, name, aug) and not find_in_inv(items.wardrobe, name, aug) and not find_in_inv(items.wardrobe2, name, aug) then
-                missing_items:add(lowercase_name(name))
+            elseif tryfilter(lowercase_name(name), filter) and not find_in_equippable_inventories(name, aug) then
+                missing_items:add({name=lowercase_name(name),aug=aug})
             end
         elseif type(name) == 'table' and name ~= empty  then
             if not stack then stack = S{} end
@@ -221,6 +221,15 @@ function search_bags_for_items_in_set(gear_table, filter, missing_items, stack)
     end
 
     return missing_items
+end
+
+-- Utility function to search equippable inventories
+function find_in_equippable_inventories(name,aug)
+    for _,bag in pairs(equippable_item_bags) do
+        if find_in_inv(items[to_windower_bag_api(bag.en)], name, aug) then
+            return true
+        end
+    end
 end
 
 -- Utility function to help search sets
