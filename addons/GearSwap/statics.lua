@@ -34,28 +34,9 @@ action_type_map = {['/ja']='Ability',['/jobability']='Ability',['/so']='Magic',[
     ['/ra']='Ranged Attack',['/range']='Ranged Attack',['/throw']='Ranged Attack',['/shoot']='Ranged Attack',['/ms']='Ability',['/monsterskill']='Ability',
     ['/ws']='Ability',['/weaponskill']='Ability',['/item']='Item',['/pet']='Ability',['/bstpet']='Ability',['Monster']='Monster Move'}
 
-usable_item_bags = {
-    res.bags[3],  -- Temporary Items
-    res.bags[0],  -- Inventory
-    res.bags[8],  -- Wardrobe 1
-    res.bags[10], -- Wardrobe 2
-    res.bags[11], -- Wardrobe 3
-    res.bags[12], -- Wardrobe 4
-    res.bags[13], -- Wardrobe 5
-    res.bags[14], -- Wardrobe 6
-    res.bags[15], -- Wardrobe 7
-    res.bags[16]} -- Wardrobe 8
+equippable_item_bags = res.bags:equippable(true)
 
-equippable_item_bags = {
-    res.bags[0],  -- Inventory
-    res.bags[8],  -- Wardrobe 1
-    res.bags[10], -- Wardrobe 2
-    res.bags[11], -- Wardrobe 3
-    res.bags[12], -- Wardrobe 4
-    res.bags[13], -- Wardrobe 5
-    res.bags[14], -- Wardrobe 6
-    res.bags[15], -- Wardrobe 7
-    res.bags[16]} -- Wardrobe 8
+usable_item_bags = equippable_item_bags:amend(res.bags:command('temporary'))
     
 bag_string_lookup = {}
 for i,v in pairs(res.bags) do
