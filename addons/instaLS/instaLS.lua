@@ -25,27 +25,27 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'instaLS'
-_addon.version = 0.160309
+_addon.version = 0.220213
 _addon.author = 'Byrth'
 
-flag=false
+linkshell_inventories_loaded = true
 chatmode = {}
 chatcolor = {}
 message = false
 require 'strings'
-
+bit = require 'bit'
 
 function translate_escape(str)
     return str:escape():gsub(string.char(0xFD)..".-"..string.char(0xFD),string.char(0xEF,0x27).."(.-)"..string.char(0xEF,0x25,0x25,0x28))
 end
 
 windower.register_event('zone change',function()
-    flag=false
+    linkshell_inventories_loaded = false
 end)
 
-windower.register_event('incoming chunk',function(id)
-    if id == 0x1D then
-        flag = true
+windower.register_event('incoming chunk', function(id,org)
+    if not linkshell_inventories_loaded and id == 0x01D then
+        linkshell_inventories_loaded = bit.band(org:byte(0x09), 225) == 225
     end
 end)
 
@@ -68,7 +68,7 @@ windower.register_event('incoming text',function(org, mod, col)
 end)
 
 windower.register_event('outgoing text',function(org,mod,bool)
-    if bool or flag then return end
+    if bool or linkshell_inventories_loaded then return end
     if mod:sub(1,3) == '/l ' then
         chatmode[#chatmode+1] = 0x05
         chatcolor[#chatcolor+1] = 6

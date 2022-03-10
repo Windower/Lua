@@ -164,7 +164,7 @@ local function emote(val)
 end
 
 local function bag(val)
-    return res.bags[val].name
+    return res.bags[val] and res.bags[val].name or 'Unknown'
 end
 
 local function race(val)
@@ -351,6 +351,7 @@ enums['action'] = {
     [0x0E] = 'Cast Fishing Rod',
     [0x0F] = 'Switch target',
     [0x10] = 'Ranged attack',
+    [0x11] = 'Chocobo dig',
     [0x12] = 'Dismount Chocobo',
     [0x13] = 'Tractor Dialogue',
     [0x14] = 'Zoning/Appear', -- I think, the resource for this is ambiguous.
@@ -1554,7 +1555,12 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned char',     label='Wardrobe 2 Size'},                       -- 0E
     {ctype='unsigned char',     label='Wardrobe 3 Size'},                       -- 0F
     {ctype='unsigned char',     label='Wardrobe 4 Size'},                       -- 10
-    {ctype='data[19]',          label='_padding1',          const=''},          -- 11
+    {ctype='unsigned char',     label='Wardrobe 5 Size'},                       -- 11
+    {ctype='unsigned char',     label='Wardrobe 6 Size'},                       -- 12
+    {ctype='unsigned char',     label='Wardrobe 7 Size'},                       -- 13
+    {ctype='unsigned char',     label='Wardrobe 8 Size'},                       -- 14
+    {ctype='unsigned char',     label='Recycle Bin Size'},                      -- 15
+    {ctype='data[14]',          label='_padding1',          const=''},          -- 16
     {ctype='unsigned short',    label='_dupeInventory Size'},                   -- 24   These "dupe" sizes are set to 0 if the inventory disabled.
     {ctype='unsigned short',    label='_dupeSafe Size'},                        -- 26
     {ctype='unsigned short',    label='_dupeStorage Size'},                     -- 28   The accumulated storage from all items (uncapped) -1
@@ -1568,13 +1574,24 @@ fields.incoming[0x01C] = L{
     {ctype='unsigned short',    label='_dupeWardrobe 2 Size'},                  -- 38
     {ctype='unsigned short',    label='_dupeWardrobe 3 Size'},                  -- 3A   This is not set to 0 despite being disabled for whatever reason
     {ctype='unsigned short',    label='_dupeWardrobe 4 Size'},                  -- 3C   This is not set to 0 despite being disabled for whatever reason
-    {ctype='data[22]',          label='_padding2',          const=''},          -- 3E
+    {ctype='unsigned short',    label='_dupeWardrobe 5 Size'},                  -- 3E   This is not set to 0 despite being disabled for whatever reason
+    {ctype='unsigned short',    label='_dupeWardrobe 6 Size'},                  -- 40   This is not set to 0 despite being disabled for whatever reason
+    {ctype='unsigned short',    label='_dupeWardrobe 7 Size'},                  -- 42   This is not set to 0 despite being disabled for whatever reason
+    {ctype='unsigned short',    label='_dupeWardrobe 8 Size'},                  -- 44   This is not set to 0 despite being disabled for whatever reason
+    {ctype='unsigned short',    label='_dupeRecycle Bin Size'},                 -- 46
+    {ctype='data[28]',          label='_padding2',          const=''},          -- 48
 }
 
+types.bagbits= L{
+    {ctype='boolbit', label='Finished'}
+}
 -- Finish Inventory
 fields.incoming[0x01D] = L{
-    {ctype='unsigned char',     label='Flag',               const=0x01},        -- 04
-    {ctype='data[3]',           label='_junk1'},                                -- 06
+    {ctype='unsigned char',     label='Flag'},                                  -- 04   0 for bag finished updates, 1 for finished loading all bags
+    {ctype='unsigned char',     label='Bag',                fn=bag},            -- 05   18 (0x12) when Flag is 1, and 18 is not a valid bag id (currently last bag + 1)
+    {ctype='data[2]',           label='_junk1'},                                -- 06
+    {ref=types.bagbits, lookup={res.bags, 0x00}, count=0x12},                   -- 08   due to the way packets are sent, false does not necsarilly mean its not Finished, true simple means that it is Finished.
+    {ctype='data[1]',           label='_junk2'},                                -- 0B
 }
 
 -- Modify Inventory
@@ -2163,7 +2180,12 @@ fields.incoming[0x037] = L{
     {ctype='unsigned char',     label='Mount'},                                 -- 5B   Related to Mounts, seems to be mount id + 1, except for chocobo. The value doesn't get zeroed after dismount
     {ctype='boolbit',           label='Wardrobe 3'},                            -- 5C
     {ctype='boolbit',           label='Wardrobe 4'},                            -- 5C
-    {ctype='bit[6]',            label='_flags8'},                               -- 5C
+    {ctype='bit',               label='_unknown6'},                             -- 5C
+    {ctype='boolbit',           label='Wardrobe 5'},                            -- 5C
+    {ctype='boolbit',           label='Wardrobe 6'},                            -- 5C
+    {ctype='boolbit',           label='Wardrobe 7'},                            -- 5C
+    {ctype='boolbit',           label='Wardrobe 8'},                            -- 5C
+    {ctype='bit',               label='_flags8'},                               -- 5C
     {ctype='data[3]',           label='_junk1'},                                -- 5D
 }
 
@@ -3186,14 +3208,48 @@ fields.incoming[0x070] = L{
 }
 
 -- Unity Start
--- Only observed being used for Unity fights.
-fields.incoming[0x075] = L{
+-- Only observed being used for Unity fights. Also observed on DynaD, Odyssey for mask//weapon/neck/izzat progression bars, Escutcheons progression and mandragora minigame.
+func.incoming[0x075] = {}
+fields.incoming[0x075] = function()
+    local fields = func.incoming[0x075]
+
+    return function(data, type)
+        return fields.base + (fields[type] or (data:byte(0x025) > 1 and fields.bars) or fields.default)
+    end
+end()
+
+enums[0x075] = {
+    [0] = 'No Timer',
+    [1] = 'Timer',
+    [2] = 'Bars',
+    [3] = 'Timer and Bars',
+}
+
+types.bars = L{
+    {ctype='unsigned char',     label='Bar Progress'},                          -- 28   0xFF if inactive
+    {ctype='data[3]',           label='_unknown4'},                             -- 29   Observed 0x000000 if active, 0xFFFFF7 if inactive
+    {ctype='char[16]',          label='Bar String'},                            -- 2C   Bar 1 for mask/izzat | Bar 2 Main slot | Bar 3 Sub slot | Bar 4 Ranged slot | Bar 5 Neck slot
+}
+
+func.incoming[0x075].base = L{
     {ctype='unsigned int',      label='Fight Designation'},                     -- 04   Anything other than 0 makes a timer. 0 deletes the timer.
     {ctype='unsigned int',      label='Timestamp Offset',   fn=time},           -- 08   Number of seconds since 15:00:00 GMT 31/12/2002 (0x3C307D70)
     {ctype='unsigned int',      label='Fight Duration',     fn=time},           -- 0C
     {ctype='data[12]',          label='_unknown1'},                             -- 10   This packet clearly needs position information, but it's unclear how these bytes carry it
     {ctype='unsigned int',      label='Battlefield Radius'},                    -- 1C   Yalms*1000, so a 50 yalm battlefield would have 50,000 for this field
     {ctype='unsigned int',      label='Render Radius'},                         -- 20   Yalms*1000, so a fence that renders when you're 25 yalms away would have 25,000 for this field
+    {ctype='unsigned char',     label='Type',               fn=e+{0x075}},      -- 24   most likely a bitflag where first bit activates the timer and bit 2 activates the bars
+}
+
+func.incoming[0x075].default = L{
+    {ctype='data[135]',          label='_junk1'},                               -- 28   Seems to be junk
+}
+
+func.incoming[0x075].bars = L{
+    {ctype='unsigned char',     label='_unknown2'},                             -- 25
+    {ctype='unsigned short',    label='_unknown3'},                             -- 26   Value changes constatly
+    {ref=types.bars,            count=5},                                       -- 28
+    {ctype='data[32]',          label='_unknown5'},                             -- 8C
 }
 
 -- Party status icon update

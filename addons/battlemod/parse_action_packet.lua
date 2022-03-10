@@ -309,11 +309,11 @@ function parse_action_packet(act)
                 local prefix = (not has_line_break or simplify) and get_prefix(act.category, m.effect, m.message, m.unknown, reaction_lookup) or ''
                 local prefix2 = has_line_break and get_prefix(act.category, m.effect, m.message, m.unknown, reaction_lookup) or ''
                 local message = prefix..make_condensedamage_number(m.number)..( clean_msg((msg or tostring(m.message))
-                    :gsub('${spell}',color_it(act.action.spell or 'ERROR 111',color_arr.spellcol))
+                    :gsub('${spell}',act.action.spell or 'ERROR 111')
                     :gsub('${ability}',color_it(act.action.ability or 'ERROR 112',color_arr.abilcol))
                     :gsub('${item}',color_it(act.action.item or 'ERROR 113',color_arr.itemcol))
                     :gsub('${item2}',count..color_it(act.action.item2 or 'ERROR 121',color_arr.itemcol))
-                    :gsub('${weapon_skill}',color_it(act.action.weapon_skill or 'ERROR 114',color_arr.wscol))
+                    :gsub('${weapon_skill}',act.action.weapon_skill or 'ERROR 114')
                     :gsub('${abil}',m.simp_name or 'ERROR 115')
                     :gsub('${numb}',numb..roll or 'ERROR 116')
                     :gsub('${actor}\'s',color_it(act.actor.name or 'ERROR 117',color_arr[act.actor.owner or act.actor.type])..'\'s'..act.actor.owner_name)
@@ -334,7 +334,7 @@ function parse_action_packet(act)
                     end
             end
             if m.has_add_effect and m.add_effect_message ~= 0 and add_effect_valid[act.category] then
-                local targ = assemble_targets(act.actor,v.target,act.category,m.add_effect_message)
+                local targ = assemble_targets(act.actor,v.target,act.category,m.add_effect_message,m.has_add_effect)
                 local col = res.action_messages[m.add_effect_message].color
                 local color = color_filt(col,v.target[1].id==Self.id)
                 if m.add_effect_message > 287 and m.add_effect_message < 303 then m.simp_add_name = skillchain_arr[m.add_effect_message-287]
@@ -385,7 +385,7 @@ function parse_action_packet(act)
                 end
             end
             if m.has_spike_effect and m.spike_effect_message ~= 0 and spike_effect_valid[act.category] then
-                local targ = assemble_targets(act.actor,v.target,act.category,m.spike_effect_message)
+                local targ = assemble_targets(act.actor,v.target,act.category,m.spike_effect_message, m.has_spike_effect)
                 local col = res.action_messages[m.spike_effect_message].color
                 local color = color_filt(col,act.actor.id==Self.id)
                 
@@ -559,7 +559,7 @@ function simplify_message(msg_ID)
     return msg
 end
 
-function assemble_targets(actor,targs,category,msg)
+function assemble_targets(actor,targs,category,msg,add_effect)
     local targets = {}
     local samename = {}
     local total = 0
@@ -575,6 +575,7 @@ function assemble_targets(actor,targs,category,msg)
             end
             total = total + 1
         end
+        if add_effect then break end
     end
     local out_str
     if targetnumber and total > 1 then
@@ -736,6 +737,16 @@ function get_spell(act)
             spell.japanese = spell.english
             spell.french = spell.english
         end
+    elseif msg_ID == 673 then
+        spell.english = 'Mweya Plasm'
+        spell.german = spell.english
+        spell.japanese = spell.english
+        spell.french = spell.english
+    elseif msg_ID == 105 then
+        spell.english = 'Experience Points'
+        spell.german = spell.english
+        spell.japanese = spell.english
+        spell.french = spell.english
     else
         if not res.action_messages[msg_ID] then
             if T{4,8}:contains(act['category']) then
@@ -761,8 +772,8 @@ function get_spell(act)
         if fields.spell then
             spell = res.spells[abil_ID]
             if spell then
-                spell.name = color_it(spell[language],color_arr.spellcol)
-                spell.spell = color_it(spell[language],color_arr.spellcol)
+                spell.name = color_it(spell[language],act.actor.type == 'mob' and color_arr.mobspellcol or color_arr.spellcol)
+                spell.spell = color_it(spell[language],act.actor.type == 'mob' and color_arr.mobspellcol or color_arr.spellcol)
             end
         elseif fields.ability then
             spell = res.job_abilities[abil_ID]
@@ -783,8 +794,8 @@ function get_spell(act)
                 spell = res.weapon_skills[abil_ID]
             end
             if spell then
-                spell.name = color_it(spell[language],color_arr.wscol)
-                spell.weapon_skill = color_it(spell[language],color_arr.wscol)
+                spell.name = color_it(spell[language],act.actor.type == 'mob' and color_arr.mobwscol or color_arr.wscol)
+                spell.weapon_skill = color_it(spell[language],act.actor.type == 'mob' and color_arr.mobwscol or color_arr.wscol)
             end
         elseif msg_ID == 303 then
             spell = res.job_abilities[74] -- Divine Seal

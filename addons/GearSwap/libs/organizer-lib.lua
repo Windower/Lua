@@ -60,7 +60,7 @@ function org.export_set()
     -- #trans_item_list[i] = Number of a given item
     -- trans_item_list[i].id = item ID
     
-    local ward_ids = {8,10,11,12}
+    local ward_ids = {8,10,11,12,13,14,15,16}
     local wardrobes = {}
     local ward = {}
     

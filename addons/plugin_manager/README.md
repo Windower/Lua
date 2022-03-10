@@ -26,4 +26,4 @@
 ## Settings Files 
 The settings file for Plugin Manager are found in a single XML file with a format similar to the settings files for plugins.
 
-* `data/settings.xml` - contains plugins and addons specific to each character. <global> is loaded if there is not a set of plugins/addons inside tags that are a case-sensitive match to the player's name.
+* `data/settings.xml` - contains plugins and addons specific to each character. \<global\> is loaded if there is not a set of plugins/addons inside tags that are a case-sensitive match to the player's name.

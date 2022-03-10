@@ -328,7 +328,7 @@ windower.register_event('outgoing text', function()
 
                     if bag == 'inventory' then
                         inventory_items:add(item.id)
-                    elseif S{'wardrobe','wardrobe2','wardrobe3','wardrobe4'}:contains(bag) then
+                    elseif S{'wardrobe','wardrobe2','wardrobe3','wardrobe4','wardrobe5','wardrobe6','wardrobe7','wardrobe8'}:contains(bag) then
                         wardrobe_items:add(item.id)
                     end
                 end
