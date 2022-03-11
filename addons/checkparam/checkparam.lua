@@ -224,6 +224,7 @@ integrate = {
     ['indicolure spell duration'] = 'indicolure effect duration',
     ['indi eff dur'] = 'indicolure effect duration',
     ['mag eva'] = 'magic evasion',
+    ['magic eva'] = 'magic evasion',
     ['magic atk bonus'] = 'magic attack bonus',
     ['magatkbns'] = 'magic attack bonus',
     ['mag atk bonus'] = 'magic attack bonus',
