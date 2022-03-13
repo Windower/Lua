@@ -30,6 +30,8 @@ Here are the available values:
 * xp.tnl                  = Number of Experience Points in your current level (number from 500 to 56,000)
 * xp.rate                 = Current XP gain rate per hour. This is calculated over a 10 minute window and requires at least two gains within the window.
 * xp.total                = Total Experience Points gained since the last time the addon was loaded (number)
+* xp.job_level            = Level of your current job.
+* xp.sub_job_level        = Level of your current support job.
 
 * lp.current              = Current Experience Points (number from 0 to 55,999 XP)
 * lp.tnm                  = Similar to a "To Next Level", but this value is always 10,000 because that's always the number of Limit Points per merit point.
