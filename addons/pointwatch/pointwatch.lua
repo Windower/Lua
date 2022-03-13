@@ -114,6 +114,7 @@ packet_handlers = {
         local p = packets.parse('incoming',org)
         xp.current = p['Current EXP']
         xp.tnl = p['Required EXP']
+        xp.job_level = p['Main Job Level']
         accolades.current = p['Unity Points']
         ep.current = p['Current Exemplar Points']
         ep.tnml = p['Required Exemplar Points']
