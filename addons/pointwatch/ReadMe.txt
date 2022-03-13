@@ -45,12 +45,13 @@ Here are the available values:
 * ep.current              = Current Exemplar Points
 * ep.rate                 = Current Exemplar Points gain rate per hour. This is calculated over a 10 minute window and requires at least two gains within the window.
 * ep.tnml                 = Required Exemplar Points for your next Master Level
+* ep.master_level         = Master Level of your current job. -- Will be incorrect during Level Sync.
 
-* sparks.current          = Current number of RoE Sparks (number between 0 and 50,000)
-* sparks.maximum          = Maximum number of RoE Sparks (always 50,000)
+* sparks.current          = Current number of RoE Sparks (number between 0 and 99,999)
+* sparks.maximum          = Maximum number of RoE Sparks (always 99,999)
 
-* accolades.current       = Current number of Unity Accolades (number between 0 and 50,000)
-* accolades.maximum       = Maximum number of Unity Accolades (always 50,000)
+* accolades.current       = Current number of Unity Accolades (number between 0 and 99,999)
+* accolades.maximum       = Maximum number of Unity Accolades (always 99,999)
 
 * dynamis.KIs             = Series of Xs and Os indicating whether or not you have the 5 KIs.
 * dynamis.entry_time      = Your Dynamis entry time, in seconds. -- If the addon is loaded in dynamis, this will be the time of addon load.

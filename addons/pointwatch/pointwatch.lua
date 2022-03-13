@@ -117,6 +117,7 @@ packet_handlers = {
         accolades.current = p['Unity Points']
         ep.current = p['Current Exemplar Points']
         ep.tnml = p['Required Exemplar Points']
+        ep.master_level = p['Master Level']
     end,
     [0x063] = function(org)
         local p = packets.parse('incoming',org)

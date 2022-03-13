@@ -116,6 +116,7 @@ function initialize()
         current = 0,
         rate = 0,
         tnml = 0,
+        master_level = 0,
     }
     
     sparks = {
