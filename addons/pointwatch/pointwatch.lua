@@ -115,6 +115,7 @@ packet_handlers = {
         xp.current = p['Current EXP']
         xp.tnl = p['Required EXP']
         xp.job_level = p['Main Job Level']
+        xp.sub_job_level = p['Sub Job Level']
         accolades.current = p['Unity Points']
         ep.current = p['Current Exemplar Points']
         ep.tnml = p['Required Exemplar Points']

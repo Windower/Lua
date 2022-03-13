@@ -102,6 +102,7 @@ function initialize()
         current = 0,
         tnl = 0,
         job_level = 0;
+        sub_job_level = 0;
     }
     
     lp = {
