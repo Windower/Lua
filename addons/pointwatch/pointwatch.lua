@@ -36,7 +36,7 @@ require('chat')
 
 _addon.name = 'PointWatch'
 _addon.author = 'Byrth'
-_addon.version = 0.211112
+_addon.version = 0.220312
 _addon.command = 'pw'
 
 settings = config.load('data\\settings.xml',default_settings)
