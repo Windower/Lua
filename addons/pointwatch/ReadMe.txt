@@ -30,6 +30,8 @@ Here are the available values:
 * xp.tnl                  = Number of Experience Points in your current level (number from 500 to 56,000)
 * xp.rate                 = Current XP gain rate per hour. This is calculated over a 10 minute window and requires at least two gains within the window.
 * xp.total                = Total Experience Points gained since the last time the addon was loaded (number)
+* xp.job_level            = Level of your current job.
+* xp.sub_job_level        = Level of your current support job.
 
 * lp.current              = Current Experience Points (number from 0 to 55,999 XP)
 * lp.tnm                  = Similar to a "To Next Level", but this value is always 10,000 because that's always the number of Limit Points per merit point.
@@ -45,12 +47,13 @@ Here are the available values:
 * ep.current              = Current Exemplar Points
 * ep.rate                 = Current Exemplar Points gain rate per hour. This is calculated over a 10 minute window and requires at least two gains within the window.
 * ep.tnml                 = Required Exemplar Points for your next Master Level
+* ep.master_level         = Master Level of your current job. -- Will be incorrect during Level Sync.
 
-* sparks.current          = Current number of RoE Sparks (number between 0 and 50,000)
-* sparks.maximum          = Maximum number of RoE Sparks (always 50,000)
+* sparks.current          = Current number of RoE Sparks (number between 0 and 99,999)
+* sparks.maximum          = Maximum number of RoE Sparks (always 99,999)
 
-* accolades.current       = Current number of Unity Accolades (number between 0 and 50,000)
-* accolades.maximum       = Maximum number of Unity Accolades (always 50,000)
+* accolades.current       = Current number of Unity Accolades (number between 0 and 99,999)
+* accolades.maximum       = Maximum number of Unity Accolades (always 99,999)
 
 * dynamis.KIs             = Series of Xs and Os indicating whether or not you have the 5 KIs.
 * dynamis.entry_time      = Your Dynamis entry time, in seconds. -- If the addon is loaded in dynamis, this will be the time of addon load.

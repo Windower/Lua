@@ -101,6 +101,8 @@ function initialize()
         rate = 0,
         current = 0,
         tnl = 0,
+        job_level = 0,
+        sub_job_level = 0,
     }
     
     lp = {
@@ -116,6 +118,7 @@ function initialize()
         current = 0,
         rate = 0,
         tnml = 0,
+        master_level = 0,
     }
     
     sparks = {
