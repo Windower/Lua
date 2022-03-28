@@ -36,11 +36,14 @@ require('chat')
 
 _addon.name = 'PointWatch'
 _addon.author = 'Byrth'
-_addon.version = 0.220312
+_addon.version = 0.220327
 _addon.command = 'pw'
 
 settings = config.load('data\\settings.xml',default_settings)
 config.register(settings,initialize)
+
+lang = windower.ffxi.get_info().language:sub(1, 2):lower()
+langs = lang.."s"
 
 box = texts.new('${current_string}',settings.text_box_settings,settings)
 box.current_string = ''
@@ -114,7 +117,11 @@ packet_handlers = {
         local p = packets.parse('incoming',org)
         xp.current = p['Current EXP']
         xp.tnl = p['Required EXP']
+        xp.job = res.jobs[p['Main Job']][lang]
+        xp.job_abbr = res.jobs[p['Main Job']][langs]
         xp.job_level = p['Main Job Level']
+        xp.sub_job = res.jobs[p['Sub Job']][lang]
+        xp.sub_job_abbr = res.jobs[p['Sub Job']][langs]
         xp.sub_job_level = p['Sub Job Level']
         accolades.current = p['Unity Points']
         ep.current = p['Current Exemplar Points']
