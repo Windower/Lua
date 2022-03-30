@@ -47,6 +47,7 @@ defaults.say = true
 defaults.shout = true
 defaults.bazaar = true
 defaults.examine = true
+defaults.yell = true
 defaults.mutedcolor = 57
 
 settings = T{}
@@ -83,7 +84,7 @@ function addon_command(...)
 			windower.add_to_chat(160,'  '..string.color('//bl help',204,160)..' : Lists this menu.')
 			windower.add_to_chat(160,'  '..string.color('//bl status',204,160)..' : Shows current configuration.')
 			windower.add_to_chat(160,'  '..string.color('//bl list',204,160)..' : Displays blacklist.')
-			windower.add_to_chat(160,'  '..string.color('//bl useblist|linkshell|party|tell|emote|say|shout|bazaar|examine',204,160)..' : Toggles using '.._addon.name..' for said chat mode.')
+			windower.add_to_chat(160,'  '..string.color('//bl useblist|linkshell|party|tell|emote|say|shout|yell|bazaar|examine',204,160)..' : Toggles using '.._addon.name..' for said chat mode.')
 			windower.add_to_chat(160,'  '..string.color('//bl mutedcolor #',204,160)..' : Sets color for muted communication.  Valid values 1-255.')
 			windower.add_to_chat(160,'  '..string.color('//bl add|update name # hidetype reason',204,160)..' : Adds to or updates a user on your blist.')
 			windower.add_to_chat(160,'  '..string.color('  name',204,160)..' = name of person you want to blist')
@@ -188,7 +189,7 @@ function addon_command(...)
 				settings:save() -- current character only
 				windower.add_to_chat(55,"Saving "..string.color(_addon.name,204,55).." settings.")
 			end
-		elseif S({'useblist','linkshell','party','tell','emote','say','shout','bazaar','examine'}):contains(comm) then
+		elseif S({'useblist','linkshell','party','tell','emote','say','shout','yell','bazaar','examine'}):contains(comm) then
 			settings[comm] = not settings[comm]
 			showStatus(comm)
 			if tostring(com2) ~= tostring(dummysettings[comm]) then
@@ -225,6 +226,7 @@ function showStatus(var)
 		windower.add_to_chat(160,"  UseBlistOnEmote: " .. string.color(onOffPrint(settings.emote),204,160))
 		windower.add_to_chat(160,"  UseBlistOnSay: " .. string.color(onOffPrint(settings.say),204,160))
 		windower.add_to_chat(160,"  UseBlistOnShout: " .. string.color(onOffPrint(settings.shout),204,160))
+		windower.add_to_chat(160,"  UseBlistOnYell: " .. string.color(onOffPrint(settings.yell),204,160))
 		windower.add_to_chat(160,"  UseBlistOnBazaar: " .. string.color(onOffPrint(settings.bazaar),204,160))
 		windower.add_to_chat(160,"  UseBlistOnExamine: " .. string.color(onOffPrint(settings.examine),204,160))
 		windower.add_to_chat(160,"  Muted"..string.color("Color",settings.mutedcolor,160)..": " .. string.color(tostring(settings.mutedcolor),204,160))
@@ -254,7 +256,8 @@ end)
 windower.register_event('incoming text',function (original, modified, mode)
 	if settings.useblist == true then
 		name = "blist"
-		if mode == 14 and settings.linkshell == true then -- linkshell (others)
+		--print(tostring(mode))
+		if (mode == 14 or mode == 214) and settings.linkshell == true then -- linkshell (others)
 			a,z,name = string.find(original,'<(%a+)> ')
 		elseif mode == 13 and settings.party == true then -- party (others)
 			a,z,name = string.find(original,'%((%a+)%) ')
@@ -266,6 +269,8 @@ windower.register_event('incoming text',function (original, modified, mode)
 			a,z,name = string.find(original,'(%a+) ')
 		elseif mode == 2 and settings.shout == true then -- shout
 			a,z,name = string.find(original,'(%a+) ')
+		elseif mode == 11 and settings.yell == true then -- yell
+			a,z,name = string.find(original,'([%l%u]+).*%[')
 		elseif mode == 121 and settings.bazaar == true then -- bazaar
 			a,z,name,filler = string.find(original,'(%a+) (.*) bazaar%.')
 		elseif mode == 208 and settings.examine == true then -- examine
