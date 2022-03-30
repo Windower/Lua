@@ -256,7 +256,6 @@ end)
 windower.register_event('incoming text',function (original, modified, mode)
 	if settings.useblist == true then
 		name = "blist"
-		--print(tostring(mode))
 		if (mode == 14 or mode == 214) and settings.linkshell == true then -- linkshell (others)
 			a,z,name = string.find(original,'<(%a+)> ')
 		elseif mode == 13 and settings.party == true then -- party (others)
