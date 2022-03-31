@@ -269,7 +269,7 @@ windower.register_event('incoming text',function (original, modified, mode)
 		elseif (mode == 15 or mode == 7) and settings.emote == true then -- emote
 			a,z,name = string.find(original,'(%a+) ')
 		elseif mode == 1 and settings.say == true then -- say
-			a,z,name = string.find(original,'(%a+) ')
+			a,z,name = string.find(original,'(%a+) :')
 		elseif mode == 2 and settings.shout == true then -- shout
 			a,z,name = string.find(original,'(%a+) ')
 		elseif mode == 11 and settings.yell == true then -- yell
