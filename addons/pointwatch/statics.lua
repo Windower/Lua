@@ -81,7 +81,6 @@ other_table = {Crimson=10,Azure=10,Amber=10,Alabaster=10,Obsidian=20}
 dynamis_map = {[185]=city_table,[186]=city_table,[187]=city_table,[188]=city_table,
     [134]=other_table,[135]=other_table,[39]=other_table,[40]=other_table,[41]=other_table,[42]=other_table}
 
-    
 -- Not technically static, but sets the initial values for all features:
 function initialize()
     cp = {
@@ -101,6 +100,12 @@ function initialize()
         rate = 0,
         current = 0,
         tnl = 0,
+        job = 0,
+        job_abbr = 0,
+        job_level = 0,
+        sub_job = 0,
+        sub_job_abbr = 0,
+        sub_job_level = 0,
     }
     
     lp = {
@@ -116,6 +121,7 @@ function initialize()
         current = 0,
         rate = 0,
         tnml = 0,
+        master_level = 0,
     }
     
     sparks = {

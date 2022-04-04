@@ -183,7 +183,45 @@ local messages = {
         azure_light = 187,
         ruby_light = 188,
         amber_light = 189,
-    },
+    }
 }
 
+local function update_offset(zone_id)
+    local z_string = 'z' .. tostring(zone_id)
+    local m = messages[z_string]
+    if m and m.name then
+        -- convert dialog entry to dialog ID
+        local dialog = require('dialog')
+        local search_phrase = string.char(
+            158,133,214,233,243,233,244,225,238,244,160,204,233,231,232,
+            244,160,201,238,244,229,238,243,233,244,249,158,129,135,208,
+            229,225,242,236,229,243,227,229,238,244,186,160,138,128,160,
+            175,160,197,226,239,238,186,160,138,129,135,199,239,236,228,
+            229,238,186,160,138,130,160,175,160,211,233,236,246,229,242,
+            249,186,160,138,131,255,177,128,135
+        )
+        local f = dialog.open_dat_by_zone_id(zone_id, 'english')
+        local dat = f:read('*a')
+        f:close()
+        local res = dialog.get_ids_matching_entry(dat, search_phrase)
+        if #res ~= 1 then
+            print('In pointwatch/message_ids.lua: matched multiple or no entries.')
+            print('Could not update message ID.')
+            return
+        end
+
+        m.offset = res[1]
+        m.name = nil
+    end
+end
+
+do
+    local info = windower.ffxi.get_info()
+    if info.logged_in then
+        update_offset(info.zone)
+    end
+end
+windower.register_event('zone change', update_offset)
+
 return messages
+

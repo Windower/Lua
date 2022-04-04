@@ -1,4 +1,4 @@
---Copyright (c) 2014, Byrthnoth
+--Copyright © 2014, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,7 @@ require('chat')
 
 _addon.name = 'PointWatch'
 _addon.author = 'Byrth'
-_addon.version = 0.211112
+_addon.version = 0.220327
 _addon.command = 'pw'
 
 settings = config.load('data\\settings.xml',default_settings)
@@ -114,9 +114,16 @@ packet_handlers = {
         local p = packets.parse('incoming',org)
         xp.current = p['Current EXP']
         xp.tnl = p['Required EXP']
+        xp.job = res.jobs[p['Main Job']].name
+        xp.job_abbr = res.jobs[p['Main Job']].name_short
+        xp.job_level = p['Main Job Level']
+        xp.sub_job = res.jobs[p['Sub Job']].name
+        xp.sub_job_abbr = res.jobs[p['Sub Job']].name_short
+        xp.sub_job_level = p['Sub Job Level']
         accolades.current = p['Unity Points']
         ep.current = p['Current Exemplar Points']
         ep.tnml = p['Required Exemplar Points']
+        ep.master_level = p['Master Level']
     end,
     [0x063] = function(org)
         local p = packets.parse('incoming',org)
