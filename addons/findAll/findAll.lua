@@ -278,8 +278,6 @@ function search(query, export)
         terms_pattern = terms:query_escape():gsub('%a', function(char) return string.format("[%s%s]", char:lower(), char:upper()) end)
     end
 
-    print(terms_pattern)
-
     for id, names in pairs(item_names) do
         if terms_pattern == '' or item_names[id].name:find(terms_pattern)
             or item_names[id].long_name:find(terms_pattern)
