@@ -162,6 +162,9 @@ do
         end)
     end
 end
+string.query_escape = function(str)
+    return (str:gsub('[()%.%+?-]', '%%%1'))
+end
 
 zone_search            = windower.ffxi.get_info().logged_in
 first_pass             = true
@@ -272,8 +275,10 @@ function search(query, export)
     local terms_pattern     = ''
 
     if terms ~= '' then
-        terms_pattern = terms:escape():gsub('%a', function(char) return string.format("[%s%s]", char:lower(), char:upper()) end)
+        terms_pattern = terms:query_escape():gsub('%a', function(char) return string.format("[%s%s]", char:lower(), char:upper()) end)
     end
+
+    print(terms_pattern)
 
     for id, names in pairs(item_names) do
         if terms_pattern == '' or item_names[id].name:find(terms_pattern)
