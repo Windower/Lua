@@ -14,7 +14,7 @@ documentation and/or other materials provided with the distribution.
 names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 DISCLAIMED. IN NO EVENT SHALL The Addon's Contributors BE LIABLE FOR ANY
@@ -25,7 +25,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
-
 
 _addon.name = 'AzureSets'
 _addon.version = '1.25'
@@ -38,7 +37,6 @@ require('logger')
 local config = require('config')
 local res = require('resources')
 local chat = require('chat')
-local packets = require('packets')
 local spells = res.spells:type('BlueMagic')
 
 local defaults = {}
@@ -66,39 +64,25 @@ local bluJobLevel = nil
 local bluPointsMax = nil
 local bluSlots = nil
 local get_blu_job_data = nil
+local language = windower.ffxi.get_info().language:lower()
 
 local spellsLookup = {}
 for spell in spells:it() do
-    spellsLookup[spell.english] = spell
-    spellsLookup[spell.english:lower()] = spell
-    spellsLookup[spell.japanese] = spell
+    spellsLookup[spell[language]:lower()] = spell
 end
 
 function initialize()
-    update_blu_info()
-    update_current_spellset()
+    local player = windower.ffxi.get_player()
+    local is_blu = player and (player.main_job_id == BLU_JOB_ID or player.sub_job_id == BLU_JOB_ID)
+    local logged_in = windower.ffxi.get_info()
+
+    if is_blu and logged_in then
+        update_blu_info()
+        update_current_spellset()
+    end
 end
 
-windower.register_event('load', function()
-    local player = windower.ffxi.get_player()
-    local is_blu = player and player.main_job_id == BLU_JOB_ID
-    local logged_in = windower.ffxi.get_info()
-    if is_blu and logged_in then
-        initialize()
-    end
-end)
-
-windower.register_event('incoming chunk', function(id, original, modified, injected, blocked) 
-    if id ~= 0x00A then
-        return
-    end
-    local packet = packets.parse('incoming', original)
-    if packet['Main Job'] == BLU_JOB_ID then
-       initialize()
-    end 
-end)
-
-windower.register_event('job change', initialize)
+windower.register_event('load', 'login', 'job change', initialize)
 
 function update_blu_info(player)
     player = player or windower.ffxi.get_player()
@@ -212,7 +196,7 @@ function set_spells_from_spellset(spellset, setPhase)
 end
 
 function find_spell_id_by_name(spellname)
-    local spell = spellsLookup[spellname] or spellsLookup[spellname:lower()]
+    local spell = spellsLookup[spellname:lower()]
     if spell and spell.id then
         return spell.id
     end
@@ -274,14 +258,14 @@ function delete_set(setname)
 end
 
 function get_spellset_list()
-    log("Listing sets:")
+    log('Listing sets:')
     for key,_ in pairs(settings.spellsets) do
         if key ~= 'default' then
             local it = 0
             for i = 1, #settings.spellsets[key] do
                 it = it + 1
             end
-            log("\t"..key..' '..settings.spellsets[key]:length()..' spells.')
+            log('\t'..key..' '..settings.spellsets[key]:length()..' spells.')
         end
     end
 end
@@ -294,19 +278,19 @@ end
 function verify_and_set_spell(id, slot)
     local spell = spells[id]
     if not spell then
-        error("spell not found")
+        error('spell not found')
         return false
     end
     if bluJobLevel and spell.levels and spell.levels[BLU_JOB_ID] and spell.levels[BLU_JOB_ID] > bluJobLevel then
-        error("job level too low to set spell")
+        error('job level too low to set spell')
         return false
     end
     if not have_enough_points_to_add_spell(id) then
-        error("cannot set spell, ran out of blue magic points")
+        error('cannot set spell, ran out of blue magic points')
         return false
     end
     if slot > bluSlots then
-        error("slot " .. tostring(slot) .. " unavailable")
+        error('slot ' .. tostring(slot) .. ' unavailable')
         return false
     end
 
