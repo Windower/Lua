@@ -68,7 +68,9 @@ local language = windower.ffxi.get_info().language:lower()
 
 local spellsLookup = {}
 for spell in spells:it() do
-    spellsLookup[spell[language]:lower()] = spell
+    spellsLookup[spell.english] = spell
+    spellsLookup[spell.english:lower()] = spell
+    spellsLookup[spell.japanese] = spell
 end
 
 function initialize()
@@ -89,16 +91,16 @@ function update_blu_info(player)
     if player.main_job_id == BLU_JOB_ID then
         bluJobLevel = player.main_job_level
 
-        if player.main_job_level > 70 then
+        if bluJobLevel > 70 then
             bluSlots = 20
         else
-            bluSlots = (math.floor((player.sub_job_level + 9) / 10) * 2) + 4
+            bluSlots = (math.floor((bluJobLevel + 9) / 10) * 2) + 4
         end
         
-        bluPointsMax = (math.floor((player.main_job_level + 9) / 10) * 5) + 5
-        if player.main_job_level >= 75 then
+        bluPointsMax = (math.floor((bluJobLevel + 9) / 10) * 5) + 5
+        if bluJobLevel >= 75 then
             bluPointsMax = bluPointsMax + player.merits.assimilation
-            if player.main_job_level == 99 then
+            if bluJobLevel == 99 then
                 bluPointsMax = bluPointsMax + player.job_points.blu.blue_magic_point_bonus
             end
         end
@@ -106,8 +108,8 @@ function update_blu_info(player)
         get_blu_job_data = windower.ffxi.get_mjob_data
     elseif player.sub_job_id == BLU_JOB_ID then
         bluJobLevel = player.sub_job_level
-        bluSlots = (math.floor((player.sub_job_level + 9) / 10) * 2) + 4
-        bluPointsMax = (math.floor((player.sub_job_level + 9) / 10) * 5) + 5
+        bluSlots = (math.floor((bluJobLevel + 9) / 10) * 2) + 4
+        bluPointsMax = (math.floor((bluJobLevel + 9) / 10) * 5) + 5
         get_blu_job_data = windower.ffxi.get_sjob_data
     else
         bluJobLevel = nil
@@ -278,19 +280,19 @@ end
 function verify_and_set_spell(id, slot)
     local spell = spells[id]
     if not spell then
-        error('spell not found')
+        error('Spell named not found')
         return false
     end
     if bluJobLevel and spell.levels and spell.levels[BLU_JOB_ID] and spell.levels[BLU_JOB_ID] > bluJobLevel then
-        error('job level too low to set spell')
+        error('Blue Mage Level too low to set spell')
         return false
     end
     if not have_enough_points_to_add_spell(id) then
-        error('cannot set spell, ran out of blue magic points')
+        error('Cannot set spell, ran out of blue magic points')
         return false
     end
     if slot > bluSlots then
-        error('slot ' .. tostring(slot) .. ' unavailable')
+        error('Slot ' .. tostring(slot) .. ' unavailable')
         return false
     end
 
