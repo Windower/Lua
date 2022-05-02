@@ -639,36 +639,61 @@ parse.i[0x076] = function (data)
     end
 end
 
-parse.i[0x0DF] = function (data)
-    if data:unpack('I',5) == player.id then
-        player.vitals.hp = data:unpack('I',9)
-        player.vitals.mp = data:unpack('I',13)
-        player.vitals.tp = data:unpack('I',0x11)
-        player.vitals.hpp = data:byte(0x17)
-        player.vitals.mpp = data:byte(0x18)
+function update_vitals(id, hp, mp, tp, hpp, mpp)
+    if id==player.id then
+        player.vitals.hp = hp
+        player.vitals.mp = mp
+        player.vitals.tp = tp
+        player.vitals.hpp = hpp
+        player.vitals.mpp = mpp
         
-        player.hp = data:unpack('I',9)
-        player.mp = data:unpack('I',13)
-        player.tp = data:unpack('I',0x11)
-        player.hpp = data:byte(0x17)
-        player.mpp = data:byte(0x18)
+        player.hp = hp
+        player.mp = mp
+        player.tp = tp
+        player.hpp = hpp
+        player.mpp = mpp
+    end
+    -- Update alliance
+    local found_person = false
+    for i,v in pairs(alliance) do
+        if type(v) == 'table' then
+            for k,j in pairs(v) do
+                if type(j) == 'table' and j.id == id then
+                    j.hp = hp
+                    j.mp = mp
+                    j.tp = tp
+                    j.hpp = hpp
+                    j.mpp = mpp
+                    found_person = true
+                end
+            end
+            if found_person then
+                break
+            end
+        end
     end
 end
 
+parse.i[0x0DF] = function (data)
+    update_vitals(
+        data:unpack('I',5),
+        data:unpack('I',9),
+        data:unpack('I',13),
+        data:unpack('I',0x11),
+        data:byte(0x17),
+        data:byte(0x18)
+    )
+end
+
 parse.i[0x0E2] = function (data)
-    if data:unpack('I',5)==player.id then
-        player.vitals.hp = data:unpack('I',9)
-        player.vitals.mp = data:unpack('I',0xB)
-        player.vitals.tp = data:unpack('I',0x11)
-        player.vitals.hpp = data:byte(0x1E)
-        player.vitals.mpp = data:byte(0x1F)
-        
-        player.hp = data:unpack('I',9)
-        player.mp = data:unpack('I',0xB)
-        player.tp = data:unpack('I',0x11)
-        player.hpp = data:byte(0x1E)
-        player.mpp = data:byte(0x1F)
-    end
+    update_vitals(
+        data:unpack('I',5),
+        data:unpack('I',9),
+        data:unpack('I',0xB),
+        data:unpack('I',0x11),
+        data:byte(0x1E),
+        data:byte(0x1F)
+    )
 end
 
 parse.o[0x100] = function(data)
