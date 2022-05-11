@@ -532,6 +532,7 @@ local function check_queue()
             end
             if support then
                 poke_npc()
+                coroutine.sleep(2)
             end
             if food then
                 consume_food()
