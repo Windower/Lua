@@ -141,7 +141,7 @@ function addon_command(...)
 			
 				members = members:update(addTemp)
 				members:save('all')
-				windower.send_ipc_message("blist reload members")
+				windower.send_ipc_message("blist_ipc: reload members")
 				windower.add_to_chat(160,"Updating "..string.color(args[2],56,160).." entry on "..string.color(_addon.name,55,160)..".")
 			end
 		elseif comm == "qa" then
@@ -165,7 +165,7 @@ function addon_command(...)
 			
 				members = members:update(addTemp)
 				members:save('all')
-				windower.send_ipc_message("blist reload members")
+				windower.send_ipc_message("blist_ipc: reload members")
 				windower.add_to_chat(160,"Updating "..string.color(string.ucfirst(args[2]),56,160).." entry on "..string.color(_addon.name,55,160)..".")
 			end
 		elseif comm == "remove" or comm == "delete" then
@@ -173,7 +173,7 @@ function addon_command(...)
 				windower.add_to_chat(160,"Removing "..string.color(args[2],56,160).." from "..string.color(_addon.name,55,160)..".")
 				members[args[2]].hidetype = "delete"
 				members:save('all')
-				windower.send_ipc_message("blist reload members")
+				windower.send_ipc_message("blist_ipc: reload members")
 			else
 				windower.add_to_chat(160,"User "..string.color(args[2],56,160).." not in "..string.color(_addon.name,55,160).." database; cannot remove.")
 			end
@@ -200,6 +200,9 @@ function addon_command(...)
 			
 		elseif comm == "settings" then
 			settings:vprint()
+
+		elseif comm == "reload" then
+			windower.send_ipc_message("blist_ipc: reload members")
 			
 		else
 			windower.add_to_chat(160, "  Not a valid ".._addon.name.." v".._addon.version.." command.  "..string.color('//bl help',204,160).." for a list of valid commands.")
@@ -249,9 +252,9 @@ function onOffPrint(bleh)
 end
 
 windower.register_event('ipc message',function (msg)
-	if msg == "blist reload members" then
-		members = config.load("data/members.xml",members)
---		windower.add_to_chat(160, "Reloading members database.")
+	if msg == "blist_ipc: reload members" then
+		members = config.load("data/members.xml",{})
+		windower.add_to_chat(160, "Reloading members database.")
 	end
 end)
 
@@ -302,7 +305,7 @@ windower.register_event('incoming text',function (original, modified, mode)
 			if nowTime > convertedT and members[name].temptime ~= 0 then
 				members[name].hidetype = "delete"
 				members:save('all')
-				windower.send_ipc_message("blist reload members")
+				windower.send_ipc_message("blist_ipc: reload members")
 			end
 			
 			if members[name].hidetype == "delete" then
@@ -316,7 +319,7 @@ windower.register_event('incoming text',function (original, modified, mode)
 			else
 				members[name].hidetype = "hard"
 				members:save('all')
-				windower.send_ipc_message("blist reload members")
+				windower.send_ipc_message("blist_ipc: reload members")
 				modified = ''
 			end
 		end
