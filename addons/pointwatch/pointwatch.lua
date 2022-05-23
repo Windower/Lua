@@ -132,9 +132,12 @@ packet_handlers = {
             lp.number_of_merits = p['Merit Points']
             lp.maximum_merits = p['Max Merit Points']
         elseif p['Order'] == 5 then
-            local job = windower.ffxi.get_player().main_job_full
-            cp.current = p[job..' Capacity Points']
-            cp.number_of_job_points = p[job..' Job Points']
+            local player = windower.ffxi.get_player()
+            if player then
+                local job = player.main_job_full
+                cp.current = p[job..' Capacity Points']
+                cp.number_of_job_points = p[job..' Job Points']
+            end
         end
     end,
     [0x110] = function(org)
