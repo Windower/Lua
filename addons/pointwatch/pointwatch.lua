@@ -64,10 +64,7 @@ packet_handlers = {
     [0x02A] = function(org) -- Resting message
         local p = packets.parse('incoming',org)
         local zone = 'z'..windower.ffxi.get_info().zone
-        if settings.options.message_printing then
-            print('Message ID: '..bit.band(p['Message ID'], 16383))
-        end
-        
+
         if messages[zone] then
             local msg = bit.band(p['Message ID'], 16383)
             for i,v in pairs(messages[zone]) do
@@ -214,9 +211,6 @@ windower.register_event('addon command',function(...)
         windower.send_command('lua u pointwatch')
     elseif first_cmd == 'reset' then
         initialize()
-    elseif first_cmd == 'message_printing' then
-        settings.options.message_printing = not settings.options.message_printing
-        print('Pointwatch: Message printing is '..tostring(settings.options.message_printing)..'.')
     elseif first_cmd == 'eval' then
         assert(loadstring(table.concat(commands, ' ')))()
     end

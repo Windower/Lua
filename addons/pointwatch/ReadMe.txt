@@ -14,10 +14,6 @@ Text Box Commands:
 * bg_transparency <number> - Changes the background transparency. Number should be between 0 and 1
 ** pos_x, pos_y, pad, transparency, alpha, and bg_alpha are also valid commands and are documented in the texts library.
 
-Other Commands:
-* message_printing - See FIXING POINTWATCH.txt in this directory for a full explanation.
-
-
 
 Strings Options:  
 The two strings options in settings.xml are loaded as Lua code and run accordingly,

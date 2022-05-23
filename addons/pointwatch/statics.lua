@@ -60,10 +60,7 @@ default_settings = {
             green = 255,
             blue = 255
         }
-    },
-    options = {
-        message_printing = false,
-    },
+    }
 }
 
 -- Approved textbox commands:
