@@ -287,6 +287,7 @@ end
 windower.register_event('time change', function(new, old)
     gt.hours = (new / 60):floor()
     gt.minutes = new % 60
+    gt.dectime = timeconvert(gt.hours..':'..gt.minutes)
     gt.gtt:update(gt)
 end)
 
