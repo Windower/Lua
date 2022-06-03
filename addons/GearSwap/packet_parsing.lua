@@ -185,7 +185,9 @@ parse.i[0x037] = function (data)
             end
         end
     end]]
-    
+    -- Info provided by Akaden
+    vana_offset = os.time() - (((data:unpack("I",0x41)*60 - data:unpack("I",0x3D)) % 0x100000000) / 60)
+
     local indi_byte = data:byte(0x59)
     if indi_byte%128/64 >= 1 then
         local temp_indi = _ExtraData.player.indi
@@ -457,7 +459,7 @@ parse.i[0x063] = function (data)
         for i=1,32 do
             local buff_id = data:unpack('H',i*2+7)
             if buff_id ~= 255 and buff_id ~= 0 then -- 255 is used for "no buff"
-                local t = data:unpack('I',i*4+0x45)/60+572662306+1009810800
+                local t = data:unpack('I',i*4+0x45)/60
                 newbuffs[i] = setmetatable({
                     name=res.buffs[buff_id].name,
                     buff=copy_entry(res.buffs[buff_id]),
@@ -467,7 +469,7 @@ parse.i[0x063] = function (data)
                     },
                     {__index=function(t,k)
                         if k and k=='duration' then
-                            return rawget(t,'time')-os.time()
+                            return rawget(t,'time')-os.time()+(vana_offset or 0)
                         else
                             return rawget(t,k)
                         end
@@ -475,7 +477,6 @@ parse.i[0x063] = function (data)
             end
         end
         if seen_0x063_type9 then
-        
             -- Look for exact matches
             for n,new in pairs(newbuffs) do
                 newbuffs[n].matched_exactly = nil
@@ -556,7 +557,7 @@ parse.i[0x063] = function (data)
                 end
             end
         end
-        
+
         table.reassign(_ExtraData.player.buff_details,newbuffs)
         for i=1,32 do
             player.buffs[i] = (newbuffs[i] and newbuffs[i].id) or nil

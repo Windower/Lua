@@ -64,10 +64,7 @@ packet_handlers = {
     [0x02A] = function(org) -- Resting message
         local p = packets.parse('incoming',org)
         local zone = 'z'..windower.ffxi.get_info().zone
-        if settings.options.message_printing then
-            print('Message ID: '..bit.band(p['Message ID'], 16383))
-        end
-        
+
         if messages[zone] then
             local msg = bit.band(p['Message ID'], 16383)
             for i,v in pairs(messages[zone]) do
@@ -132,9 +129,12 @@ packet_handlers = {
             lp.number_of_merits = p['Merit Points']
             lp.maximum_merits = p['Max Merit Points']
         elseif p['Order'] == 5 then
-            local job = windower.ffxi.get_player().main_job_full
-            cp.current = p[job..' Capacity Points']
-            cp.number_of_job_points = p[job..' Job Points']
+            local player = windower.ffxi.get_player()
+            if player then
+                local job = player.main_job_full
+                cp.current = p[job..' Capacity Points']
+                cp.number_of_job_points = p[job..' Job Points']
+            end
         end
     end,
     [0x110] = function(org)
@@ -211,9 +211,6 @@ windower.register_event('addon command',function(...)
         windower.send_command('lua u pointwatch')
     elseif first_cmd == 'reset' then
         initialize()
-    elseif first_cmd == 'message_printing' then
-        settings.options.message_printing = not settings.options.message_printing
-        print('Pointwatch: Message printing is '..tostring(settings.options.message_printing)..'.')
     elseif first_cmd == 'eval' then
         assert(loadstring(table.concat(commands, ' ')))()
     end

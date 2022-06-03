@@ -62,7 +62,15 @@ config.register(settings, redraw)
 
 clock:show()
 
-utc_diff = os.difftime(os.time(), os.time(os.date('!*t', os.time())))
+local function get_timezone_offset(ts)
+    ts = ts or os.time()
+    local utcdate   = os.date("!*t", ts)
+    local localdate = os.date("*t", ts)
+    localdate.isdst = false -- this is the trick
+    return os.difftime(os.time(localdate), os.time(utcdate))
+end
+
+utc_diff = get_timezone_offset()
 
 windower.register_event('prerender', function()
     local utc_now = os.time() - utc_diff

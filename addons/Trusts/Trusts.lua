@@ -139,7 +139,7 @@ function check_exist()
     local get_party = windower.ffxi.get_party()
     for i=1,5 do
         local member = get_party['p'..i]
-        if member then
+        if member and member.mob then
             if member.mob.spawn_type == 14 then
                 party[member.name] = member.mob.models[1]
                 table.insert(party_ind,member.name)
