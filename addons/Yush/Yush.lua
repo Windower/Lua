@@ -59,6 +59,7 @@ defaults.ResetKey = '`'
 defaults.BackKey = 'backspace'
 defaults.Verbose = false
 defaults.VerboseOutput = 'Text'
+defaults.VerboseKeys = false
 defaults.Label = {}
 
 settings = config.load(defaults)
@@ -67,6 +68,7 @@ label = texts.new(settings.Label, settings)
 
 binds = {}
 names = {}
+key_combos = {}
 current = binds
 stack = L{binds}
 keys = S{}
@@ -75,12 +77,24 @@ output = function()
     if settings.Verbose then
         names[current] = names[current] or 'Unnamed ' .. tostring(current):sub(8)
 
+        output_text_table = {}
+        table.insert(output_text_table, names[current])
+        if settings.VerboseKeys then
+            for key, val in pairs(current) do
+                if type(val) ~= 'string' then
+                    val = names[val] or 'Unnamed'
+                end
+                table.insert(output_text_table, key_combos[key] .. ': ' .. val)
+            end
+        end
+        local output_text = table.concat(output_text_table, '\n')
+
         if settings.VerboseOutput == 'Text' then
-            label:text(names[current])
+            label:text(output_text)
         elseif settings.VerboseOutput == 'Chat' then
-            log('Changing into macro set %s.':format(names[current]))
+            log('Changing into macro set %s.':format(output_text))
         elseif settings.VerboseOutput == 'Console' then
-            print('Changing into macro set %s.':format(names[current]))
+            print('Changing into macro set %s.':format(output_text))
         end
     end
 end
@@ -127,7 +141,9 @@ parse_binds = function(fbinds, top)
 
     rawset(names, top, rawget(_innerG._names, fbinds))
     for key, val in pairs(fbinds) do
+        key_combo = key
         key = S(key:split('+')):map(string.lower)
+        rawset(key_combos, key, key_combo)
         if type(val) == 'string' or type(val) == 'function' then
             rawset(top, key, val)
         else

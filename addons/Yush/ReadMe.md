@@ -29,6 +29,10 @@ The key which resets the current macro set to the previous set.
 
 If true, will display the current macro set you are in. The name it displays is the same name it has in the file it loads.
 
+**VerboseKeys**
+
+If true, will append the list of keybinds for the current macro set.
+
 **VerboseOutput**
 
 Determines where the current macro set will be displayed (only effective if the *Verbose* setting is `true`). The following options are available:
