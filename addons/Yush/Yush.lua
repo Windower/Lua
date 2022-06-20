@@ -77,24 +77,23 @@ output = function()
     if settings.Verbose then
         names[current] = names[current] or 'Unnamed'
 
-        output_text_table = {}
-        table.insert(output_text_table, names[current])
+        local output_text_names = L{}
+        output_text_names:append(names[current])
         if settings.VerboseKeys then
             for key, val in pairs(current) do
                 if type(val) ~= 'string' then
                     val = names[val] or 'Unnamed'
                 end
-                table.insert(output_text_table, key_combos[key] .. ': ' .. val)
+                output_text_names:append(key_combos[key] .. ': ' .. val)
             end
         end
-        local output_text = table.concat(output_text_table, '\n')
 
         if settings.VerboseOutput == 'Text' then
-            label:text(output_text)
+            label:text(output_text_names:concat('\n'))
         elseif settings.VerboseOutput == 'Chat' then
-            log('Changing into macro set %s.':format(output_text))
+            log('Changing into macro set %s.':format(output_text_names:concat(' | ')))
         elseif settings.VerboseOutput == 'Console' then
-            print('Changing into macro set %s.':format(output_text))
+            print('Changing into macro set %s.':format(output_text_names:concat(' | ')))
         end
     end
 end
