@@ -75,7 +75,7 @@ keys = S{}
 
 output = function()
     if settings.Verbose then
-        names[current] = names[current] or 'Unnamed ' .. tostring(current):sub(8)
+        names[current] = names[current] or 'Unnamed'
 
         output_text_table = {}
         table.insert(output_text_table, names[current])
