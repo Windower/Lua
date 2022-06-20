@@ -31,7 +31,7 @@ If true, will display the current macro set you are in. The name it displays is 
 
 **VerboseKeys**
 
-If true, will append the list of keybinds for the current macro set.
+If  true, will append the list of keybinds for the current macro set (only effective if the *Verbose* setting is `true`).
 
 **VerboseOutput**
 
