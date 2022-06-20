@@ -141,14 +141,13 @@ parse_binds = function(fbinds, top)
 
     rawset(names, top, rawget(_innerG._names, fbinds))
     for key, val in pairs(fbinds) do
-        key_combo = key
-        key = S(key:split('+')):map(string.lower)
-        rawset(key_combos, key, key_combo)
+        local split_key = S(key:split('+')):map(string.lower)
+        rawset(key_combos, split_key, key)
         if type(val) == 'string' or type(val) == 'function' then
-            rawset(top, key, val)
+            rawset(top, split_key, val)
         else
             local sub = {}
-            rawset(top, key, sub)
+            rawset(top, split_key, sub)
             parse_binds(val, sub)
         end
     end
