@@ -59,6 +59,7 @@ defaults.ResetKey = '`'
 defaults.BackKey = 'backspace'
 defaults.Verbose = false
 defaults.VerboseOutput = 'Text'
+defaults.VerboseKeys = false
 defaults.Label = {}
 
 settings = config.load(defaults)
@@ -67,20 +68,32 @@ label = texts.new(settings.Label, settings)
 
 binds = {}
 names = {}
+key_combos = {}
 current = binds
 stack = L{binds}
 keys = S{}
 
 output = function()
     if settings.Verbose then
-        names[current] = names[current] or 'Unnamed ' .. tostring(current):sub(8)
+        names[current] = names[current] or 'Unnamed'
+
+        local output_text_names = L{}
+        output_text_names:append(names[current])
+        if settings.VerboseKeys then
+            for key, val in pairs(current) do
+                if type(val) ~= 'string' then
+                    val = names[val] or 'Unnamed'
+                end
+                output_text_names:append(key_combos[key] .. ': ' .. val)
+            end
+        end
 
         if settings.VerboseOutput == 'Text' then
-            label:text(names[current])
+            label:text(output_text_names:concat('\n'))
         elseif settings.VerboseOutput == 'Chat' then
-            log('Changing into macro set %s.':format(names[current]))
+            log('Changing into macro set %s.':format(output_text_names:concat(' | ')))
         elseif settings.VerboseOutput == 'Console' then
-            print('Changing into macro set %s.':format(names[current]))
+            print('Changing into macro set %s.':format(output_text_names:concat(' | ')))
         end
     end
 end
@@ -127,12 +140,13 @@ parse_binds = function(fbinds, top)
 
     rawset(names, top, rawget(_innerG._names, fbinds))
     for key, val in pairs(fbinds) do
-        key = S(key:split('+')):map(string.lower)
+        local split_key = S(key:split('+')):map(string.lower)
+        rawset(key_combos, split_key, key)
         if type(val) == 'string' or type(val) == 'function' then
-            rawset(top, key, val)
+            rawset(top, split_key, val)
         else
             local sub = {}
-            rawset(top, key, sub)
+            rawset(top, split_key, sub)
             parse_binds(val, sub)
         end
     end
