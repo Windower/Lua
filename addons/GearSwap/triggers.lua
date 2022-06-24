@@ -256,6 +256,7 @@ parse.i[0x028] = function (data)
             equip_sets(prefix..'aftercast',ts,spell)
         elseif debugging.command_registry then
             msg.debugging('Hitting Aftercast without detecting an entry in command_registry')
+			equip_sets(prefix..'aftercast',nil,spell)
         end
     elseif (readies[act.category] and act.param == 28787) then -- and not (act.category == 9 or (act.category == 7 and prefix == 'pet_'))) then
         spell.action_type = 'Interruption'
@@ -268,6 +269,7 @@ parse.i[0x028] = function (data)
             equip_sets(prefix..'aftercast',ts,spell)
         elseif debugging.command_registry then
             msg.debugging('Hitting Aftercast without detecting an entry in command_registry')
+			equip_sets(prefix..'aftercast',nil,spell)
         end
     elseif readies[act.category] and prefix == 'pet_' and act.targets[1].actions[1].message ~= 0 then
         -- Entry for pet midcast. Excludes the second packet of "Out of range" BPs.
