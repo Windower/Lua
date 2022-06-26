@@ -474,6 +474,10 @@ function table.unpack(t, ...)
     return unpack(temp)
 end
 
+function table.pack(...)
+    return {...}
+end
+
 -- Returns the values of the table, extracted into an argument list. Like unpack, but works on dictionaries as well.
 function table.extract(t)
     local res = {}
