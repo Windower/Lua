@@ -248,11 +248,11 @@ parse.i[0x028] = function (data)
         else
             spell.value = act.targets[1].actions[1].param
         end
-        if ts then --or spell.prefix == '/item' then
+        if ts or spell.prefix == '/item' then
             -- Only aftercast things that were precasted.
             -- Also, there are some actions (like being paralyzed while casting Ninjutsu) that sends two result action packets. Block the second packet.
             refresh_globals()
-            command_registry[ts].midaction = false
+            if ts and command_registry[ts] then command_registry[ts].midaction = false end
             equip_sets(prefix..'aftercast',ts,spell)
         elseif debugging.command_registry then
             msg.debugging('Hitting Aftercast without detecting an entry in command_registry')
