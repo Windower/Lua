@@ -51,6 +51,13 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
     if splitline.n == 0 then return end
 
     local command = splitline[1]
+    if ffxi and command:startswith('/attack') then
+        local match = windower.regex.match(original:lower(), '^\/attack *( on|off)? +([0-9]+) *$') --"/attackoff" exists but "/attackon" doesn't
+        if match and match[1] and match[1][2] then
+            engage_by_id(match[1][2], match[1][1]:trim())
+            return true
+        end
+    end
     local bstpet = command == '/bstpet'
     local unified_prefix = unify_prefix[command]
     local abil, temptarg, temp_mob_arr
