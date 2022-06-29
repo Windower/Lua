@@ -986,6 +986,14 @@ fields.outgoing[0x0E7] = L{
     {ctype='unsigned char',      label='_unknown3'},                            -- 07   Observed to be 00
 }
 
+-- Toggle Heal
+fields.outgoing[0x0E8] = L{
+    {ctype='unsigned char',     label='Movement'},                              -- 04   02 if caused by movement
+    {ctype='unsigned char',     label='_unknown2'},                             -- 05   00 observed
+    {ctype='unsigned char',     label='_unknown3'},                             -- 06   00 observed
+    {ctype='unsigned char',     label='_unknown4'},                             -- 07   00 observed
+}
+
 -- Sit
 fields.outgoing[0x0EA] = L{
     {ctype='unsigned char',     label='Movement'},                              -- 04
@@ -3621,14 +3629,6 @@ fields.incoming[0x0E2] = L{
     {ctype='unsigned char',     label='_unknown6'},                             -- 20
     {ctype='unsigned char',     label='_unknown7'},                             -- 21   Could be an initialization for the name. 0x01 observed.
     {ctype='char*',             label='Name'},                                  -- 22   *   Maybe a base stat
-}
-
--- Toggle Heal
-fields.incoming[0x0E8] = L{
-    {ctype='unsigned char',     label='Movement'},                              -- 04   02 if caused by movement
-    {ctype='unsigned char',     label='_unknown2'},                             -- 05   00 observed
-    {ctype='unsigned char',     label='_unknown3'},                             -- 06   00 observed
-    {ctype='unsigned char',     label='_unknown4'},                             -- 07   00 observed
 }
 
 -- Widescan Mob
