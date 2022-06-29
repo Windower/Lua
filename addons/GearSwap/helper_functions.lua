@@ -1241,6 +1241,55 @@ end
 
 
 -----------------------------------------------------------------------------------
+--Name: engage_by_id(mob_id, mode) (CREDIT: Rubenator, RolandJ)
+--Args:
+---- mob_id: the id of the proposed mob to engage or disengage
+---- mode: the specific /attack subcommand to perform, if specified (optional)
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+local action_packet_categories = T{['Engage']=0x02,['Switch Target']=0x0F,['Disengage']=0x04}
+local engage_player_status_map = T{Idle='Engage', Engaged='Switch Target'}
+function engage_by_id(mob_id, mode)
+    local mob = windower.ffxi.get_mob_by_id(tonumber(mob_id))
+    if not mob or not mob.id or not mob.index or not mob.valid_target then return end
+
+    local player = windower.ffxi.get_player()
+    if not player or not player.status then return end
+
+    local player_status = res.statuses[player.status] and res.statuses[player.status].english
+    if not player_status then return end
+
+    local desired_mode = (mode == 'on' or mode == '' and player_status == 'Idle') and 'Engage' or 'Disengage'
+    local category
+    if desired_mode == 'Disengage' then
+        category = player_status == 'Engaged' and 'Disengage'
+    else
+        category = engage_player_status_map[player_status]
+    end
+    if not category or windower.ffxi.get_mob_by_target('me').charmed then return end
+
+    local engaged_id = (windower.ffxi.get_mob_by_target('t') or {}).id
+    if engaged_id and mob.id then
+        if category == 'Disengage' and mob.id ~= engaged_id then
+			return -- Do not disengage if engaged with something else
+        elseif ((category == 'Engage' and player_status == 'Engaged') or category == 'Switch Target') and mob.id == engaged_id then
+			return -- Do not engage the same thing you're already engaged with
+        end
+    end
+
+    local action_packet_category = action_packet_categories[category]
+    packets.inject(packets.new('outgoing', 0x01A, {
+        ['Target'] = mob.id,
+        ['Target Index'] = mob.index,
+        ['Category'] = action_packet_category,
+    }))
+end
+
+
+
+-----------------------------------------------------------------------------------
 --Name: windower.debug(...)
 --Args:
 ---- ...: Anything, to be passed to the real windower.debug if the windower_debugging
