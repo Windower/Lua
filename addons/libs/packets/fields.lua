@@ -716,8 +716,9 @@ fields.outgoing[0x05E] = L{
     {ctype='unsigned char',     label='Type'},                                  -- 17   03 for leaving the MH, 00 otherwise
 }
 
--- Equipment Screen (0x02 length) -- Also observed when zoning
+-- Equipment Screen, also observed when zoning
 fields.outgoing[0x061] = L{
+    {ctype='data[4]',           label='_unknown1'},                             -- 04   Always zero?
 }
 
 -- Digging Finished
