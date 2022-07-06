@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 _addon.name='Trusts'
 _addon.author='from20020516'
-_addon.version='1.1'
+_addon.version='1.1.1'
 _addon.commands={'trusts','tru'}
 
 config = require('config')
@@ -56,7 +56,8 @@ windower.register_event('load',function()
         wait={
             ['aftercast']=3,
             ['retr']=1.25,
-            ['retrall']=3},}
+            ['retrall']=3},
+        listnames=false, }
     settings = config.load(defaults)
     lang = string.lower(settings.language)
     player = windower.ffxi.get_player()
@@ -108,9 +109,18 @@ function list_sets()
     settings = config.load()
     chat(1, 'Trusts - Saved sets:')
 
-    for set, _ in pairs(settings.sets) do
+    for set, trust_list in pairs(settings.sets) do
         if set ~= 'default' then
-            chat(207, set)
+            local names = ''
+            if settings.listnames then
+                for i=1,check_limit() do
+                    local name = trust_list[tostring(i)]
+                    if name then
+                        names = names .. ' | ' .. name
+                    end
+                end
+            end
+            chat(207, set .. names)
         end
     end
 end
