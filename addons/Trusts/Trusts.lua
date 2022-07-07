@@ -78,12 +78,15 @@ windower.register_event('addon command',function(...)
         chat(207,'//tru '..color('list',166,160)..' --Lists your saved sets.')
         chat(207,'//tru '..color('random',166,160)..' --What\'s your fortune today?')
         chat(207,'//tru '..color('check',166,160)..' --List of unlearned trusts. gotta catch \'em all!')
+        chat(207,'//tru '..color('listnames',166,160)..' --Toggle trust names for all sets when using the list command.')
     elseif cmd[1] == 'save' then
         save_set(cmd[2])
     elseif cmd[1] == 'check' then
         check_learned()
     elseif cmd[1] == 'list' then
         list_sets()
+    elseif cmd[1] == 'listnames' then
+        toggle_listnames()
     else
         call_set(cmd[1] or 'default')
     end
@@ -102,6 +105,12 @@ function save_set(set)
     end
     settings:save('all')
     log('set '..set..' saved.')
+end
+
+function toggle_listnames()
+    settings.listnames = not settings.listnames
+    windower.add_to_chat(207, 'Name listing is now ' .. (settings.listnames and 'on.' or 'off.'))
+    settings:save('all')
 end
 
 function list_sets()
