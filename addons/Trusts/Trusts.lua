@@ -83,6 +83,8 @@ windower.register_event('addon command',function(...)
         save_set(cmd[2])
     elseif cmd[1] == 'check' then
         check_learned()
+    elseif cmd[1] == 'list' and cmd[2] then
+        print_set_trusts(cmd[2])
     elseif cmd[1] == 'list' then
         list_sets()
     elseif cmd[1] == 'listnames' then
@@ -113,23 +115,34 @@ function toggle_listnames()
     settings:save('all')
 end
 
+function print_set_trusts(set)
+    local trust_list = settings.sets[set]
+    if trust_list then
+        local names = ''
+        for i=1,check_limit() do
+            local name = trust_list[tostring(i)]
+            if name then
+                names = names .. ' | ' .. name
+            end
+        end
+        windower.add_to_chat(207, set .. names)
+    else
+        windower.add_to_chat(207, string.color(set .. ' does not exist.', 28, 160))
+    end
+end
+
 function list_sets()
     local chat = windower.add_to_chat
     settings = config.load()
     chat(1, 'Trusts - Saved sets:')
 
-    for set, trust_list in pairs(settings.sets) do
+    for set, _ in pairs(settings.sets) do
         if set ~= 'default' then
-            local names = ''
             if settings.listnames then
-                for i=1,check_limit() do
-                    local name = trust_list[tostring(i)]
-                    if name then
-                        names = names .. ' | ' .. name
-                    end
-                end
+                print_set_trusts(set)
+            else
+                chat(207, set)
             end
-            chat(207, set .. names)
         end
     end
 end
