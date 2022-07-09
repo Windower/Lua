@@ -430,6 +430,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
                 call_events(dragged.image, 'left_click')
             end
             dragged = nil
+            clicked = nil
             return true
         end
     end
