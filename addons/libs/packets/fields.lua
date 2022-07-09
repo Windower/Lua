@@ -2800,7 +2800,7 @@ func.incoming[0x056][0x00D8] = L{
 
 func.incoming[0x056][0xFFFE] = L{
     {ctype='int',           label='Current TVR Mission'},                       -- 04
-    {ctype='data[8]',       label='_junk'},                                     -- 08
+    {ctype='data[28]',      label='_junk'},                                     -- 08
 }
 
 func.incoming[0x056][0xFFFF] = L{
