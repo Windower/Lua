@@ -2752,6 +2752,7 @@ enums.quest_mission_log = {
     [0x00F8] = 'Completed Adoulin Quests',
     [0x0100] = 'Current Coalition Quests',
     [0x0108] = 'Completed Coalition Quests',
+    [0xFFFE] = 'Current TVR Missions',
     [0xFFFF] = 'Current Missions',
 }
 
@@ -2795,6 +2796,11 @@ func.incoming[0x056][0x00D8] = L{
     {ctype='data[8]',       label='Completed TOAU Missions'},                   -- 04
     {ctype='data[8]',       label='Completed WOTG Missions'},                   -- 0C
     {ctype='data[16]',      label='_junk'},                                     -- 14
+}
+
+func.incoming[0x056][0xFFFE] = L{
+    {ctype='int',           label='Current TVR Mission'},                       -- 04
+    {ctype='data[8]',       label='_junk'},                                     -- 08
 }
 
 func.incoming[0x056][0xFFFF] = L{
