@@ -72,7 +72,7 @@ function get_sets()
     
     sets.midcast.magic_base = {
         main="Laevateinn",
-        sub="Enki Strap",
+        sub="Khonsu",
         ammo={name="Mana Ampulla",mp=20},
         head={ name="Merlinic Hood", augments={'"Mag.Atk.Bns."+28','"Fast Cast"+3','"Refresh"+1','Mag. Acc.+6 "Mag.Atk.Bns."+6',},hp=22,mp=56},
         body={ name="Witching Robe", augments={'MP+50','Mag. Acc.+15','"Mag.Atk.Bns."+15','"Refresh"+1',},hp=50,mp=117},
@@ -89,7 +89,7 @@ function get_sets()
     }
     
     sets.midcast.Stun = {main="Laevateinn",
-        sub="Enki strap",
+        sub="Khonsu",
         ammo={name="Hydrocera",mp=20},
         head={ name="Merlinic Hood", augments={'"Fast Cast"+7','MND+10','Mag. Acc.+10','"Mag.Atk.Bns."+10',},hp=22,mp=56},
         neck="Erra Pendant",
@@ -121,7 +121,7 @@ function get_sets()
     -- MAcc level 0 (Macc and Enmity irrelevant)
     sets.midcast['Elemental Magic'][0][0] = {
         main="Laevateinn",
-        sub="Enki Strap",
+        sub="Khonsu",
         ammo="Pemphredo Tathlum",
         head={ name="Merlinic Hood", augments={'VIT+8','"Mag.Atk.Bns."+27','Accuracy+5 Attack+5','Mag. Acc.+18 "Mag.Atk.Bns."+18',},hp=22,mp=56},
         neck="Baetyl Pendant",
@@ -154,7 +154,7 @@ function get_sets()
     
     -- MAcc level 1 (MAcc and Enmity relevant)
     sets.midcast['Elemental Magic'][1][0] = {main="Laevateinn",
-        sub="Enki Strap",
+        sub="Khonsu",
         ammo="Pemphredo Tathlum",
         head={ name="Merlinic Hood", augments={'VIT+8','"Mag.Atk.Bns."+27','Accuracy+5 Attack+5','Mag. Acc.+18 "Mag.Atk.Bns."+18',},hp=22,mp=56},
         body={ name="Witching Robe", augments={'MP+50','Mag. Acc.+15','"Mag.Atk.Bns."+15','"Refresh"+1',},hp=50,mp=117},
@@ -217,7 +217,7 @@ function get_sets()
     
     sets.midcast['Enfeebling Magic'] = {
         main="Laevateinn",
-        sub="Enki Strap",
+        sub="Khonsu",
         ammo="Pemphredo Tathlum",
         head={name="Amalric Coif +1",hp=27,mp=61},
         neck="Erra Pendant",
