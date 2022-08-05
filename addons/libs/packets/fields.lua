@@ -716,8 +716,9 @@ fields.outgoing[0x05E] = L{
     {ctype='unsigned char',     label='Type'},                                  -- 17   03 for leaving the MH, 00 otherwise
 }
 
--- Equipment Screen (0x02 length) -- Also observed when zoning
+-- Equipment Screen, also observed when zoning
 fields.outgoing[0x061] = L{
+    {ctype='data[4]',           label='_unknown1'},                             -- 04   Always zero?
 }
 
 -- Digging Finished
@@ -984,6 +985,14 @@ fields.outgoing[0x0E7] = L{
     {ctype='unsigned char',      label='_unknown2'},                            -- 05   Observed to be 00
     {ctype='unsigned char',      label='Logout Type',       fn=e+{'logout'}},   -- 06   /logout = 01, /pol == 02 (removed), /shutdown = 03
     {ctype='unsigned char',      label='_unknown3'},                            -- 07   Observed to be 00
+}
+
+-- Toggle Heal
+fields.outgoing[0x0E8] = L{
+    {ctype='unsigned char',     label='Movement'},                              -- 04   02 if caused by movement
+    {ctype='unsigned char',     label='_unknown2'},                             -- 05   00 observed
+    {ctype='unsigned char',     label='_unknown3'},                             -- 06   00 observed
+    {ctype='unsigned char',     label='_unknown4'},                             -- 07   00 observed
 }
 
 -- Sit
@@ -2743,6 +2752,7 @@ enums.quest_mission_log = {
     [0x00F8] = 'Completed Adoulin Quests',
     [0x0100] = 'Current Coalition Quests',
     [0x0108] = 'Completed Coalition Quests',
+    [0xFFFE] = 'Current TVR Missions',
     [0xFFFF] = 'Current Missions',
 }
 
@@ -2786,6 +2796,11 @@ func.incoming[0x056][0x00D8] = L{
     {ctype='data[8]',       label='Completed TOAU Missions'},                   -- 04
     {ctype='data[8]',       label='Completed WOTG Missions'},                   -- 0C
     {ctype='data[16]',      label='_junk'},                                     -- 14
+}
+
+func.incoming[0x056][0xFFFE] = L{
+    {ctype='int',           label='Current TVR Mission'},                       -- 04
+    {ctype='data[28]',      label='_junk'},                                     -- 08
 }
 
 func.incoming[0x056][0xFFFF] = L{
@@ -3621,14 +3636,6 @@ fields.incoming[0x0E2] = L{
     {ctype='unsigned char',     label='_unknown6'},                             -- 20
     {ctype='unsigned char',     label='_unknown7'},                             -- 21   Could be an initialization for the name. 0x01 observed.
     {ctype='char*',             label='Name'},                                  -- 22   *   Maybe a base stat
-}
-
--- Toggle Heal
-fields.incoming[0x0E8] = L{
-    {ctype='unsigned char',     label='Movement'},                              -- 04   02 if caused by movement
-    {ctype='unsigned char',     label='_unknown2'},                             -- 05   00 observed
-    {ctype='unsigned char',     label='_unknown3'},                             -- 06   00 observed
-    {ctype='unsigned char',     label='_unknown4'},                             -- 07   00 observed
 }
 
 -- Widescan Mob

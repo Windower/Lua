@@ -214,6 +214,9 @@ function dialog.open_dat_by_zone_id(zone_id, language)
     end
 
     local dat_path = windower.ffxi_path
+    if not dat_path:endswith('\\') then
+        dat_path = dat_path..'\\'
+    end
     local path
     local vtable = dat_path .. 'VTABLE.DAT'
     local ftable = dat_path .. 'FTABLE.DAT'
