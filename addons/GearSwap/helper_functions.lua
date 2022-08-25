@@ -604,7 +604,6 @@ end
 function find_usable_item(item_id)
     for _,bag in ipairs(usable_item_bags) do
         for i,v in pairs(items[to_windower_bag_api(bag.en)]) do
-            
             if type(v) == 'table' and v.id == item_id and is_usable_item(v,bag.id) then
                 return i, bag.id
             end
