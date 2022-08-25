@@ -260,6 +260,42 @@ function parse_equip_chunk(chunk)
     end
 end
 
+parse.o[0x037] = function (data,injected) -- Use Item
+    print(injected)
+    print(data)
+    if gearswap_disabled then return end
+    local packet = packets.parse('outgoing', data)
+    local item = windower.ffxi.get_items(packet['Bag'], packet['Slot'])
+    if not item or not item.id then return end
+    ts = command_registry:find_by_spell(item.id)
+    if not ts then
+        local act = {
+            ['actor_id'] = player.id,
+            ['category'] = 9,
+            ['param'] = 24931,
+            ['targets'] = {
+                {
+                    ['id'] = packet.Player,
+                    ['actions'] = {
+                        {
+                            ['param']=item.id
+                        },
+                    },
+                },
+            },
+        }
+        local spell = get_spell(act)
+        if not spell then return end
+        spell.target = windower.ffxi.get_mob_by_id(packet.Player)
+        spell.prefix = '/item'
+        spell.type = 'Item'
+        spell.action_type = action_type_map[spell.prefix]
+        ts = command_registry:new_entry(spell)
+        refresh_globals()
+        equip_sets('midcast', ts, spell)
+    end
+end
+
 parse.o[0x050] = function (data,injected) --equip
     if injected then return end
     -- Because of the way windower works, uninjected chunks will appear after
