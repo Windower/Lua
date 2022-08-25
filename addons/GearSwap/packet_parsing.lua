@@ -260,9 +260,7 @@ function parse_equip_chunk(chunk)
     end
 end
 
-parse.o[0x037] = function (data,injected) -- Use Item
-    print(injected)
-    print(data)
+parse.o[0x037] = function (data,injected) -- use item
     if gearswap_disabled then return end
     local packet = packets.parse('outgoing', data)
     local item = windower.ffxi.get_items(packet['Bag'], packet['Slot'])
