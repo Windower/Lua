@@ -602,9 +602,14 @@ end
 ---- bag_id - The item's bag ID (if it exists)
 -----------------------------------------------------------------------------------
 function find_usable_item(item_id)
+    --table.vprint(usable_item_bags)
     for _,bag in ipairs(usable_item_bags) do
+        --table.vprint(usable_item_bags)
+        --print(to_windower_bag_api(bag.en), items[to_windower_bag_api(bag.en)])
         for i,v in pairs(items[to_windower_bag_api(bag.en)]) do
+            
             if type(v) == 'table' and v.id == item_id and is_usable_item(v,bag.id) then
+                --print(i, bag.id)
                 return i, bag.id
             end
         end
@@ -623,6 +628,7 @@ end
 -----------------------------------------------------------------------------------
 function is_usable_item(i_tab,bag_id)
     local ext = extdata.decode(i_tab)
+    --print(i_tab, i_tab.status, bag_id)
     if ext.type == 'Enchanted Equipment' and ext.usable then
         return i_tab.status == 5
     elseif i_tab.status == 0 and bag_id < 4 then
