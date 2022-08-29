@@ -3609,8 +3609,9 @@ fields.incoming[0x0DF] = L{
 -- Linkshell Equip
 fields.incoming[0x0E0] = L{
     {ctype='unsigned char',     label='Linkshell Number'},                      -- 04
-    {ctype='unsigned char',     label='Inventory Slot'},                        -- 05
-    {ctype='unsigned short',    label='_junk1'},                                -- 06
+    {ctype='unsigned char',     label='Slot'},                                  -- 05
+    {ctype='unsigned char',     label='Bag'},                                   -- 06
+    {ctype='unsigned char',     label='_junk1'},                                -- 07
 }
 
 -- Party Member List
