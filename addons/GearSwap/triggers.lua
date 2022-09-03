@@ -43,7 +43,7 @@
 windower.register_event('outgoing text',function(original,modified,blocked,ffxi,extra_stuff,extra2)
     windower.debug('outgoing text')
     if gearswap_disabled then return modified end
-    
+
     local splitline = windower.from_shift_jis(windower.convert_auto_trans(modified)):gsub('<wait[%s%d%.]*>',''):gsub('"(.-)"',function(str)
             return ' '..str:gsub(' ',string.char(7))..' '
         end):split(' '):filter(-'')
@@ -257,24 +257,33 @@ parse.i[0x028] = function (data)
         elseif debugging.command_registry then
             msg.debugging('Hitting Aftercast without detecting an entry in command_registry')
         end
-    elseif (readies[act.category] and act.param == 28787) then -- and not (act.category == 9 or (act.category == 7 and prefix == 'pet_'))) then
-        spell.action_type = 'Interruption'
-        spell.interrupted = true
-        if ts or spell.prefix == '/item' then
-            -- Only aftercast things that were precasted.
-            -- Also, there are some actions (like being paralyzed while casting Ninjutsu) that sends two result action packets. Block the second packet.
+    elseif readies[act.category] then -- and not (act.category == 9 or (act.category == 7 and prefix == 'pet_'))) then
+        if prefix == 'pet_' and act.targets[1].actions[1].message ~= 0 then
+            -- Entry for pet midcast. Excludes the second packet of "Out of range" BPs.
+            ts = command_registry:new_entry(spell)
             refresh_globals()
-            if command_registry[ts] then command_registry[ts].midaction = false end
-            equip_sets(prefix..'aftercast',ts,spell)
-        elseif debugging.command_registry then
-            msg.debugging('Hitting Aftercast without detecting an entry in command_registry')
+            command_registry[ts].pet_midaction = true
+            equip_sets('pet_midcast',ts,spell)
+        elseif act.param == 28787 then
+            spell.action_type = 'Interruption'
+            spell.interrupted = true
+            if ts or spell.prefix == '/item' then
+                -- Only aftercast things that were precasted.
+                -- Also, there are some actions (like being paralyzed while casting Ninjutsu) that sends two result action packets. Block the second packet.
+                refresh_globals()
+                if command_registry[ts] then command_registry[ts].midaction = false end
+                equip_sets(prefix..'aftercast',ts,spell)
+            elseif debugging.command_registry then
+                msg.debugging('Hitting Aftercast without detecting an entry in command_registry')
+            end
+        elseif act.category == 9 and spell.prefix == '/item' and act.targets[1].actions[1].param then
+            ts = command_registry:find_by_spell(spell)
+            if not ts then
+                ts = command_registry:new_entry(spell)
+                refresh_globals()
+                equip_sets(prefix..'midcast', ts, spell)
+            end
         end
-    elseif readies[act.category] and prefix == 'pet_' and act.targets[1].actions[1].message ~= 0 then
-        -- Entry for pet midcast. Excludes the second packet of "Out of range" BPs.
-        ts = command_registry:new_entry(spell)
-        refresh_globals()
-        command_registry[ts].pet_midaction = true
-        equip_sets('pet_midcast',ts,spell)
     end
 end
 
