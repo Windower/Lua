@@ -153,7 +153,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
                     -- The packets created above should not be used.
                     if command_registry[ts].proposed_packet then
                         equip_sets('precast',ts,spell)
-                        return true
+                        return ""
                     end
                 else
                     return equip_sets('pretarget',-1,spell)
