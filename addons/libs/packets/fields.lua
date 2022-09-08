@@ -3610,7 +3610,8 @@ fields.incoming[0x0DF] = L{
 fields.incoming[0x0E0] = L{
     {ctype='unsigned char',     label='Linkshell Number'},                      -- 04
     {ctype='unsigned char',     label='Inventory Slot'},                        -- 05
-    {ctype='unsigned short',    label='_junk1'},                                -- 06
+    {ctype='unsigned char',     label='Bag'},                                   -- 06
+    {ctype='unsigned char',     label='_junk1'},                                -- 07
 }
 
 -- Party Member List
@@ -4008,6 +4009,10 @@ fields.incoming[0x118] = L{
     {ctype='unsigned char',     label='Darkness Spheres Set'},                      -- 7C
     {ctype='data[0x03]',        label='_unknown1'},                                 -- 7D   Presumably Unused Padding
     {ctype='signed int',        label='Silver A.M.A.N. Vouchers Stored'},           -- 80
+    {ctype='signed int',        label='Domain Points'},                             -- 84
+    {ctype='signed int',        label='Domain Points Earned Today'},                -- 88
+    {ctype='signed int',        label='Mog Segments'},                              -- 8C
+    {ctype='signed int',        label='Gallimaufry'},                               -- 90
 }
 
 types.ability_recast = L{

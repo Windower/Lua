@@ -26,40 +26,24 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local nms = {
-    'alfard',
-    'amphitrite',
-    'apademak',
-    'arch dynamis lord',
-    'azdaja',
-    'bennu',
-    'briareus',
-    'brulo',
-    'bukhis',
-    'carabosse',
-    'chloris',
-    'cirein-croin',
-    'dragua',
-    'glavoid',
-    'ironclad smiter',
-    'ironclad sunderer',
-    'ironclad triturator',
-    'isgebind',
-    'itzpapalotl',
-    'kukulkan',
-    'maere',
-    'ogopogo',
-    'orthrus',
-    'resheph',
-    'sedna',
-    'sobek',
-    'ulhuadshi',
-    'warder of courage'
+return {
+    name = 'Ironclad Sunderer',
+    collectable = 3293, --Iron Plate
+    collectable_target_count = 50,
+    pops = { {
+        id = 3260, --Teekesselchen Fragment
+        type = 'item',
+        dropped_from = {
+            name = 'Teekesselchen, Forced (I-5)',
+            pops = { {
+                id = 3265, --Bubbling Oil
+                type = 'item',
+                dropped_from = { name = 'Sinister Seidel, (J-5)' }
+            } }
+        }
+    }, {
+        id = 3266, --Darkflame Arm
+        type = 'item',
+        dropped_from = { name = 'Stygian Djinn, (K-7)' }
+    } }
 }
-
-nm_data = {}
-for _, nm in pairs(nms) do
-    nm_data[nm] = require('nms/' .. nm)
-end
-
-return nm_data

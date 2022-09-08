@@ -26,40 +26,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-local nms = {
-    'alfard',
-    'amphitrite',
-    'apademak',
-    'arch dynamis lord',
-    'azdaja',
-    'bennu',
-    'briareus',
-    'brulo',
-    'bukhis',
-    'carabosse',
-    'chloris',
-    'cirein-croin',
-    'dragua',
-    'glavoid',
-    'ironclad smiter',
-    'ironclad sunderer',
-    'ironclad triturator',
-    'isgebind',
-    'itzpapalotl',
-    'kukulkan',
-    'maere',
-    'ogopogo',
-    'orthrus',
-    'resheph',
-    'sedna',
-    'sobek',
-    'ulhuadshi',
-    'warder of courage'
+return {
+    name = 'Bennu',
+    pops = { {
+        id = 1522, --Resplendent roc quill
+        type = 'key item',
+        dropped_from = {
+            name = 'Ouzelum, Timed (I-8/J-9)',
+        }
+    } }
 }
-
-nm_data = {}
-for _, nm in pairs(nms) do
-    nm_data[nm] = require('nms/' .. nm)
-end
-
-return nm_data
