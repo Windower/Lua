@@ -26,7 +26,7 @@
 
 _addon.name = 'DressUp'
 _addon.author = 'Cair'
-_addon.version = '1.21'
+_addon.version = '1.30'
 _addon.commands = {'DressUp','du'}
 
 
@@ -37,6 +37,8 @@ require('static_variables')
 
 
 models = {}
+require('main')
+require('sub')
 require('head')
 require('body')
 require('hands')
