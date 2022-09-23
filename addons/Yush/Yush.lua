@@ -117,7 +117,7 @@ end
 check = function(keyset)
     keyset = keyset or keys
     for key, val in pairs(current) do
-        if key <= keyset then
+        if key == keyset then
             if type(val) == 'string' then
                 windower.send_command(val)
             elseif type(val) == 'function' then
