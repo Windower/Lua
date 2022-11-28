@@ -286,6 +286,14 @@ windower.register_event('addon command', function(command1, command2, ...)
 
         end
 
+    elseif command1 == 'done' then
+        local lots = windower.ffxi.get_party().lots
+        for slot_index, item_table in pairs(windower.ffxi.get_items().treasure) do
+            if lots[slot_index] == nil then
+                windower.ffxi.pass_item(slot_index)
+            end
+        end
+
     elseif command1 == 'passall' then
         for slot_index, item_table in pairs(windower.ffxi.get_items().treasure) do
             windower.ffxi.pass_item(slot_index)
