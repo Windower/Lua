@@ -289,19 +289,28 @@ windower.register_event('addon command', function(command1, command2, ...)
     elseif command1 == 'done' then
         local lots = windower.ffxi.get_party().p0.lots
         for slot_index, _ in pairs(windower.ffxi.get_items('treasure')) do
+            -- Pass if we haven't lotted or passed.
             if lots[slot_index] == nil then
                 windower.ffxi.pass_item(slot_index)
             end
         end
 
     elseif command1 == 'passall' then
+        local lots = windower.ffxi.get_party().p0.lots
         for slot_index, _ in pairs(windower.ffxi.get_items('treasure')) do
-            windower.ffxi.pass_item(slot_index)
+            -- Pass if we haven't passed (will pass if lotted).
+            if lots[slot_index] == nil or type(lots[slot_index]) == 'number' then
+                windower.ffxi.pass_item(slot_index)
+            end
         end
 
     elseif command1 == 'lotall' then
+        local lots = windower.ffxi.get_party().p0.lots
         for slot_index, _ in pairs(windower.ffxi.get_items('treasure')) do
-            windower.ffxi.lot_item(slot_index)
+            -- Lot if we haven't lotted or passed.
+            if lots[slot_index] == nil then
+                windower.ffxi.lot_item(slot_index)
+            end
         end
 
     elseif command1 == 'clearall' then
