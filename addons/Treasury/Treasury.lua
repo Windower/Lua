@@ -8,6 +8,9 @@ config = require('config')
 packets = require('packets')
 require('logger')
 
+local MIN_TREASURE_SLOT_INDEX = 0
+local MAX_TREASURE_SLOT_INDEX = 9
+
 defaults = {}
 defaults.Pass = S{}
 defaults.Lot = S{}
@@ -287,29 +290,32 @@ windower.register_event('addon command', function(command1, command2, ...)
         end
 
     elseif command1 == 'done' then
-        local lots = windower.ffxi.get_party().p0.lots
-        for slot_index, _ in pairs(windower.ffxi.get_items('treasure')) do
+        local lots     = windower.ffxi.get_party().p0.lots
+        local treasure = windower.ffxi.get_items('treasure')
+        for idx=MIN_TREASURE_SLOT_INDEX, MAX_TREASURE_SLOT_INDEX do
             -- Pass if we haven't lotted or passed.
-            if lots[slot_index] == nil then
-                windower.ffxi.pass_item(slot_index)
+            if treasure[idx] and lots[idx] == nil then
+                windower.ffxi.pass_item(idx)
             end
         end
 
     elseif command1 == 'passall' then
-        local lots = windower.ffxi.get_party().p0.lots
-        for slot_index, _ in pairs(windower.ffxi.get_items('treasure')) do
+        local lots     = windower.ffxi.get_party().p0.lots
+        local treasure = windower.ffxi.get_items('treasure')
+        for idx=MIN_TREASURE_SLOT_INDEX, MAX_TREASURE_SLOT_INDEX do
             -- Pass if we haven't passed (will pass if lotted).
-            if lots[slot_index] == nil or type(lots[slot_index]) == 'number' then
-                windower.ffxi.pass_item(slot_index)
+            if treasure[idx] and (lots[idx] == nil or type(lots[idx]) == 'number') then
+                windower.ffxi.pass_item(idx)
             end
         end
 
     elseif command1 == 'lotall' then
-        local lots = windower.ffxi.get_party().p0.lots
-        for slot_index, _ in pairs(windower.ffxi.get_items('treasure')) do
+        local lots     = windower.ffxi.get_party().p0.lots
+        local treasure = windower.ffxi.get_items('treasure')
+        for idx=MIN_TREASURE_SLOT_INDEX, MAX_TREASURE_SLOT_INDEX do
             -- Lot if we haven't lotted or passed.
-            if lots[slot_index] == nil then
-                windower.ffxi.lot_item(slot_index)
+            if treasure[idx] and lots[idx] == nil then
+                windower.ffxi.lot_item(idx)
             end
         end
 
