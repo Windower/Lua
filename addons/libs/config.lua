@@ -277,19 +277,31 @@ function settings_table(node, settings, key, meta)
         return t
     end
 
-    if not node.children:all(function(n)
+    local function tag_or_comment(n)
         return n.type == 'tag' or n.type == 'comment'
-    end) and not (#node.children == 1 and node.children[1].type == 'text') then
+    end
+    local function text_or_comment(n)
+        return n.type == 'text' or n.type == 'comment'
+    end
+
+    if not node.children:all(tag_or_comment) and not node.children:all(text_or_comment) then
         error('Malformatted settings file.')
         return t
     end
 
     -- TODO: Type checking necessary? merge should take care of that.
-    if #node.children == 1 and node.children[1].type == 'text' then
-        local val = node.children[1].value
-        if node.children[1].cdata then
+    if #node.children >= 1 and node.children:all(text_or_comment) then
+        if node.children:any(function(n) return n.cdata end) then
             meta.cdata:add(key)
-            return val
+        end
+
+        local val = ''
+        for child in node.children:it() do
+            if child.type == 'comment' then
+                meta.comments[key] = child.value:trim()
+            elseif child.type == 'text' then
+                val = val .. child.value
+            end
         end
 
         if val:lower() == 'false' then
