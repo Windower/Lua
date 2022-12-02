@@ -290,7 +290,7 @@ function command_logic(original,modified)
             windower.send_command('@input '..lastsent)
             return '',false
         end
-    elseif command2_list[command] or (command_list[command] and valid_target(potential_targ)) then
+    elseif command2_list[command] then
         -- If the submitted command does not require ability interpretation and is fine already, send it out.
         lastsent = ''
         if logging then
