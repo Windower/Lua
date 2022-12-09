@@ -1,0 +1,159 @@
+<?xml version="1.0" ?>
+<ChatMon>
+	<settings
+		TellSound="Tell"
+		ExamineSound="Examine"
+		EmoteSound="Emote"
+		TalkSound="Talk"
+		InviteSound="Invite"
+		SoundInterval="5"
+	/>
+	<!--
+		Triggers:
+			match: Trigger alert when matched. Uses matching rules as defined by wc_match. see: https://github.com/Windower/Lua/wiki/Functions
+			notmatch: Exclude if matched; prioritized over match
+			sound: Sound to play
+			from: Limit match to specified channels. Separate multiples with a pipe.
+				  Matches against all channels if not provided.
+			notfrom: Exclude specified channels; prioritized over from. Separate multiples with a pipe.
+		About Sounds:
+			This is a file name relative to the sounds directory in the addon location
+			An absolute path may be used as well
+			The only accepted format is WAV, which is a windower limitation
+			Built-in shortcuts: Tell, Examine, Emote, Talk, Invite
+		About Channels:
+			The channel is the numerical id assigned by the server for the text.
+			You may also use these named shortcuts:
+				Say, Shout, Yell, Party, Linkshell, Linkshell2, Tell, Invite, Emote, Examine, Readies, Casting, WearOff
+				Note: All is ignored and only provided for backwards compatibility.
+	-->
+	<!-- Status -->
+	<trigger match="*no longer charmed*" notfrom="Say|Shout|Yell" sound="call17.wav" /><!-- channel unknown -->
+	<trigger from="191" match="*is no longer weakened." sound="call17.wav" />
+	<!-- Buffs -->
+	<trigger from="WearOff" match="*s Refresh effect wears off." sound="call17.wav" />
+	<trigger from="WearOff" match="*s Reraise effect wears off." sound="reraise.wav" />
+	<trigger from="WearOff" match="*s Haste effect wears off." sound="haste.wav" />
+	<trigger from="WearOff" match="*s Regen effect wears off." sound="regen.wav" />
+	<!-- Debuffs -->
+	<trigger from="WearOff" match="*s Slow effect wears off.*" sound="slow.wav" />
+	<trigger from="WearOff" match="*s Elegy effect wears off.*" sound="slow.wav" />
+	<!-- High alert skills -->
+	<trigger from="Readies" match="*Self-Destruct*" sound="call0.wav" />
+	<trigger from="Readies" match="*Baleful Gaze*" sound="petrified.wav" />
+	<trigger from="Readies" match="*Meltdown*" sound="call0.wav" />
+	<trigger from="Readies" match="*Pyric Bulwark*" sound="call0.wav" />
+	<trigger from="Readies" match="*Phlegm Expulsion*" sound="stun.wav" />
+	<trigger from="Readies" match="*Bad Breath*" sound="stun.wav" />
+	<trigger from="Readies" match="*Tabbiyaa Gambit*" sound="alert4.wav" />
+	<trigger from="Readies" match="*Seed of Deference*" sound="charmed.wav" />
+	<trigger from="Readies" match="*Beguiling Gaze*" sound="charmed.wav" />
+	<trigger from="Readies" match="*Cimicine Discharge*" sound="erase.wav" />
+	<trigger from="Readies" match="*Discharge*" sound="paralyzed.wav" />
+	<trigger from="Casting" match="*Breakga*" sound="petrified.wav" />
+	<trigger from="Casting" match="*Slowga*" sound="slow.wav" />
+	<trigger from="Casting" match="*Silencega*" sound="silenced.wav" />
+	<!-- TOAU HNM -->
+	<trigger from="Readies" match="*Fossilizing Breath*" sound="petrified.wav" />
+	<trigger from="Readies" match="*Fulmination*" sound="paralyzed.wav" />
+	<trigger from="Readies" match="*Tourbillion*" sound="erase.wav" />
+	<trigger from="Readies" match="*Polar Blast*" sound="paralyzed.wav" />
+	<trigger from="Readies" match="*Pyric Blast*" sound="plagued.wav" />
+	<trigger from="Readies" match="*Nerve Gas*" sound="poisoned.wav" />
+	<trigger from="Readies" match="*Cackle*" sound="erase.wav" />
+	<trigger from="Readies" match="*Bilgestorm*" sound="erase.wav" />
+	<trigger from="Readies" match="*Hellclap*" sound="erase.wav" />
+	<trigger from="Readies" match="*Necrobane*" sound="paralyzed.wav" />
+	<trigger from="Readies" match="*Necropurge*" sound="cursed.wav" />
+	<trigger from="Readies" match="*Nocturnal Servitude*" sound="charmed.wav" />
+	<trigger from="Readies" match="*Eternal Damnation*" sound="doom.wav" />
+	<!-- EHJ -->
+	<trigger from="Readies" match="*Valfodr*" sound="silenced.wav" />
+	<trigger from="Readies" match="*Heavy Stomp*" sound="paralyzed.wav" />
+	<trigger from="Readies" match="*Chaos Blade*" sound="cursed.wav" />
+	<trigger from="Readies" match="*Petro Eyes*" sound="petrified.wav" />
+	<trigger from="Readies" match="*Poison Breath*" sound="poisoned.wav" />
+	<trigger from="Readies" match="*Heavy Stomp*" sound="paralyzed.wav" />
+	<trigger from="Readies" match="*Mortal Ray*" sound="doom.wav" />
+	<trigger from="Readies" match="*Frog Cheer*" sound="charmed.wav" />
+	<trigger from="Readies" match="*Frog Song*" sound="charmed.wav" />
+	<trigger from="Readies" match="*Water Bomb*" sound="silenced.wav" />
+	<trigger from="Readies" match="*Numbing Breath*" sound="paralyzed.wav" />
+	<trigger from="Readies" match="*Curse*" sound="cursed.wav" />
+	<trigger from="Readies" match="*Level 5 Petrify*" sound="petrified.wav" />
+	<trigger from="Readies" match="*Deafening Tantara*" sound="silenced.wav" />
+	<trigger from="Readies" match="*Immortal Anathema*" sound="cursed.wav" />
+	<trigger from="Readies" match="*Tribulation*" sound="erase.wav" />
+	<!-- SKY: Gods -->
+	<trigger from="Readies" match="*] Roar*|*readies Roar*" sound="paralyzed.wav" />
+	<trigger from="Readies" match="*Dread Shriek*" sound="paralyzed.wav" />
+	<trigger from="Readies" match="*Radiant Breath*" sound="silenced.wav" />
+	<trigger from="Readies" match="*Tail Swing*" sound="alert.wav" />
+	<!-- LIMBUS -->
+	<trigger from="Readies" match="*Death Trap*" sound="stun.wav" />
+	<trigger from="Readies" match="*Ion Efflux*" sound="paralyzed.wav" />
+	<trigger from="Readies" match="*Stun Cannon*" sound="paralyzed.wav" />
+	<trigger from="Readies" match="*Floodlight*" sound="silenced.wav" />
+	<trigger from="Readies" match="*Rear Lasers*" sound="petrified.wav" />
+	<trigger from="Readies" match="*Chemical Bomb*" sound="erase.wav" />
+	<trigger from="Readies" match="*Citadel Buster*" sound="call0.wav" />
+	<!--  SEA: Jar specials -->
+	<trigger from="Readies" match="*Reactor Overload*" sound="silenced.wav" />
+	<trigger from="Readies" match="*Optic Induration*" sound="petrified.wav" />
+	<trigger from="Readies" match="*Decayed Filament*" sound="poisoned.wav" />
+	<!--  SEA: Aern specials -->
+	<trigger from="Readies" match="*Auroral Wind*" sound="silenced.wav" />
+	<trigger from="Readies" match="*Glacier Splitter*" sound="paralyzed.wav" />
+	<trigger from="Readies" match="*Medusa Javelin*" sound="petrified.wav" />
+	<trigger from="Readies" match="*Impact Stream*" sound="defensedown.wav" />
+	<!--  SEA: Hpemde specials -->
+	<trigger from="Readies" match="*Tail Thrust*" sound="paralyzed.wav" />
+	<trigger from="Readies" match="*Ichor Stream*" sound="poisoned.wav" />
+	<!--  SEA: Phaubo specials -->
+	<trigger from="Readies" match="*Voiceless Storm*" sound="silenced.wav" />
+	<trigger from="Readies" match="*Aerial Collision*" sound="defensedown.wav" />
+	<!--  SEA: Yovra specials -->
+	<trigger from="Readies" match="*Asthenic Fog*" sound="erase.wav" />
+	<trigger from="Readies" match="*Vitriolic Barrage*" sound="poisoned.wav" />
+	<trigger from="Readies" match="*Luminous Drape*" sound="charmed.wav" />
+	<!-- General/Event -->
+	<trigger from="146" match="*Time remaining: 10 minutes*" sound="alert4.wav" />
+	<trigger from="146" match="*Unlocking Rune of Release." sound="safe.wav" />
+	<trigger from="146" match="*Rune of Transfer activated." sound="safe.wav" />
+	<!-- Besieged/Campaign -->
+	<trigger from="161" match="*targeted stronghold from the*" sound="wavestart.wav" />
+	<trigger from="161" match="*Intercept their forces in the*" sound="besiegedadvance.wav" />
+	<trigger from="161" match="*Intercept their forces in Al Zahbi&apos;s Bastion!*" sound="besiegedstarted.wav" />
+	<!-- Crafting -->
+	<trigger from="148" match="The finished product has taken form!" sound="chime1.wav" />
+	<!-- Fishing -->
+	<trigger from="148" match="You didn&apos;t catch anything." sound="tone1.wav" />
+	<trigger from="148" match="You feel something pulling at your line." sound="tick.wav" />
+	<trigger from="148" match="Something clamps onto your line ferociously!" sound="tick2.wav" />
+	<trigger from="148" match="Something caught the hook!" sound="call17.wav" />
+	<trigger from="148" match="Something caught the hook!!!" sound="call16.wav" />
+	<trigger from="191" match="*is no longer enchanted.*" sound="alert2.wav" />
+	<trigger from="123" match="You must wait longer to perform that action." sound="call15.wav" />
+	<!--
+		Filters:
+			mode: match or regex. If match, uses wc_match rules. Defaults to match if not specified
+			from: Limit match to specified channel modes. This is different than a normal channel.
+				  Currently, only Shout, Yell, and Tell is recognized
+			value: The search pattern. Binary characters may be written using the \x## sequence
+	-->
+	<filter from="Shout|Yell" mode="match">
+		*ffxi gil*
+	</filter>
+	<filter from="Shout|Yell" mode="match">
+		*localgamers.shop*
+	</filter>
+	<filter from="Shout|Yell" mode="regex" desc="rmt percentages: e.g. off10%">
+		off\s*\d+\s*%
+	</filter>
+	<filter from="Shout|Yell" mode="match" desc="Solid star ★">
+		*\x81\x9a*
+	</filter>
+	<filter from="Shout|Yell" mode="match" desc="Hollow star ☆">
+		*\x81\x99*
+	</filter>
+</ChatMon>
