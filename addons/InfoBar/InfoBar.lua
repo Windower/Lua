@@ -34,6 +34,7 @@ texts = require('texts')
 require('vectors')
 res = require('resources')
 require('sqlite3')
+files = require('files')
 
 defaults = {}
 defaults.NoTarget = "${name} (${main_job}${main_job_level}/${sub_job}${sub_job_level}) (${x},${y},${z})"
@@ -65,7 +66,9 @@ local infobar = {}
 infobar.new_line = '\n'
 
 windower.register_event('load',function()
-    db = sqlite3.open(windower.addon_path..'/database.db')
+    local sql = files.read('./data.sql')
+    db = sqlite3.open(windower.addon_path..'/data.db')
+    db:exec(sql)
     notesdb = sqlite3.open(windower.addon_path..'/notes.db')
     notesdb:exec('CREATE TABLE IF NOT EXISTS notes(name TEXT primary key, note TEXT)')
     if not windower.ffxi.get_info().logged_in then return end
