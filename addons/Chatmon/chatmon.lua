@@ -35,7 +35,6 @@ local settings = require('settings')
 -- internal config
 --------------------------------------------------------------------------------
 CONFIG_FILE = "data/ChatMon.xml"
-DEFAULTS_FILE = "data/ChatMon-Default.xml"
 CHANNEL_GENERAL = 207 -- channel for general messages from chatmon
 CHANNEL_RESULTS = 141 -- channel for displaying results/data
 CHANNEL_BLOCKED = 160 -- channel for displaying messages blocked by a filter
@@ -325,16 +324,10 @@ function loadSettings()
 	if (config == nil) then
 		local fConfig = files.new(CONFIG_FILE)
 		if not fConfig:exists() then
+			print("Chatmon: No configuration found; creating an empty one.")
 			fConfig:create()
-			local fDefault = files.new(DEFAULTS_FILE)
-			if fDefault:exists() then
-				print("Chatmon: No configuration found; using defaults from " .. DEFAULTS_FILE)
-				local data = fDefault:read()
-				fConfig:write(data)
-			else
-				print("Chatmon: No configuration found; creating an empty one.")
-				fConfig:write(basic_config)
-			end
+			fConfig:write(basic_config)
+			print("Chatmon: See data/Chatmon-Example.xml for a ready to use example loadout.")
 		end
 		config = settings:load(fConfig)
 	else
