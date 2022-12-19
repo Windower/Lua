@@ -1219,15 +1219,15 @@ return {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Petrified Log",
-            "Petrified Log",
-            "Petrified Log",
-            "Bundling Twine",
         },
     },
     ["Ancient Lumber 2"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Petrified Log",
+            "Petrified Log",
+            "Petrified Log",
+            "Bundling Twine",
         },
     },
     ["Anelace"] = {
@@ -3330,15 +3330,15 @@ return {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Beech Log",
-            "Beech Log",
-            "Beech Log",
-            "Bundling Twine",
         },
     },
     ["Beech Lumber 2"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Beech Log",
+            "Beech Log",
+            "Beech Log",
+            "Bundling Twine",
         },
     },
     ["Beef Paella"] = {
@@ -7528,11 +7528,6 @@ return {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
             "Chapuli Wing",
             "Chapuli Wing",
             "Chapuli Wing",
@@ -8436,11 +8431,6 @@ return {
     ["Colibri Fletchings 2"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
             "Zephyr Thread",
             "Colibri Feather",
             "Colibri Feather",
@@ -11134,15 +11124,15 @@ return {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Divine Log",
-            "Divine Log",
-            "Divine Log",
-            "Bundling Twine",
         },
     },
     ["Divine Lumber 2"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Divine Log",
+            "Divine Log",
+            "Divine Log",
+            "Bundling Twine",
         },
     },
     ["Divine Sap"] = {
@@ -14317,11 +14307,6 @@ return {
             "G. Bird Plume",
             "G. Bird Plume",
             "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
         },
     },
     ["Gilded Chest"] = {
@@ -15135,11 +15120,6 @@ return {
         ["ingredients"] = {
             "Moko Grass",
             "Moko Grass",
-            "Moko Grass",
-            "Moko Grass",
-            "Moko Grass",
-            "Moko Grass",
-            "Spindle",
         },
     },
     ["Grass Thread 2"] = {
@@ -15147,6 +15127,11 @@ return {
         ["ingredients"] = {
             "Moko Grass",
             "Moko Grass",
+            "Moko Grass",
+            "Moko Grass",
+            "Moko Grass",
+            "Moko Grass",
+            "Spindle",
         },
     },
     ["Grasshopper Broth"] = {
@@ -19268,15 +19253,15 @@ return {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Lacquer Tree Log",
-            "Lacquer Tree Log",
-            "Lacquer Tree Log",
-            "Bundling Twine",
         },
     },
     ["Lacquer Tree Lumber 2"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Lacquer Tree Log",
+            "Lacquer Tree Log",
+            "Lacquer Tree Log",
+            "Bundling Twine",
         },
     },
     ["Lacquer Tree Sap"] = {
@@ -19382,15 +19367,15 @@ return {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Lancewood Log",
-            "Lancewood Log",
-            "Lancewood Log",
-            "Bundling Twine",
         },
     },
     ["Lancewood Lumber 2"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Lancewood Log",
+            "Lancewood Log",
+            "Lancewood Log",
+            "Bundling Twine",
         },
     },
     ["Lanner Bow"] = {
@@ -24443,11 +24428,6 @@ return {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
             "Peapuk Wing",
             "Peapuk Wing",
             "Peapuk Wing",
@@ -25853,11 +25833,6 @@ return {
     ["Puk Fletchings 2"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
             "Zephyr Thread",
             "Puk Wing",
             "Puk Wing",
@@ -32704,15 +32679,15 @@ return {
     ["Teak Lumber"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Bundling Twine",
-            "Teak Log",
-            "Teak Log",
             "Teak Log",
         },
     },
     ["Teak Lumber 2"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
+            "Bundling Twine",
+            "Teak Log",
+            "Teak Log",
             "Teak Log",
         },
     },
@@ -33735,11 +33710,6 @@ return {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
             "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
-            "Zephyr Thread",
             "Tulfaire Feather",
             "Tulfaire Feather",
             "Tulfaire Feather",
@@ -34186,15 +34156,15 @@ return {
     ["Urunday Lumber"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Bundling Twine",
-            "Urunday Log",
-            "Urunday Log",
             "Urunday Log",
         },
     },
     ["Urunday Lumber 2"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
+            "Bundling Twine",
+            "Urunday Log",
+            "Urunday Log",
             "Urunday Log",
         },
     },
