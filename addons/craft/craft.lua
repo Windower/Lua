@@ -792,7 +792,12 @@ windower.register_event('incoming chunk', function(id, original, modified, injec
         local p = packets.parse('incoming',original)
         if p['Result'] == 0 or p['Result'] == 2 then
             local item = res.items[p['Item']].english
-            windower.add_to_chat(121, 'You synthesized: \30\02%s\30\01.':format(item))
+            local count = p['Count']
+			if count > 1 then
+				windower.add_to_chat(121, 'You synthesized: \30\02%s\30\01 x%d.':format(item, count))
+			else
+				windower.add_to_chat(121, 'You synthesized: \30\02%s\30\01.':format(item))
+			end
             injected_synth = false	
         end
         if p['Result'] == 1 or p['Result'] == 5 then
