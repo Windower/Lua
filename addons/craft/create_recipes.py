@@ -1,5 +1,9 @@
-import urllib2
+try:
+    import urllib.request as urllib2
+except ImportError:
+    import urllib2
 from bs4 import BeautifulSoup
+from io import open
 from slpp import slpp as lua
 import os
 import platform
@@ -118,10 +122,10 @@ def get_recipes_from_soup(soup, spheres=False):
 
 def get_items_dictionary():
     if platform.system() == 'Windows':
-        path = 'C:\\Program Files (x86)\\Windower4\\res\\items.lua'
+        path = 'C:/Program Files (x86)/Windower/res/items.lua'
     else:
         path = os.path.join(os.path.expanduser("~"), 'Resources/lua/items.lua')
-    with open(path) as fd:
+    with open(path, encoding='utf8') as fd:
         data = fd.read().replace('return', '', 1)
         return lua.decode(data)
 
@@ -204,10 +208,10 @@ def build_recipe_string(name, crystal, ingredients):
 
 def save_recipes(recipes):
     with open('recipes.lua', 'w') as fd:
-        fd.write("return {\n")
-        for key in sorted(recipes.iterkeys()):
+        fd.write(u"return {\n")
+        for key in sorted(recipes):
             fd.write(build_recipe_string(key, *recipes[key]))
-        fd.write("}\n")
+        fd.write(u"}\n")
 
 def get_recipes(craft, spheres=False):
     base = "https://www.bg-wiki.com/bg/"
@@ -216,10 +220,11 @@ def get_recipes(craft, spheres=False):
         req = urllib2.Request(base + craft, headers=hdr)
         try:
             page = urllib2.urlopen(req).read()
-        except urllib2.HTTPError, e:
+        except urllib2.HTTPError as e:
+            print(e.fp.read())
             return
         with open(name, 'w') as fd:
-            fd.write(page)
+            fd.write(str(page))
     with open(name, 'r') as fd:
         page = fd.read()
         soup = BeautifulSoup(page, 'lxml')
