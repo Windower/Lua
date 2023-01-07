@@ -518,7 +518,7 @@ parse.i[0x063] = function (data)
                     end
                     local buff_name = res.buffs[new.id][language]
                     windower.debug('refresh buff '..buff_name..' ('..tostring(new.id)..')')
-                    if false and not gearswap_disabled then
+                    if not gearswap_disabled then
                         refresh_globals()
                         equip_sets('buff_refresh',nil,buff_name,new)
                     end
