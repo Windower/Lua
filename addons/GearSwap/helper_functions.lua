@@ -148,7 +148,7 @@ end
 function is_slot_key(k)
     return slot_map[k]
 end
- 
+
  
 -----------------------------------------------------------------------------------
 ----Name: make_empty_item_table(slot)
@@ -273,7 +273,7 @@ function update_job_names()
     player.job = player.main_job..'/'..player.sub_job
 end
 
- 
+
 -----------------------------------------------------------------------------------
 ----Name: get_default_slot(k)
 -- Given a generally known slot key, return the default version of that key.
@@ -325,7 +325,7 @@ function set_merge(respect_disable, baseSet, ...)
             end
         end
     end
-    
+
     return baseSet
 end
 
@@ -349,7 +349,7 @@ function parse_set_to_keys(str)
     if type(str) == 'table' then
         str = table.concat(str, ' ')
     end
-    
+
     -- Parsing results get pushed into the result list.
     local result = L{}
 
@@ -358,7 +358,7 @@ function parse_set_to_keys(str)
     local stop
     local sep = '.'
     local count = 0
-    
+
     -- Loop as long as remainder hasn't been nil'd or reduced to 0 characters, but only to a maximum of 30 tries.
     while remainder ~= "" and count < 30 do
         -- Try aaa.bbb set names first
@@ -369,7 +369,7 @@ function parse_set_to_keys(str)
             -- "remainder" is everything after that
             result:append(key)
         end
-        
+
         -- Then try aaa['bbb'] set names.
         -- Be sure to account for both single and double quote enclosures.
         -- Ignore periods contained within quote strings.
@@ -397,7 +397,7 @@ function parse_set_to_keys(str)
             end
             result:append(key)
         end
-        
+
         count = count +1
     end
 
@@ -444,11 +444,11 @@ end
 function initialize_arrow_offset(mob_table)
     local backtab = {}
     local arrow = windower.ffxi.get_info().target_arrow
-    
+
     if arrow.x == 0 and arrow.y == 0 and arrow.z == 0 then
         return arrow
     end
-    
+
     backtab.x = arrow.x-mob_table.x
     backtab.y = arrow.y-mob_table.y
     backtab.z = arrow.z-mob_table.z
@@ -473,11 +473,11 @@ function assemble_action_packet(target_id,target_index,category,spell_id,arrow_o
     outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
     outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
     outstr = outstr..string.char( (category%256), math.floor(category/256)%256)
-    
+
     if category == 16 then
         spell_id = 0
     end
-        
+
     outstr = outstr..string.char( (spell_id%256), math.floor(spell_id/256)%256)..string.char(0,0) .. 'fff':pack(arrow_offset.x,arrow_offset.z,arrow_offset.y)
     return outstr
 end
@@ -524,7 +524,7 @@ end
 function assemble_menu_item_packet(target_id,target_index,...)
     local outstr = string.char(0x36,0x20,0,0)
     -- Message is coming out too short by 12 characters
-    
+
     -- Target ID
     outstr = outstr.."I":pack(target_id)
     local item_ids,counts,count = {...},{},0
@@ -534,7 +534,7 @@ function assemble_menu_item_packet(target_id,target_index,...)
             count = count + 1
         end
     end
-    
+
     local unique_items = 0
     for i,v in pairs(counts) do
         outstr = outstr.."I":pack(v)
@@ -547,9 +547,9 @@ function assemble_menu_item_packet(target_id,target_index,...)
     while #outstr < 0x30 do
         outstr = outstr..string.char(0)
     end
-    
+
     -- Inventory Index for the one unit
-    
+
     for i,v in pairs(counts) do
         inventory_index = find_inventory_item(i)
         if inventory_index then
@@ -685,7 +685,7 @@ function filter_pretarget(action)
         msg.debugging("Unable to execute command. You do not have access to that monsterskill ("..(res.monster_skills[action.id][language] or action.id)..")")
         return false
     end
-    
+
     if err then
         msg.debugging(err)
     end
@@ -705,9 +705,15 @@ end
 ---- false if the spell is not currently accessible
 -----------------------------------------------------------------------------------
 function check_spell(available_spells,spell)
-    -- Filter for spells that you do not know. Exclude Impact / Dispelga.
+    -- Filter for spells that you do not know.
+    -- Exclude Impact / Dispelga / Honor March if the respective slots are enabled.
+    -- Need to add logic to check whether the equipment is already on
     local spell_jobs = copy_entry(res.spells[spell.id].levels)
-    if not available_spells[spell.id] and not (spell.id == 503 or spell.id == 417 or spell.id == 360) then
+    if not available_spells[spell.id] and not (
+            (not disable_table[5] and not disable_table[4] and spell.id == 503) or -- Body + Head + Impact
+            (not disable_table[2] and spell.id == 417) or -- Range + Honor March
+            ((not disable_table[0] or not disable_table[1]) and spell.id == 360) -- Main or Sub + Dispelga
+        ) then
         return false,"Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")"
     -- Filter for spells that you know, but do not currently have access to
     elseif (not spell_jobs[player.main_job_id] or not (spell_jobs[player.main_job_id] <= player.main_job_level or
@@ -883,7 +889,7 @@ end
 function cmd_reg:find_by_time(target_time)
     local time_stamp,ts
     target_time = target_time or os.time()
-    
+
     -- Iterate over command_registry looking for the spell with the closest timestamp.
     -- Call aftercast with this spell's information (interrupted) if one is found.
     for i,v in pairs(self) do
@@ -951,14 +957,14 @@ end
 function get_spell(act)
     local spell, abil_ID, effect_val
     local msg_ID = act.targets[1].actions[1].message
-    
+
     if T{7,8,9}:contains(act.category) then
         abil_ID = act.targets[1].actions[1].param
     elseif T{3,4,5,6,11,13,14,15}:contains(act.category) then
         abil_ID = act.param
         effect_val = act.targets[1].actions[1].param
     end
-    
+
     if act.category == 12 or act.category == 2 then
         spell = copy_entry(resources_ranged_attack)
     else
@@ -975,13 +981,13 @@ function get_spell(act)
             else
                 spell = {name=tostring(msg_ID)}
             end
-            
+
             return spell
         end
-        
+
         
         local fields = fieldsearch(res.action_messages[msg_ID].english) -- ENGLISH
-        
+
         if table.contains(fields,'spell') then
             spell = copy_entry(res.spells[abil_ID])
             if act.category == 4 then spell.recast = act.recast end
@@ -1011,7 +1017,7 @@ function get_spell(act)
         elseif msg_ID == 328 then
             spell = copy_entry(res.job_abilities[effect_val]) -- BPs that are out of range
         end
-        
+
         
         if table.contains(fields,'item') then
             if spell then
@@ -1023,12 +1029,12 @@ function get_spell(act)
             spell = spell_complete(spell)
         end
     end
-    
+
     if spell then
         spell.name = spell[language]
         spell.interrupted = false
     end
-    
+
     return spell
 end
 
@@ -1054,7 +1060,7 @@ function spell_complete(rline)
         -- Entrust allows Indi- spells to be cast on party members
         rline.targets.Party = true
     end
-    
+
     if rline == nil then
         return {tpaftercast = player.tp, mpaftercast = player.mp, mppaftercast = player.mpp}
     end
@@ -1064,18 +1070,18 @@ function spell_complete(rline)
     elseif not rline.tp_cost or rline.tp_cost == -1 then
         rline.tp_cost = 0
     end
-    
+
     if rline.skill and tonumber(rline.skill) then
         rline.skill = res.skills[rline.skill][language]
     end
-    
+
     if rline.element and tonumber(rline.element) then
         rline.element = res.elements[rline.element][language]
     end
-    
+
     if rline.tp_cost == 0 then rline.tpaftercast = player.tp else
     rline.tpaftercast = player.tp - rline.tp_cost end
-    
+
     if rline.mp_cost == 0 then
         rline.mpaftercast = player.mp
         rline.mppaftercast = player.mpp
@@ -1083,7 +1089,7 @@ function spell_complete(rline)
         rline.mpaftercast = player.mp - rline.mp_cost
         rline.mppaftercast = (player.mp - rline.mp_cost)/player.max_mp
     end
-    
+
     return rline
 end
 

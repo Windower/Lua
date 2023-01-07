@@ -33,7 +33,7 @@ parse.i[0x00A] = function (data)
     windower.debug('zone change')
     command_registry = Command_Registry.new()
     table.clear(not_sent_out_equip)
-    
+
     player.id = data:unpack('I',0x05)
     player.index = data:unpack('H',0x09)
     if player.main_job_id and player.main_job_id ~= data:byte(0xB5) and player.name and player.name == data:unpack('z',0x85) and not gearswap_disabled then
@@ -49,7 +49,7 @@ parse.i[0x00A] = function (data)
     player.max_hp = data:unpack('I',0xE9)
     player.max_mp = data:unpack('I',0xED)
     update_job_names()
-    
+
     world.zone_id = data:unpack('H',0x31)
     _ExtraData.world.conquest = false
     for i,v in pairs(region_to_zone_map) do
@@ -63,9 +63,9 @@ parse.i[0x00A] = function (data)
     end
     weather_update(data:byte(0x69))
     world.logged_in = true
-    
+
     _ExtraData.world.in_mog_house = data:byte(0x81) == 1
-    
+
     _ExtraData.player.base_str = data:unpack('H',0xCD)
     _ExtraData.player.base_dex = data:unpack('H',0xCF)
     _ExtraData.player.base_vit = data:unpack('H',0xD1)
@@ -80,7 +80,7 @@ parse.i[0x00A] = function (data)
     _ExtraData.player.add_int = data:unpack('h',0xE3)
     _ExtraData.player.add_mnd = data:unpack('h',0xE5)
     _ExtraData.player.add_chr = data:unpack('h',0xE7)
-    
+
     _ExtraData.player.str = _ExtraData.player.base_str + _ExtraData.player.add_str
     _ExtraData.player.dex = _ExtraData.player.base_dex + _ExtraData.player.add_dex
     _ExtraData.player.vit = _ExtraData.player.base_vit + _ExtraData.player.add_vit
@@ -89,7 +89,7 @@ parse.i[0x00A] = function (data)
     _ExtraData.player.mnd = _ExtraData.player.base_mnd + _ExtraData.player.add_mnd
     _ExtraData.player.chr = _ExtraData.player.base_chr + _ExtraData.player.add_chr
     refresh_ffxi_info()
-    
+
     blank_0x063_v9_inc = true
 end
 
@@ -115,7 +115,7 @@ parse.i[0x01B] = function (data)
     for job_id = 1,23 do
         player.jobs[to_windower_api(res.jobs[job_id].english)] = data:byte(job_id + 72)
     end
-    
+
     local enc = data:unpack('H',0x61)
     local tab = {}
     for slot_id,slot_name in pairs(default_slot_map) do
@@ -243,12 +243,12 @@ function parse_equip_chunk(chunk)
     if inv_slot == 0 then -- Unequipping
         local bag_id = items.equipment[equip_slot].bag_id
         inv_slot = items.equipment[equip_slot].slot
-        
+
         if inv_slot == empty then return end -- unequipping something that was already unequipped?
-        
+
         local inv = items[to_windower_compact(res.bags[bag_id].english)]
         if not inv[inv_slot] then inv[inv_slot] = make_empty_item_table(inv_slot) end
-        
+
         inv[inv_slot].status = 0 -- Set the status to "unequipped"
         items.equipment[equip_slot] = {slot=empty,bag_id=0}
     else
@@ -380,7 +380,7 @@ parse.i[0x061] = function (data)
     player.max_mp = data:unpack('I',9)
     player.main_job_id = data:byte(13)
     player.main_job_level = data:byte(14)
-    
+
     _ExtraData.player.nation_id = data:byte(0x51)
     _ExtraData.player.nation = res.regions[_ExtraData.player.nation_id][language] or 'None'
     _ExtraData.player.base_str = data:unpack('H',0x15)
@@ -407,7 +407,7 @@ parse.i[0x061] = function (data)
     _ExtraData.player.earth_resistance = data:unpack('h',0x3F)
     _ExtraData.player.water_resistance = data:unpack('h',0x41)
     _ExtraData.player.dark_resistance = data:unpack('h',0x43)
-    
+
     _ExtraData.player.str = _ExtraData.player.base_str + _ExtraData.player.add_str
     _ExtraData.player.dex = _ExtraData.player.base_dex + _ExtraData.player.add_dex
     _ExtraData.player.vit = _ExtraData.player.base_vit + _ExtraData.player.add_vit
@@ -415,7 +415,7 @@ parse.i[0x061] = function (data)
     _ExtraData.player.int = _ExtraData.player.base_int + _ExtraData.player.add_int
     _ExtraData.player.mnd = _ExtraData.player.base_mnd + _ExtraData.player.add_mnd
     _ExtraData.player.chr = _ExtraData.player.base_chr + _ExtraData.player.add_chr
-            
+
     if player.sub_job_id ~= data:byte(15) then
         -- Subjob change event
         local temp_sub = player.sub_job
@@ -463,7 +463,7 @@ parse.i[0x063] = function (data)
                 newbuffs[i] = setmetatable({
                     name=res.buffs[buff_id].name,
                     buff=copy_entry(res.buffs[buff_id]),
-                    id = buff_id,
+                    id=buff_id,
                     time=t,
                     date=os.date('*t',t),
                     },
@@ -489,7 +489,7 @@ parse.i[0x063] = function (data)
                     end
                 end
             end
-            
+
             -- Look for time-independent matches, which are assumedly a spell overwriting itself
             for n,new in pairs(newbuffs) do
                 newbuffs[n].matched_imprecisely = nil
@@ -504,7 +504,8 @@ parse.i[0x063] = function (data)
                     end
                 end
             end
-            
+
+            local batch = L{}
             for n,new in pairs(newbuffs) do
                 if new.matched_exactly then
                     newbuffs[n].matched_exactly = nil
@@ -529,17 +530,16 @@ parse.i[0x063] = function (data)
                     local buff_name = res.buffs[new.id][language]
                     windower.debug('gain buff '..buff_name..' ('..tostring(new.id)..')')
                     -- Need to figure out what I'm going to do with this:
-                    if T{'terror','sleep','stun','petrification','charm','weakness'}:contains(buff_name:lower()) then
+                    if T{'terror','sleep','stun','petrification','charm','weakness','lullaby'}:contains(buff_name:lower()) then
+                        --Weakness is technically incorrect, because monsters can afflict players with weakness without killing them.
+                        --However, it is being used to detect when players die so for the moment it must stay.
                         for ts,v in pairs(command_registry) do
                             if v.midaction then
                                 command_registry:delete_entry(ts)
                             end
                         end
                     end
-                    if not gearswap_disabled then
-                        refresh_globals()
-                        equip_sets('buff_change',nil,buff_name,true,new)
-                    end
+                    batch:append({name=buff_name,gain=true,tab=new})
                 end
             end
             for i,old in pairs(_ExtraData.player.buff_details) do
@@ -550,10 +550,13 @@ parse.i[0x063] = function (data)
                     end
                     local buff_name = res.buffs[old.id][language]
                     windower.debug('lose buff '..buff_name..' ('..tostring(old.id)..')')
-                    if not gearswap_disabled then
-                        refresh_globals()
-                        equip_sets('buff_change',nil,buff_name,false,old)
-                    end
+                    batch:append({name=buff_name,gain=false,tab=old})
+                end
+            end
+            if not gearswap_disabled and #batch > 0 then
+                refresh_globals()
+                for v,_ in batch:it() do
+                    equip_sets('buff_change',nil,v.name,v.gain,v.tab)
                 end
             end
         end
@@ -575,29 +578,33 @@ parse.i[0x067] = function (data)
 end
 
 parse.i[0x068] = function (data)
-    
     if player.index == data:unpack('H',0x07) then -- You are the owner
         _ExtraData.pet.tp = data:unpack('H',0x11)
     end
 end
 
 parse.i[0x076] = function (data)
-    partybuffs = {}
+    _ExtraPartyData.buffs = {}
+    _ExtraPartyData.buff_details = {}
     for i = 0,4 do
         if data:unpack('I',i*48+5) == 0 then
             break
         else
             local index = data:unpack('H',i*48+5+4)
-            partybuffs[index] = {
-                id = data:unpack('I',i*48+5+0),
-                index = data:unpack('H',i*48+5+4),
-                buffs = {}
-            }
+            _ExtraPartyData.buffs[index] = {}
+            _ExtraPartyData.buff_details[index] = {}
             for n=1,32 do
-                partybuffs[index].buffs[n] = data:byte(i*48+5+16+n-1) + 256*( math.floor( data:byte(i*48+5+8+ math.floor((n-1)/4)) / 4^((n-1)%4) )%4)
+                local buff_id = data:byte(i*48+5+16+n-1) + 256*( math.floor( data:byte(i*48+5+8+ math.floor((n-1)/4)) / 4^((n-1)%4) )%4)
+                if buff_id ~= 255 and buff_id ~= 0 then
+                    _ExtraPartyData.buffs[index][n] = buff_id
+                    _ExtraPartyData.buff_details[index][n] = {
+                        name=res.buffs[buff_id].name,
+                        buff=copy_entry(res.buffs[buff_id]),
+                        id=buff_id,
+                    }
+                end
             end
-            
-            
+
             if alliance[1] then
                 local cur_player
                 for n,m in pairs(alliance[1]) do
@@ -606,17 +613,26 @@ parse.i[0x076] = function (data)
                         break
                     end
                 end
-                local new_buffs = convert_buff_list(partybuffs[index].buffs)
-                if cur_player and cur_player.buffactive and not gearswap_disabled then
+                local new_buffs = convert_buff_list(_ExtraPartyData.buffs[index])
+                if index == 1464 then
+                    local newbuff_count = 0
+                    for _,v in pairs(new_buffs) do
+                        newbuff_count = newbuff_count + 1
+                    end
+                end
+                if cur_player and cur_player.buffactive and not gearswap_disabled and
+                        user_env and type(user_env['party_buff_change']) == 'function' then
+                    -- Make sure the character existed before (with a buffactive list) - Avoids zoning.
+                    -- This is also the heaviest event, so make sure the user is using it.
                     local old_buffs = cur_player.buffactive
-                -- Make sure the character existed before (with a buffactive list) - Avoids zoning.
+                    local batch = L{}
                     for n,m in pairs(new_buffs) do
                         if type(n) == 'number' and m ~= old_buffs[n] then
                             if not old_buffs[n] or m > old_buffs[n] then -- gaining buff
-                                equip_sets('party_buff_change',nil,cur_player,res.buffs[n][language],true,copy_entry(res.buffs[n]))
+                                batch:append({player=cur_player,name=res.buffs[n][language],gain=true,tab=copy_entry(res.buffs[n])})
                                 old_buffs[n] = nil
                             else -- losing buff
-                                equip_sets('party_buff_change',nil,cur_player,res.buffs[n][language],false,copy_entry(res.buffs[n]))
+                                batch:append({player=cur_player,name=res.buffs[n][language],gain=false,tab=copy_entry(res.buffs[n])})
                                 old_buffs[n] = nil
                             end
                         elseif type(n) ~= 'number' then
@@ -624,18 +640,34 @@ parse.i[0x076] = function (data)
                             old_buffs[n] = nil
                         end
                     end
-                    
+
                     for n,m in pairs(old_buffs) do
                         if type(n) == 'number' and m ~= new_buffs[n] then-- losing buff
-                            equip_sets('party_buff_change',nil,cur_player,res.buffs[n][language],false,copy_entry(res.buffs[n]))
+                            batch:append({player=cur_player,name=res.buffs[n][language],gain=false,tab=copy_entry(res.buffs[n])})
+                        end
+                    end
+                    if #batch > 0 then
+                        refresh_globals()
+                        for v,_ in batch:it() do
+                            equip_sets('party_buff_change',nil,v.player,v.name,v.gain,v.tab)
                         end
                     end
                 end
                 if cur_player then
-                    cur_player.buffactive = new_buffs
+                    if cur_player.buffactive then
+                        table.reassign(cur_player.buffactive, new_buffs)
+                    else
+                        cur_player.buffactive = new_buffs
+                    end
+                end
+                if cur_player and cur_player.id ~= player.id then
+                    if cur_player.buff_details then
+                        table.reassign(cur_player.buff_details,_ExtraPartyData.buff_details[index])
+                    else
+                        cur_player.buff_details = _ExtraPartyData.buff_details[index]
+                    end
                 end
             end
-            
         end
     end
 end
@@ -647,7 +679,7 @@ function update_vitals(id, hp, mp, tp, hpp, mpp)
         player.vitals.tp = tp
         player.vitals.hpp = hpp
         player.vitals.mpp = mpp
-        
+
         player.hp = hp
         player.mp = mp
         player.tp = tp
@@ -702,9 +734,9 @@ parse.o[0x100] = function(data)
     local newmain = data:byte(5)
     if res.jobs[newmain] and newmain ~= 0 and newmain ~= player.main_job_id then
         windower.debug('job change')
-        
+
         command_registry = Command_Registry.new()
-        
+
         table.clear(not_sent_out_equip)
         table.clear(equip_list_history)
         table.clear(equip_list)
@@ -716,10 +748,9 @@ parse.o[0x100] = function(data)
         end
         windower.send_command('lua i '.._addon.name..' load_user_files '..newmain)
     end
-    
-    
+
     if gearswap_disabled then return end
-    
+
     local newmain = data:byte(5)
     if res.jobs[newmain] and newmain ~= player.main_job_id then
         command_enable('main','sub','range','ammo','head','neck','lear','rear','body','hands','lring','rring','back','waist','legs','feet') -- enable all slots
@@ -735,7 +766,6 @@ function initialize_packet_parsing()
             end
             if i == 0x63 and lastpacket and lastpacket:byte(5) ~= 9 then
                 -- Not receiving an accurate buff line on load because the wrong 0x063 packet was sent last
-            
             end
         end
     end

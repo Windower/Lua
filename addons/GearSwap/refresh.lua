@@ -61,38 +61,38 @@ end
 -----------------------------------------------------------------------------------
 function load_user_files(job_id,user_file)
     job_id = tonumber(job_id)
-    
+
     if current_file then
         user_pcall('file_unload',current_file)
     end
-    
+
     for i in pairs(registered_user_events) do
         unregister_event_user(i)
     end
-    
+
     for i in pairs(__raw.text.registry) do
         windower.text.delete(i)
     end
-    
+
     for i in pairs(__raw.prim.registry) do
         windower.prim.delete(i)
     end
-    
+
     current_file = nil
     sets = nil
     user_env = nil
     unhandled_command_events = {}
     --registered_user_events = {}
     include_user_path = nil
-    
+
     language = 'english' -- Reset language to english when changing job files.
     refresh_globals()
-    
+
     if job_id and res.jobs[job_id] then
         player.main_job_id = job_id
         update_job_names()
     end
-    
+
     
     local path,base_dir,filename
     path,base_dir,filename = pathsearch({user_file})
@@ -104,7 +104,7 @@ function load_user_files(job_id,user_file)
             player.name..'.lua',short_job..'.lua',long_job..'.lua','default.lua'}
         path,base_dir,filename = pathsearch(tab)
     end
-    
+
     if not path then
         current_file = nil
         sets = nil
@@ -120,18 +120,18 @@ function load_user_files(job_id,user_file)
         show_swaps = show_swaps,debug_mode=debug_mode,include_path=user_include_path,
         register_unhandled_command=user_unhandled_command,move_spell_target=move_spell_target,
         language=language,
-        
+
         -- Library functions
-        string=string,math=math,table=table,set=set,list=list,T=T,S=S,L=L,pack=pack,functions=functions,
+        string=string,math=math,table=table,set=set,list=list,queue=queue,T=T,S=S,L=L,Q=Q,pack=pack,functions=functions,
         os=os,texts=texts,bit=bit,type=type,tostring=tostring,tonumber=tonumber,pairs=pairs,
         ipairs=ipairs, print=print, add_to_chat=add_to_chat_user,unpack=unpack,next=next,
         select=select,lua_base_path=windower.addon_path,empty=empty,file=file,
         loadstring=loadstring,assert=assert,error=error,pcall=pcall,io=io,dofile=dofile,
-        
+
         debug=debug,coroutine=coroutine,setmetatable=setmetatable,getmetatable=getmetatable,
         rawset=rawset,rawget=rawget,require=include_user,
         _libs=_libs,
-        
+
         -- Player environment things
         buffactive=buffactive,
         player=player,
@@ -145,12 +145,12 @@ function load_user_files(job_id,user_file)
                 body=empty,hands=empty,ring1=empty,ring2=empty,
                 back=empty,waist=empty,legs=empty,feet=empty}}
         }
-    
+
     user_env['_G'] = user_env
-    
+
     -- Try to load data/<name>_<main job>.lua
     local funct, err = loadfile(path)
-    
+
     -- If the file cannot be loaded, print the error and load the default.
     if funct == nil then
         print('User file problem: '..err)
@@ -161,24 +161,24 @@ function load_user_files(job_id,user_file)
         current_file = filename
         print('GearSwap: Loaded your '..current_file..' file!')
     end
-    
+
     setfenv(funct, user_env)
-    
+
     -- Verify that funct contains functions.
     local status, plugin = pcall(funct)
-    
+
     if not status then
         error('GearSwap: File failed to load: \n'..plugin)
         sets = nil
         return nil
     end
-    
+
     _global.pretarget_cast_delay = 0
     _global.precast_cast_delay = 0
     _global.cancel_spell = false
     _global.current_event = 'get_sets'
     user_pcall('get_sets')
-    
+
     gearswap_disabled = false
     sets = user_env.sets
 end
@@ -204,10 +204,10 @@ function refresh_player(dt,user_event_flag)
     if not user_event_flag or dt > 0.5 then
         pl = windower.ffxi.get_player()
         if not pl or not pl.vitals then return end
-                
+
         player_mob_table = windower.ffxi.get_mob_by_index(pl.index)
         if not player_mob_table then return end
-        
+
         table.reassign(player,pl)
         for i,v in pairs(player.vitals) do
             player[i]=v
@@ -221,7 +221,7 @@ function refresh_player(dt,user_event_flag)
         end
         player.nation_id = player.nation
         player.nation = res.regions[player.nation_id][language] or 'None'
-    
+
         for i,v in pairs(player_mob_table) do
             if i == 'name' then
                 player.mob_name = v
@@ -229,12 +229,12 @@ function refresh_player(dt,user_event_flag)
                 player[i] = v
             end
         end
-    
+
         if player_mob_table.race ~= nil then
             player.race_id = player.race
             player.race = res.races[player.race][language]
         end
-        
+
         -- If we have a pet, create or update the table info.
         if player_mob_table and player_mob_table.pet_index then
             local player_pet_table = windower.ffxi.get_mob_by_index(player_mob_table.pet_index)
@@ -244,7 +244,7 @@ function refresh_player(dt,user_event_flag)
                 pet.is_npc = nil
                 pet.isvalid = true
                 if pet.tp then pet.tp = pet.tp/10 end
-                
+
                 if avatar_element[pet.name] then
                     pet.element = res.elements[avatar_element[pet.name]][language]
                 else
@@ -256,12 +256,12 @@ function refresh_player(dt,user_event_flag)
         else
             table.reassign(pet, {isvalid=false})
         end
-        
+
         if player.main_job_id == 18 or player.sub_job_id == 18 then
             local auto_tab
             if player.main_job_id == 18 then auto_tab = windower.ffxi.get_mjob_data()
             else auto_tab = windower.ffxi.get_sjob_data() end
-            
+
             if auto_tab.name then
                 for i,v in pairs(auto_tab) do
                     if not T{'available_heads','attachments','available_frames','available_attachments','frame','head'}:contains(i) then
@@ -298,7 +298,7 @@ function refresh_player(dt,user_event_flag)
                         pet.attachments[res.items[id][language]] = true
                     end
                 end
-                
+
                 if pet.max_mp ~= 0 then
                     pet.mpp = math.floor(pet.mp/pet.max_mp*100)
                 else
@@ -308,7 +308,7 @@ function refresh_player(dt,user_event_flag)
         elseif player.main_job_id == 23 then
             local species_id = windower.ffxi.get_mjob_data().species
             -- Should add instincts when they become available
-            
+
             if species_id then
                 player.species = {}
                 for i,v in pairs(res.monstrosity[species_id]) do
@@ -326,15 +326,15 @@ function refresh_player(dt,user_event_flag)
             player.species = nil
         end
     end
-    
+
     -- This being nil does not cause a return, but items should not really be changing when zoning.
     local cur_equip = table.reassign({},items.equipment)
-            
+
     -- Assign player.equipment to be the gear that has been sent out and the server currently thinks
     -- you are wearing. (the sent_out_equip for loop above).
     player.equipment = make_user_table()
     table.reassign(player.equipment,to_names_set(cur_equip))
-    
+
     -- Assign player.inventory to be keyed to item.inventory[i][language] and to have a value of count, similar to buffactive
     for i,bag in pairs(res.bags) do
         local bag_name = to_windower_bag_api(bag.en)
@@ -345,18 +345,18 @@ function refresh_player(dt,user_event_flag)
     player.target = target_complete(windower.ffxi.get_mob_by_target('t'))
     player.subtarget = target_complete(windower.ffxi.get_mob_by_target('st'))
     player.last_subtarget = target_complete(windower.ffxi.get_mob_by_target('lastst'))
+
     
-    
-    
+
     table.reassign(fellow,target_complete(windower.ffxi.get_mob_by_target('<ft>')))
     if fellow.name then
         fellow.isvalid = true
     else
         fellow.isvalid=false
     end
-    
+
     table.reassign(buffactive,convert_buff_list(player.buffs))
-    
+
     for global_variable_name,extradatatable in pairs(_ExtraData) do
         if _G[global_variable_name] then
             for sub_variable_name,value in pairs(extradatatable) do
@@ -396,7 +396,7 @@ function refresh_ffxi_info(dt,user_event_flag)
             world[i] = v
         end
     end
-    
+
     for global_variable_name,extradatatable in pairs(_ExtraData) do
         if _G[global_variable_name] then
             for sub_variable_name,value in pairs(extradatatable) do
@@ -477,25 +477,25 @@ function refresh_group_info(dt,user_event_flag)
     if not alliance or #alliance == 0 then
         alliance = make_alliance()
     end
-    
+
     local c_alliance = make_alliance()
-    
+
     local j = windower.ffxi.get_party() or {}
-    
+
     c_alliance.leader = j.alliance_leader -- Test whether this works
     c_alliance[1].leader = j.party1_leader
     c_alliance[2].leader = j.party2_leader
     c_alliance[3].leader = j.party3_leader
-    
+
     for i,v in pairs(j) do
         if type(v) == 'table' and v.mob and v.mob.race then
             v.mob.race_id = v.mob.race
             v.mob.race = res.races[v.mob.race][language]
         end
-        
+
         local allyIndex
         local partyIndex
-        
+
         -- For 'p#', ally index is 1, party index is the second char
         if i:sub(1,1) == 'p' and tonumber(i:sub(2)) then
             allyIndex = 1
@@ -505,17 +505,18 @@ function refresh_group_info(dt,user_event_flag)
             allyIndex = tonumber(i:sub(2,2))+1
             partyIndex = tonumber(i:sub(3))+1
         end
-        
+
         if allyIndex and partyIndex then
-            if v.mob and partybuffs[v.mob.index] then
-                v.buffactive = convert_buff_list(partybuffs[v.mob.index].buffs)
+            if v.mob and _ExtraPartyData.buffs[v.mob.index] then
+                v.buffactive = convert_buff_list(_ExtraPartyData.buffs[v.mob.index])
+                v.buff_details = _ExtraPartyData.buff_details[v.mob.index]
             elseif v.mob and v.mob.index == player.index then
                 v.buffactive = buffactive
             end
             c_alliance[allyIndex][partyIndex] = v
             c_alliance[allyIndex].count = c_alliance[allyIndex].count + 1
             c_alliance.count = c_alliance.count + 1
-            
+
             if v.mob then
                 if v.mob.id == c_alliance[1].leader then
                     c_alliance[1].leader = v
@@ -524,14 +525,14 @@ function refresh_group_info(dt,user_event_flag)
                 elseif v.mob.id == c_alliance[3].leader then
                     c_alliance[3].leader = v
                 end
-                
+
                 if v.mob.id == c_alliance.leader then
                     c_alliance.leader = v
                 end
             end
         end
     end
-    
+
         
     -- Clear the old structure while maintaining the party references:
     for ally_party = 1,3 do
@@ -542,7 +543,7 @@ function refresh_group_info(dt,user_event_flag)
     end
     alliance.count = 0
     alliance.leader = nil
-    
+
     -- Reassign to the new structure
     table.reassign(alliance[1],c_alliance[1])
     table.reassign(alliance[2],c_alliance[2])
@@ -582,15 +583,15 @@ end
 -----------------------------------------------------------------------------------
 function convert_buff_list(bufflist)
     local buffarr = {}
-    for i,id in pairs(bufflist) do
-        if res.buffs[id] then -- For some reason we always have buff 255 active, which doesn't have an entry.
+    for _,id in pairs(bufflist) do
+        if res.buffs[id] then
             local buff = res.buffs[id][language]:lower()
             if buffarr[buff] then
                 buffarr[buff] = buffarr[buff] +1
             else
                 buffarr[buff] = 1
             end
-            
+
             if buffarr[id] then
                 buffarr[id] = buffarr[id] +1
             else
@@ -656,7 +657,7 @@ end
 function refresh_user_env(job_id)
     refresh_globals()
     if not job_id then job_id = windower.ffxi.get_player().main_job_id end
-    
+
     if not job_id then
         windower.send_command('@wait 1;lua i '.._addon.name..' refresh_user_env')
     else
@@ -678,17 +679,17 @@ function pathsearch(files_list)
     -- base directory search order:
     -- windower
     -- %appdata%/Windower/GearSwap
-    
+
     -- sub directory search order:
     -- libs-dev (only in windower addon path)
     -- libs (only in windower addon path)
     -- data/player.name
     -- data/common
     -- data
-    
+
     local gearswap_data = windower.addon_path .. 'data/'
     local gearswap_appdata = (os.getenv('APPDATA') or '') .. '/Windower/GearSwap/'
-    
+
     local search_path = {
         [1] = windower.addon_path .. 'libs-dev/',
         [2] = windower.addon_path .. 'libs/',
@@ -700,7 +701,7 @@ function pathsearch(files_list)
         [8] = gearswap_appdata,
         [9] = windower.windower_path .. 'addons/libs/'
     }
-    
+
     local user_path
     local normal_path
 
@@ -712,7 +713,7 @@ function pathsearch(files_list)
                         user_path = basepath .. include_user_path .. '/' .. v
                     end
                     normal_path = basepath .. v
-                    
+
                     if user_path and windower.file_exists(user_path) then
                         return user_path,basepath,v
                     elseif normal_path and windower.file_exists(normal_path) then
@@ -722,6 +723,6 @@ function pathsearch(files_list)
             end
         end
     end
-    
+
     return false
 end
