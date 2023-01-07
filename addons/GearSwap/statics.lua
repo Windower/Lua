@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -- Convert the spells and job abilities into a referenceable list of aliases --
- 
+
 unify_prefix = {['/ma'] = '/ma', ['/magic']='/ma',['/jobability'] = '/ja',['/ja']='/ja',['/item']='/item',['/song']='/ma',
     ['/so']='/ma',['/ninjutsu']='/ma',['/weaponskill']='/ws',['/ws']='/ws',['/ra']='/ra',['/rangedattack']='/ra',['/nin']='/ma',
     ['/throw']='/ra',['/range']='/ra',['/shoot']='/ra',['/monsterskill']='/ms',['/ms']='/ms',['/pet']='/ja',['Monster']='Monster',['/bstpet']='/ja'}
@@ -37,16 +37,16 @@ action_type_map = {['/ja']='Ability',['/jobability']='Ability',['/so']='Magic',[
 equippable_item_bags = {res.bags:equippable(true):extract()}
 
 usable_item_bags = {res.bags:with('command','temporary'), table.extract(equippable_item_bags)}
-    
+
 bag_string_lookup = {}
 for i,v in pairs(res.bags) do
     bag_string_lookup[to_windower_bag_api(v.en)]=i
 end
-    
+
 bstpet_range = {min=672,max=798} -- Range of the JA resource devoted to BST jugpet abilities
-    
+
 delay_map_to_action_type = {['Ability']=3,['Magic']=20,['Ranged Attack']=10,['Item']=10,['Monster Move']=10,['Interruption']=3}
-    
+
 validabils = {}
 validabils['english'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}, ['/ra'] = {}, ['/ms'] = {}, ['/pet'] = {}, ['/trig'] = {}, ['/echo'] = {}}
 validabils['french'] = {['/ma'] = {}, ['/ja'] = {}, ['/ws'] = {}, ['/item'] = {}, ['/ra'] = {}, ['/ms'] = {}, ['/pet'] = {}, ['/trig'] = {}, ['/echo'] = {}}
@@ -92,7 +92,7 @@ for i,v in pairs(res.items) do
         make_entry(v,i)
     end
 end
-    
+
     -- Should transition these slot maps to be based off res.slots, but it's very unlikely to change.
 default_slot_map = T{'sub','range','ammo','head','body','hands','legs','feet','neck','waist',
     'left_ear', 'right_ear', 'left_ring', 'right_ring','back'}
@@ -126,14 +126,14 @@ encumbrance_map[0] = 0x79 -- Slots mapped onto encumbrance byte values.
 
 addendum_white = {[14]="Poisona",[15]="Paralyna",[16]="Blindna",[17]="Silena",[18]="Stona",[19]="Viruna",[20]="Cursna",
     [143]="Erase",[13]="Raise II",[140]="Raise III",[141]="Reraise II",[142]="Reraise III",[135]="Reraise"}
-    
+
 addendum_black = {[253]="Sleep",[259]="Sleep II",[260]="Dispel",[162]="Stone IV",[163]="Stone V",[167]="Thunder IV",
     [168]="Thunder V",[157]="Aero IV",[158]="Aero V",[152]="Blizzard IV",[153]="Blizzard V",[147]="Fire IV",[148]="Fire V",
     [172]="Water IV",[173]="Water V",[255]="Break"}
 
 resources_ranged_attack = {id="0",index="0",prefix="/range",english="Ranged",german="Fernwaffe",french="Attaque à dist.",japanese="飛び道具",type="Misc",element="None",targets=S{"Enemy"}}
 
-    
+
 -- _globals --
 user_data_table = {
     __newindex = function(tab, key, val)
@@ -145,16 +145,6 @@ user_data_table = {
     end
     }
 
---[[eq_data_table = {
-    __newindex = function(tab, key, val)
-            rawset(tab, slot_map[user_key_filter(key)], newtab)
-        end,
-
-    __index = function(tab, key)
-        return rawget(tab, slot_map[user_key_filter(key)])
-    end
-    }]]
-    
 slot_map = make_user_table()
 
 slot_map.main = 0
@@ -232,6 +222,12 @@ _ExtraData = {
         pet = {},
         world = {in_mog_house = false,conquest=false},
     }
+-- _ExtraPartyData is the same, but for the party.
+-- These structures are necessarily indexed by player index.
+_ExtraPartyData = {
+    buffs = {},
+    buff_details = {},
+}
 
 unbridled_learning_set = {['Thunderbolt']=true,['Harden Shell']=true,['Absolute Terror']=true,
     ['Gates of Hades']=true,['Tourbillion']=true,['Pyric Bulwark']=true,['Bilgestorm']=true,
@@ -334,7 +330,7 @@ universal_tool_map = {
         ['Yain: Ichi'] = res.items[2972],
     }
 
-region_to_zone_map = { 
+region_to_zone_map = {
     [4] = S{100,101,139,140,141,142,167,190},
     [5] = S{102,103,108,193,196,248},
     [6] = S{1,2,104,105,149,150,195},
@@ -355,7 +351,7 @@ region_to_zone_map = {
     [22] = S{11,12,13},
     [24] = S{24,25,26,27,28,29,30,31,32},
     }
-    
+
 
 function initialize_globals()
     local pl = windower.ffxi.get_player()
@@ -375,14 +371,14 @@ function initialize_globals()
         if not player.jobs then player.jobs = {} end
         if not player.merits then player.merits = {} end
     end
-    
+
     player.equipment = make_user_table()
     pet = make_user_table()
     pet.isvalid = false
     fellow = make_user_table()
     fellow.isvalid = false
     partybuffs = {}
-    
+
     -- GearSwap effectively needs to maintain two inventory structures:
     --  one is the proposed current inventory based on equip packets sent to the server,
     --  the other is the currently reported inventory based on packets sent from the server.
