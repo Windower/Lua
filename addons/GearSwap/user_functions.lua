@@ -77,10 +77,10 @@ function move_spell_target(position_table)
         error('\nGearSwap: move_spell_target() is only valid in the precast function', 2)
         return
     end
-    
+
     if type(position_table) == 'table' and type(position_table.x or position_table.X) == 'number' and
         type(position_table.y or position_table.Y) == 'number' and
-        type(position_table.z or positino_table.Z) == 'number' then
+        type(position_table.z or position_table.Z) == 'number' then
         _global.target_arrow.x = position_table.x or position_table.X
         _global.target_arrow.y = position_table.y or position_table.Y
         _global.target_arrow.z = position_table.z or position_table.Z
@@ -160,13 +160,13 @@ function enable(...)
             error('\nGearSwap: enable error, passed an unrecognized slot name. ('..tostring(v)..')',2)
         end
     end
-    
+
     return sending_table
 end
 
 function user_enable(...)
     local sending_table = enable(...)
-    
+
     if table.length(sending_table) > 0 then
         equip(sending_table)
     end
@@ -175,7 +175,7 @@ end
 
 function command_enable(...)
     local sending_table = enable(...)
-    
+
     if table.length(sending_table) > 0 then
         refresh_globals()
         equip_sets('equip_command',nil,sending_table)
@@ -223,7 +223,7 @@ function print_set(set,title)
             end
         end
     end
-    
+
     if #set == table.length(set) then -- If it is a list (keyed by continuous whole number starting at 1), then print it out in order
         for key,value in ipairs(set) do
             print_element(key,value)
@@ -235,7 +235,7 @@ function print_set(set,title)
                 print_element(k,set[k])
             end
         end
-        for key,value in pairs(set) do
+        for key,_ in pairs(set) do
             if not slot_map[key] then
                 print_element(key,set[key])
             end
@@ -301,21 +301,21 @@ function include_user(str, load_include_in_this_table)
     if not (type(str) == 'string') then
         error('\nGearSwap: include() was passed an invalid value ('..tostring(str)..'). (must be a string)', 2)
     end
-    
+
     str = str:lower()
     if type(package.loaded[str]) == 'table' then
         return package.loaded[str]
     elseif T{'pack'}:contains(str) then
         return
     end
-    
+
     if str:sub(-4)~='.lua' then str = str..'.lua' end
     local path, loaded_values = pathsearch({str})
-    
+
     if not path then
         error('\nGearSwap: Cannot find the include file ('..tostring(str)..').', 2)
     end
-    
+
     local f, err = loadfile(path)
     if f and not err then
         if load_include_in_this_table and type(load_include_in_this_table) == 'table' then
@@ -358,7 +358,7 @@ function user_midaction(bool)
             return true, v.spell
         end
     end
-    
+
     return false
 end
 
@@ -390,7 +390,7 @@ function add_to_chat_user(num,str)
         -- It only needs the number.
         num=8
     end
-    
+
     if language == 'japanese' then
         msg.add_to_chat(num,windower.to_shift_jis(str))
     else
