@@ -531,6 +531,8 @@ parse.i[0x063] = function (data)
                     windower.debug('gain buff '..buff_name..' ('..tostring(new.id)..')')
                     -- Need to figure out what I'm going to do with this:
                     if T{'terror','sleep','stun','petrification','charm','weakness','lullaby'}:contains(buff_name:lower()) then
+                        --Weakness is technically incorrect, because monsters can afflict players with weakness without killing them.
+                        --However, it is being used to detect when players die so for the moment it must stay.
                         for ts,v in pairs(command_registry) do
                             if v.midaction then
                                 command_registry:delete_entry(ts)
