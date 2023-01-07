@@ -507,8 +507,9 @@ function refresh_group_info(dt,user_event_flag)
         end
 
         if allyIndex and partyIndex then
-            if v.mob and partybuffs[v.mob.index] then
-                v.buffactive = convert_buff_list(partybuffs[v.mob.index].buffs)
+            if v.mob and _ExtraPartyData.buffs[v.mob.index] then
+                v.buffactive = convert_buff_list(_ExtraPartyData.buffs[v.mob.index])
+                v.buff_details = _ExtraPartyData.buff_details[v.mob.index]
             elseif v.mob and v.mob.index == player.index then
                 v.buffactive = buffactive
             end
