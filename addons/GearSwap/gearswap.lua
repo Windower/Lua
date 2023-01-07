@@ -48,6 +48,7 @@ require 'logger'
 error = _raw.error
 
 require 'lists'
+require 'queues'
 require 'sets'
 
 
@@ -134,7 +135,7 @@ initialize_packet_parsing()
 windower.register_event('load',function()
     windower.debug('load')
     refresh_globals()
-    
+
     if world.logged_in then
         refresh_user_env()
         if debugging.general then windower.send_command('@unload spellcast;') end
@@ -152,11 +153,11 @@ windower.register_event('addon command',function (...)
     logit('\n\n'..tostring(os.clock)..table.concat({...},' '))
     local splitup = {...}
     if not splitup[1] then return end -- handles //gs
-    
+
     for i,v in pairs(splitup) do splitup[i] = windower.from_shift_jis(windower.convert_auto_trans(v)) end
 
     local cmd = table.remove(splitup,1):lower()
-    
+
     if cmd == 'c' then
         if gearswap_disabled then return end
         if splitup[1] then
@@ -278,7 +279,7 @@ end
 
 function incoming_chunk(id,data,modified,injected,blocked)
     windower.debug('incoming chunk '..id)
-    
+
     if next_packet_events and next_packet_events.sequence_id ~= data:unpack('H',3) then
         if not next_packet_events.globals_update or next_packet_events.globals_update ~= data:unpack('H',3) then
             refresh_globals()
@@ -301,7 +302,7 @@ function incoming_chunk(id,data,modified,injected,blocked)
             next_packet_events = nil
         end
     end
-    
+
     if not injected and parse.i[id] then
         parse.i[id](data,blocked)
     end
@@ -309,7 +310,7 @@ end
 
 function outgoing_chunk(id,original,data,injected,blocked)
     windower.debug('outgoing chunk '..id)
-    
+
     if not blocked and parse.o[id] then
         parse.o[id](data,injected)
     end
@@ -321,7 +322,7 @@ windower.register_event('outgoing chunk',outgoing_chunk)
 windower.register_event('status change',function(new,old)
     windower.debug('status change '..new)
     if gearswap_disabled or T{2,3,4}:contains(old) or T{2,3,4}:contains(new) then return end
-    
+
     refresh_globals()
     equip_sets('status_change',nil,res.statuses[new].english,res.statuses[old].english)
 end)
