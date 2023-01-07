@@ -47,16 +47,16 @@ function equip_sets(swap_type,ts,...)
     local val2 = var_inps[2]
     table.reassign(_global,command_registry[ts] or {pretarget_cast_delay = 0,precast_cast_delay=0,cancel_spell = false, new_target=false,target_arrow={x=0,y=0,z=0}})
     _global.current_event = tostring(swap_type)
-    
+
     if _global.current_event == 'precast' and val1 and val1.english and val1.english:find('Geo-') then
         _global.target_arrow = initialize_arrow_offset(val1.target)
     end
-    
+
     windower.debug(tostring(swap_type)..' enter')
     if showphase or debugging.general then msg.debugging(8,windower.to_shift_jis(tostring(swap_type))..' enter') end
-    
+
     local cur_equip = table.reassign({},update_equipment())
-    
+
     table.reassign(equip_list,{})
     table.reassign(player.equipment,to_names_set(cur_equip))
     for i,v in pairs(slot_map) do
@@ -64,7 +64,7 @@ function equip_sets(swap_type,ts,...)
             player.equipment[i] = player.equipment[toslotname(v)]
         end
     end
-    
+
     logit('\n\n'..tostring(os.clock)..'(15) equip_sets: '..tostring(swap_type))
     if val1 then
         if type(val1) == 'table' and val1.english then
@@ -83,20 +83,20 @@ function equip_sets(swap_type,ts,...)
     else
         logit(' : nil-or-false')
     end
-    
+
     if type(swap_type) == 'string' then
         msg.debugging("Entering "..swap_type)
     else
         msg.debugging("Entering User Event "..tostring(swap_type))
     end
-    
+
     if not val1 then val1 = {}
         if debugging.general then
             msg.debugging(8,'val1 error')
         end
     end
 
-    
+
     if type(swap_type) == 'function' then
         results = { pcall(swap_type,...) }
         if not table.remove(results,1) then error('\nUser Event Error: '..results[1]) end
@@ -105,48 +105,15 @@ function equip_sets(swap_type,ts,...)
     else
         user_pcall(swap_type,...)
     end
-    
---[[    local c
-    if type(swap_type) == 'function' then
-        c = coroutine.create(swap_type)
-    elseif swap_type == 'equip_command' then
-        equip(val1)
-    elseif type(swap_type) == 'string' and user_env[swap_type] and type(user_env[swap_type]) == 'function' then
-        c = coroutine.create(user_env[swap_type])
-    elseif type(swap_type) == 'string' and user_env[swap_type] then
-        msg.addon_msg(123,windower.to_shift_jis(tostring(str))..'() exists but is not a function')
-    end
-    
-    if c then
-        while coroutine.status(c) == 'suspended' do
-            local err, typ, val = coroutine.resume(c,unpack(var_inputs))
-            if not err then
-                error('\nGearSwap has detected an error in the user function '..tostring(swap_type)..':\n'..typ)
-            elseif typ then
-                if typ == 'sleep' and type(val) == 'number' and val >= 0 then
-                    -- coroutine slept
-                    err, typ, val = coroutine.schedule(c,val)
-                else
-                    -- Someone yielded or slept with a nonsensical argument.
-                    err, typ, val = coroutine.resume(c)
-                end
-            else
-                -- coroutine finished
-            end
-        end 
-    end]]
-    
-    
+
     if type(swap_type) == 'string' and (swap_type == 'pretarget' or swap_type == 'filtered_action') then -- Target may just have been changed, so make the ind now.
         ts = command_registry:new_entry(val1)
---    elseif type(swap_type) == 'string' and swap_type == 'precast' and not command_registry[ts] and debugging.command_registry then
---        print_set(spell,'precast nil error') -- spell's scope changed to local
     end
-    
+
     if player.race ~= 'Precomposed NPC' then
         -- Short circuits the routine and gets out before equip processing
         -- if there's no swapping to be done because the user is a monster.
-        
+
         for v,i in pairs(default_slot_map) do
             if equip_list[i] and encumbrance_table[v] then
                 not_sent_out_equip[i] = equip_list[i]
@@ -154,19 +121,19 @@ function equip_sets(swap_type,ts,...)
                 msg.debugging(i..' slot was not equipped because you are encumbered.')
             end
         end
-        
+
         table.update(equip_list_history,equip_list)
-        
+
         -- Attempts to identify the player-specified item in inventory
         -- Starts with (i=slot name, v=item name) 
         -- Ends with (i=slot id and v={bag_id=bag_id, slot=inventory slot}).
         local equip_next,priorities = unpack_equip_list(equip_list,cur_equip)
-        
+
         if (_settings.show_swaps and table.length(equip_next) > 0) or _settings.demo_mode then --and table.length(equip_next)>0 then
             local tempset = to_names_set(equip_next)
             print_set(tempset,tostring(swap_type))
         end
-        
+
         if (buffactive.charm or player.charmed) or (player.status == 2 or player.status == 3) then -- dead or engaged dead statuses
             local failure_reason
             if (buffactive.charm or player.charmed) then
@@ -208,13 +175,13 @@ function equip_sets(swap_type,ts,...)
             windower.packets.inject_outgoing(command_registry[ts].proposed_packet:byte(1),command_registry[ts].proposed_packet)
         end
     end
-    
+
     windower.debug(tostring(swap_type)..' exit')
-    
+
     if type(swap_type) == 'function' then
         return unpack(results)
     end
-    
+
     return equip_sets_exit(swap_type,ts,val1)
 end
 
@@ -236,7 +203,7 @@ function equip_sets_exit(swap_type,ts,val1)
     end
     if type(swap_type) == 'string' then
         if swap_type == 'pretarget' then
-            
+
             if command_registry[ts].cancel_spell then
                 msg.debugging("Action canceled ("..storedcommand..' '..val1.target.raw..")")
                 storedcommand = nil
@@ -246,11 +213,11 @@ function equip_sets_exit(swap_type,ts,val1)
                 msg.debugging('This case should not be hittable - 1')
                 return true
             end
-            
+
             if command_registry[ts].new_target then
                 val1.target = command_registry[ts].new_target -- Switch target, if it is requested.
             end
-            
+
             -- Compose a proposed packet for the given action (this should be possible after pretarget)
             command_registry[ts].spell = val1
             if val1.target and val1.target.id and val1.target.index and val1.prefix and unify_prefix[val1.prefix] then
@@ -275,7 +242,7 @@ function equip_sets_exit(swap_type,ts,val1)
                         command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id,val1.target.index,outgoing_action_category_table[unify_prefix[val1.prefix]],val1.id,command_registry[ts].target_arrow)
                         if not command_registry[ts].proposed_packet then
                             command_registry:delete_entry(ts)
-                            
+
                             msg.debugging("Unable to create a packet for this command because the target is still invalid after pretarget ("..storedcommand..' '..val1.target.raw..")")
                             storedcommand = nil
                             return storedcommand..' '..val1.target.raw
@@ -285,7 +252,7 @@ function equip_sets_exit(swap_type,ts,val1)
                     msg.debugging(8,"Hark, what weird prefix through yonder window breaks? "..tostring(val1.prefix))
                 end
             end
-            
+
             if ts and command_registry[ts] and val1.target then
                 if st_targs[val1.target.raw] then
                 -- st targets
