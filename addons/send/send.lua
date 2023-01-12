@@ -15,7 +15,7 @@ windower.register_event('addon command',function (...)
     local qual = table.remove(broken_init,1)
     local player = windower.ffxi.get_player()
 
-    if qual:lower()==player['name']:lower() then
+    if player and qual:lower()==player['name']:lower() then
         if broken_init ~= nil then
         relevant_msg(table.concat(broken_init,' '))
         end
@@ -41,12 +41,12 @@ windower.register_event('ipc message',function (msg)
     
     local qual = table.remove(broken,1)
     local player = windower.ffxi.get_player()
-    if qual:lower()==player.name:lower() then
+    if player and qual:lower()==player.name:lower() then
         relevant_msg(table.concat(broken,' '))
     end
     if string.char(qual:byte(1)) == '@' then
         local arg = string.char(qual:byte(2, qual:len()))
-        if arg:upper() == player.main_job:upper() then
+        if player and arg:upper() == player.main_job:upper() then
             if broken ~= nil then
                 relevant_msg(table.concat(broken,' '))
             end
@@ -85,8 +85,6 @@ function split(msg, match)
 end
 
 function relevant_msg(msg)
-    local player = windower.ffxi.get_player()
-    
     if msg:sub(1,2)=='//' then
         windower.send_command(msg:sub(3))
     elseif msg:sub(1,1)=='/' then
