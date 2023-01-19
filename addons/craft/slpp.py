@@ -48,6 +48,10 @@ class SLPP(object):
         self.tab = '\t'
 
     def decode(self, text):
+        try:
+            basestring
+        except NameError:
+            basestring = str
         if not text or not isinstance(text, basestring):
             return
         #FIXME: only short comments removed
@@ -71,18 +75,22 @@ class SLPP(object):
         tp = type(obj)
         if isinstance(obj, str):
             s += '"%s"' % obj.replace(r'"', r'\"')
-        if isinstance(obj, unicode):
+        if isinstance(obj, str):
             s += '"%s"' % obj.encode('utf-8').replace(r'"', r'\"')
-        elif tp in [int, float, long, complex]:
+        elif tp in [int, float, complex]:
             s += str(obj)
         elif tp is bool:
             s += str(obj).lower()
         elif obj is None:
             s += 'nil'
         elif tp in [list, tuple, dict]:
+            try:
+                basestring
+            except NameError:
+                basestring = str
             self.depth += 1
             if len(obj) == 0 or ( tp is not dict and len(filter(
-                    lambda x:  type(x) in (int,  float,  long) \
+                    lambda x:  type(x) in (int, float) \
                     or (isinstance(x, basestring) and len(x) < 10),  obj
                 )) == len(obj) ):
                 newline = tab = ''
@@ -148,7 +156,7 @@ class SLPP(object):
                     if self.ch != end:
                         s += '\\'
                 s += self.ch
-        print ERRORS['unexp_end_string']
+        print(ERRORS['unexp_end_string'])
 
     def object(self):
         o = {}
@@ -174,7 +182,7 @@ class SLPP(object):
                     self.next_chr()
                     if k is not None:
                        o[idx] = k
-                    if not numeric_keys and len([ key for key in o if isinstance(key, (str, unicode, float,  bool,  tuple))]) == 0:
+                    if not numeric_keys and len([ key for key in o if isinstance(key, (str, float, bool, tuple))]) == 0:
                         ar = []
                         for key in o:
                            ar.insert(key, o[key])
@@ -200,7 +208,7 @@ class SLPP(object):
                             o[idx] = k
                         idx += 1
                         k = None
-        print ERRORS['unexp_end_table'] #Bad exit here
+        print(ERRORS['unexp_end_table']) #Bad exit here
 
     words = {'true': True, 'false': False, 'nil': None}
     def word(self):
