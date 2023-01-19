@@ -30,6 +30,7 @@ defaults = {}
 defaults.Images = {}
 defaults.Images.Background = {}
 defaults.Images.Background.Pos = {}
+defaults.Images.Background.Pos.AllowDecenter = false
 defaults.Images.Background.Pos.X = 164
 defaults.Images.Background.Pos.Y = 6
 defaults.Images.Background.Visible = true
@@ -280,7 +281,12 @@ function calc_new_width()
 end
 
 function position_images()
-    local x = windower.get_windower_settings().x_res / 2 - settings.Images.Background.Size.Width / 2
+    local x
+    if settings.Images.Background.Pos.AllowDecenter then
+        x = settings.Images.Background.Pos.X
+    else
+        x = windower.get_windower_settings().x_res / 2 - settings.Images.Background.Size.Width / 2
+    end
     
     background_image:pos(x, settings.Images.Background.Pos.Y)
     foreground_image:pos(x + 2, settings.Images.Foreground.Pos.Y)
