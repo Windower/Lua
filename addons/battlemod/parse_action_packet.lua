@@ -221,6 +221,9 @@ function parse_action_packet(act)
                 -- Some messages uses the english log version of the buff
                 if not simplify and log_form_messages:contains(m.message) then
                     m.status = res.buffs[m.param].enl
+                    if m.status == 'Costume' then m.status = 'costumed'
+                    elseif m.status == 'innundated' then m.status = 'inundated'
+                    end
                 end
 
                 -- if m.message == 93 or m.message == 273 then m.status=color_it('Vanish',color_arr['statuscol']) end
