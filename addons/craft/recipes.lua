@@ -674,7 +674,6 @@ return {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
             "Platinum Ingot",
-            "Wool Thread",
             "Gold Thread",
             "Gold Thread",
             "Silk Cloth",
@@ -1816,7 +1815,6 @@ return {
         ["crystal"] = "Light Crystal",
         ["ingredients"] = {
             "Silver Chain",
-            "Velvet Cloth",
             "Velvet Cloth",
             "Velvet Cloth",
             "Sheep Leather",
@@ -4740,7 +4738,7 @@ return {
             "Hallowed Water",
         },
     },
-    ["Blessed Briault"] = {
+    ["Blessed Bliaut"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
             "Silver Thread",
@@ -4953,6 +4951,7 @@ return {
             "Gold Thread",
             "Gold Thread",
             "Silk Cloth",
+            "Rainbow Cloth",
             "Saruta Cotton",
             "Saruta Cotton",
             "Dragon Blood",
@@ -5672,6 +5671,14 @@ return {
             "Beech Lumber",
             "Firesand",
             "Teak Lumber",
+        },
+    },
+    ["Bongo Drum"] = {
+        ["crystal"] = "Earth Crystal",
+        ["ingredients"] = {
+            "Bamboo Stick",
+            "Dhalmel Hide",
+            "Buffalo Leather",
         },
     },
     ["Book Holder"] = {
@@ -6672,6 +6679,7 @@ return {
         ["crystal"] = "Water Crystal",
         ["ingredients"] = {
             "Lugworm",
+            "Lugworm",
             "Shell Bug",
             "Shell Bug",
         },
@@ -7128,6 +7136,7 @@ return {
         ["crystal"] = "Water Crystal",
         ["ingredients"] = {
             "Gelatin",
+            "Hare Meat",
             "Hare Meat",
             "Rotten Meat",
         },
@@ -7723,6 +7732,14 @@ return {
             "Rosewood Lbr.",
         },
     },
+    ["Chikuwa"] = {
+        ["crystal"] = "Earth Crystal",
+        ["ingredients"] = {
+            "Rock Salt",
+            "Bastore Bream",
+            "Tiger Cod",
+        },
+    },
     ["Chimera Blood"] = {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
@@ -7888,6 +7905,9 @@ return {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
             "Maple Sugar",
+            "Kukuru Bean",
+            "Kukuru Bean",
+            "Kukuru Bean",
             "Kukuru Bean",
             "Honey",
             "Selbina Milk",
@@ -8473,18 +8493,6 @@ return {
             "Gigant Axe",
         },
     },
-    ["Comaa Belt"] = {
-        ["crystal"] = "Earth Crystal",
-        ["ingredients"] = {
-            "Thought Crystal",
-            "Hope Crystal",
-            "Fulfillment Crystal",
-            "Khoma Thread",
-            "Khoma Thread",
-            "Khoma Thread",
-            "Khoma Thread",
-        },
-    },
     ["Combat Caster's Axe +1"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -8640,7 +8648,7 @@ return {
     ["Compression Sphere 5"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Dark Card",
+            "Dark Crest Card",
         },
     },
     ["Console"] = {
@@ -9989,13 +9997,13 @@ return {
             "Dk. Ixion Ferrule",
         },
     },
-    ["Dagger"] = {
+    ["Dagger (Weapon)"] = {
         ["crystal"] = "Light Crystal",
         ["ingredients"] = {
             "Rusty Dagger",
         },
     },
-    ["Dagger 2"] = {
+    ["Dagger (Weapon) 2"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
             "Bronze Ingot",
@@ -10950,7 +10958,7 @@ return {
     ["Detonation Sphere 5"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Wind Card",
+            "Wind Crest Card",
         },
     },
     ["Devotee's Mitts"] = {
@@ -12096,6 +12104,15 @@ return {
             "Yilanbaligi",
         },
     },
+    ["Egg Sandwich"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Selbina Butter",
+            "White Bread",
+            "Hard-boiled Egg",
+            "Graubg. Lettuce",
+        },
+    },
     ["Egg Soup"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -12395,6 +12412,57 @@ return {
         ["ingredients"] = {
             "Lizard Skin",
             "Enhancing Mantle",
+        },
+    },
+    ["Enchanted Ink"] = {
+        ["crystal"] = "Dark Crystal",
+        ["ingredients"] = {
+            "Black Ink",
+            "Magicked Blood",
+        },
+    },
+    ["Enfeeblement Kit of Blindness"] = {
+        ["crystal"] = "Earth Crystal",
+        ["ingredients"] = {
+            "Fine Parchment",
+            "Fine Parchment",
+            "Enchanted Ink",
+            "Enchanted Ink",
+            "Padded Box",
+            "Blinding Potion",
+        },
+    },
+    ["Enfeeblement Kit of Poison"] = {
+        ["crystal"] = "Earth Crystal",
+        ["ingredients"] = {
+            "Fine Parchment",
+            "Fine Parchment",
+            "Enchanted Ink",
+            "Enchanted Ink",
+            "Padded Box",
+            "Poison Potion",
+        },
+    },
+    ["Enfeeblement Kit of Silence"] = {
+        ["crystal"] = "Earth Crystal",
+        ["ingredients"] = {
+            "Fine Parchment",
+            "Fine Parchment",
+            "Enchanted Ink",
+            "Enchanted Ink",
+            "Padded Box",
+            "Silencing Potion",
+        },
+    },
+    ["Enfeeblement Kit of Sleep"] = {
+        ["crystal"] = "Earth Crystal",
+        ["ingredients"] = {
+            "Fine Parchment",
+            "Fine Parchment",
+            "Enchanted Ink",
+            "Enchanted Ink",
+            "Padded Box",
+            "Sleeping Potion",
         },
     },
     ["Engetsuto"] = {
@@ -12813,6 +12881,8 @@ return {
         ["ingredients"] = {
             "Apple Vinegar",
             "Beastman Blood",
+            "Hecteyes Eye",
+            "Hecteyes Eye",
             "Hecteyes Eye",
             "Gelatin",
             "Frost Turnip",
@@ -13409,6 +13479,7 @@ return {
             "Popoto",
             "Apple Vinegar",
             "Olive Oil",
+            "Tiger Cod",
             "Tiger Cod",
             "Bird Egg",
             "Moval. Water",
@@ -14998,7 +15069,7 @@ return {
     ["Goldsmithing Set 90"] = {
         ["crystal"] = "Geo Crystal",
         ["ingredients"] = {
-            "Gold Ingot",
+            "Gold Sheet",
             "Emerald",
             "Ruby",
             "Diamond",
@@ -15402,19 +15473,6 @@ return {
             "Distilled Water",
         },
     },
-    ["Griffon Leather 3"] = {
-        ["crystal"] = "Dark Crystal",
-        ["ingredients"] = {
-            "Win. Tea Leaves",
-            "Win. Tea Leaves",
-            "Win. Tea Leaves",
-            "Griffon Hide",
-            "Griffon Hide",
-            "Griffon Hide",
-            "Tanning Vat",
-            "Distilled Water",
-        },
-    },
     ["Grilled Hare"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -15498,6 +15556,19 @@ return {
             "Firesand",
             "Bast Parchment",
             "Gysahl Greens",
+        },
+    },
+    ["Gyudon"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Ginger",
+            "Tarutaru Rice",
+            "Soy Stock",
+            "Wild Onion",
+            "Buffalo Meat",
+            "Cotton Tofu",
+            "Shungiku",
+            "Shirataki",
         },
     },
     ["Hachimaki"] = {
@@ -15746,13 +15817,13 @@ return {
     ["Hard Leather Ring"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Tiger Leather",
+            "Leath. Kit 60",
         },
     },
     ["Hard Leather Ring 2"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Leath. Kit 60",
+            "Tiger Leather",
         },
     },
     ["Hard-boiled Egg"] = {
@@ -16185,6 +16256,7 @@ return {
     ["Herb Paste"] = {
         ["crystal"] = "Water Crystal",
         ["ingredients"] = {
+            "Toko. Wildgrass",
             "Toko. Wildgrass",
             "La Theine Millet",
             "Lizard Egg",
@@ -17544,7 +17616,7 @@ return {
     ["Impaction Sphere 5"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Lightning Card",
+            "Lightning Crest Card",
         },
     },
     ["Imperial Cermet"] = {
@@ -17650,7 +17722,7 @@ return {
     ["Induration Sphere 4"] = {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
-            "Ice Card",
+            "Ice Crest Card",
         },
     },
     ["Induration Sphere 5"] = {
@@ -18344,7 +18416,7 @@ return {
         },
     },
     ["Jolt Counter"] = {
-        ["crystal"] = "Earth Crystal",
+        ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
             "Moonbow Steel",
             "Moonbow Stone",
@@ -18794,6 +18866,18 @@ return {
             "Khimaira Mane",
         },
     },
+    ["Khoma Belt"] = {
+        ["crystal"] = "Earth Crystal",
+        ["ingredients"] = {
+            "Thought Crystal",
+            "Hope Crystal",
+            "Fulfillment Crystal",
+            "Khoma Thread",
+            "Khoma Thread",
+            "Khoma Thread",
+            "Khoma Thread",
+        },
+    },
     ["Khoma Cloth"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
@@ -19079,6 +19163,14 @@ return {
             "Yagudo Cherry",
             "Distilled Water",
             "Bird Egg",
+        },
+    },
+    ["Konjak"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Seashell",
+            "Distilled Water",
+            "Konjak Tuber",
         },
     },
     ["Konron Hassen"] = {
@@ -19501,7 +19593,7 @@ return {
         },
     },
     ["Leather Pot"] = {
-        ["crystal"] = "Earth Crystal",
+        ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
             "Hickory Lumber",
             "Karakul Leather",
@@ -20013,7 +20105,7 @@ return {
     ["Liquefaction Sphere 5"] = {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
-            "Fire Card",
+            "Fire Crest Card",
         },
     },
     ["Lithic Wyvern Scale"] = {
@@ -20287,6 +20379,12 @@ return {
             "Bkn. Lu Rod",
         },
     },
+    ["Lu Shang's Fishing Rod +1"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "B. Lu. Rod +1",
+        },
+    },
     ["Lucent Axe"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -20420,6 +20518,15 @@ return {
         ["ingredients"] = {
             "Wool Thread",
             "Lynx Hide",
+        },
+    },
+    ["M. Counteragent"] = {
+        ["crystal"] = "Water Crystal",
+        ["ingredients"] = {
+            "Seashell",
+            "Salinator",
+            "Distilled Water",
+            "Distilled Water",
         },
     },
     ["Mace"] = {
@@ -21036,14 +21143,6 @@ return {
         },
     },
     ["Marbled Drawers"] = {
-        ["crystal"] = "Earth Crystal",
-        ["ingredients"] = {
-            "Bamboo Stick",
-            "Dhalmel Hide",
-            "Buffalo Leather",
-        },
-    },
-    ["Marbled Drawers 2"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
             "Walnut Lumber",
@@ -21799,6 +21898,13 @@ return {
             "Glass Fiber",
         },
     },
+    ["Miracle Mulch"] = {
+        ["crystal"] = "Dark Crystal",
+        ["ingredients"] = {
+            "Chocobo Bedding",
+            "Dung",
+        },
+    },
     ["Mirage Stole"] = {
         ["crystal"] = "Light Crystal",
         ["ingredients"] = {
@@ -22017,6 +22123,14 @@ return {
             "Raptor Skin",
         },
     },
+    ["Mohbwa Cloth"] = {
+        ["crystal"] = "Earth Crystal",
+        ["ingredients"] = {
+            "Mohbwa Thread",
+            "Mohbwa Thread",
+            "Mohbwa Thread",
+        },
+    },
     ["Mohbwa Sash"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
@@ -22232,7 +22346,7 @@ return {
             "Moonbow Steel",
             "Moonbow Cloth",
             "Moonbow Leather",
-            "Comaa Belt",
+            "Khoma Belt",
         },
     },
     ["Moonbow Whistle"] = {
@@ -23523,6 +23637,15 @@ return {
             "Contortacle",
         },
     },
+    ["Oden"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Fish Stock",
+            "Konjak",
+            "Daikon",
+            "Chikuwa",
+        },
+    },
     ["Odorous Knife"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
@@ -23605,6 +23728,16 @@ return {
             "Flaxseed Oil",
             "Flaxseed Oil",
             "Wamoura Silk",
+        },
+    },
+    ["Omelette Sandwich"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Selbina Butter",
+            "White Bread",
+            "Apkallu Egg",
+            "Puk Egg",
+            "Graubg. Lettuce",
         },
     },
     ["Onyx"] = {
@@ -23755,6 +23888,7 @@ return {
             "San d'Or. Flour",
             "Selbina Butter",
             "Maple Sugar",
+            "Saruta Orange",
             "Saruta Orange",
             "Bird Egg",
         },
@@ -24390,6 +24524,8 @@ return {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
             "Blue Peas",
+            "Blue Peas",
+            "Blue Peas",
             "Dried Marjoram",
             "Wild Onion",
             "Distilled Water",
@@ -24462,6 +24598,7 @@ return {
     ["Pear au Lait"] = {
         ["crystal"] = "Water Crystal",
         ["ingredients"] = {
+            "Derfland Pear",
             "Derfland Pear",
             "Honey",
             "Selbina Milk",
@@ -24991,6 +25128,7 @@ return {
             "Rock Salt",
             "Sea Foliage",
             "Kitron",
+            "Rarab Tail",
         },
     },
     ["Pie Dough"] = {
@@ -25585,6 +25723,19 @@ return {
             "Orichalcum Lance",
         },
     },
+    ["Popo. con Queso"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "San d'Or. Flour",
+            "Selbina Butter",
+            "Popoto",
+            "Rock Salt",
+            "Danceshroom",
+            "Selbina Milk",
+            "Wild Onion",
+            "Chalaimbille",
+        },
+    },
     ["Popstar"] = {
         ["crystal"] = "Light Crystal",
         ["ingredients"] = {
@@ -25896,6 +26047,44 @@ return {
             "Distilled Water",
         },
     },
+    ["Pungent Powder"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Ahriman Lens",
+            "Silk Cloth",
+            "Saruta Cotton",
+            "Glass Fiber",
+            "Glass Fiber",
+            "Gelatin",
+            "Cornstarch",
+            "Pagodite",
+        },
+    },
+    ["Pungent Powder II"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Ahriman Lens",
+            "Silk Cloth",
+            "Saruta Cotton",
+            "Glass Fiber",
+            "Glass Fiber",
+            "Revival Root",
+            "Cornstarch",
+            "Pagodite",
+        },
+    },
+    ["Pungent Powder III"] = {
+        ["crystal"] = "Light Crystal",
+        ["ingredients"] = {
+            "Ahriman Lens",
+            "Silk Cloth",
+            "Saruta Cotton",
+            "Glass Fiber",
+            "Glass Fiber",
+            "Cornstarch",
+            "Pagodite",
+        },
+    },
     ["Pup. Collar"] = {
         ["crystal"] = "Light Crystal",
         ["ingredients"] = {
@@ -26012,6 +26201,19 @@ return {
             "Iron Ingot",
             "Walnut Lumber",
             "Walnut Lumber",
+        },
+    },
+    ["R. Pickled R. Tail"] = {
+        ["crystal"] = "Dark Crystal",
+        ["ingredients"] = {
+            "Apple Vinegar",
+            "Black Pepper",
+            "Maple Sugar",
+            "Rock Salt",
+            "Ro'Maeve Water",
+            "Rolanberry",
+            "Rarab Tail",
+            "Rarab Tail",
         },
     },
     ["Ra'Kaznar Arrowheads"] = {
@@ -27102,7 +27304,7 @@ return {
     ["Reverberation Sphere 4"] = {
         ["crystal"] = "Lightng. Crystal",
         ["ingredients"] = {
-            "Water Card",
+            "Water Crest Card",
         },
     },
     ["Reverberation Sphere 5"] = {
@@ -27300,6 +27502,7 @@ return {
         ["ingredients"] = {
             "Rock Salt",
             "Danceshroom",
+            "Danceshroom",
         },
     },
     ["Roast Mushroom 2"] = {
@@ -27307,12 +27510,14 @@ return {
         ["ingredients"] = {
             "Rock Salt",
             "Woozyshroom",
+            "Woozyshroom",
         },
     },
     ["Roast Mushroom 3"] = {
         ["crystal"] = "Fire Crystal",
         ["ingredients"] = {
             "Rock Salt",
+            "Sleepshroom",
             "Sleepshroom",
         },
     },
@@ -28682,7 +28887,7 @@ return {
     ["Scission Sphere 5"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Earth Card",
+            "Earth Crest Card",
         },
     },
     ["Scope"] = {
@@ -28918,6 +29123,19 @@ return {
             "Steel Ingot",
             "Coral Fragment",
             "Coral Fragment",
+        },
+    },
+    ["Seafood Gratin"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "San d'Or. Flour",
+            "Selbina Butter",
+            "Rock Salt",
+            "Danceshroom",
+            "Selbina Milk",
+            "Gigant Squid",
+            "Bastore Sweeper",
+            "Chalaimbille",
         },
     },
     ["Seafood Paella"] = {
@@ -29395,6 +29613,7 @@ return {
             "Bay Leaves",
             "Rock Salt",
             "Kazham Pineapl.",
+            "Shall Shell",
             "Shall Shell",
             "Distilled Water",
         },
@@ -30722,7 +30941,7 @@ return {
             "Cockatrice Skin",
         },
     },
-    ["Smithing Set 71"] = {
+    ["Smithing Set 70"] = {
         ["crystal"] = "Pyre Crystal",
         ["ingredients"] = {
             "Darksteel Ingot",
@@ -33536,7 +33755,7 @@ return {
     ["Transfixion Sphere 5"] = {
         ["crystal"] = "Wind Crystal",
         ["ingredients"] = {
-            "Light Card",
+            "Light Crest Card",
         },
     },
     ["Translucent Rock"] = {
@@ -34911,22 +35130,6 @@ return {
             "Hexed Kecks",
         },
     },
-    ["Vexed Kote"] = {
-        ["crystal"] = "Fire Crystal",
-        ["ingredients"] = {
-            "Eschite Ore",
-            "Hexed Tekko -1",
-        },
-    },
-    ["Vexed Kote 2"] = {
-        ["crystal"] = "Fire Crystal",
-        ["ingredients"] = {
-            "Cehuetzi Pelt",
-            "Muut's Vestment",
-            "Eschite Ore",
-            "Hexed Tekko",
-        },
-    },
     ["Vexed Mitra"] = {
         ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
@@ -35005,6 +35208,22 @@ return {
             "Muut's Vestment",
             "Eschite Ore",
             "Hexed Sune-Ate",
+        },
+    },
+    ["Vexed Tekko"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Eschite Ore",
+            "Hexed Tekko -1",
+        },
+    },
+    ["Vexed Tekko 2"] = {
+        ["crystal"] = "Fire Crystal",
+        ["ingredients"] = {
+            "Cehuetzi Pelt",
+            "Muut's Vestment",
+            "Eschite Ore",
+            "Hexed Tekko",
         },
     },
     ["Vexed Tights"] = {
