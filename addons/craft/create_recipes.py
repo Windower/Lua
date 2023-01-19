@@ -1,4 +1,4 @@
-import urllib2
+import urllib.request
 from bs4 import BeautifulSoup
 from slpp import slpp as lua
 import os
@@ -36,22 +36,27 @@ def get_recipe(row):
         'Glimmer Crystal',
         'Shadow Crystal',
     ]
-    y, r, c, i = [
+    result, _, recipe = [
         td for td in row.findAll('td')
     ]
-    name = str(y.findAll('a')[0]['title'])
+    name = str(result.findAll('a')[0]['title'])
     crystal = None
     ingredients = []
-    for li in i.findAll('li'):
+    for li in recipe.findAll('li'):
         english = str(li.findAll('a')[0]['title'])
         if english in crystals:
             crystal = english
             continue
-        if li.text[-1].isdigit() and not "Kit" in english:
-            for n in range(int(li.text[-1])):
+        try:
+            if li.text is None:
+                ingredients.append("unknown")  # ingredient is "Question Mark", e.g. for Pagodite
+            elif li.text[-1].isdigit() and not "Kit" in english:
+                for n in range(int(li.text[-1])):
+                    ingredients.append(english)
+            else:
                 ingredients.append(english)
-        else:
-            ingredients.append(english)
+        except IndexError:
+            return None
     return [(name, crystal, ingredients)]
 
 def get_sphere_recipe(row):
@@ -99,7 +104,7 @@ def get_recipes_from_rows(rows, spheres=False):
 
 def get_recipes_from_soup(soup, spheres=False):
     string = "Sphere Obtained" if spheres else "Synthesis Information"
-    lengths = [4, 5, 6, 7] if spheres else [4]
+    lengths = [4, 5, 6, 7] if spheres else [3]
     subtables = [
         descendant.parent.parent.parent
         for descendant in soup.descendants
@@ -188,6 +193,7 @@ def fix_recipes(recipes):
                 sorted.append(inverted[ingredient])
             else:
                 sorted.append(get_item(ingredient, inverted))
+        sorted = list(filter(lambda item: item is not None, sorted))
         sorted.sort()
         ingredients = [
             items[ingredient]['en']
@@ -205,7 +211,7 @@ def build_recipe_string(name, crystal, ingredients):
 def save_recipes(recipes):
     with open('recipes.lua', 'w') as fd:
         fd.write("return {\n")
-        for key in sorted(recipes.iterkeys()):
+        for key in sorted(recipes.keys()):
             fd.write(build_recipe_string(key, *recipes[key]))
         fd.write("}\n")
 
@@ -213,12 +219,12 @@ def get_recipes(craft, spheres=False):
     base = "https://www.bg-wiki.com/bg/"
     name = "%s.html" % craft
     if not os.path.exists(name):
-        req = urllib2.Request(base + craft, headers=hdr)
+        req = urllib.request.Request(base + craft, headers=hdr)
         try:
-            page = urllib2.urlopen(req).read()
-        except urllib2.HTTPError, e:
+            page = urllib.request.urlopen(req).read()
+        except urllib.request.HTTPError:
             return
-        with open(name, 'w') as fd:
+        with open(name, 'wb') as fd:
             fd.write(page)
     with open(name, 'r') as fd:
         page = fd.read()
