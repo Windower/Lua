@@ -43,7 +43,7 @@ helptext = [[DressUp - Command List:
 
 -- Initializes default settings table
 defaults = {}
-defaults.autoupdate = false
+defaults.autoupdate = true
 defaults.profiles = {}
 defaults["others"] = {}
 defaults.replacements = { face = {}, race = {}, head = {}, body = {}, hands = {}, legs = {}, feet = {}, main = {}, sub = {}, ranged = {} }
