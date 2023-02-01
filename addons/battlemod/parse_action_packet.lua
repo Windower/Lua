@@ -927,6 +927,7 @@ end
 
 function get_prefix(category, effect, message, unknown, reaction_lookup)
     local prefix = S{1,3,4,6,11,13,14,15}:contains(category) and (bit.band(unknown,1)==1 and 'Cover! ' or '')
+                    ..(bit.band(unknown,2)==2 and (message==85 or message==284) and not simplify and 'Resist! ' or '')
                     ..(bit.band(unknown,4)==4 and 'Magic Burst! ' or '') --Used on Swipe/Lunge MB
                     ..(bit.band(unknown,8)==8 and 'Immunobreak! ' or '') --Unused? Displayed directly on message
                     ..(showcritws and bit.band(effect,2)==2 and S{1,3,11}:contains(category) and message~=67 and 'Critical Hit! ' or '') --Unused? Crits have their own message
