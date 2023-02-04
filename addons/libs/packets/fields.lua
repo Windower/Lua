@@ -2243,7 +2243,7 @@ types.shop_item = L{
 
 -- Shop
 fields.incoming[0x03C] = L{
-    {ctype='unsigned short',    label='_zero1',             const=0x0000},      -- 04
+    {ctype='unsigned short',    label='Starting Index'},                        -- 04
     {ctype='unsigned short',    label='_padding1'},                             -- 06
     {ref=types.shop_item,       label='Item',               count='*'},         -- 08 -   *
 }
