@@ -4019,7 +4019,7 @@ types.ability_recast = L{
     {ctype='unsigned short',    label='Duration',           fn=div+{1}},        -- 00
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 02
     {ctype='unsigned char',     label='Recast',             fn=arecast},        -- 03
-    {ctype='signed short',      label='Recast Modifier',}                       -- 04
+    {ctype='signed short',      label='Recast Modifier'},                       -- 04
     {ctype='unsigned short',    label='_unknown2'}                              -- 06
 }
 
