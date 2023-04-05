@@ -185,7 +185,7 @@ end
 local function setup_ui()
     refresh_ui_settings()
     destroy()
-    
+
     bg_image = images.new(bg_image_settings)
     bg_image:show()
 
@@ -416,6 +416,55 @@ windower.register_event('unload', function()
     destroy()
 end)
 
+local mouse_down = false
+windower.register_event('mouse', function(type, x, y, delta, blocked)
+    -- Mouse drag
+    if type == 0 and mouse_down then
+        -- Taken from the destroy() function
+        for key, slot_data in pairs(equipment_data) do
+            if slot_data.image ~= nil then
+                slot_data.image:destroy()
+                slot_data.image = nil
+            end
+        end
+        for key, slot_data in pairs(encumbrance_data) do
+            if slot_data.image ~= nil then
+                slot_data.image:destroy()
+                slot_data.image = nil
+            end
+        end
+        if ammo_count_text then
+            ammo_count_text:destroy()
+            ammo_count_text = nil
+        end
+
+        return true
+    end
+
+    -- Left mouse button down
+    if type == 1 and bg_image:hover(x, y) then
+        mouse_down = true
+        return true
+    end
+
+    -- Right mouse button down
+    if type == 2 and mouse_down then
+        -- Updates settings with current position of bg_image if different
+        local bg_pos_x, bg_pos_y = bg_image:pos()
+        if bg_pos_x ~= settings.pos.x or bg_pos_y ~= settings.pos.y then
+            settings.pos.x = bg_pos_x
+            settings.pos.y = bg_pos_y
+        end
+        
+        setup_ui()
+        config.save(settings)
+        mouse_down = false
+        return true
+    end
+
+    return false
+end)
+
 -- Called when the addon receives a command.
 windower.register_event('addon command', function (...)
     config.reload(settings)
@@ -642,7 +691,7 @@ function refresh_ui_settings()
             width = settings.size * 4,
             height = settings.size * 4,
         },
-        draggable = false,
+        draggable = true,
     }
     equipment_image_settings = {
         color = {
