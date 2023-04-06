@@ -454,13 +454,13 @@ windower.register_event('keyboard', function(key, pressed)
             end
         end
         
-        if key == 78 and pressed and ctrl_pressed then
+        if key == 13 and pressed and ctrl_pressed then
             current_scale = current_scale + 0.1
             scale(current_scale)
             return true
         end
 
-        if key == 74 and pressed and ctrl_pressed then
+        if key == 12 and pressed and ctrl_pressed then
             current_scale = current_scale - 0.1
             scale(current_scale)
             return true
@@ -583,7 +583,7 @@ windower.register_event('addon command', function (...)
         settings.resize = not settings.resize
         
         if settings.resize then
-            log("You man now resize EquipViewer by pressing ctrl and either 'numpad +' or 'numpad -'")
+            log("You man now resize EquipViewer by pressing ctrl and either '+' or '-'")
         else
             log('Equipviewer size is now locked.')
         end
@@ -726,7 +726,7 @@ windower.register_event('addon command', function (...)
         log('ev position <xpos> <ypos>: move to position (from top left)')
         log('ev draggable: toggles ability to drag equipment window')
         log('ev size <pixels>: set pixel size of each item slot')
-        log('ev resize: toggles ability to adjust scale with ctrl and \'numpad +\' or \'numpad -\' buttons')
+        log('ev resize: toggles ability to adjust scale with ctrl and \'+\' or \'-\' buttons')
         log('ev scale <factor>: scale multiplier for each item slot (from 32px)')
         log('ev alpha <opacity>: set opacity of icons (out of 255)')
         log('ev transparency <transparency>: inverse of alpha (out of 255)')
