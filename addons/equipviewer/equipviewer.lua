@@ -99,7 +99,6 @@ local defaults = {
     bg = {
         alpha = 72,
         drag_alpha = 72,
-        fixed_alpha = 72,
         red = 0,
         green = 0,
         blue = 0,
@@ -469,10 +468,13 @@ windower.register_event('keyboard', function(key, pressed)
 end)
 
 windower.register_event('mouse', function(type, x, y, delta, blocked)
-    -- log(type)
     -- Mouse drag
     if type == 0 and mouse_down then
         local bg_pos_x, bg_pos_y = bg_image:pos()
+
+        if bg_image:alpha() ~= settings.bg.drag_alpha then
+            bg_image:alpha(settings.bg.drag_alpha)
+        end
 
         for key, slot in pairs(equipment_data) do
             local pos_x = bg_pos_x + ((slot.display_pos % 4) * settings.size)
@@ -495,7 +497,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
         return true
     end
 
-    -- Right mouse button down
+    -- Left mouse button up
     if type == 2 and mouse_down then
         -- Updates settings with current position of bg_image if different
         local bg_pos_x, bg_pos_y = bg_image:pos()
@@ -503,8 +505,9 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
             settings.pos.x = bg_pos_x
             settings.pos.y = bg_pos_y
         end
+
+        bg_image:alpha(settings.bg.alpha)
         
-        -- setup_ui()
         config.save(settings)
         mouse_down = false
         return true
@@ -558,11 +561,8 @@ windower.register_event('addon command', function (...)
         bg_image:draggable(settings.draggable)
 
         if settings.draggable then
-            settings.bg.fixed_alpha = bg_image:alpha()
-            bg_image:alpha(settings.bg.drag_alpha)
             log("EquipViewer is now draggable.")
         else
-            bg_image:alpha(settings.bg.fixed_alpha)
             log("EquipViewer's position is now fixed.")
         end
         config.save(settings)
@@ -583,7 +583,7 @@ windower.register_event('addon command', function (...)
         settings.resize = not settings.resize
         
         if settings.resize then
-            log("You man now resize EquipViewer by pressing ctrl and either '+' or '-'")
+            log("You man now resize EquipViewer by pressing ctrl and either 'numpad +' or 'numpad -'")
         else
             log('Equipviewer size is now locked.')
         end
@@ -726,7 +726,7 @@ windower.register_event('addon command', function (...)
         log('ev position <xpos> <ypos>: move to position (from top left)')
         log('ev draggable: toggles ability to drag equipment window')
         log('ev size <pixels>: set pixel size of each item slot')
-        log('ev resize: toggles ability to adjust scale with ctrl and \'+\' or \'-\' buttons')
+        log('ev resize: toggles ability to adjust scale with ctrl and \'numpad +\' or \'numpad -\' buttons')
         log('ev scale <factor>: scale multiplier for each item slot (from 32px)')
         log('ev alpha <opacity>: set opacity of icons (out of 255)')
         log('ev transparency <transparency>: inverse of alpha (out of 255)')
