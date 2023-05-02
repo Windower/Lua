@@ -26,7 +26,7 @@
 
 function export_set(options)
     local item_list = T{}
-    local targinv,all_items,xml,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing,named_file
+    local targinv,all_items,xml,minify,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing,named_file
     if #options > 0 then
         for _,v in ipairs(options) do
             if S{'inventory','inv','i'}:contains(v:lower()) then
