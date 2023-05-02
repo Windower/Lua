@@ -37,6 +37,8 @@ function export_set(options)
                 wearable = true
             elseif S{'xml'}:contains(v:lower()) then
                 xml = true
+            elseif S{'mini'}:contains(v:lower()) then
+                minify = true
             elseif S{'sets','set','s'}:contains(v:lower()) then
                 all_sets = true
                 if not user_env or not user_env.sets then
@@ -195,6 +197,25 @@ function export_set(options)
             end
         end
         f:write('      </set>\n    </group>\n  </sets>\n</spellcast>')
+        f:close()
+    elseif minify then
+        -- Default to exporting in .lua
+        if (not overwrite_existing) and windower.file_exists(path..'.lua') then
+            path = path..' '..os.clock()
+        end
+        local f = io.open(path..'.lua','w+')
+        f:write('sets.exported={\n')
+        for i,v in ipairs(item_list) do
+            if v.name ~= empty then
+                if v.augments then
+                    --Advanced set table
+                    f:write(v.slot..'={ name="'..v.name..'", augments={'..v.augments..'}},')
+                else
+                    f:write(v.slot..'="'..v.name..'",')
+                end
+            end
+        end
+        f:write('\n}')
         f:close()
     else
         -- Default to exporting in .lua
