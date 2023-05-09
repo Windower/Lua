@@ -51,7 +51,7 @@ music_types = {
 
 songs = {
     [25]='Voracious Resurgence Unknown 1', [26]='Voracious Resurgence Unknown 2', [27]='Voracious Resurgence Unknown 3', [28]='The Destiny Destroyers', [29]="Devils' Delight",  [30]="Odyssey - Bumba", [31]='Voracious Resurgence Unknown 4', [32]='Voracious Resurgence Unknown 5',
-    [33]='Voracious Resurgence Unknown 6', [34]="We Are Vana'diel", [35]='Goddessspeed', [36]='Sortie - +3 Area',
+    [33]='Voracious Resurgence Unknown 6', [34]="We Are Vana'diel", [35]='Goddessspeed', [36]='Sortie - +3 Area', [37]='Voracious Resurgence Unknown 7', [38]='Voracious Resurgence Unknown 8',
     [40]='Cloister of Time and Souls', [41]='Royal Wanderlust', [42]='Snowdrift Waltz', [43]='Troubled Shadows', [44]='Where Lords Rule Not', [45]='Summers Lost', [46]='Goddess Divine', [47]='Echoes of Creation', [48]='Main Theme', [49]='Luck of the Mog',
     [50]='Feast of the Ladies', [51]='Abyssea - Scarlet Skies, Shadowed Plains', [52]='Melodies Errant', [53]='Shinryu', [54]='Everlasting Bonds', [55]='Provenance Watcher', [56]='Where it All Begins', [57]='Steel Sings, Blades Dance', [58]='A New Direction', [59]='The Pioneers',
     [60]='Into Lands Primeval - Ulbuka', [61]="Water's Umbral Knell", [62]='Keepers of the Wild', [63]='The Sacred City of Adoulin', [64]='Breaking Ground', [65]='Hades', [66]='Arciela', [67]='Mog Resort', [68]='Worlds Away', [69]="Distant Worlds (Nanaa Mihgo's version)",
