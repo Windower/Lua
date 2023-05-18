@@ -39,7 +39,7 @@
 -----------------------------------------------------------------------------------
 function valid_target(targ,flag)
     local spell_targ
-    local san_targ = find_san(strip(targ))
+    local san_targ = find_san(strip_non_alphanumeric_convert_digits_to_roman(targ))
     -- If the target is whitelisted, pass it through.
     if pass_through_targs:contains(targ:lower()) or st_targs:contains(targ:lower()) or (tonumber(targ:lower()) and windower.ffxi.get_mob_by_id(tonumber(targ:lower()))) then
         return targ:lower()
@@ -48,7 +48,7 @@ function valid_target(targ,flag)
         local current_target = windower.ffxi.get_mob_by_target('t')
         local targar = {}
         for i,v in pairs(windower.ffxi.get_mob_array()) do
-            if string.find(strip(v.name),san_targ) and (v.valid_target or v.id == windower.ffxi.get_player().id) then -- Malformed pattern somehow
+            if string.find(strip_non_alphanumeric_convert_digits_to_roman(v.name),san_targ) and (v.valid_target or v.id == windower.ffxi.get_player().id) then -- Malformed pattern somehow
                 -- Handling for whether it's a monster or not
                 if v.is_npc and v.spawn_type ~= 14 and current_target then
                     if v.id == current_target.id then
