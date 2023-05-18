@@ -26,7 +26,7 @@
 
 function export_set(options)
     local item_list = T{}
-    local targinv,all_items,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing,named_file
+    local targinv,all_items,minify,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing,named_file
     if #options > 0 then
         for _,v in ipairs(options) do
             if S{'inventory','inv','i'}:contains(v:lower()) then
@@ -35,6 +35,8 @@ function export_set(options)
                 all_items = true
             elseif v:lower() == 'wearable' then
                 wearable = true
+            elseif S{'mini'}:contains(v:lower()) then
+                minify = true
             elseif S{'sets','set','s'}:contains(v:lower()) then
                 all_sets = true
                 if not user_env or not user_env.sets then
@@ -56,7 +58,7 @@ function export_set(options)
             end
         end
     end
-    
+
     local buildmsg = 'Exporting '
     if all_items then
         buildmsg = buildmsg..'all your items'
@@ -71,7 +73,7 @@ function export_set(options)
     end
 
     buildmsg = buildmsg..' as a lua file.'
-    
+
     if use_job_in_filename then
         buildmsg = buildmsg..' (Naming format: Character_JOB)'
     elseif use_subjob_in_filename then
@@ -79,17 +81,17 @@ function export_set(options)
     elseif named_file then
         buildmsg = buildmsg..' (Named: Character_'..filename..')'
     end
-    
+
     if overwrite_existing then
         buildmsg = buildmsg..' Will overwrite existing files with same name.'
     end
-    
+
     msg.addon_msg(123,buildmsg)
-    
+
     if not windower.dir_exists(windower.addon_path..'data/export') then
         windower.create_dir(windower.addon_path..'data/export')
     end
-    
+
     if all_items then
         for i = 0, #res.bags do
             item_list:extend(get_item_list(items[res.bags[i].english:gsub(' ', ''):lower()]))
@@ -105,7 +107,7 @@ function export_set(options)
         item_list,exported = unpack_names({},'L1',user_env.sets,{},{empty=true})
     else
         -- Default to loading the currently worn gear.
-        
+
         for i = 1,16 do -- ipairs will be used on item_list
             if not item_list[i] then
                 item_list[i] = {}
@@ -113,7 +115,7 @@ function export_set(options)
                 item_list[i].slot = toslotname(i-1)
             end
         end
-        
+
         for slot_name,gs_item_tab in pairs(items.equipment) do
             if gs_item_tab.slot ~= empty then
                 local item_tab
@@ -138,7 +140,7 @@ function export_set(options)
             end
         end
     end
-    
+
     if #item_list == 0 then
         msg.addon_msg(123,'There is nothing to export.')
         return
@@ -155,14 +157,14 @@ function export_set(options)
             return
         end
     end
-    
-    
+
+
     if not windower.dir_exists(windower.addon_path..'data/export') then
         windower.create_dir(windower.addon_path..'data/export')
     end
-    
+
     local path = windower.addon_path..'data/export/'..player.name
-    
+
     if use_job_in_filename then
         path = path..'_'..windower.ffxi.get_player().main_job
     elseif use_subjob_in_filename then
@@ -172,23 +174,39 @@ function export_set(options)
     else
         path = path..os.date(' %Y-%m-%d %H-%M-%S')
     end
-    -- Default to exporting in .lua
+
     if (not overwrite_existing) and windower.file_exists(path..'.lua') then
         path = path..' '..os.clock()
     end
+
     local f = io.open(path..'.lua','w+')
-    f:write('sets.exported={\n')
-    for i,v in ipairs(item_list) do
-        if v.name ~= empty then
-            if v.augments then
-                --Advanced set table
-                f:write('    '..v.slot..'={ name="'..v.name..'", augments={'..v.augments..'}},\n')
-            else
-                f:write('    '..v.slot..'="'..v.name..'",\n')
+    if minify then
+        f:write('sets.exported={\n')
+        for i,v in ipairs(item_list) do
+            if v.name ~= empty then
+                if v.augments then
+                    --Advanced set table
+                    f:write(v.slot..'={ name="'..v.name..'", augments={'..v.augments..'}},')
+                else
+                    f:write(v.slot..'="'..v.name..'",')
+                end
             end
         end
+        f:write('\n}')
+    else
+        f:write('sets.exported={\n')
+        for i,v in ipairs(item_list) do
+            if v.name ~= empty then
+                if v.augments then
+                    --Advanced set table
+                    f:write('    '..v.slot..'={ name="'..v.name..'", augments={'..v.augments..'}},\n')
+                else
+                    f:write('    '..v.slot..'="'..v.name..'",\n')
+                end
+            end
+        end
+        f:write('}')
     end
-    f:write('}')
     f:close()
 end
 
