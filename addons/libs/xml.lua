@@ -384,7 +384,7 @@ function classify(tokens, var)
 
             else
                 if mode == 'tag' then
-                    if parsed:last().children:find(function (el) return el.type == 'attribute' and el.name == token end) ~= nil then
+                    if parsed:last().children:find(function (el) return type(el) == "table" and el.type == 'attribute' and el.name == token end) ~= nil then
                         return xml_error('Attribute '..token..' already defined. Multiple assignment not allowed.', line)
                     end
                     name, namespace = get_namespace(token)
