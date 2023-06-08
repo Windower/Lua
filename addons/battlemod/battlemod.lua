@@ -13,7 +13,7 @@ require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
 
-_addon.version = '3.32'
+_addon.version = '3.33'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth, maintainer: SnickySnacks'
 _addon.commands = {'bm','battlemod'}
@@ -364,6 +364,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
         elseif (am.message_id == 206 or am.message_id == 204) and condensetargets then -- Wears off and is no longer messages
             -- Condenses across multiple packets
             local status
+            local lang = log_form_messages:contains(am.message_id) and 'english_log' or language
             
             if not is_injected and am.message_id == 206 then
                 local outstr = res.action_messages[am.message_id][language]
@@ -379,15 +380,11 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             end
             
             if enfeebling:contains(am.param_1) and res.buffs[am.param_1] then
-                if log_form_messages:contains(am.message_id) then
-                    status = color_it(res.buffs[am.param_1].english_log,color_arr.enfeebcol)
-                else
-                    status = color_it(res.buffs[am.param_1][language],color_arr.enfeebcol)
-                end
+                status = color_it(res.buffs[am.param_1][lang],color_arr.enfeebcol)
             elseif color_arr.statuscol == rcol then
-                status = color_it(res.buffs[am.param_1][language],string.char(0x1F,191))
+                status = color_it(res.buffs[am.param_1][lang],string.char(0x1F,191))
             else
-                status = color_it(res.buffs[am.param_1][language],color_arr.statuscol)
+                status = color_it(res.buffs[am.param_1][lang],color_arr.statuscol)
             end
             
             if not multi_actor[status] then multi_actor[status] = player_info(am.actor_id) end
