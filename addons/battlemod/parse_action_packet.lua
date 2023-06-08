@@ -266,7 +266,7 @@ function parse_action_packet(act)
                 elseif T{78,198,328}:contains(m.message) then
                     m.simp_name = '(Too Far)'
                 end
-                local msg,numb = simplify_message(m.message)
+                local msg,numb = simplify_message(m.message), ''
                 if not color_arr[act.actor.owner or act.actor.type] then windower.add_to_chat(123,'Battlemod error, missing filter:'..tostring(act.actor.owner)..' '..tostring(act.actor.type)) end
                 if m.fields.status then numb = m.status else numb = pref_suf((m.message == 674 and m.add_effect_param or m.cparam or m.param),m.message,act.actor.damage,col) end
     
@@ -562,24 +562,35 @@ end
 function assemble_targets(actor,targs,category,msg,add_effect)
     local targets = {}
     local samename = {}
-    local total = 0
+    local targets_list = T{}
     for i,v in pairs(targs) do
     -- Done in two loops so that the ands and commas don't get out of place.
     -- This loop filters out unwanted targets.
         if check_filter(actor,v,category,msg) or check_filter(v,actor,category,msg) then
-            if samename[v.name] and condensetargetname then
-                samename[v.name] = samename[v.name] + 1
-            else 
+            if (samename[v.name] or samename[v.index]) and condensetargetname then
+                if v.index < 1024 then
+                    samename[v.name] = samename[v.name] + 1
+                else
+                    samename[v.index] = samename[v.index] + 1
+                end
+            else
                 targets[#targets+1] = v
-                samename[v.name] = 1
+                if v.index < 1024 then
+                    samename[v.name] = 1
+                else
+                    samename[v.index] = 1
+                end
             end
-            total = total + 1
+            if not targets_list:contains(v.index) then
+                table.insert(targets_list, v.index)
+            end
         end
         if add_effect then break end
     end
     local out_str
-    if targetnumber and total > 1 then
-        out_str = '{'..total..'}: '
+    
+    if targetnumber and #targets_list > 1 then
+        out_str = '{'..#targets_list..'}: '
     else
         out_str = ''
     end
@@ -587,17 +598,18 @@ function assemble_targets(actor,targs,category,msg,add_effect)
     for i,v in pairs(targets) do
         local name = string.gsub(v.name,' ', string.char(0x81,0x3F)) --fix for ffxi chat splits on space
         local article = common_nouns:contains(v.id) and (not simplify or msg == 206) and 'The ' or ''
-        local numb = condensetargetname and samename[v.name] > 1 and ' {'..samename[v.name]..'}' or ''
+        local numb = condensetargetname and samename[v.name] and samename[v.name] > 1 and ' {'..samename[v.name]..'}' or (condensetargetname or msg == 206 or msg == 204) and samename[v.index] and samename[v.index] > 1 and ' {'..samename[v.index]..'}' or ''
         if i == 1 then
-            name = color_it(name,color_arr[v.owner or v.type])..v.owner_name
-            if samename[v.name] > 1 then
+            name = color_it(name,color_arr[v.owner or v.type])
+            if (samename[v.name] and samename[v.name] > 1) or (samename[v.index] and samename[v.index] > 1) then
                 targets_condensed = true
             else
                 if (not simplify or msg == 206) and #targets == 1 and string.find(res.action_messages[msg][language], '${target}\'s') then
-                    name = color_it(name,color_arr[v.owner or v.type])..(plural_entities:contains(v.id) and '\'' or '\'s')..v.owner_name
+                    name = name..(plural_entities:contains(v.id) and '\'' or '\'s')
                 end
                 targets_condensed = false
             end
+            name = name..v.owner_name
             out_str = out_str..article..name..numb
         else
             targets_condensed = true
@@ -622,7 +634,7 @@ function player_info(id)
     local typ,dmg,owner,filt,owner_name
     
     if player_table == nil then
-        return {name=nil,id=nil,is_npc=nil,type='debug',owner=nil, owner_name=nil,race=nil}
+        return {name=nil,id=nil,index=nil,is_npc=nil,type='debug',damage=nil,owner=nil, owner_name=nil,race=nil}
     end
     
     for i,v in pairs(windower.ffxi.get_party()) do
@@ -701,7 +713,7 @@ function player_info(id)
         end
     end
     if not typ then typ = 'debug' end
-    return {name=player_table.monstrosity_name or player_table.name,id=id,is_npc = player_table.is_npc,type=typ,damage=dmg,filter=filt,owner=(owner or nil), owner_name=(owner_name or ''),race = player_table.race}
+    return {name=player_table.monstrosity_name or player_table.name,id=player_table.id,index=player_table.index,is_npc=player_table.is_npc,type=typ,damage=dmg,filter=filt,owner=(owner or nil),owner_name=(owner_name or ''),race=player_table.race}
 end
 
 function get_spell(act)
@@ -902,6 +914,12 @@ function color_filt(col,is_me)
         else
             return 63
         end
+    elseif col == 36 then -- Defeats
+        if is_me then
+            return 36
+        else
+            return 37
+        end
     else
         return col
     end
@@ -909,6 +927,7 @@ end
 
 function get_prefix(category, effect, message, unknown, reaction_lookup)
     local prefix = S{1,3,4,6,11,13,14,15}:contains(category) and (bit.band(unknown,1)==1 and 'Cover! ' or '')
+                    ..(bit.band(unknown,2)==2 and (message==85 or message==284) and not simplify and 'Resist! ' or '')
                     ..(bit.band(unknown,4)==4 and 'Magic Burst! ' or '') --Used on Swipe/Lunge MB
                     ..(bit.band(unknown,8)==8 and 'Immunobreak! ' or '') --Unused? Displayed directly on message
                     ..(showcritws and bit.band(effect,2)==2 and S{1,3,11}:contains(category) and message~=67 and 'Critical Hit! ' or '') --Unused? Crits have their own message

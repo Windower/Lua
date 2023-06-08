@@ -1,4 +1,4 @@
- --Copyright © 2013, Byrthnoth
+ --Copyright © 2023, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -33,9 +33,10 @@ targets_condensed = false
 common_nouns = T{}
 plural_entities = T{}
 item_quantity = {id = 0, count = ''}
+antideduplication_table = {}
 rcol = string.char(0x1E,0x01)
 non_block_messages = T{1,2,7,14,15,24,25,26,30,31,32,33,44,63,67,69,70,77,102,103,110,122,132,152,157,158,161,162,163,165,167,185,187,188,196,197,223,224,225,226,227,228,229,238,245,252,263,264,265,274,275,276,281,282,288,289,290,291,292,293,294,295,296,297,298,299,300,301,302,306,317,318,324,352,353,354,357,358,366,367,373,379,382,383,384,385,386,387,388,389,390,391,392,393,394,395,396,397,398,409,413,451,452,454,522,535,536,537,539,576,577,587,588,592,603,606,648,650,651,658,732,736,746,747,748,749,750,751,752,753,767,768,769,770,781}
-passed_messages = T{4,5,6,16,17,18,20,34,35,36,38,40,47,48,49,53,62,64,72,78,87,88,89,90,94,97,112,116,154,170,171,172,173,174,175,176,177,178,191,192,198,204,206,215,217,218,219,234,246,249,251,307,308,313,315,328,336,350,523,530,531,558,561,563,575,584,601,609,562,610,611,612,613,614,615,616,617,618,619,620,625,626,627,628,629,630,631,632,633,634,635,636,643,660,661,662,679}
+passed_messages = T{4,5,6,16,17,18,20,34,35,36,38,40,47,48,49,53,62,64,72,78,87,88,89,90,94,97,112,116,154,170,171,172,173,174,175,176,177,178,191,192,198,204,206,215,217,218,219,234,241,246,249,251,307,308,313,315,328,336,350,523,530,531,558,561,563,575,584,601,609,562,610,611,612,613,614,615,616,617,618,619,620,625,626,627,628,629,630,631,632,633,634,635,636,643,660,661,662,679}
 agg_messages = T{85,653,655,75,156,189,248,323,355,408,422,425,82,93,116,127,131,134,151,144,146,148,150,166,186,194,230,236,237,242,243,268,271,319,320,364,375,412,414,416,420,424,426,432,433,441,602,645,668,435,437,439}
 color_redundant = T{26,33,41,71,72,89,94,109,114,164,173,181,184,186,70,84,104,127,128,129,130,131,132,133,134,135,136,137,138,139,140,64,86,91,106,111,175,178,183,81,101,16,65,87,92,107,112,174,176,182,82,102,67,68,69,170,189,15,208,18,25,32,40,163,185,23,24,27,34,35,42,43,162,165,187,188,30,31,14,205,144,145,146,147,148,149,150,151,152,153,190,13,9,253,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,284,285,286,287,292,293,294,295,300,301,301,303,308,309,310,311,316,317,318,319,324,325,326,327,332,333,334,335,340,341,342,343,344,345,346,347,348,349,350,351,355,357,358,360,361,363,366,369,372,374,375,378,381,384,395,406,409,412,415,416,418,421,424,437,450,453,456,458,459,462,479,490,493,496,499,500,502,505,507,508,10,51,52,55,58,62,66,80,83,85,88,90,93,100,103,105,108,110,113,122,168,169,171,172,177,179,180,12,11,37,291} -- 37 and 291 might be unique colors, but they are not gsubbable.
 block_messages = T{12}
@@ -153,7 +154,7 @@ domain_buffs = S{
 no_effect_map = T{248,355,189,75,408,156,0,0,0,0,189,0,189,156,156}
 receives_map = T{0,0,186,82,375,116,0,0,0,0,186,0,127,116,116}
 stat_ignore = T{66,69,70,71,444,445,446}
-enfeebling = T{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,155,156,157,158,159,167,168,174,175,177,186,189,192,193,194,223,259,260,261,262,263,264,298,378,379,380,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,404,448,449,450,451,452,473,540,557,558,559,560,561,562,563,564,565,566,567}
+enfeebling = T{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,155,156,157,158,159,167,168,174,175,177,186,189,192,193,194,223,259,260,261,262,263,264,298,378,379,380,386,387,388,389,390,391,392,393,394,395,396,397,398,399,400,404,448,449,450,451,452,473,540,557,558,559,560,561,562,563,564,565,566,567,572,576,597,630,631}
 
 reaction_offsets = {
     [1] = 8,
@@ -223,7 +224,7 @@ message_map[75] = T{283} -- No Effect: Spell, Target
 message_map[248] = T{355} -- no ability of any kind
 message_map['No effect'] = T{283,423,659} -- generic "no effect" messages for sorting by category
 message_map[432] = T{433} -- Receives: Spell, Target
-message_map[82] = T{230,236,237,267,268,271} -- Receives: Spell, Target, Status
+message_map[82] = T{230,236,237,267,268,270,271} -- Receives: Spell, Target, Status
 message_map[230] = T{266} -- Receives: Spell, Target, Status
 message_map[319] = T{266} -- Receives: Spell, Target, Status (Generic for avatar buff BPs)
 message_map[134] = T{287} -- Receives: Spell, Target, Status
@@ -298,7 +299,6 @@ default_filters = [[
             <readies>false</readies> <!-- Prevents your "Jim readies ____" messages from appearing -->
             <casting>false</casting> <!-- Prevents your "Jim begins casting ____" messages from appearing -->
             <all>false</all> <!-- Prevents all of your messages from appearing -->
-            
             <target>true</target> <!-- true = SHOW all actions where I am the target. -->
         </me>
         <party> <!-- A party member is doing something -->
@@ -312,6 +312,7 @@ default_filters = [[
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
+            <target>false</target>
         </party>
         <alliance> <!-- An alliance member is doing something -->
             <melee>false</melee>
@@ -324,6 +325,7 @@ default_filters = [[
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
+            <target>false</target>
         </alliance>
         <others> <!-- Some guy nearby is doing something -->
             <melee>false</melee>
@@ -336,6 +338,7 @@ default_filters = [[
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
+            <target>false</target>
         </others>
         <my_pet> <!-- Your pet is doing something -->
             <melee>false</melee>
@@ -346,6 +349,7 @@ default_filters = [[
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
+            <target>false</target>
         </my_pet>
         <my_fellow> <!-- Your adventuring fellow is doing something -->
             <melee>false</melee>
@@ -356,6 +360,7 @@ default_filters = [[
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
+            <target>false</target>
         </my_fellow>
         <other_pets> <!-- Someone else's pet is doing something -->
             <melee>false</melee>
@@ -366,6 +371,7 @@ default_filters = [[
             <readies>false</readies>
             <casting>false</casting>
             <all>false</all>
+            <target>false</target>
         </other_pets>
 
         <enemies> <!-- Monster that your party has claimed doing something with one of the below targets -->
@@ -601,14 +607,25 @@ my_pet={melee=false,ranged=false,damage=false,healing=false,misses=false,readies
 my_fellow={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false,target=false},
 other_pets={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false,target=false},
 monsters = {
-me={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false},
-party={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false},
-alliance={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false},
-others={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false},
-my_pet={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false},
-my_fellow={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false},
-other_pets={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false},
-monsters={melee=false,ranged=false,damage=false,healing=false,misses=false,readies=false,casting=false,all=false}} }
+me={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false},
+party={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false},
+alliance={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false},
+others={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false},
+my_pet={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false},
+my_fellow={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false},
+other_pets={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false},
+enemies={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false},
+monsters={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false}},
+enemies = {
+me={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false},
+party={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false},
+alliance={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false},
+others={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false},
+my_pet={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false},
+my_fellow={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false},
+other_pets={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false},
+enemies={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false},
+monsters={melee=false,ranged=false,damage=false,healing=false,misses=false,items=false,uses=false,readies=false,casting=false,all=false}} }
 
 default_settings = [[
 <?xml version="1.0" ?>

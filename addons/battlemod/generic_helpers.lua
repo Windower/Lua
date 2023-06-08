@@ -1,4 +1,4 @@
---Copyright © 2013, Byrthnoth
+--Copyright © 2023, Byrthnoth
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
