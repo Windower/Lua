@@ -711,7 +711,7 @@ function check_spell(available_spells,spell)
     local spell_jobs = copy_entry(res.spells[spell.id].levels)
     if not available_spells[spell.id] and not (
             (not disable_table[5] and not disable_table[4] and spell.id == 503) or -- Body + Head + Impact
-            (not disable_table[2] and spell.id == 417) or -- Range + Honor March
+            (not disable_table[2] and (spell.id == 417 or spell.id == 418)) or -- Range + Honor March + Aria of Passion
             ((not disable_table[0] or not disable_table[1]) and spell.id == 360) -- Main or Sub + Dispelga
         ) then
         return false,"Unable to execute command. You do not know that spell ("..(res.spells[spell.id][language] or spell.id)..")"
