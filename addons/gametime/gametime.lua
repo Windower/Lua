@@ -320,7 +320,7 @@ function day_change(day)
         dlist = {'4','5','6','7','8','1','2','3'}
     elseif (day == 'Iceday') then
         dlist = {'5','6','7','8','1','2','3','4'}
-    elseif (day == 'Lightningsday') then
+    elseif (day == 'Lightningday') then
         dlist = {'6','7','8','1','2','3','4','5'}
     elseif (day == 'Lightsday') then
         dlist = {'7','8','1','2','3','4','5','6'}
