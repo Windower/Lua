@@ -29,9 +29,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 require('luau')
 
 _addon.name = 'AutoInvite'
-_addon.author = 'Registry'
+_addon.author = 'Registry, modified by Novasilex'
 _addon.commands = {'autoinvite','ai'}
-_addon.version = 1.0
+_addon.version = 1.1
 _addon.language = 'english'
 
 defaults = T{}
@@ -75,6 +75,13 @@ settings = config.load(defaults)
 -- Check for keyword
 windower.register_event('chat message', function(message, player, mode, is_gm)
     local word = false
+
+   if message:lower():match('givelead') and settings.whitelist:contains(player)then
+      try_change_leader(player)
+   elseif message:lower():match('disband') and settings.whitelist:contains(player) then
+      try_disband(player)
+   end
+      
     if mode == 3 then
         for item in settings.keywords:it() do
             if message:lower():match(item:lower()) then
@@ -121,6 +128,16 @@ function try_invite(player)
     end
 
     windower.send_command('input /pcmd add '..player)
+end
+
+-- Attempts to change leader of party
+function try_change_leader(player)
+    windower.send_command('input /pcmd leader '..player)
+end
+
+-- Attempts to disband party
+function try_disband(player)
+    windower.send_command('input /pcmd breakup')
 end
 
 -- Adds names/items to a given list type.
