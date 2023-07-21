@@ -1,6 +1,6 @@
 _addon.name = 'Itemizer'
 _addon.author = 'Ihina'
-_addon.version = '3.0.1.3'
+_addon.version = '3.0.1.4'
 _addon.command = 'itemizer'
 
 require('luau')
@@ -127,7 +127,7 @@ windower.register_event('unhandled command', function(command, ...)
             local last = args[#args]
             if last == 'all' then
                 args:remove()
-            elseif tonumber(last) then
+            elseif tonumber(last) and not last:find('+') then
                 count = tonumber(last)
                 args:remove()
             else
