@@ -7,12 +7,13 @@ res = require 'resources'
 require 'actions'
 require 'pack'
 bit = require 'bit'
+packets = require('packets')
 
 require 'generic_helpers'
 require 'parse_action_packet'
 require 'statics'
 
-_addon.version = '3.31'
+_addon.version = '3.33'
 _addon.name = 'BattleMod'
 _addon.author = 'Byrth, maintainer: SnickySnacks'
 _addon.commands = {'bm','battlemod'}
@@ -170,6 +171,17 @@ windower.register_event('incoming text',function (original, modified, color, col
         elseif original:endswith(endline) and string.find(original, item) then --block items action messages
             return true
         end
+    elseif color == 191 then
+        local endline = string.char(0x7F, 0x31)
+        if original:endswith(endline) and string.find(original, 'effect wears off.') then --deduplication blocking fix
+            local status = string.match(original, '\'s (.+) effect wears off') or string.match(original, '\' (.+) effect wears off')
+            if antideduplication_table[status] and string.find(original, antideduplication_table[status].message) then
+                packet_inject(antideduplication_table[status].packet_table)
+                return true
+            end
+        elseif string.find(original, 'dummy'..endline) then --block sideeffect of setting the message to 0 in injected 0x029 packet
+            return true
+        end
     end
     
     return modified,color
@@ -250,12 +262,12 @@ function filterload(job)
     if file.exists('data\\filters\\filters-'..job..'.xml') then
         default_filt = false
         filter = config.load('data\\filters\\filters-'..job..'.xml',default_filter_table,false)
-        config.save(filter)
+        --config.save(filter)
         windower.add_to_chat(4,'Loaded '..job..' Battlemod filters')
     elseif not default_filt then
         default_filt = true
         filter = config.load('data\\filters\\filters.xml',default_filter_table,false)
-        config.save(filter)
+        --config.save(filter)
         windower.add_to_chat(4,'Loaded default Battlemod filters')
     end
     current_job = job
@@ -305,11 +317,13 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
         am.actor_id = original:unpack('I',0x05)
         am.target_id = original:unpack('I',0x09)
         am.param_1 = original:unpack('I',0x0D)
-        am.param_2 = original:unpack('H',0x11)%2^9 -- First 7 bits
-        am.param_3 = math.floor(original:unpack('I',0x11)/2^5) -- Rest
+        am.param_2 = original:unpack('I',0x11)
+        --am.param_2 = original:unpack('H',0x11)%2^9 -- First 7 bits
+        --am.param_3 = math.floor(original:unpack('I',0x11)/2^5) -- Rest
         am.actor_index = original:unpack('H',0x15)
         am.target_index = original:unpack('H',0x17)
-        am.message_id = original:unpack('H',0x19)%2^15 -- Cut off the most significant bit
+        am.message_id = original:unpack('H',0x19)
+        --am.message_id = original:unpack('H',0x19)%2^15 -- Cut off the most significant bit
         
         local actor = player_info(am.actor_id)
         local target = player_info(am.target_id)
@@ -347,16 +361,30 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                     :gsub('${number}',number or ''), am.message_id)
                 windower.add_to_chat(color, msg)
             end
-        elseif am.message_id == 206 and condensetargets then -- Wears off messages
+        elseif (am.message_id == 206 or am.message_id == 204) and condensetargets then -- Wears off and is no longer messages
             -- Condenses across multiple packets
             local status
+            local lang = log_form_messages:contains(am.message_id) and 'english_log' or language
             
-            if enfeebling:contains(am.param_1) and res.buffs[param_1] then
-                status = color_it(res.buffs[param_1][language],color_arr.enfeebcol)
+            if not is_injected and am.message_id == 206 then
+                local outstr = res.action_messages[am.message_id][language]
+            
+                if plural_entities:contains(am.actor_id) then
+                    outstr = plural_actor(outstr, am.message_id)
+                end
+                if plural_entities:contains(am.target_id) then
+                    outstr = plural_target(outstr, am.message_id)
+                end
+            
+                antideduplication(outstr, am)
+            end
+            
+            if enfeebling:contains(am.param_1) and res.buffs[am.param_1] then
+                status = color_it(res.buffs[am.param_1][lang],color_arr.enfeebcol)
             elseif color_arr.statuscol == rcol then
-                status = color_it(res.buffs[am.param_1][language],string.char(0x1F,191))
+                status = color_it(res.buffs[am.param_1][lang],string.char(0x1F,191))
             else
-                status = color_it(res.buffs[am.param_1][language],color_arr.statuscol)
+                status = color_it(res.buffs[am.param_1][lang],color_arr.statuscol)
             end
             
             if not multi_actor[status] then multi_actor[status] = player_info(am.actor_id) end
@@ -375,16 +403,25 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                 multi_targs[status][1] = target
                 multi_packet(status)
             end
+            if is_injected then
+                local parsed = packets.parse('incoming', original)
+                parsed['Message'] = 0
+                local rebuilt = packets.build(parsed)
+                return rebuilt
+            end
             am.message_id = false
         elseif passed_messages:contains(am.message_id) then
             local item,status,spell,skill,number,number2
             local outstr = res.action_messages[am.message_id][language]
+            local color = color_filt(res.action_messages[am.message_id].color, am.actor_id==Self.id)
             if plural_entities:contains(am.actor_id) then
                 outstr = plural_actor(outstr, am.message_id)
             end
             if plural_entities:contains(am.target_id) then
                 outstr = plural_target(outstr, am.message_id)
             end
+            
+            if am.message_id == 206 and not is_injected then antideduplication(outstr, am) end
             
             local fields = fieldsearch(outstr)
             
@@ -447,14 +484,20 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                 :gsub('${number2}',number2 or '')
                 :gsub('${skill}',skill or '')
                 :gsub('${lb}','\7'), am.message_id))
-            windower.add_to_chat(res.action_messages[am.message_id]['color'],outstr)
+            windower.add_to_chat(color,outstr)
+            if am.message_id == 206 and is_injected then 
+                local parsed = packets.parse('incoming', original)
+                parsed['Message'] = 0
+                local rebuilt = packets.build(parsed)
+                return rebuilt
+            end
             am.message_id = false
         elseif debugging and res.action_messages[am.message_id] then 
         -- 38 is the Skill Up message, which (interestingly) uses all the number params.
         -- 202 is the Time Remaining message, which (interestingly) uses all the number params.
-            print('debug_EAM#'..am.message_id..': '..res.action_messages[am.message_id][language]..' '..am.param_1..'   '..am.param_2..'   '..am.param_3)
+            print('debug_EAM#'..am.message_id..': '..res.action_messages[am.message_id][language]..' '..am.param_1..'   '..am.param_2)
         elseif debugging then
-            print('debug_EAM#'..am.message_id..': '..'Unknown'..' '..am.param_1..'   '..am.param_2..'   '..am.param_3)
+            print('debug_EAM#'..am.message_id..': '..'Unknown'..' '..am.param_1..'   '..am.param_2)
         end
         if not am.message_id then
             return true
@@ -505,4 +548,29 @@ function multi_packet(...)
     multi_targs[ind] = nil
     multi_msg[ind] = nil
     multi_actor[ind] = nil
+end
+
+function antideduplication(msg, data)
+    local status = res.buffs[data.param_1].en
+    local actor = player_info(data.actor_id)
+    local target = player_info(data.target_id)
+    local target_article = common_nouns:contains(data.target_id) and 'The ' or ''
+    msg = (clean_msg(msg
+        :gsub('${status}',status)
+        :gsub('${target}\'s',target_article..target.name ..'\'s')
+        :gsub('${target}',target_article..target.name)))
+    antideduplication_table[status] = {message = msg, packet_table = data}
+end
+
+function packet_inject(data)
+    packets.inject(packets.new('incoming', 0x029, {
+            ['Actor'] = data.actor_id,
+            ['Target'] = data.target_id,
+            ['Param 1'] = data.param_1,
+            ['Param 2'] = data.param_2,
+            ['Actor Index'] = data.actor_index,
+            ['Target Index'] = data.target_index,
+            ['Message'] = 206,
+            ['_unknown1'] = 0
+            }))
 end

@@ -712,8 +712,9 @@ fields.outgoing[0x05E] = L{
                                                                                 --      Zone line identifier ('4' for Port Jeuno > Qufim Island, '2' for Port Jeuno > Lower Jeuno, etc.)
     {ctype='data[12]',          label='_unknown1',          const=''},          -- 08
     {ctype='unsigned short',    label='_unknown2',          const=0},           -- 14
-    {ctype='unsigned char',     label='_unknown3',          const=0x04},        -- 16   Seemed to never vary for me
-    {ctype='unsigned char',     label='Type'},                                  -- 17   03 for leaving the MH, 00 otherwise
+    {ctype='unsigned char',     label='MH Door Menu',  fn=e+{'mh door menus'}}, -- 16   should always contain the "MH Door Menu" byte of the last `incoming 0x00A`
+    {ctype='unsigned char',     label='Type'},                                  -- 17   should be 0 except for when using mog house door, when it is a menu value:
+                                                                                --      0="Whence I came", 1=first_option, 2=second_option, 3and-so-on, 125=mh_first_floor, 126=mh_second_floor, 127=mog_garden
 }
 
 -- Equipment Screen, also observed when zoning
@@ -1217,6 +1218,19 @@ types.job_level = L{
     {ctype='unsigned char',     label='Level'},                                 -- 00
 }
 
+enums['mh door menus'] = {      -- only known use is Mog House exit menu type 
+    [0x00] = 'None',            -- results in simple yes/no dialog to leave to where you came from
+    [0x01] = 'San d\'Oria',     -- only when flower girl quest completed
+    [0x02] = 'Bastok',          -- only when flower girl quest completed
+    [0x03] = 'Windurst',        -- only when flower girl quest completed
+    [0x04] = 'Jeuno',           -- only when flower girl quest completed
+    [0x05] = 'Aht Urgan',       -- only when flower girl quest completed
+    [0x06] = "San d\'Oria [S]", -- only one exit so value should never be seen on retail (but value tested)
+    [0x07] = "Bastok [S]",      -- only one exit so value should never be seen on retail (but value tested)
+    [0x08] = "Windurst [S]",    -- only one exit so value should never be seen on retail (but value tested)
+    [0x09] = 'Adoulin',         -- no flower girl quest, should always be this value for adoulin mh
+}
+
 -- Zone update
 fields.incoming[0x00A] = L{
     {ctype='unsigned int',      label='Player',             fn=id},             -- 04
@@ -1267,7 +1281,11 @@ fields.incoming[0x00A] = L{
     {ctype='unsigned int',      label='_unknown9',          const=0x0003A020},  -- A4
     {ctype='data[2]',           label='_unknown10'},                            -- A8
     {ctype='unsigned short',    label='Zone model'},                            -- AA
-    {ctype='data[8]',           label='_unknown11'},                            -- AC   0xAC is 2 for some zones, 0 for others
+    {ctype='data[2]',           label='_unknown11'},                            -- AC   0xAC is 2 for some zones, 0 for others
+    {ctype='unsigned char',     label='MH Door Menu',fn=e+{'mh door menus'}},   -- AE   Updated when Mog House entered. Determines which MH exits are available in door/exit menu.
+                                                                                --      Persists through zoning and logout. see enum for more info
+    {ctype='unsigned char',     label='Nomad Moogle'},                          -- AF   set to 1 iff nomad moogle menu is accessible in zone (Odyssey:Gaol, Mhaura, Norg, etc -- but not mog house or mog garden)
+    {ctype='data[4]',           label='_unknown12'},                            -- B0
     {ctype='unsigned char',     label='Main Job',           fn=job},            -- B4
     {ctype='unsigned char',     label='_unknown12'},                            -- B5
     {ctype='unsigned char',     label='_unknown13'},                            -- B6
@@ -4019,7 +4037,8 @@ types.ability_recast = L{
     {ctype='unsigned short',    label='Duration',           fn=div+{1}},        -- 00
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 02
     {ctype='unsigned char',     label='Recast',             fn=arecast},        -- 03
-    {ctype='unsigned int',      label='_unknown2'}                              -- 04
+    {ctype='signed short',      label='Recast Modifier'},                       -- 04
+    {ctype='unsigned short',    label='_unknown2'}                              -- 06
 }
 
 -- Ability timers
@@ -4041,4 +4060,3 @@ Redistribution and use in source and binary forms, with or without modification,
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL Windower BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
-

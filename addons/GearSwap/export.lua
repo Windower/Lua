@@ -26,7 +26,7 @@
 
 function export_set(options)
     local item_list = T{}
-    local targinv,all_items,xml,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing,named_file
+    local targinv,all_items,minify,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing,named_file
     if #options > 0 then
         for _,v in ipairs(options) do
             if S{'inventory','inv','i'}:contains(v:lower()) then
@@ -35,8 +35,8 @@ function export_set(options)
                 all_items = true
             elseif v:lower() == 'wearable' then
                 wearable = true
-            elseif S{'xml'}:contains(v:lower()) then
-                xml = true
+            elseif S{'mini'}:contains(v:lower()) then
+                minify = true
             elseif S{'sets','set','s'}:contains(v:lower()) then
                 all_sets = true
                 if not user_env or not user_env.sets then
@@ -58,7 +58,7 @@ function export_set(options)
             end
         end
     end
-    
+
     local buildmsg = 'Exporting '
     if all_items then
         buildmsg = buildmsg..'all your items'
@@ -72,12 +72,8 @@ function export_set(options)
         buildmsg = buildmsg..'your currently equipped gear'
     end
 
-    if xml then
-        buildmsg = buildmsg..' as an xml file.'
-    else
-        buildmsg = buildmsg..' as a lua file.'
-    end
-    
+    buildmsg = buildmsg..' as a lua file.'
+
     if use_job_in_filename then
         buildmsg = buildmsg..' (Naming format: Character_JOB)'
     elseif use_subjob_in_filename then
@@ -85,17 +81,17 @@ function export_set(options)
     elseif named_file then
         buildmsg = buildmsg..' (Named: Character_'..filename..')'
     end
-    
+
     if overwrite_existing then
         buildmsg = buildmsg..' Will overwrite existing files with same name.'
     end
-    
+
     msg.addon_msg(123,buildmsg)
-    
+
     if not windower.dir_exists(windower.addon_path..'data/export') then
         windower.create_dir(windower.addon_path..'data/export')
     end
-    
+
     if all_items then
         for i = 0, #res.bags do
             item_list:extend(get_item_list(items[res.bags[i].english:gsub(' ', ''):lower()]))
@@ -111,7 +107,7 @@ function export_set(options)
         item_list,exported = unpack_names({},'L1',user_env.sets,{},{empty=true})
     else
         -- Default to loading the currently worn gear.
-        
+
         for i = 1,16 do -- ipairs will be used on item_list
             if not item_list[i] then
                 item_list[i] = {}
@@ -119,7 +115,7 @@ function export_set(options)
                 item_list[i].slot = toslotname(i-1)
             end
         end
-        
+
         for slot_name,gs_item_tab in pairs(items.equipment) do
             if gs_item_tab.slot ~= empty then
                 local item_tab
@@ -130,15 +126,13 @@ function export_set(options)
                         name = res.items[item_tab.id][language],
                         slot = slot_name
                         }
-                    if not xml then
-                        local augments = extdata.decode(item_tab).augments or {}
-                        local aug_str = ''
-                        for aug_ind,augment in pairs(augments) do
-                            if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
-                        end
-                        if string.len(aug_str) > 0 then
-                            item_list[slot_map[slot_name]+1].augments = aug_str
-                        end
+                    local augments = extdata.decode(item_tab).augments or {}
+                    local aug_str = ''
+                    for aug_ind,augment in pairs(augments) do
+                        if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
+                    end
+                    if string.len(aug_str) > 0 then
+                        item_list[slot_map[slot_name]+1].augments = aug_str
                     end
                 else
                     msg.addon_msg(123,'You are wearing an item that is not in the resources yet.')
@@ -146,7 +140,7 @@ function export_set(options)
             end
         end
     end
-    
+
     if #item_list == 0 then
         msg.addon_msg(123,'There is nothing to export.')
         return
@@ -163,14 +157,14 @@ function export_set(options)
             return
         end
     end
-    
-    
+
+
     if not windower.dir_exists(windower.addon_path..'data/export') then
         windower.create_dir(windower.addon_path..'data/export')
     end
-    
+
     local path = windower.addon_path..'data/export/'..player.name
-    
+
     if use_job_in_filename then
         path = path..'_'..windower.ffxi.get_player().main_job
     elseif use_subjob_in_filename then
@@ -180,28 +174,26 @@ function export_set(options)
     else
         path = path..os.date(' %Y-%m-%d %H-%M-%S')
     end
-    if xml then
-        -- Export in .xml
-        if (not overwrite_existing) and windower.file_exists(path..'.xml') then
-            path = path..' '..os.clock()
-        end
-        local f = io.open(path..'.xml','w+')
-        f:write('<spellcast>\n  <sets>\n    <group name="exported">\n      <set name="exported">\n')
+
+    if (not overwrite_existing) and windower.file_exists(path..'.lua') then
+        path = path..' '..os.clock()
+    end
+
+    local f = io.open(path..'.lua','w+')
+    if minify then
+        f:write('sets.exported={\n')
         for i,v in ipairs(item_list) do
             if v.name ~= empty then
-                local slot = xmlify(tostring(v.slot))
-                local name = xmlify(tostring(v.name))
-                f:write('        <'..slot..'>'..name..'</'..slot..'>\n')
+                if v.augments then
+                    --Advanced set table
+                    f:write(v.slot..'={ name="'..v.name..'", augments={'..v.augments..'}},')
+                else
+                    f:write(v.slot..'="'..v.name..'",')
+                end
             end
         end
-        f:write('      </set>\n    </group>\n  </sets>\n</spellcast>')
-        f:close()
+        f:write('\n}')
     else
-        -- Default to exporting in .lua
-        if (not overwrite_existing) and windower.file_exists(path..'.lua') then
-            path = path..' '..os.clock()
-        end
-        local f = io.open(path..'.lua','w+')
         f:write('sets.exported={\n')
         for i,v in ipairs(item_list) do
             if v.name ~= empty then
@@ -214,8 +206,8 @@ function export_set(options)
             end
         end
         f:write('}')
-        f:close()
     end
+    f:close()
 end
 
 function unpack_names(ret_tab,up,tab_level,unpacked_table,exported)
@@ -280,11 +272,6 @@ function unlogify_unpacked_name(name)
     return name,slot
 end
 
-function xmlify(phrase)
-    if tonumber(phrase:sub(1,1)) then phrase = 'NUM'..phrase end
-    return phrase --:gsub('"','&quot;'):gsub("'","&apos;"):gsub('<','&lt;'):gsub('>','&gt;'):gsub('&&','&amp;')
-end
-
 function get_item_list(bag)
     local items_in_bag = {}
     -- Load the entire inventory
@@ -298,15 +285,13 @@ function get_item_list(bag)
                     slot = res.slots[potslots:it()()].english:gsub(' ','_'):lower() -- Multi-lingual support requires that we add more languages to slots.lua
                 end
                 items_in_bag[#items_in_bag].slot = slot or 'item'
-                if not xml then
-                    local augments = extdata.decode(v).augments or {}
-                    local aug_str = ''
-                    for aug_ind,augment in pairs(augments) do
-                        if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
-                    end
-                    if string.len(aug_str) > 0 then
-                        items_in_bag[#items_in_bag].augments = aug_str
-                    end
+                local augments = extdata.decode(v).augments or {}
+                local aug_str = ''
+                for aug_ind,augment in pairs(augments) do
+                    if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
+                end
+                if string.len(aug_str) > 0 then
+                    items_in_bag[#items_in_bag].augments = aug_str
                 end
             else
                 msg.addon_msg(123,'You possess an item that is not in the resources yet.')

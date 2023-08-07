@@ -146,6 +146,10 @@ function cc.run_report(path)
     print("File created: "..mainReportName)
 end
 
+function cc.xmlify(phrase)
+    if tonumber(phrase:sub(1,1)) then phrase = 'NUM'..phrase end
+    return phrase --:gsub('"','&quot;'):gsub("'","&apos;"):gsub('<','&lt;'):gsub('>','&gt;'):gsub('&&','&amp;')
+end
  -- This function tallies all the gear in your inventory 
 function cc.export_inv(path)
     if ccDebug then
@@ -161,8 +165,8 @@ function cc.export_inv(path)
         if not settings.ccskipBags:contains(gearswap.res.bags[n].english) then
             for i,v in ipairs(gearswap.get_item_list(gearswap.items[gearswap.res.bags[n].english:gsub(' ', ''):lower()])) do
                 if v.name ~= empty then
-                    local slot = gearswap.xmlify(tostring(v.slot))
-                    local name = gearswap.xmlify(tostring(v.name)):gsub('NUM1','1')
+                    local slot = cc.xmlify(tostring(v.slot))
+                    local name = cc.xmlify(tostring(v.name)):gsub('NUM1','1')
                     
                     if cc.sandbox.itemsByName[name:lower()] ~= nil then
                         itemid = cc.sandbox.itemsByName[name:lower()]

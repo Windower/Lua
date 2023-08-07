@@ -607,6 +607,10 @@ function texts.destroy(t)
     meta[t] = nil
 end
 
+function texts.settings(t)
+    return meta[t].settings
+end
+
 -- Handle drag and drop
 windower.register_event('mouse', function(type, x, y, delta, blocked)
     if blocked then
