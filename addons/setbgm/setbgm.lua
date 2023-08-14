@@ -120,10 +120,16 @@ end
 
 function find_songs(str)
     windower.add_to_chat(207, 'Songs matching %s:':format(str:color(204)))
+    local output = ''
     for id=25,900 do
         if songs[id] and songs[id]:lower():find(str) then
-            windower.add_to_chat(207, '  %s: %s':format(tostring(id):color(204), songs[id]))
+            output = output .. '\n    %s: %s':format(tostring(id):color(204), songs[id])
         end
+    end
+    if output ~= '' then
+        windower.add_to_chat(207,output)
+    else
+        windower.add_to_chat(207,'    No songs matching %s found.':format(str:color(204)))
     end
 end
 
@@ -155,8 +161,9 @@ function setbgm_command(...)
     elseif #arg == 2 and arg[1]:lower() == 'list' and arg[2]:lower() == 'type' then
         display_music_types()
         return
-    elseif #arg == 2 and arg[1]:lower() == 'find' then
-        local str = arg[2]:lower()
+    elseif #arg > 1 and arg[1]:lower() == 'find' then
+        table.remove(arg,1)
+        local str = table.concat(arg,' ')
         find_songs(str)
         return
     elseif #arg == 1 then
