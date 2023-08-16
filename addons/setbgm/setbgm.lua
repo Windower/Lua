@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --]]
 
 _addon.name = 'setbgm'
-_addon.version = '1.2.3'
+_addon.version = '1.3.0'
 _addon.command = 'setbgm'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
@@ -118,6 +118,21 @@ function display_songs()
     end
 end
 
+function find_songs(str)
+    windower.add_to_chat(207, 'Songs matching %s:':format(str:color(204)))
+    local output = ''
+    for id=25,900 do
+        if songs[id] and songs[id]:lower():find(str) then
+            output = output .. '\n    %s: %s':format(tostring(id):color(204), songs[id])
+        end
+    end
+    if output ~= '' then
+        windower.add_to_chat(207,output)
+    else
+        windower.add_to_chat(207,'    No songs matching %s found.':format(str:color(204)))
+    end
+end
+
 function display_music_types()
     windower.add_to_chat(207, 'Available music types:')
     local output = '  '
@@ -130,6 +145,7 @@ end
 function display_help()
     windower.add_to_chat(167, 'Command usage:')
     windower.add_to_chat(167, '    setbgm list [music|type]')
+    windower.add_to_chat(167, '    setbgm find <string>')
     windower.add_to_chat(167, '    setbgm <song id> [<music type id>]')
     windower.add_to_chat(167, '    setbgm <song id> <song id> <song id> <song id> <song id> <song id> <song id> <song id>')
 end
@@ -144,6 +160,11 @@ function setbgm_command(...)
         return
     elseif #arg == 2 and arg[1]:lower() == 'list' and arg[2]:lower() == 'type' then
         display_music_types()
+        return
+    elseif #arg > 1 and arg[1]:lower() == 'find' then
+        table.remove(arg,1)
+        local str = table.concat(arg,' ')
+        find_songs(str)
         return
     elseif #arg == 1 then
         set_music(nil, arg[1])
