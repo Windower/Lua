@@ -4,7 +4,6 @@ _addon.version = '3.1.0.0'
 _addon.command = 'itemizer'
 
 require('luau')
-local packets = require('packets')
 
 defaults = {}
 defaults.AutoNinjaTools = true
