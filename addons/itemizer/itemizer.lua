@@ -43,7 +43,7 @@ bag_ids.temporary = nil
 windower.register_event("load", function()
     local _, _, saved   = settings.version:find("(%d+%.%d+%.)")
     local _, _, current = _addon.version:find("(%d+%.%d+%.)")
-    if settings.version ~= _addon.version then
+    if saved ~= current then
         log("Itemizer v%s: New features added. (use //itemizer help to find out about them)":format(_addon.version))
         settings.version = _addon.version
         settings:save() 
@@ -125,10 +125,11 @@ windower.register_event("addon command", function(command, arg2, ...)
         settings:save()
         log('AutoItems is now',settings.AutoItems)
     elseif T{'useuniversaltool','uut'}:contains(command:lower()) then
-        if settings.UseUniversalTools[arg2:ucfirst()] ~= nil then
-            settings.UseUniversalTools[arg2:ucfirst()] = not settings.UseUniversalTools[arg2:ucfirst()]
+        local arg = arg2:ucfirst()
+        if settings.UseUniversalTools[arg] ~= nil then
+            settings.UseUniversalTools[arg] = not settings.UseUniversalTools[arg]
             settings:save()
-            log('UseUniversalTools for %s spells is now':format(arg2:ucfirst()),settings.UseUniversalTools[arg2:ucfirst()])
+            log('UseUniversalTools for %s spells is now':format(arg),settings.UseUniversalTools[arg])
         else
             error('Argument 2 must be a ninjutsu spell (sans :ichi or :ni) i.e. uut katon')
         end
