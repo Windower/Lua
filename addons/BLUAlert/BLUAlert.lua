@@ -1,40 +1,34 @@
---[[
-BLUAlert v1.0.0.0
-
-Copyright © 2017, Christopher Szewczyk
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    * Neither the name of BLUAlert nor the
-      names of its contributors may be used to endorse or promote products
-      derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL Christopher Szewczyk BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-]]
+-- BLUAlert v1.1.0.0
+-- Copyright © 2017, 2023 Christopher Szewczyk, Evan Martinson
+-- All rights reserved.
+-- Redistribution and use in source and binary forms, with or without
+-- modification, are permitted provided that the following conditions are met:
+-- * Redistributions of source code must retain the above copyright
+--   notice, this list of conditions and the following disclaimer.
+-- * Redistributions in binary form must reproduce the above copyright
+--   notice, this list of conditions and the following disclaimer in the
+--   documentation and/or other materials provided with the distribution.
+-- * Neither the name of BLUAlert nor the
+--   names of its contributors may be used to endorse or promote products
+--   derived from this software without specific prior written permission.
+-- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+-- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+-- WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+-- DISCLAIMED. IN NO EVENT SHALL Christopher Szewczyk or Evan Martinson BE LIABLE FOR ANY
+-- DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+-- (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+-- LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+-- ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+-- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+-- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 require('sets')
 res = require('resources')
 chat = require('chat')
 
 _addon.name    = 'BLUAlert'
-_addon.author  = 'Kainsin'
-_addon.version = '1.0.0.0'
+_addon.author  = 'Kainsin', 'Prince Headache'
+_addon.version = '1.1.0.0'
 
 -- Some BLU spells have a different name then the monster abilities they come from.
 blu_different_names = {
@@ -76,6 +70,7 @@ function get_action_id(targets)
     end
 end
 
+-- Register the action event listener
 windower.register_event('action', function(action)
     -- Category 7 is the readies message for abilities.
     if (action['category'] == 7) then
@@ -85,5 +80,16 @@ windower.register_event('action', function(action)
             windower.add_to_chat(123, "Unknown Blue Magic Used!")
             windower.play_sound(windower.addon_path..'sounds/UnknownBlueMagicUsed.wav')
         end
+    end
+end)
+
+--Prince Headache's Modifications:
+
+-- Plays a sound when Blue Magic is learned
+windower.register_event('incoming text', function(original, modified, original_mode, modified_mode, blocked)
+    -- Check if the modified message contains "learns" followed by a Blue Magic spell name
+    local spell_name = modified:match("learns%s+(.+)!")
+    if spell_name and find_blu_spell(spell_name) then
+        windower.play_sound(windower.addon_path..'sounds/BlueMagicLearned.wav')
     end
 end)
