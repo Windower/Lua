@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --]]
 
 _addon.name = 'setbgm'
-_addon.version = '1.3.0'
+_addon.version = '1.3.2'
 _addon.command = 'setbgm'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
@@ -50,6 +50,7 @@ music_types = {
 }
 
 songs = {
+    [0] = 'No Music',
     [25]='The Voracious Resurgence', [26]='The Devoured', [27]='Enroaching Perils', [28]='The Destiny Destroyers', [29]="Devils' Delight",  [30]="Sojourner", [31]='Black Stars Rise', [32]='All Smiles',
     [33]='Valhalla', [34]="We Are Vana'diel", [35]='Goddessspeed', [36]='Good Fortune', [37]='All-Consuming Chaos', [38]='Your Choice',
     [40]='Cloister of Time and Souls', [41]='Royal Wanderlust', [42]='Snowdrift Waltz', [43]='Troubled Shadows', [44]='Where Lords Rule Not', [45]='Summers Lost', [46]='Goddess Divine', [47]='Echoes of Creation', [48]='Main Theme', [49]='Luck of the Mog',
