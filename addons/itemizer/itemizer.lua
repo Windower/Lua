@@ -40,7 +40,11 @@ bag_ids = res.bags:key_map(string.gsub-{' ', ''} .. string.lower .. table.get-{'
 bag_ids.temporary = nil
 
 --Added this function for first load on new version. Because of the newly added features that weren't there before.
-windower.register_event("load", function()
+windower.register_event("load", "login", function()
+    if not windower.ffxi.get_info().logged_in then
+        return
+    end
+        
     local _, _, saved   = settings.version:find("(%d+%.%d+%.)")
     local _, _, current = _addon.version:find("(%d+%.%d+%.)")
     if saved ~= current then
