@@ -123,23 +123,23 @@ windower.register_event("addon command", function(command, arg2, ...)
     elseif T{'autoninjatools','ant'}:contains(command:lower()) then
         settings.AutoNinjaTools = not settings.AutoNinjaTools
         settings:save()
-        log('AutoNinjaTools is now %s.':format(settings.AutoNinjaTools))
+        log('AutoNinjaTools is now', settings.AutoNinjaTools)
     elseif T{'autoitems','ai'}:contains(command:lower()) then
         settings.AutoItems = not settings.AutoItems
         settings:save()
-        log('AutoItems is now %s.':format(settings.AutoItems))
+        log('AutoItems is now', settings.AutoItems)
     elseif T{'useuniversaltool','uut'}:contains(command:lower()) then
         local arg = arg2:ucfirst()
         if settings.UseUniversalTools[arg] ~= nil then
             settings.UseUniversalTools[arg] = not settings.UseUniversalTools[arg]
             settings:save()
-            log('UseUniversalTools for %s spells is now %s.':format(arg, settings.UseUniversalTools[arg]))
+            log('UseUniversalTools for %s spells is now':format(arg), settings.UseUniversalTools[arg])
         else
             error('Argument 2 must be a ninjutsu spell (sans :ichi or :ni) i.e. uut katon')
         end
     elseif T{'autostack','as'}:contains(command:lower()) then
         settings.AutoStack = not settings.AutoStack
-        log('AutoStack is now %s.':format(settings.AutoStack))
+        log('AutoStack is now', settings.AutoStack)
         settings:save()
     end
 end)
