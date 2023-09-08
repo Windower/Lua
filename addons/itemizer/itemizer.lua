@@ -91,7 +91,7 @@ stack = function(bag_id)
     if not bag_id or type(bag_id) ~= 'number' or bag_id == 0 then
         return
     end
-    windower.packets.inject_outgoing(0x03A,string.char(0x3A,0x1E,0,0,bag_id,0,0,0))
+    windower.packets.inject_outgoing(0x03A, string.char(0x3A, 0x1E, 0, 0, bag_id, 0, 0, 0))
 end
 
 windower.register_event("addon command", function(command, arg2, ...)
@@ -116,30 +116,30 @@ windower.register_event("addon command", function(command, arg2, ...)
         if type(arg2) == 'number' then
             settings.delay = arg2
             settings:save()
-            log('Delay is now',settings.delay)
+            log('Delay is now %s.':format(settings.delay))
         else
             error('The delay must be a number')
         end
     elseif T{'autoninjatools','ant'}:contains(command:lower()) then
         settings.AutoNinjaTools = not settings.AutoNinjaTools
         settings:save()
-        log('AutoNinjaTools is now',settings.AutoNinjaTools)
+        log('AutoNinjaTools is now %s.':format(settings.AutoNinjaTools))
     elseif T{'autoitems','ai'}:contains(command:lower()) then
         settings.AutoItems = not settings.AutoItems
         settings:save()
-        log('AutoItems is now',settings.AutoItems)
+        log('AutoItems is now %s.':format(settings.AutoItems))
     elseif T{'useuniversaltool','uut'}:contains(command:lower()) then
         local arg = arg2:ucfirst()
         if settings.UseUniversalTools[arg] ~= nil then
             settings.UseUniversalTools[arg] = not settings.UseUniversalTools[arg]
             settings:save()
-            log('UseUniversalTools for %s spells is now':format(arg),settings.UseUniversalTools[arg])
+            log('UseUniversalTools for %s spells is now %s.':format(arg, settings.UseUniversalTools[arg]))
         else
             error('Argument 2 must be a ninjutsu spell (sans :ichi or :ni) i.e. uut katon')
         end
     elseif T{'autostack','as'}:contains(command:lower()) then
         settings.AutoStack = not settings.AutoStack
-        log('AutoStack is now',settings.AutoStack)
+        log('AutoStack is now %s.':format(settings.AutoStack))
         settings:save()
     end
 end)
