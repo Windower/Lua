@@ -306,7 +306,7 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: user_pcall(str,val1,val2,exit_funct)
+--Name: user_pcall(str,...)
 --Desc: Calls a user function, if it exists. If not, throws an error.
 --Args:
 ---- str - Function's key in user_env.
@@ -319,6 +319,27 @@ function user_pcall(str,...)
         if type(user_env[str]) == 'function' then
             bool,err = pcall(user_env[str],...)
             if not bool then error('\nGearSwap has detected an error in the user function '..str..':\n'..err) end
+        elseif user_env[str] then
+            msg.addon_msg(123,windower.to_shift_jis(tostring(str))..'() exists but is not a function')
+        end
+    end
+end
+
+
+-----------------------------------------------------------------------------------
+--Name: user_pcall2(str,...)
+--Desc: Calls a user function, if it exists. If not, prints an error and continues.
+--Args:
+---- str - Function's key in user_env.
+-----------------------------------------------------------------------------------
+--Returns:
+---- none
+-----------------------------------------------------------------------------------
+function user_pcall2(str,...)
+    if user_env then
+        if type(user_env[str]) == 'function' then
+            bool,err = pcall(user_env[str],...)
+            if not bool then print('\nGearSwap has detected an error in the user function '..str..':\n'..err) end
         elseif user_env[str] then
             msg.addon_msg(123,windower.to_shift_jis(tostring(str))..'() exists but is not a function')
         end
