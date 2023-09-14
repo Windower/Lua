@@ -218,11 +218,6 @@ function command_logic(original,modified)
         potential_targ = splitline[splitline.n]
     end
     local a,b,spell = string.find(original,'"(.-)"')
-
-    -- If user is attempting to use the default item command stop.
-    if original:match("item [\"\'][%a%s\':-.]+[\"\'] .+") then
-        return false
-    end
     
     if unhandled_list[command] then
         return modified,true
