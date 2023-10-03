@@ -120,7 +120,7 @@ windower.register_event('prerender',function()
                 foreground_image:size(x, settings.Images.Foreground.Size.Height)
                 if debug then print(old_width, x, new_width) end
 
-                local now = os.clock()
+                local now = os.time()
                 if now - last_update > 0.5 then
                     update_strings()
                     last_update = now
