@@ -234,8 +234,8 @@ function display_help()
 end
 
 function exp_msg(val,msg)
-    local t = os.clock()
-    if msg == 8 or msg == 105 then
+    local t = os.time()
+    if msg == 8 or msg == 105 or msg == 253 then
         xp.registry[t] = (xp.registry[t] or 0) + val
         xp.current = math.min(xp.current + val,55999)
         if xp.current > xp.tnl then
@@ -246,12 +246,12 @@ function exp_msg(val,msg)
 end
 
 function analyze_points_table(tab)
-    local t = os.clock()
+    local t = os.time()
     local running_total = 0
-    local maximum_timestamp = 29
+    local maximum_timestamp = 0
     for ts,points in pairs(tab) do
         local time_diff = t - ts
-        if t - ts > 600 then
+        if time_diff > 600 then
             tab[ts] = nil
         else
             running_total = running_total + points
@@ -262,7 +262,7 @@ function analyze_points_table(tab)
     end
     
     local rate
-    if maximum_timestamp == 29 then
+    if maximum_timestamp < 30 then
         rate = 0
     else
         rate = math.floor((running_total/maximum_timestamp)*3600)
