@@ -235,7 +235,7 @@ end
 
 function exp_msg(val,msg)
     local t = os.time()
-    if msg == 8 or msg == 105 or msg ==253 then
+    if msg == 8 or msg == 105 or msg == 253 then
         xp.registry[t] = (xp.registry[t] or 0) + val
         xp.current = math.min(xp.current + val,55999)
         if xp.current > xp.tnl then
