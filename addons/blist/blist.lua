@@ -273,7 +273,7 @@ windower.register_event('incoming text',function (original, modified, mode)
 		elseif mode == 2 and settings.shout == true then -- shout
 			a,z,name = string.find(original,'(%a+) ')
 		elseif mode == 11 and settings.yell == true then -- yell
-			a,z,name = string.find(original,'([%l%u]+).*%[')
+			a,z,name = string.find(original,'([%u%l]+).*%[')
 		elseif mode == 121 and settings.bazaar == true then -- bazaar
 			a,z,name,filler = string.find(original,'(%a+) (.*) bazaar%.')
 		elseif mode == 208 and settings.examine == true then -- examine
