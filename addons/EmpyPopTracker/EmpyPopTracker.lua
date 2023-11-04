@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon.name = 'Empy Pop Tracker'
 _addon.author = 'Dean James (Xurion of Bismarck)'
 _addon.commands = { 'ept', 'empypoptracker' }
-_addon.version = '2.7.0'
+_addon.version = '2.8.0'
 
 config = require('config')
 res = require('resources')
@@ -207,15 +207,17 @@ function generate_text(data, key_items, items, depth)
     end
 
     if data.collectable and EmpyPopTracker.settings.collectables then
-        local count = get_item_count(data.collectable, items)
+        local item_count = get_item_count(data.collectable, items)
+        local pool_count = item_treasure_pool_count(data.collectable, items.treasure)
+        local collectable_pool_notification = pool_count > 0 and start_color('pool') .. ' [' .. pool_count .. ']' .. '\\cr' or ''
         local start = ''
         local finish = ''
-        if count >= data.collectable_target_count then
+        if item_count >= data.collectable_target_count then
             start = start_color('obtained')
             finish = '\\cr'
         end
 
-        text = text .. '\n\n' .. start .. res.items[data.collectable].name .. ': ' .. count .. '/' .. data.collectable_target_count .. finish
+        text = text .. '\n\n' .. start .. res.items[data.collectable].name .. ': ' .. item_count .. '/' .. data.collectable_target_count .. finish .. collectable_pool_notification
     end
 
     return text
