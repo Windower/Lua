@@ -10,6 +10,8 @@ local meta = {}
 
 saved_images = {}
 local dragged
+local clicked
+local last_pos = {}
 
 local events = {
     reload = true,
@@ -244,6 +246,15 @@ function images.pos_y(t, y)
     t:pos(meta[t].settings.pos.x, y)
 end
 
+function images.last_pos(t, x, y)
+    if x == nil then
+        return last_pos.x, last_pos.y
+    end
+
+    last_pos.x = x
+    last_pos.y = y
+end
+
 function images.size(t, width, height)
     local m = meta[t]
     if width == nil then
@@ -387,6 +398,8 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
     if type == 0 then
         if dragged then
             dragged.image:pos(x - dragged.x, y - dragged.y)
+            call_events(dragged.image, 'drag')
+            dragged.image:last_pos(dragged.image:pos())
             return true
         end
 
@@ -394,10 +407,16 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
     elseif type == 1 then
         for _, t in pairs(saved_images) do
             local m = meta[t]
-            if m.settings.draggable and t:hover(x, y) then
-                local pos_x, pos_y = t:pos()
-                dragged = {image = t, x = x - pos_x, y = y - pos_y}
-                return true
+            if t:hover(x, y) then
+                if m.settings.draggable then
+                    local pos_x, pos_y = t:pos()
+                    dragged = {image = t, x = x - pos_x, y = y - pos_y}
+                    clicked = {x = x, y = y}
+                    t:last_pos(pos_x, pos_y)
+                    return true
+                else
+                    call_events(t, 'left_click')
+                end
             end
         end
 
@@ -407,7 +426,11 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
             if meta[dragged.image].root_settings then
                 config.save(meta[dragged.image].root_settings)
             end
+            if x == clicked.x and y == clicked.y then
+                call_events(dragged.image, 'left_click')
+            end
             dragged = nil
+            clicked = nil
             return true
         end
     end
