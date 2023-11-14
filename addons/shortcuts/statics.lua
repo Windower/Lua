@@ -160,7 +160,7 @@ command2_list = {
     ['bstpet']=new_cmd_entry(No_targets,{['1']=BST_targets,['2']=BST_targets,['3']=BST_targets,['4']=BST_targets,['5']=BST_targets,['6']=BST_targets,['7']=BST_targets}),
     }
 	
-unhandled_list = {['p']=true,['s']=true,['sh']=true,['yell']=true,['echo']=true,['t']=true,['l']=true,['breaklinkshell']=true}
+unhandled_list = {['p']=true,['s']=true,['sh']=true,['yell']=true,['echo']=true,['t']=true,['l']=true,['breaklinkshell']=true,['item']=true}
 
 -- List of commands to be ignored
 ignore_list = {['equip']=true,['raw']=true,['fish']=true,['dig']=true,['range']=true,['map']=true,['hide']=true,['jump']=true,['attackoff']=true,['quest']=true,['recruitlist']=true,['rlist']=true,['statustimer']=true,['recycle']=true}

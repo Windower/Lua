@@ -1,6 +1,6 @@
 _addon.name = 'Itemizer'
 _addon.author = 'Ihina'
-_addon.version = '3.0.1.4'
+_addon.version = '3.1.0.0'
 _addon.command = 'itemizer'
 
 require('luau')
@@ -8,8 +8,9 @@ require('luau')
 defaults = {}
 defaults.AutoNinjaTools = true
 defaults.AutoItems = true
+defaults.AutoStack = true
 defaults.Delay = 0.5
-defaults.version                       = "3.0.1.1"
+defaults.version                       = _addon.version
 defaults.UseUniversalTools = {}
 
 defaults.UseUniversalTools.Katon       = false
@@ -39,10 +40,16 @@ bag_ids = res.bags:key_map(string.gsub-{' ', ''} .. string.lower .. table.get-{'
 bag_ids.temporary = nil
 
 --Added this function for first load on new version. Because of the newly added features that weren't there before.
-windower.register_event("load", function()
-    if settings.version == "3.0.1.1" then
-        windower.add_to_chat(207,"Itemizer v3.0.1.2: New features added. (use //itemizer help to find out about them)")
-        settings.version = "3.0.1.2"
+windower.register_event("load", "login", function()
+    if not windower.ffxi.get_info().logged_in then
+        return
+    end
+        
+    local _, _, saved   = settings.version:find("(%d+%.%d+%.)")
+    local _, _, current = _addon.version:find("(%d+%.%d+%.)")
+    if saved ~= current then
+        log("Itemizer v%s: New features added. (use //itemizer help to find out about them)":format(_addon.version))
+        settings.version = _addon.version
         settings:save() 
     end
 end)
@@ -62,6 +69,7 @@ find_items = function(ids, bag, limit)
                         bag = bag_index,
                         slot = item.slot,
                         count = count,
+                        id = item.id,
                     })
 
                     if limit then
@@ -79,39 +87,60 @@ find_items = function(ids, bag, limit)
     return res, found
 end
 
+stack = function(bag_id)
+    if not bag_id or type(bag_id) ~= 'number' or bag_id == 0 then
+        return
+    end
+    windower.packets.inject_outgoing(0x03A, string.char(0x3A, 0x1E, 0, 0, bag_id, 0, 0, 0))
+end
+
 windower.register_event("addon command", function(command, arg2, ...)
     if command == 'help' then
-        local helptext = [[Itemizer - Command List:')
+        local helptext = [[Itemizer - Usage:
+    //get <item> [bag] [count] -- //gets <item> [bag] - Retrieves the specified item from the specified bag
+    //put <item> [bag] [count] -- //puts <item> [bag] - Places the specified item into the specified bag
+    //stack -- Stacks all stackable items in all currently available bags
+        Command List:
   1. Delay <delay> - Sets the time delay.
-  2. Autoninjatools - toggles Automatically getting ninja tools (Shortened ant)
+  2. Autoninjatools - Toggles automatically getting ninja tools (Shortened ant)
   3. Autoitems - Toggles automatically getting items from bags (shortened ai)
-  4. Useuniversaltool <spell> - toggles using universal ninja tools for <spell> (shortened uut)
+  4. Useuniversaltool <spell> - Toggles using universal ninja tools for <spell> (shortened uut)
      i.e. uut katon  - will toggle katon either true or false depending on your setting
      all defaulted false.
-  5. help --Shows this menu.]]
+  5. Autostack - Toggles utomatically stacking items in the destination bag (shortened as, defaults true)
+  6. help - Shows this menu.]]
         for _, line in ipairs(helptext:split('\n')) do
-            windower.add_to_chat(207, line)
+            log(line)
         end
     elseif command:lower() == "delay" and arg2 ~= nil then
         if type(arg2) == 'number' then
             settings.delay = arg2
             settings:save()
+            log('Delay is now %s.':format(settings.delay))
         else
             error('The delay must be a number')
         end
     elseif T{'autoninjatools','ant'}:contains(command:lower()) then
         settings.AutoNinjaTools = not settings.AutoNinjaTools
         settings:save()
+        log('AutoNinjaTools is now', settings.AutoNinjaTools)
     elseif T{'autoitems','ai'}:contains(command:lower()) then
         settings.AutoItems = not settings.AutoItems
         settings:save()
+        log('AutoItems is now', settings.AutoItems)
     elseif T{'useuniversaltool','uut'}:contains(command:lower()) then
-        if settings.UseUniversalTools[arg2:ucfirst()] ~= nil then
-            settings.UseUniversalTools[arg2:ucfirst()] = not settings.UseUniversalTools[arg2:ucfirst()]
+        local arg = arg2:ucfirst()
+        if settings.UseUniversalTools[arg] ~= nil then
+            settings.UseUniversalTools[arg] = not settings.UseUniversalTools[arg]
             settings:save()
+            log('UseUniversalTools for %s spells is now':format(arg), settings.UseUniversalTools[arg])
         else
             error('Argument 2 must be a ninjutsu spell (sans :ichi or :ni) i.e. uut katon')
         end
+    elseif T{'autostack','as'}:contains(command:lower()) then
+        settings.AutoStack = not settings.AutoStack
+        log('AutoStack is now', settings.AutoStack)
+        settings:save()
     end
 end)
         
@@ -127,7 +156,7 @@ windower.register_event('unhandled command', function(command, ...)
             local last = args[#args]
             if last == 'all' then
                 args:remove()
-            elseif tonumber(last) and not last:find('+') then
+            elseif not last:find('[^0-9]') then
                 count = tonumber(last)
                 args:remove()
             else
@@ -185,6 +214,17 @@ windower.register_event('unhandled command', function(command, ...)
 
         for match in matches:it() do
             windower.ffxi[command .. '_item'](command == 'get' and match.bag or destination_bag, match.slot, match.count)
+            
+            if settings.AutoStack and command == 'put' and match.count < res.items[match.id].stack then
+                stack(destination_bag)
+            end
+        end
+    
+    elseif command == 'stack' then
+        log('Stacking items in all currently accessible bags.')
+
+        for bag_index in bag_ids:filter(table.get-{'enabled'} .. windower.ffxi.get_bag_info):it() do
+            stack(bag_index)
         end
     end	
 end)

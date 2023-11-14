@@ -63,7 +63,7 @@ function load_user_files(job_id,user_file)
     job_id = tonumber(job_id)
 
     if current_file then
-        user_pcall('file_unload',current_file)
+        user_pcall2('file_unload',current_file)
     end
 
     for i in pairs(registered_user_events) do

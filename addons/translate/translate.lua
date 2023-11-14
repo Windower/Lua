@@ -221,6 +221,7 @@ windower.register_event('incoming chunk',function(id,orgi,modi,is_injected,is_bl
         end
         return true
     end
+    return is_blocked
 end)
 
 function translate_phrase(out_text)

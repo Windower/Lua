@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --]]
 
 _addon.name = 'setbgm'
-_addon.version = '1.2.3'
+_addon.version = '1.3.2'
 _addon.command = 'setbgm'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
@@ -50,8 +50,9 @@ music_types = {
 }
 
 songs = {
-    [25]='Voracious Resurgence Unknown 1', [26]='Voracious Resurgence Unknown 2', [27]='Voracious Resurgence Unknown 3', [28]='The Destiny Destroyers', [29]="Devils' Delight",  [30]="Odyssey - Bumba", [31]='Voracious Resurgence Unknown 4', [32]='Voracious Resurgence Unknown 5',
-    [33]='Voracious Resurgence Unknown 6', [34]="We Are Vana'diel", [35]='Goddessspeed', [36]='Sortie - +3 Area', [37]='Voracious Resurgence Unknown 7', [38]='Voracious Resurgence Unknown 8',
+    [0] = 'No Music',
+    [25]='The Voracious Resurgence', [26]='The Devoured', [27]='Enroaching Perils', [28]='The Destiny Destroyers', [29]="Devils' Delight",  [30]="Sojourner", [31]='Black Stars Rise', [32]='All Smiles',
+    [33]='Valhalla', [34]="We Are Vana'diel", [35]='Goddessspeed', [36]='Good Fortune', [37]='All-Consuming Chaos', [38]='Your Choice',
     [40]='Cloister of Time and Souls', [41]='Royal Wanderlust', [42]='Snowdrift Waltz', [43]='Troubled Shadows', [44]='Where Lords Rule Not', [45]='Summers Lost', [46]='Goddess Divine', [47]='Echoes of Creation', [48]='Main Theme', [49]='Luck of the Mog',
     [50]='Feast of the Ladies', [51]='Abyssea - Scarlet Skies, Shadowed Plains', [52]='Melodies Errant', [53]='Shinryu', [54]='Everlasting Bonds', [55]='Provenance Watcher', [56]='Where it All Begins', [57]='Steel Sings, Blades Dance', [58]='A New Direction', [59]='The Pioneers',
     [60]='Into Lands Primeval - Ulbuka', [61]="Water's Umbral Knell", [62]='Keepers of the Wild', [63]='The Sacred City of Adoulin', [64]='Breaking Ground', [65]='Hades', [66]='Arciela', [67]='Mog Resort', [68]='Worlds Away', [69]="Distant Worlds (Nanaa Mihgo's version)",
@@ -118,6 +119,21 @@ function display_songs()
     end
 end
 
+function find_songs(str)
+    windower.add_to_chat(207, 'Songs matching %s:':format(str:color(204)))
+    local output = ''
+    for id=25,900 do
+        if songs[id] and songs[id]:lower():find(str) then
+            output = output .. '\n    %s: %s':format(tostring(id):color(204), songs[id])
+        end
+    end
+    if output ~= '' then
+        windower.add_to_chat(207,output)
+    else
+        windower.add_to_chat(207,'    No songs matching %s found.':format(str:color(204)))
+    end
+end
+
 function display_music_types()
     windower.add_to_chat(207, 'Available music types:')
     local output = '  '
@@ -130,6 +146,7 @@ end
 function display_help()
     windower.add_to_chat(167, 'Command usage:')
     windower.add_to_chat(167, '    setbgm list [music|type]')
+    windower.add_to_chat(167, '    setbgm find <string>')
     windower.add_to_chat(167, '    setbgm <song id> [<music type id>]')
     windower.add_to_chat(167, '    setbgm <song id> <song id> <song id> <song id> <song id> <song id> <song id> <song id>')
 end
@@ -144,6 +161,11 @@ function setbgm_command(...)
         return
     elseif #arg == 2 and arg[1]:lower() == 'list' and arg[2]:lower() == 'type' then
         display_music_types()
+        return
+    elseif #arg > 1 and arg[1]:lower() == 'find' then
+        table.remove(arg,1)
+        local str = table.concat(arg,' ')
+        find_songs(str)
         return
     elseif #arg == 1 then
         set_music(nil, arg[1])
