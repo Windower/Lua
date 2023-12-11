@@ -118,11 +118,14 @@ local find_job_change_npc = function()
 end
 
 windower.register_event('addon command', function(command, ...)
+    command = command:lower()
     local p = windower.ffxi.get_player()
     local args = L{...}
-    local job = ''
+    local job = nil
     if args[1] then 
         job = args[1]:lower()
+    else
+        job = command
     end
     local main = nil
     local sub = nil
@@ -136,8 +139,8 @@ windower.register_event('addon command', function(command, ...)
         log('Resetting Job')
         sub = p.sub_job:lower()
     elseif command:contains('/') or command:contains('\\') then
-        command = command:gsub('\\','/')
-        local js = command:split('/')
+        job = job:gsub('\\','/')
+        local js = job:split('/')
         main = (js[1] ~= '' and js[1] or nil)
         sub = (js[2] ~= '' and js[2] or nil)
         -- remove identicals.
