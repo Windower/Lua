@@ -132,10 +132,10 @@ windower.register_event('addon command', function(command, ...)
     if command:lower() == 'main' then
         main = job
         if main and main:upper() == p.main_job then main = nil end
-    elseif command:lower() == 'sub' then
+    elseif command == 'sub' then
         sub = job
         if sub and sub:upper() == p.sub_job then main = nil end
-    elseif command:lower() == 'reset' then
+    elseif command == 'reset' then
         log('Resetting Job')
         sub = p.sub_job:lower()
     elseif command:contains('/') or command:contains('\\') then
@@ -147,7 +147,7 @@ windower.register_event('addon command', function(command, ...)
         if main and main:upper() == p.main_job then main = nil end
         if sub and sub:upper() == p.sub_job then sub = nil end
     elseif command ~= nil and command ~= '' then
-        main = command:lower()
+        main = command
         if main and main:upper() == p.main_job then main = nil end
     else
         log('Syntax: //jc main|sub JOB  -- Chnages main or sub to target JOB')
