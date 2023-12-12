@@ -118,33 +118,36 @@ local find_job_change_npc = function()
 end
 
 windower.register_event('addon command', function(command, ...)
+    command = command:lower()
     local p = windower.ffxi.get_player()
     local args = L{...}
-    local job = ''
+    local job = nil
     if args[1] then 
         job = args[1]:lower()
+    else
+        job = command
     end
     local main = nil
     local sub = nil
-    if command:lower() == 'main' then
+    if command == 'main' then
         main = job
         if main and main:upper() == p.main_job then main = nil end
-    elseif command:lower() == 'sub' then
+    elseif command == 'sub' then
         sub = job
         if sub and sub:upper() == p.sub_job then main = nil end
-    elseif command:lower() == 'reset' then
+    elseif command == 'reset' then
         log('Resetting Job')
         sub = p.sub_job:lower()
     elseif command:contains('/') or command:contains('\\') then
-        command = command:gsub('\\','/')
-        local js = command:split('/')
+        job = job:gsub('\\','/')
+        local js = job:split('/')
         main = (js[1] ~= '' and js[1] or nil)
         sub = (js[2] ~= '' and js[2] or nil)
         -- remove identicals.
         if main and main:upper() == p.main_job then main = nil end
         if sub and sub:upper() == p.sub_job then sub = nil end
     elseif command ~= nil and command ~= '' then
-        main = command:lower()
+        main = command
         if main and main:upper() == p.main_job then main = nil end
     else
         log('Syntax: //jc main|sub JOB  -- Chnages main or sub to target JOB')
