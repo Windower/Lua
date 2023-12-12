@@ -129,7 +129,7 @@ windower.register_event('addon command', function(command, ...)
     end
     local main = nil
     local sub = nil
-    if command:lower() == 'main' then
+    if command == 'main' then
         main = job
         if main and main:upper() == p.main_job then main = nil end
     elseif command == 'sub' then
