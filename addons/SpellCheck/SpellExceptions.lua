@@ -17,7 +17,6 @@ spell_exceptions = {
     [351] = {id=351,en="Dokumori: Ni",ja="毒盛の術:弐"},
     [342] = {id=342,en="Jubaku: Ni",ja="呪縛の術:弐"},
     [349] = {id=349,en="Kurayami: San",ja="暗闇の術:参"},
-    [355] = {id=355,en="Tonko: San",ja="遁甲の術:参"},
     [416] = {id=416,en="Cactuar Fugue",ja="サボテンダーフーガ"},
     [407] = {id=407,en="Chocobo Hum",ja="チョコボのハミング"},
     [363] = {id=363,en="Sleepga",ja="スリプガ"},
