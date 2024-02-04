@@ -15,7 +15,7 @@ require 'statics'
 
 _addon.version = '3.33'
 _addon.name = 'BattleMod'
-_addon.author = 'Byrth, maintainer: SnickySnacks'
+_addon.author = 'Byrth, SnickySnacks, Kenshi'
 _addon.commands = {'bm','battlemod'}
 
 windower.register_event('load',function()
