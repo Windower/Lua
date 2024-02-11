@@ -8,6 +8,9 @@ config = require('config')
 packets = require('packets')
 require('logger')
 
+local MIN_TREASURE_SLOT_INDEX = 0
+local MAX_TREASURE_SLOT_INDEX = 9
+
 defaults = {}
 defaults.Pass = S{}
 defaults.Lot = S{}
@@ -188,7 +191,7 @@ function find_id(name)
 end
 
 function pool_ids()
-    return S(T(windower.ffxi.get_items().treasure):map(table.get-{'item_id'}))
+    return S(T(windower.ffxi.get_items('treasure')):map(table.get-{'item_id'}))
 end
 
 stack = function()
@@ -286,14 +289,34 @@ windower.register_event('addon command', function(command1, command2, ...)
 
         end
 
+    elseif command1 == 'done' then
+        local lots     = windower.ffxi.get_party().p0.lots
+        local treasure = windower.ffxi.get_items('treasure')
+        for idx=MIN_TREASURE_SLOT_INDEX, MAX_TREASURE_SLOT_INDEX do
+            -- Pass if we haven't lotted or passed.
+            if treasure[idx] and lots[idx] == nil then
+                windower.ffxi.pass_item(idx)
+            end
+        end
+
     elseif command1 == 'passall' then
-        for slot_index, item_table in pairs(windower.ffxi.get_items().treasure) do
-            windower.ffxi.pass_item(slot_index)
+        local lots     = windower.ffxi.get_party().p0.lots
+        local treasure = windower.ffxi.get_items('treasure')
+        for idx=MIN_TREASURE_SLOT_INDEX, MAX_TREASURE_SLOT_INDEX do
+            -- Pass if we haven't passed (will pass if lotted).
+            if treasure[idx] and (lots[idx] == nil or type(lots[idx]) == 'number') then
+                windower.ffxi.pass_item(idx)
+            end
         end
 
     elseif command1 == 'lotall' then
-        for slot_index, item_table in pairs(windower.ffxi.get_items().treasure) do
-            windower.ffxi.lot_item(slot_index)
+        local lots     = windower.ffxi.get_party().p0.lots
+        local treasure = windower.ffxi.get_items('treasure')
+        for idx=MIN_TREASURE_SLOT_INDEX, MAX_TREASURE_SLOT_INDEX do
+            -- Lot if we haven't lotted or passed.
+            if treasure[idx] and lots[idx] == nil then
+                windower.ffxi.lot_item(idx)
+            end
         end
 
     elseif command1 == 'clearall' then
@@ -353,6 +376,7 @@ windower.register_event('addon command', function(command1, command2, ...)
         print('    \\cs(255,255,255)lot|pass|drop clear\\cr - Clears the specified list for the current character')
         print('    \\cs(255,255,255)lot|pass list\\cr - Lists all items on the specified list for the current character')
         print('    \\cs(255,255,255)lotall|passall\\cr - Lots/Passes all items currently in the pool')
+        print('    \\cs(255,255,255)done\\cr - Passes all items currently in the pool that have not been lotted on by the current character')
         print('    \\cs(255,255,255)clearall\\cr - Removes lotting/passing/dropping settings for this character')
         print('    \\cs(255,255,255)autodrop [on|off]\\cr - Enables/disables (or toggles) the auto-drop setting')
         print('    \\cs(255,255,255)verbose [on|off]\\cr - Enables/disables (or toggles) the verbose setting')
