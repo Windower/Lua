@@ -14,7 +14,8 @@ local functions, table, string = _libs.functions, _libs.tables, _libs.strings
 
 local fns = {}
 
-local slots = {}
+local slots = setmetatable({}, {__mode = 'k'})
+local bit_slots = {}
 
 local language_string = _addon and _addon.language and _addon.language:lower() or windower.ffxi.get_info().language:lower()
 local language_string_log = language_string .. '_log'
@@ -53,12 +54,15 @@ local resource_entry_mt = {__index = function()
 end()}
 
 function resource_group(r, fn, attr)
-    fn = type(fn) == 'function' and fn or functions.equals(fn)
     attr = redict[attr] or attr
+    fn = type(fn) == 'function' and fn or
+        bit_slots[attr] and class(fn) == 'Set' and set.subset+{fn} or
+        bit_slots[attr] and set.contains-{fn} or
+        functions.equals(fn)
 
     local res = {}
     for value, id in table.it(r) do
-        if fn(value[attr]) then
+        if value[attr] ~= nil and fn(value[attr]) then
             res[id] = value
         end
     end
@@ -131,7 +135,6 @@ for res_name in res_names:it() do
     end
 end
 
-local bit_slots = {}
 local fn_cache = {}
 
 post_process = function(t)
