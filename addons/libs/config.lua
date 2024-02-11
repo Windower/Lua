@@ -271,25 +271,41 @@ function settings_table(node, settings, key, meta)
     settings = settings or T{}
     key = key or 'settings'
     meta = meta or settings_map[settings]
+    meta.comments[key] = T{}
 
     local t = T{}
     if node.type ~= 'tag' then
         return t
     end
 
-    if not node.children:all(function(n)
+    local all_tag_or_comment = node.children:all(function (n)
         return n.type == 'tag' or n.type == 'comment'
-    end) and not (#node.children == 1 and node.children[1].type == 'text') then
+    end)
+    local all_text_or_comment = node.children:all(function (n)
+        return n.type == 'text' or n.type == 'comment'
+    end)
+    local any_non_empty_text = node.children:any(function (n)
+        return n.type == 'text' and not n.value:empty()
+    end)
+
+    if not all_tag_or_comment and not all_text_or_comment then
         error('Malformatted settings file.')
         return t
     end
 
     -- TODO: Type checking necessary? merge should take care of that.
-    if #node.children == 1 and node.children[1].type == 'text' then
-        local val = node.children[1].value
-        if node.children[1].cdata then
+    if #node.children >= 1 and all_text_or_comment and any_non_empty_text then
+        if node.children:any(function(n) return n.cdata end) then
             meta.cdata:add(key)
-            return val
+        end
+
+        local val = ''
+        for child in node.children:it() do
+            if child.type == 'comment' then
+                meta.comments[key]:append(child.value:trim())
+            elseif child.type == 'text' then
+                val = val .. child.value
+            end
         end
 
         if val:lower() == 'false' then
@@ -308,7 +324,7 @@ function settings_table(node, settings, key, meta)
 
     for child in node.children:it() do
         if child.type == 'comment' then
-            meta.comments[key] = child.value:trim()
+            meta.comments[key]:append(child.value:trim())
         elseif child.type == 'tag' then
             key = child.name:lower()
             local childdict
@@ -400,13 +416,14 @@ function settings_xml(meta)
 
     local chars = (meta.original:keyset() - S{'global'}):sort()
     for char in (L{'global'} + chars):it() do
-        if char == 'global' and meta.comments.settings then
+        if char == 'global' and not meta.comments.settings:empty() then
             lines:append('    <!--')
-            local comment_lines = meta.comments.settings:split('\n')
-            for comment in comment_lines:it() do
-                lines:append('        %s':format(comment:trim()))
+            for comment in meta.comments.settings:it() do
+                local comment_lines = comment:split('\n')
+                for comment in comment_lines:it() do
+                    lines:append('        %s':format(comment:trim()))
+                end
             end
-
             lines:append('    -->')
         end
 
@@ -431,11 +448,12 @@ function nest_xml(t, meta, indentlevel)
     local keys = set.sort(table.keyset(t))
     local val
     for _, key in ipairs(keys) do
+        local lower_key = tostring(key):lower()
         val = t[key]
         if type(val) == 'table' and not (class(val) == 'List' or class(val) == 'Set') then
             fragments:append('%s<%s>':format(indent, key))
-            if meta.comments[key] then
-                local c = '<!-- %s -->':format(meta.comments[key]:trim()):split('\n')
+            for comment in meta.comments[lower_key]:it() do
+                local c = '<!-- %s -->':format(comment:trim()):split('\n')
                 local pre = ''
                 for cstr in c:it() do
                     fragments:append('%s%s%s':format(indent, pre, cstr:trim()))
@@ -452,7 +470,7 @@ function nest_xml(t, meta, indentlevel)
                 val = set.format(val, 'csv')
             elseif type(val) == 'table' then
                 val = table.format(val, 'csv')
-            elseif type(val) == 'string' and meta.cdata:contains(tostring(key):lower()) then
+            elseif type(val) == 'string' and meta.cdata:contains(lower_key) then
                 val = '<![CDATA[%s]]>':format(val)
             else
                 val = tostring(val)
@@ -461,7 +479,7 @@ function nest_xml(t, meta, indentlevel)
             if val == '' then
                 fragments:append('%s<%s />':format(indent, key))
             else
-                fragments:append('%s<%s>%s</%s>':format(indent, key, meta.cdata:contains(tostring(key):lower()) and val or val:xml_escape(), key))
+                fragments:append('%s<%s>%s</%s>':format(indent, key, meta.cdata:contains(lower_key) and val or val:xml_escape(), key))
             end
             local length = fragments:last():length() - indent:length()
             if length > maxlength then
@@ -472,8 +490,9 @@ function nest_xml(t, meta, indentlevel)
     end
 
     for frag_key, key in pairs(inlines) do
-        if meta.comments[key] then
-            fragments[frag_key] = '%s%s<!-- %s -->':format(fragments[frag_key], ' ':rep(maxlength - fragments[frag_key]:trim():length() + 1), meta.comments[key])
+        local lower_key = tostring(key):lower()
+        for comment in meta.comments[lower_key]:it() do
+            fragments[frag_key] = '%s%s<!-- %s -->':format(fragments[frag_key], ' ':rep(maxlength - fragments[frag_key]:trim():length() + 1), comment)
         end
     end
 
