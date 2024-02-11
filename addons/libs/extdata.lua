@@ -1754,7 +1754,7 @@ function decode.Augmented(str)
         local path_map = {[0] = 'A',[1] = 'B', [2] = 'C', [3] = 'D'}
         rettab.path = path_map[math.floor(str:byte(5)%4)]
         rettab.rank = math.floor(str:byte(7)%128 / 4)
-        rettab.augments = {'Path: ' ..rettab.path, 'Rank: ' ..rettab.rank}
+        rettab.augments = {'Path: ' ..rettab.path}
     elseif flag_2/128 >= 1 then -- Evolith
         rettab.augment_system = 3
         local slot_type_map = {[0] = 'None', [1] = 'Filled Upside-down Triangle', [2] = 'Filled Diamond', [3] = 'Filled Star', [4] = 'Empty Triangle', [5] = 'Empty Square', [6] = 'Empty Circle', [7] = 'Empty Upside-down Triangle', [8] = 'Empty Diamond', [9] = 'Empty Star', [10] = 'Filled Triangle', [11] = 'Filled Square', [12] = 'Filled Circle', [13] = 'Empty Circle', [14] = 'Fire', [15] = 'Ice'}
