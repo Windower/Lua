@@ -89,7 +89,7 @@ local check_flags = function(bits, lookup)
     local flags = S{}
 
     for flag, value in pairs(lookup.values) do
-        if bit.band(bits, flag) ~= 0 then
+        if bit.band(flag, bits) >= flag then
             flags:add(value)
         end
     end
@@ -103,7 +103,7 @@ local parse_flags = function(bits)
     local count = 0
     repeat
         local flag = 2 ^ count
-        if bit.band(flag, bits) ~= 0 then
+        if bit.band(flag, bits) >= flag then
             flags:add(count)
         end
         count = count + 1
