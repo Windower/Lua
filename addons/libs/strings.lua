@@ -24,6 +24,13 @@ debug.setmetatable('', {
     __unp = functions.equals,
 })
 
+string.encoding = {
+    ascii = {},
+    utf8 = {},
+    shift_jis = {},
+    binary = {},
+}
+
 -- Returns a function that returns the string when called.
 function string.fn(str)
     return functions.const(str)
@@ -121,9 +128,70 @@ function string.splice(str, from, to, str2)
     return str:sub(1, from - 1)..str2..str:sub(to + 1)
 end
 
--- Returns an iterator, that goes over every character of the string.
-function string.it(str)
-    return str:gmatch('.')
+-- Returns an iterator, that goes over every character of the string. Handles Japanese text as well as special characters and auto-translate.
+do
+    local iterators = {
+        [string.encoding.ascii] = function(str)
+            return str:gmatch('.')
+        end,
+        [string.encoding.utf8] = function(str)
+            local index = 1
+            return function()
+                if index > #str then
+                    return nil
+                end
+
+                local byte = str:byte(index, index)
+
+                local length
+                if byte < 0x80 then
+                    length = 1
+                elseif byte < 0xE0 then
+                    length = 2
+                elseif byte < 0xF0 then
+                    length = 3
+                elseif byte < 0xF8 then
+                    length = 4
+                else
+                    error('Invalid code point')
+                end
+
+                index = index + length
+                return str:sub(index - length, index - 1)
+            end
+        end,
+        [string.encoding.shift_jis] = function(str)
+            local index = 1
+            return function()
+                if index > #str then
+                    return nil
+                end
+
+                local byte = str:byte(index, index)
+
+                local length
+                if byte < 0x80 or byte >= 0xA1 and byte <= 0xDF then
+                    length = 1
+                elseif byte == 0xFD then
+                    length = 6
+                elseif byte >= 0x80 and byte <= 0x9F or byte >= 0xE0 and byte <= 0xEF or byte >= 0xFA and byte <= 0xFC then
+                    length = 2
+                else
+                    error('Invalid code point')
+                end
+
+                index = index + length
+                return str:sub(index - length, index - 1)
+            end
+        end,
+        [string.encoding.binary] = function(str)
+            return str:gmatch('.')
+        end,
+    }
+
+    function string.it(str, encoding)
+        return iterators[encoding or string.encoding.ascii](str)
+    end
 end
 
 -- Removes leading and trailing whitespaces and similar characters (tabs, newlines, etc.).
