@@ -83,6 +83,19 @@ function class(o)
     return mt and mt.__class or type(o)
 end
 
+-- Packs an iterator function into a table
+function functions.pack(fn)
+    local res = {}
+    local value = fn()
+    local count = 0
+    while value ~= nil do
+        count = count + 1
+        res[count] = value
+        value = fn()
+    end
+    return setmetatable(res, _meta.T)
+end
+
 -- Returns a function that returns the table when called.
 function table.fn(t)
     return functions.const(t)
