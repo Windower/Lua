@@ -24,6 +24,13 @@ debug.setmetatable('', {
     __unp = functions.equals,
 })
 
+string.encoding = {
+    ascii = {},
+    utf8 = {},
+    shift_jis = {},
+    binary = {},
+}
+
 -- Returns a function that returns the string when called.
 function string.fn(str)
     return functions.const(str)
@@ -121,9 +128,50 @@ function string.splice(str, from, to, str2)
     return str:sub(1, from - 1)..str2..str:sub(to + 1)
 end
 
--- Returns an iterator, that goes over every character of the string.
-function string.it(str)
-    return str:gmatch('.')
+-- Returns an iterator, that goes over every character of the string. Handles Japanese text as well as special characters and auto-translate.
+do
+    local process = function(str, fn)
+        local index = 1
+        return function()
+            if index > #str then
+                return nil
+            end
+
+            local length = fn(str:byte(index, index))
+            if length == nil then
+                error('Invalid code point')
+            end
+
+            index = index + length
+            return str:sub(index - length, index - 1)
+        end
+    end
+
+    local iterators = {
+        [string.encoding.ascii] = function(str)
+            return str:gmatch('.')
+        end,
+        [string.encoding.utf8] = process(str, function(byte)
+            return
+                byte < 0x80 and 1 or
+                byte < 0xE0 and 2 or
+                byte < 0xF0 and 3 or
+                byte < 0xF8 and 4
+        end),
+        [string.encoding.shift_jis] = process(str, function(byte)
+            return
+                (byte < 0x80 or byte >= 0xA1 and byte <= 0xDF) and 1 or
+                (byte >= 0x80 and byte <= 0x9F or byte >= 0xE0 and byte <= 0xEF or byte >= 0xFA and byte <= 0xFC) and 2 or
+                byte == 0xFD and 6
+        end),
+        [string.encoding.binary] = function(str)
+            return str:gmatch('.')
+        end,
+    }
+
+    function string.it(str, encoding)
+        return iterators[encoding or string.encoding.ascii](str)
+    end
 end
 
 -- Removes leading and trailing whitespaces and similar characters (tabs, newlines, etc.).
