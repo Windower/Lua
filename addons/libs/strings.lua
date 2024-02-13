@@ -130,60 +130,40 @@ end
 
 -- Returns an iterator, that goes over every character of the string. Handles Japanese text as well as special characters and auto-translate.
 do
+    local process = function(str, fn)
+        local index = 1
+        return function()
+            if index > #str then
+                return nil
+            end
+
+            local length = fn(str:byte(index, index))
+            if length == nil then
+                error('Invalid code point')
+            end
+
+            index = index + length
+            return str:sub(index - length, index - 1)
+        end
+    end
+
     local iterators = {
         [string.encoding.ascii] = function(str)
             return str:gmatch('.')
         end,
-        [string.encoding.utf8] = function(str)
-            local index = 1
-            return function()
-                if index > #str then
-                    return nil
-                end
-
-                local byte = str:byte(index, index)
-
-                local length
-                if byte < 0x80 then
-                    length = 1
-                elseif byte < 0xE0 then
-                    length = 2
-                elseif byte < 0xF0 then
-                    length = 3
-                elseif byte < 0xF8 then
-                    length = 4
-                else
-                    error('Invalid code point')
-                end
-
-                index = index + length
-                return str:sub(index - length, index - 1)
-            end
-        end,
-        [string.encoding.shift_jis] = function(str)
-            local index = 1
-            return function()
-                if index > #str then
-                    return nil
-                end
-
-                local byte = str:byte(index, index)
-
-                local length
-                if byte < 0x80 or byte >= 0xA1 and byte <= 0xDF then
-                    length = 1
-                elseif byte == 0xFD then
-                    length = 6
-                elseif byte >= 0x80 and byte <= 0x9F or byte >= 0xE0 and byte <= 0xEF or byte >= 0xFA and byte <= 0xFC then
-                    length = 2
-                else
-                    error('Invalid code point')
-                end
-
-                index = index + length
-                return str:sub(index - length, index - 1)
-            end
-        end,
+        [string.encoding.utf8] = process(str, function(byte)
+            return
+                byte < 0x80 and 1 or
+                byte < 0xE0 and 2 or
+                byte < 0xF0 and 3 or
+                byte < 0xF8 and 4
+        end),
+        [string.encoding.shift_jis] = process(str, function(byte)
+            return
+                byte < 0x80 or byte >= 0xA1 and byte <= 0xDF and 1 or
+                byte == 0xFD and 6 or
+                byte >= 0x80 and byte <= 0x9F or byte >= 0xE0 and byte <= 0xEF or byte >= 0xFA and byte <= 0xFC and 2
+        end),
         [string.encoding.binary] = function(str)
             return str:gmatch('.')
         end,
