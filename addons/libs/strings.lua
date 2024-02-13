@@ -160,9 +160,9 @@ do
         end),
         [string.encoding.shift_jis] = process(str, function(byte)
             return
-                byte < 0x80 or byte >= 0xA1 and byte <= 0xDF and 1 or
-                byte == 0xFD and 6 or
-                byte >= 0x80 and byte <= 0x9F or byte >= 0xE0 and byte <= 0xEF or byte >= 0xFA and byte <= 0xFC and 2
+                (byte < 0x80 or byte >= 0xA1 and byte <= 0xDF) and 1 or
+                (byte >= 0x80 and byte <= 0x9F or byte >= 0xE0 and byte <= 0xEF or byte >= 0xFA and byte <= 0xFC) and 2 or
+                byte == 0xFD and 6
         end),
         [string.encoding.binary] = function(str)
             return str:gmatch('.')
