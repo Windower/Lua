@@ -151,19 +151,23 @@ do
         [string.encoding.ascii] = function(str)
             return str:gmatch('.')
         end,
-        [string.encoding.utf8] = process(str, function(byte)
-            return
-                byte < 0x80 and 1 or
-                byte < 0xE0 and 2 or
-                byte < 0xF0 and 3 or
-                byte < 0xF8 and 4
-        end),
-        [string.encoding.shift_jis] = process(str, function(byte)
-            return
-                (byte < 0x80 or byte >= 0xA1 and byte <= 0xDF) and 1 or
-                (byte >= 0x80 and byte <= 0x9F or byte >= 0xE0 and byte <= 0xEF or byte >= 0xFA and byte <= 0xFC) and 2 or
-                byte == 0xFD and 6
-        end),
+        [string.encoding.utf8] = function(str) 
+            return process(str, function(byte)
+                return
+                    byte < 0x80 and 1 or
+                    byte < 0xE0 and 2 or
+                    byte < 0xF0 and 3 or
+                    byte < 0xF8 and 4
+            end)
+        end,
+        [string.encoding.shift_jis] = function(str)
+            return process(str, function(byte)
+                return
+                    (byte < 0x80 or byte >= 0xA1 and byte <= 0xDF) and 1 or
+                    (byte >= 0x80 and byte <= 0x9F or byte >= 0xE0 and byte <= 0xEF or byte >= 0xFA and byte <= 0xFC) and 2 or
+                    byte == 0xFD and 6
+            end)
+        end,
         [string.encoding.binary] = function(str)
             return str:gmatch('.')
         end,
