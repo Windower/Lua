@@ -664,10 +664,13 @@ do
         end
 
         function string.find(str, pattern, encoding, from, to, plain)
-            if type(encoding) == 'number' then
-                encoding, from, to, plain = type(to) == 'table' and to or nil, encoding, type(from) == 'number' and from or plain, type(from) == 'boolean' and from or nil
+            if type(encoding) ~= 'table' then
+                if type(from) == 'boolean' then
+                    encoding, from, to, plain = string.encoding.ascii, encoding, nil, from
+                else
+                    encoding, from, to, plain = string.encoding.ascii, encoding, from, to
+                end
             end
-            encoding = encoding or string.encoding.ascii
 
             if encoding == string.encoding.ascii and to == nil then
                 return rawfind(str, pattern, from, plain)
@@ -693,10 +696,9 @@ do
         end
 
         function string.match(str, pattern, encoding, from, to)
-            if (type(encoding) == 'number') then
-                encoding, from, to = type(from) == 'table' and from or nil, encoding, type(from) == 'number' and from or to
+            if type(encoding) ~= 'table' then
+                encoding, from, to = string.encoding.ascii, encoding, from
             end
-            encoding = encoding or string.encoding.ascii
 
             if encoding == string.encoding.ascii and to == nil then
                 return rawmatch(str, pattern, from)
@@ -710,14 +712,15 @@ do
         local rawgmatch = string.gmatch
 
         function string.gmatch(str, pattern, encoding, from, to)
-            if (type(encoding) == 'number') then
-                encoding, from, to = type(from) == 'table' and from or nil, encoding, type(from) == 'number' and from or to
+            if type(encoding) ~= 'table' then
+                encoding, from, to = string.encoding.ascii, encoding, from
             end
-            encoding = encoding or string.encoding.ascii
 
             if encoding == string.encoding.ascii and to == nil then
                 return rawgmatch(str, pattern, from)
             end
+
+            to = adjust_to(str, to)
 
             local pos = adjust_from(str, from)
             local process = function(first, last, ...)
@@ -740,7 +743,7 @@ do
             end
 
             return function()
-                return process(string.find(str, pattern, encoding, pos, adjust_to(str, to)))
+                return process(string.find(str, pattern, encoding, pos, to))
             end
         end
     end
@@ -751,14 +754,15 @@ do
         function string.gsub(str, pattern, repl, n, encoding, from, to)
             if type(n) == 'table' then
                 n, encoding, from, to = nil, n, encoding, from
-            elseif type(encoding) == 'number' then
-                encoding, from, to = nil, encoding, from
+            elseif type(encoding) ~= 'table' then
+                encoding, from, to = string.encoding.ascii, encoding, from
             end
-            encoding = encoding or string.encoding.ascii
 
             if encoding == string.encoding.ascii and to == nil then
                 return rawgsub(str, pattern, from)
             end
+
+            to = adjust_to(str, to)
 
             local repltype = type(repl)
             repl =
@@ -766,24 +770,27 @@ do
                 repltype == 'table' and function(match) return repl[match] end or
                 function() return repl end
 
-            local pos = adjust_from(str, from)
             local fragments = {}
             local count = 0
-            repeat
-                local first, last = string.find(str, pattern, encoding, pos, adjust_to(str, to))
-                if first then
-                    count = count + 1
-                    fragments[count] = str:sub(pos, first - 1)
-                    count = count + 1
-                    fragments[count] = repl(str:sub(first, last))
+            local pos = adjust_from(str, from)
+            local first, last = string.find(str, pattern, encoding, pos, to)
+            while first do
+                count = count + 1
+                fragments[count] = str:sub(pos, first - 1)
+                count = count + 1
+                fragments[count] = repl(str:sub(first, last))
+                if count / 2 == n then
+                    break
                 end
                 pos = last + 1
-            until first == nil or count == n
+                first, last = string.find(str, pattern, encoding, pos, to)
+            end
 
             return table.concat(fragments) .. str:sub(pos)
         end
     end
 end
+
 
 
 -- Removes leading and trailing whitespaces and similar characters (tabs, newlines, etc.).
