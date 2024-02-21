@@ -717,7 +717,7 @@ do
             end
 
             if encoding == string.encoding.ascii and to == nil then
-                return rawgmatch(str, pattern, from)
+                return rawgmatch(str, pattern)
             end
 
             to = adjust_to(str, to)
@@ -759,7 +759,7 @@ do
             end
 
             if encoding == string.encoding.ascii and to == nil then
-                return rawgsub(str, pattern, from)
+                return rawgsub(str, pattern, repl)
             end
 
             to = adjust_to(str, to)
