@@ -64,6 +64,9 @@ end
 local ammo_count_text = nil
 local bg_image = nil
 
+local mouse_down = false
+local ctrl_pressed = false
+
 local defaults = {
     pos = {
         x = 500,
@@ -95,6 +98,7 @@ local defaults = {
     },
     bg = {
         alpha = 72,
+        drag_alpha = 72,
         red = 0,
         green = 0,
         blue = 0,
@@ -104,6 +108,8 @@ local defaults = {
     hide_on_zone = true,
     hide_on_cutscene = true,
     left_justify = false,
+    draggable = true,
+    resize = false,
 }
 settings = config.load(defaults)
 config.save(settings)
@@ -111,6 +117,7 @@ if settings.game_path then
     icon_extractor.ffxi_path(settings.game_path)
 end
 local last_encumbrance_bitfield = 0
+local current_scale = settings.size/32
 
 -- gets the currently equipped item data for the slot information provided
 local function get_equipped_item(slotName, slotId, bag, index)
@@ -185,7 +192,7 @@ end
 local function setup_ui()
     refresh_ui_settings()
     destroy()
-    
+
     bg_image = images.new(bg_image_settings)
     bg_image:show()
 
@@ -402,6 +409,26 @@ function display_ammo_count(count)
     end
 end
 
+function scale(scale_factor)
+    scale_factor = tonumber(scale_factor)
+
+    if scale_factor > 3 then
+        scale_factor = 3
+        current_scale = 3
+        log('Current scale is now at maximum: '..settings.size/32)
+    elseif scale_factor < 0.1 then
+        scale_factor = 0.1
+        current_scale = 0.1
+        log('Current scale is now at minimum: '..settings.size/32)
+    end
+
+    local size = scale_factor*32
+    settings.size = size
+    config.save(settings)
+
+    setup_ui()
+end
+
 -- Called when player status changes.
 windower.register_event('status change', function(new_status_id)
     if new_status_id == 4 and settings.hide_on_cutscene then --Cutscene/Menu
@@ -414,6 +441,79 @@ end)
 -- Called when our addon is unloaded.
 windower.register_event('unload', function()
     destroy()
+end)
+
+windower.register_event('keyboard', function(key, pressed)
+    if settings.resize then
+        if key == 29 then
+            if pressed then
+                ctrl_pressed = true
+            else
+                ctrl_pressed = false
+            end
+        end
+        
+        if key == 13 and pressed and ctrl_pressed then
+            current_scale = current_scale + 0.1
+            scale(current_scale)
+            return true
+        end
+
+        if key == 12 and pressed and ctrl_pressed then
+            current_scale = current_scale - 0.1
+            scale(current_scale)
+            return true
+        end
+    end
+end)
+
+windower.register_event('mouse', function(type, x, y, delta, blocked)
+    -- Mouse drag
+    if type == 0 and mouse_down then
+        local bg_pos_x, bg_pos_y = bg_image:pos()
+
+        if bg_image:alpha() ~= settings.bg.drag_alpha then
+            bg_image:alpha(settings.bg.drag_alpha)
+        end
+
+        for key, slot in pairs(equipment_data) do
+            local pos_x = bg_pos_x + ((slot.display_pos % 4) * settings.size)
+            local pos_y = bg_pos_y + (math.floor(slot.display_pos / 4) * settings.size)
+            slot.image:pos(pos_x, pos_y)
+        end
+    
+        for key, slot in pairs(encumbrance_data) do
+            local pos_x = bg_pos_x + ((slot.display_pos % 4) * settings.size)
+            local pos_y = bg_pos_y + (math.floor(slot.display_pos / 4) * settings.size)
+            slot.image:pos(pos_x, pos_y)
+        end
+
+        return true
+    end
+
+    -- Left mouse button down
+    if type == 1 and bg_image:hover(x, y) and settings.draggable then
+        mouse_down = true
+        return true
+    end
+
+    -- Left mouse button up
+    if type == 2 and mouse_down then
+        -- Updates settings with current position of bg_image if different
+        local bg_pos_x, bg_pos_y = bg_image:pos()
+        if bg_pos_x ~= settings.pos.x or bg_pos_y ~= settings.pos.y then
+            settings.pos.x = bg_pos_x
+            settings.pos.y = bg_pos_y
+        end
+
+        bg_image:alpha(settings.bg.alpha)
+        
+        config.save(settings)
+        mouse_down = false
+        return true
+    end
+
+    return false
 end)
 
 -- Called when the addon receives a command.
@@ -456,6 +556,16 @@ windower.register_event('addon command', function (...)
         setup_ui()
 
         log('Position changed to '..settings.pos.x..', '..settings.pos.y)
+    elseif cmd == 'drag' or cmd == 'draggable' then
+        settings.draggable = not settings.draggable
+        bg_image:draggable(settings.draggable)
+
+        if settings.draggable then
+            log("EquipViewer is now draggable.")
+        else
+            log("EquipViewer's position is now fixed.")
+        end
+        config.save(settings)
     elseif cmd == 'size' then
         if #cmd_args < 1 then
             error('Not enough arguments.')
@@ -469,20 +579,23 @@ windower.register_event('addon command', function (...)
         setup_ui()
 
         log('Size changed to '..settings.size)
+    elseif cmd == 'resize' then
+        settings.resize = not settings.resize
+        
+        if settings.resize then
+            log("You man now resize EquipViewer by pressing ctrl and either 'numpad +' or 'numpad -'")
+        else
+            log('Equipviewer size is now locked.')
+        end
+        config.save(settings)
     elseif cmd == 'scale' then
         if #cmd_args < 1 then
             error('Not enough arguments.')
             log('Current scale: '..settings.size/32)
             return
         end
-        local size = tonumber(cmd_args[1])*32
-        if size > 100 then
-            error('Size too large')
-        end
-        settings.size = size
-        config.save(settings)
 
-        setup_ui()
+        scale(cmd_args[1])
 
         log('Size changed to '..settings.size)
     elseif cmd == 'alpha' or cmd == 'opacity' then
@@ -611,7 +724,9 @@ windower.register_event('addon command', function (...)
     else
         log('HELP:')
         log('ev position <xpos> <ypos>: move to position (from top left)')
+        log('ev draggable: toggles ability to drag equipment window')
         log('ev size <pixels>: set pixel size of each item slot')
+        log('ev resize: toggles ability to adjust scale with ctrl and \'numpad +\' or \'numpad -\' buttons')
         log('ev scale <factor>: scale multiplier for each item slot (from 32px)')
         log('ev alpha <opacity>: set opacity of icons (out of 255)')
         log('ev transparency <transparency>: inverse of alpha (out of 255)')
@@ -642,7 +757,7 @@ function refresh_ui_settings()
             width = settings.size * 4,
             height = settings.size * 4,
         },
-        draggable = false,
+        draggable = settings.draggable,
     }
     equipment_image_settings = {
         color = {
