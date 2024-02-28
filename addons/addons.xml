@@ -255,6 +255,13 @@
     <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
+    <name>finalAlert</name>
+    <author>Godchain (Asura)</author>
+    <description>Displays Final Fantasy 7 style alerts when enemies use skills or magic. Allows you to emphasize skills by name (useful for interrupts).</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://discord.gg/aUrHCvk</support>
+  </addon>
+  <addon>
     <name>FFOColor</name>
     <author>Nitrous (Shiva)</author>
     <description>Allows you to show FFOChat text in one of the 5 game chat channels. As well as specify colors for the text</description>
