@@ -81,7 +81,7 @@ function split(msg, match)
     local splitarr = {}
     local u = 1
     while u <= length do
-        local nextanch = msg:find(match,u,string.encoding.shift_jis)
+        local nextanch = msg:find(match,string.encoding.shift_jis,u)
         if nextanch ~= nil then
             splitarr[#splitarr+1] = msg:sub(u,nextanch-match:len())
             if nextanch~=length then
