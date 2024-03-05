@@ -10,7 +10,7 @@ require('chat')
 windower.register_event('addon command',function (...)
     local broken_init = T{...}:map(function(str)
         str = windower.convert_auto_trans(str):strip_format()
-        if str:find(' ',string.encoding.shift_jis) then 
+        if str:find(' ', string.encoding.shift_jis) then 
             return str:enclose('"')
         end
         return str
@@ -22,7 +22,7 @@ windower.register_event('addon command',function (...)
     end)
 
     if dbg then 
-        windower.add_to_chat(207,'send (debug): '..term)
+        windower.add_to_chat(207, 'send (debug): '..term)
     end
 
     local qual = table.remove(broken_init,1)
@@ -81,7 +81,7 @@ function split(msg, match)
     local splitarr = {}
     local u = 1
     while u <= length do
-        local nextanch = msg:find(match,string.encoding.shift_jis,u)
+        local nextanch = msg:find(match, string.encoding.shift_jis, u)
         if nextanch ~= nil then
             splitarr[#splitarr+1] = msg:sub(u,nextanch-match:len())
             if nextanch~=length then
