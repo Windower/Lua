@@ -88,8 +88,8 @@ end
 
 -- position the images and text
 function ui:position(theme_options)
-    local x = windower.get_windower_settings().x_res / 2 - (theme_options.total_width / 2) + theme_options.offset_x
-    local y = windower.get_windower_settings().y_res - 60 + theme_options.offset_y
+    local x = windower.get_windower_settings().ui_x_res / 2 - (theme_options.total_width / 2) + theme_options.offset_x
+    local y = windower.get_windower_settings().ui_y_res - 60 + theme_options.offset_y
 
     self.background:pos(x, y)
 
