@@ -8,15 +8,13 @@ local dbg = false
 require('chat')
 
 windower.register_event('addon command',function (...)
-    local broken_init = T{...}:map(function(str)
+     local term = T{...}:map(function(str)
         str = windower.convert_auto_trans(str):strip_format()
         if str:find(' ', string.encoding.shift_jis) then 
             return str:enclose('"')
         end
         return str
-    end)
-
-    local term = broken_init:sconcat():gsub('<(%a+)id>', function(target_string)
+    end):sconcat():gsub('<(%a+)id>', function(target_string)
         local entity = windower.ffxi.get_mob_by_target(target_string)
         return entity and entity.id or '<' .. target_string .. 'id>'
     end)
@@ -25,6 +23,7 @@ windower.register_event('addon command',function (...)
         windower.add_to_chat(207, 'send (debug): '..term)
     end
 
+    local broken_init = split(term,' ')
     local qual = table.remove(broken_init,1)
     local player = windower.ffxi.get_player()
 
@@ -55,21 +54,21 @@ windower.register_event('ipc message',function (msg)
     local qual = table.remove(broken,1)
     local player = windower.ffxi.get_player()
     if player and qual:lower()==player.name:lower() then
-        relevant_msg(table.concat(broken,' '))
+        relevant_msg(table.concat(broken, ' '))
     end
     if string.char(qual:byte(1)) == '@' then
         local arg = string.char(qual:byte(2, qual:len()))
         if player and arg:upper() == player.main_job:upper() then
             if broken ~= nil then
-                relevant_msg(table.concat(broken,' '))
+                relevant_msg(table.concat(broken, ' '))
             end
         elseif arg:upper() == 'ALL' then
             if broken ~= nil then
-                relevant_msg(table.concat(broken,' '))
+                relevant_msg(table.concat(broken, ' '))
             end
         elseif arg:upper() == 'OTHERS' then
             if broken ~= nil then
-                relevant_msg(table.concat(broken,' '))
+                relevant_msg(table.concat(broken, ' '))
             end
         end
     end
