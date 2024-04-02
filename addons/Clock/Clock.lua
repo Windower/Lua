@@ -50,7 +50,7 @@ redraw = function()
     end, 0)
     local format_string = settings.ShowTimeZones and '%s%s: ${%s}' or '${%s}'
     local strings = sorted:map(function(tz)
-        local display = settings.Display[tz] or tz_format[tz]
+        local display = settings.Display[tz:lower()] or tz_format[tz]
         return format_string:format(display, ' ':rep(width - #display), tz)
     end)
 
