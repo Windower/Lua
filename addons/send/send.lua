@@ -8,7 +8,13 @@ local dbg = false
 require('chat')
 
 windower.register_event('addon command',function (...)
-     local term = T{...}:map(function(str)
+    if {...}[1]:lower() == '@debug' then
+        dbg = not dbg
+        windower.add_to_chat(55,'send: debug '..tostring(dbg))
+        return
+    end
+
+    local term = T{...}:map(function(str)
         str = windower.convert_auto_trans(str):strip_format()
         if str:find(' ', string.encoding.shift_jis) then 
             return str:enclose('"')
