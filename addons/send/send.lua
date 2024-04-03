@@ -1,17 +1,35 @@
-_addon.version = '1.0'
+_addon.version = '1.1'
 _addon.name = 'Send'
 _addon.command = 'send'
 _addon.author = 'Byrth'
 
-windower.register_event('addon command',function (...)
-    local term = table.concat({...}, ' ')
+local debug = false
 
-    term = term:gsub('<(%a+)id>', function(target_string)
+require('chat')
+
+windower.register_event('addon command', function (...)
+    if ...:lower() == '@debug' then
+        debug = not debug
+        windower.add_to_chat(55, 'send: debug ' .. tostring(dbg))
+        return
+    end
+
+    local term = T{...}:map(function(str)
+        str = windower.convert_auto_trans(str):strip_format()
+        if str:find(' ', string.encoding.shift_jis) then 
+            return str:enclose('"')
+        end
+        return str
+    end):sconcat():gsub('<(%a+)id>', function(target_string)
         local entity = windower.ffxi.get_mob_by_target(target_string)
         return entity and entity.id or '<' .. target_string .. 'id>'
     end)
 
-    local broken_init = split(term, ' ')
+    if dbg then 
+        windower.add_to_chat(207, 'send (debug): '..term)
+    end
+
+    local broken_init = split(term,' ')
     local qual = table.remove(broken_init,1)
     local player = windower.ffxi.get_player()
 
@@ -42,21 +60,21 @@ windower.register_event('ipc message',function (msg)
     local qual = table.remove(broken,1)
     local player = windower.ffxi.get_player()
     if player and qual:lower()==player.name:lower() then
-        relevant_msg(table.concat(broken,' '))
+        relevant_msg(table.concat(broken, ' '))
     end
     if string.char(qual:byte(1)) == '@' then
         local arg = string.char(qual:byte(2, qual:len()))
         if player and arg:upper() == player.main_job:upper() then
             if broken ~= nil then
-                relevant_msg(table.concat(broken,' '))
+                relevant_msg(table.concat(broken, ' '))
             end
         elseif arg:upper() == 'ALL' then
             if broken ~= nil then
-                relevant_msg(table.concat(broken,' '))
+                relevant_msg(table.concat(broken, ' '))
             end
         elseif arg:upper() == 'OTHERS' then
             if broken ~= nil then
-                relevant_msg(table.concat(broken,' '))
+                relevant_msg(table.concat(broken, ' '))
             end
         end
     end
@@ -68,7 +86,7 @@ function split(msg, match)
     local splitarr = {}
     local u = 1
     while u <= length do
-        local nextanch = msg:find(match,u)
+        local nextanch = msg:find(match, string.encoding.shift_jis, u)
         if nextanch ~= nil then
             splitarr[#splitarr+1] = msg:sub(u,nextanch-match:len())
             if nextanch~=length then
@@ -96,4 +114,3 @@ function relevant_msg(msg)
     end
 
 end
-
