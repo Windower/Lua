@@ -13,10 +13,10 @@ windower.register_event('addon command', function (...)
         windower.add_to_chat(55, 'send: debug ' .. tostring(debug))
         return
     end
-    
+
     local term = T{...}:map(function(str)
         str = windower.convert_auto_trans(str):strip_format()
-        if str:find(' ', string.encoding.shift_jis) then 
+        if str:find(' ', string.encoding.shift_jis) then
             return str:enclose('"')
         end
         return str
@@ -25,18 +25,18 @@ windower.register_event('addon command', function (...)
         return entity and entity.id or '<' .. target_string .. 'id>'
     end)
 
-    if debug then 
+    if debug then
         windower.add_to_chat(207, 'send (debug): '..term)
     end
 
     local broken_init = split(term, ' ')
     local qual = table.remove(broken_init, 1):lower()
     local player = windower.ffxi.get_player()
-    
+
     if #broken_init < 1 then
         return
     end
-    
+
     if player and qual == player['name']:lower() then
         relevant_msg(table.concat(broken_init, ' '))
         return
@@ -62,28 +62,28 @@ windower.register_event('addon command', function (...)
 end)
 
 windower.register_event('ipc message', function (msg)
-    if debug then 
+    if debug then
         windower.add_to_chat(207, 'send receive (debug): ' .. msg)
     end
 
     local broken = split(msg, ' ')
     local command = table.remove(broken, 1)
-    
-    if command ~= 'send' or #broken < 2 then 
+
+    if command ~= 'send' or #broken < 2 then
         return
     end
-    
+
     local qual = table.remove(broken, 1)
     local player = windower.ffxi.get_player()
     if not player then
         return
     end
-    
+
     if qual:lower() == player.name:lower() then
         relevant_msg(table.concat(broken, ' '))
     elseif string.char(qual:byte(1)) == '@' then
         local arg = string.char(qual:byte(2, qual:len())):upper()
-        
+
         if arg == player.main_job:upper() or arg == 'ALL' or arg == 'OTHERS' then
             relevant_msg(table.concat(broken, ' '))
         elseif arg:startswith('PARTY') then
@@ -103,7 +103,7 @@ windower.register_event('ipc message', function (msg)
             end
         elseif arg:upper():startswith('ZONE') then
             local samezone = tonumber(arg:sub(5, #arg)) == windower.ffxi.get_info().zone
-            
+
             if samezone then
                 relevant_msg(table.concat(broken, ' '))
             end
