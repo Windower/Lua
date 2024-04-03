@@ -3,13 +3,13 @@ _addon.name = 'Send'
 _addon.command = 'send'
 _addon.author = 'Byrth'
 
-local dbg = false
+local debug = false
 
 require('chat')
 
 windower.register_event('addon command', function (...)
     if ...:lower() == '@debug' then
-        dbg = not dbg
+        debug = not debug
         windower.add_to_chat(55, 'send: debug ' .. tostring(dbg))
         return
     end
