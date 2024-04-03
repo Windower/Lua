@@ -73,7 +73,7 @@ windower.register_event('ipc message', function (msg)
         return
     end
     
-    local qual = table.remove(broken,1)
+    local qual = table.remove(broken, 1)
     local player = windower.ffxi.get_player()
     if not player then
         return
@@ -87,10 +87,10 @@ windower.register_event('ipc message', function (msg)
         if arg == player.main_job:upper() or arg == 'ALL' or arg == 'OTHERS' then
             relevant_msg(table.concat(broken, ' '))
         elseif arg:startswith('PARTY') then
-            local name = arg:sub(6,#arg):lower()
+            local name = arg:sub(6, #arg):lower()
             local party = windower.ffxi.get_party()
             local sameparty = function()
-                for i=1,5 do
+                for i=1, 5 do
                     local idx = 'p'..i
                     if party[idx] and party[idx].name:lower() == name then
                         return true
@@ -102,7 +102,7 @@ windower.register_event('ipc message', function (msg)
                 relevant_msg(table.concat(broken, ' '))
             end
         elseif arg:upper():startswith('ZONE') then
-            local samezone = tonumber(arg:sub(5,#arg)) == windower.ffxi.get_info().zone
+            local samezone = tonumber(arg:sub(5, #arg)) == windower.ffxi.get_info().zone
             
             if samezone then
                 relevant_msg(table.concat(broken, ' '))
@@ -134,11 +134,11 @@ function split(msg, match)
 end
 
 function relevant_msg(msg)
-    if msg:sub(1,2) == '//' then
+    if msg:sub(1, 2) == '//' then
         windower.send_command(msg:sub(3))
-    elseif msg:sub(1,1) == '/' then
+    elseif msg:sub(1, 1) == '/' then
         windower.send_command('input '..msg)
-    elseif msg:sub(1,3) == 'atc' then
+    elseif msg:sub(1, 3) == 'atc' then
         windower.add_to_chat(55, msg:sub(5))
     else
         windower.send_command(msg)
