@@ -7,10 +7,10 @@ local dbg = false
 
 require('chat')
 
-windower.register_event('addon command',function (...)
-    if {...}[1]:lower() == '@debug' then
+windower.register_event('addon command', function (...)
+    if ...:lower() == '@debug' then
         dbg = not dbg
-        windower.add_to_chat(55,'send: debug '..tostring(dbg))
+        windower.add_to_chat(55, 'send: debug ' .. tostring(dbg))
         return
     end
 
