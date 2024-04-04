@@ -14,11 +14,6 @@ windower.register_event('addon command', function(target, ...)
         return
     end
 
-    if not ... then
-        error('No command provided.')
-        return
-    end
-
     target = target:lower()
 
     if target == '@debug' then
@@ -27,7 +22,12 @@ windower.register_event('addon command', function(target, ...)
         return
     end
 
-    local command = T{...}:map(strip_format .. windower.convert_auto_trans):map(function(str)
+    if not ... then
+        error('No command provided.')
+        return
+    end
+
+    local command = target .. ' ' .. T{...}:map(string.strip_format .. windower.convert_auto_trans):map(function(str)
         return str:find(' ', string.encoding.shift_jis) and str:enclose('"') or str
     end):sconcat():gsub('<(%a+)id>', function(target_string)
         local entity = windower.ffxi.get_mob_by_target(target_string)
