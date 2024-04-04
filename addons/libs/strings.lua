@@ -44,83 +44,6 @@ function string.contains(str, sub)
     return str:find(sub, nil, true) ~= nil
 end
 
--- Splits a string into a table by a separator pattern.
-function string.psplit(str, sep, maxsplit, include)
-    maxsplit = maxsplit or 0
-
-    return str:split(sep, maxsplit, include, false)
-end
-
-local rawsplit = function(str, sep, maxsplit, include, raw)
-    if not sep or sep == '' then
-        local res = {}
-        local key = 0
-        for c in str:gmatch('.') do
-            key = key + 1
-            res[key] = c
-        end
-
-        return res, key
-    end
-
-    maxsplit = maxsplit or 0
-    if raw == nil then
-        raw = true
-    end
-
-    local res = {}
-    local key = 0
-    local i = 1
-    local startpos, endpos
-    local match
-    while i <= #str + 1 do
-        -- Find the next occurence of sep.
-        startpos, endpos = str:find(sep, i, raw)
-        -- If found, get the substring and append it to the table.
-        if startpos then
-            match = str:sub(i, startpos - 1)
-            key = key + 1
-            res[key] = match
-
-            if include then
-                key = key + 1
-                res[key] = str:sub(startpos, endpos)
-            end
-
-            -- If maximum number of splits reached, return
-            if key == maxsplit - 1 then
-                key = key + 1
-                res[key] = str:sub(endpos + 1)
-                break
-            end
-            i = endpos + 1
-        -- If not found, no more separators to split, append the remaining string.
-        else
-            key = key + 1
-            res[key] = str:sub(i)
-            break
-        end
-    end
-
-    return res, key
-end
-
--- Splits a string into a table by a separator string.
-function string.split(str, sep, maxsplit, include, raw)
-    local res, key = rawsplit(str, sep, maxsplit, include, raw)
-
-    if _meta.L then
-        res.n = key
-        return setmetatable(res, _meta.L)
-    end
-
-    if _meta.T then
-        return setmetatable(res, _meta.T)
-    end
-
-    return res
-end
-
 -- Alias to string.sub, with some syntactic sugar.
 function string.slice(str, from, to)
     return str:sub(from or 1, to or #str)
@@ -751,11 +674,9 @@ do
     do
         local rawgsub = string.gsub
 
-        function string.gsub(str, pattern, repl, n, encoding, from, to)
-            if type(n) == 'table' then
-                n, encoding, from, to = nil, n, encoding, from
-            elseif type(encoding) ~= 'table' then
-                encoding, from, to = string.encoding.ascii, encoding, from
+        function string.gsub(str, pattern, repl, encoding, n, from, to)
+            if type(encoding) ~= 'table' then
+                encoding, n, from, to = string.encoding.ascii, encoding, n, from
             end
 
             if encoding == string.encoding.ascii and to == nil then
@@ -789,9 +710,90 @@ do
             return table.concat(fragments) .. str:sub(pos)
         end
     end
+
+    do
+        local rawsplit = function(str, sep, encoding, maxsplit, include, raw, from, to)
+            if not sep or sep == '' then
+                local res = {}
+                local count = 0
+                for c in str:it(encoding, from, to) do
+                    count = count + 1
+                    res[count] = c
+                end
+
+                return res, count
+            end
+
+            maxsplit = maxsplit or 0
+            if raw == nil then
+                raw = true
+            end
+
+            local res = {}
+            local count = 0
+            local pos = 1
+            local startpos, endpos
+            local match
+            while pos <= to do
+                -- Find the next occurence of sep.
+                startpos, endpos = str:find(sep, encoding, pos, to, raw)
+                -- If found, get the substring and append it to the table.
+                if startpos then
+                    match = str:sub(pos, startpos - 1)
+                    count = count + 1
+                    res[count] = match
+
+                    if include then
+                        count = count + 1
+                        res[count] = str:sub(startpos, endpos)
+                    end
+
+                    -- If maximum number of splits reached, return
+                    if count == maxsplit - 1 then
+                        count = count + 1
+                        res[count] = str:sub(endpos + 1)
+                        break
+                    end
+                    pos = endpos + 1
+                -- If not found, no more separators to split, append the remaining string.
+                else
+                    count = count + 1
+                    res[count] = str:sub(pos)
+                    break
+                end
+            end
+
+            return res, count
+        end
+
+        -- Splits a string into a table by a separator string.
+        function string.split(str, sep, encoding, maxsplit, include, raw, from, to)
+            if type(encoding) ~= 'table' then
+                encoding, maxsplit, include, raw, from, to = string.encoding.ascii, encoding, maxsplit, include, raw, from
+            end
+
+            local res, key = rawsplit(str, sep, encoding, maxsplit, include, raw, from or 1, to or #str)
+
+            if _meta.L then
+                res.n = key
+                return setmetatable(res, _meta.L)
+            end
+
+            if _meta.T then
+                return setmetatable(res, _meta.T)
+            end
+
+            return res
+        end
+    end
 end
 
+-- Splits a string into a table by a separator pattern.
+function string.psplit(str, sep, maxsplit, include)
+    maxsplit = maxsplit or 0
 
+    return str:split(sep, maxsplit, include, false)
+end
 
 -- Removes leading and trailing whitespaces and similar characters (tabs, newlines, etc.).
 function string.trim(str)
@@ -1041,7 +1043,6 @@ end
 
 -- A string.gsub wrapper for case-insensitive patterns.
 function string.igsub(str, pattern, ...)
-    if not ... then print(debug.traceback()) end
     return str:gsub(pattern:ipattern(), ...)
 end
 
