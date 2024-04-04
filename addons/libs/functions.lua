@@ -145,6 +145,19 @@ function functions.it(fn, ...)
     end
 end
 
+-- Packs an iterator function into a table
+function functions.pack(fn)
+    local res = {}
+    local value = fn()
+    local count = 0
+    while value ~= nil do
+        count = count + 1
+        res[count] = value
+        value = fn()
+    end
+    return res
+end
+
 -- Schedules the current function to run delayed by the provided time in seconds and returns the coroutine
 function functions.schedule(fn, time, ...)
     return coroutine.schedule(fn:prepare(...), time)

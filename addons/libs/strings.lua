@@ -27,12 +27,16 @@ debug.setmetatable('', {
     __unp = functions.equals,
 })
 
-string.encoding = {
-    ascii = {},
-    utf8 = {},
-    shift_jis = {},
-    binary = {},
-}
+local enum = function(...)
+    local res = {}
+    for i = 1, select('#', ...) do
+        local name = select(i, ...)
+        res[name] = setmetatable({}, {__tostring = function() return 'enum: ' .. name end})
+    end
+    return res
+end
+
+string.encoding = enum('ascii', 'utf8', 'shift_jis', 'binary')
 
 -- Returns a function that returns the string when called.
 function string.fn(str)
@@ -195,9 +199,9 @@ do
             local index = from
             local search = pattern:it(encoding):pack()
             local length = #search
-            for c in str:it(encoding, from, to - offset + 1) do
+            for c in str:it(encoding, from, to - offset) do
                 local position = 0
-                for check in str:it(encoding, index + #c, index + offset) do
+                for check in str:it(encoding, index, index + offset) do
                     position = position + 1
                     if check ~= search[position] then
                         break
@@ -735,32 +739,28 @@ do
             local startpos, endpos
             local match
             while pos <= to do
-                -- Find the next occurence of sep.
                 startpos, endpos = str:find(sep, encoding, pos, to, raw)
-                -- If found, get the substring and append it to the table.
-                if startpos then
-                    match = str:sub(pos, startpos - 1)
-                    count = count + 1
-                    res[count] = match
-
-                    if include then
-                        count = count + 1
-                        res[count] = str:sub(startpos, endpos)
-                    end
-
-                    -- If maximum number of splits reached, return
-                    if count == maxsplit - 1 then
-                        count = count + 1
-                        res[count] = str:sub(endpos + 1)
-                        break
-                    end
-                    pos = endpos + 1
-                -- If not found, no more separators to split, append the remaining string.
-                else
+                if not startpos then
                     count = count + 1
                     res[count] = str:sub(pos)
                     break
                 end
+
+                match = str:sub(pos, startpos - 1)
+                count = count + 1
+                res[count] = match
+
+                if include then
+                    count = count + 1
+                    res[count] = str:sub(startpos, endpos)
+                end
+
+                if count == maxsplit - 1 then
+                    count = count + 1
+                    res[count] = str:sub(endpos + 1)
+                    break
+                end
+                pos = endpos + 1
             end
 
             return res, count
