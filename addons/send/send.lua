@@ -1,7 +1,7 @@
 _addon.version = '1.2'
 _addon.name = 'Send'
 _addon.command = 'send'
-_addon.author = 'Byrth, Lili, Arcon'
+_addon.author = 'Byrth, Lili'
 
 local debug = false
 
