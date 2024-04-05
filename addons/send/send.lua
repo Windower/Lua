@@ -1,7 +1,7 @@
 _addon.version = '1.2'
 _addon.name = 'Send'
 _addon.command = 'send'
-_addon.author = 'Byrth, Lili'
+_addon.author = 'Byrth, Lili, Arcon'
 
 local debug = false
 
@@ -14,29 +14,25 @@ windower.register_event('addon command', function(target, ...)
         return
     end
 
-    target = target:lower()
-
-    if target == '@debug' then
-        debug = not debug
-        windower.add_to_chat(55, 'send: debug ' .. tostring(debug))
-        return
-    end
-
     if not ... then
         error('No command provided.')
         return
     end
 
-    local command = target .. ' ' .. T{...}:map(string.strip_format .. windower.convert_auto_trans):map(function(str)
+    target = target:lower()
+
+    if target == '@debug' then
+        local arg = (... == 'on' or ... == 'off') and ... or error('Invalid argument. Usage: send @debug <on|off>')
+        debug = arg == 'on'
+        return windower.add_to_chat(55, 'send: debug ' .. tostring(debug))
+    end
+
+    local command = T{...}:map(string.strip_format .. windower.convert_auto_trans):map(function(str)
         return str:find(' ', string.encoding.shift_jis) and str:enclose('"') or str
     end):sconcat():gsub('<(%a+)id>', function(target_string)
         local entity = windower.ffxi.get_mob_by_target(target_string)
         return entity and entity.id or '<' .. target_string .. 'id>'
     end)
-
-    if debug then
-        windower.add_to_chat(207, 'send (debug): ' .. command)
-    end
 
     local player = windower.ffxi.get_player()
 
@@ -49,15 +45,21 @@ windower.register_event('addon command', function(target, ...)
         if player then
             execute_command(command)
         end
-        command = target .. player.name .. ' ' .. command
+        target = target .. player.name
     elseif target == '@zone' then
         if player then
             execute_command(command)
         end
-        command = target .. windower.ffxi.get_info().zone .. ' ' .. command
+        target = target .. windower.ffxi.get_info().zone
     end
 
-    windower.send_ipc_message('send ' .. command)
+    command = 'send ' .. target .. ' ' .. command
+
+    if debug then
+        windower.add_to_chat(207, 'send (debug): ' .. command)
+    end
+
+    windower.send_ipc_message(command)
 end)
 
 windower.register_event('ipc message', function (msg)
@@ -85,14 +87,14 @@ windower.register_event('ipc message', function (msg)
     elseif target:startswith('@') then
         local arg = target:sub(2):lower()
 
-        if arg == player.main_job:upper() or arg == 'all' or arg == 'others' then
+        if arg == player.main_job:lower() or arg == 'all' or arg == 'others' then
             execute_command(command)
         elseif arg:startswith('party') then
-            local name = arg:sub(6, #arg):lower()
+            local sender = arg:sub(6, #arg):lower()
             local party = windower.ffxi.get_party()
             for i = 1, 5 do
                 local idx = 'p'..i
-                if party[idx] and party[idx].name:lower() == name then
+                if party[idx] and party[idx].name:lower() == sender then
                     execute_command(command)
                     return
                 end
