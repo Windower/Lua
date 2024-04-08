@@ -24,50 +24,43 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-require('logger')
 function export_set(options)
-    local item_list = T{}
-    local targinv,all_items,wearable,all_sets,noaugments,onlyaugmented,minify,clipboard
-    local use_job_in_filename,use_subjob_in_filename,overwrite_existing,named_file
-    if #options > 0 then
-        for _,v in ipairs(options) do
-            if S{'inventory','inv','i'}:contains(v:lower()) then
-                targinv = true
-            elseif v:lower() == 'all' then
-                all_items = true
-            elseif v:lower() == 'wearable' then
-                wearable = true
-            elseif S{'sets','set','s'}:contains(v:lower()) then
-                all_sets = true
-                if not user_env or not user_env.sets then
-                    msg.addon_msg(123,'Cannot export the sets table of the current file because there is no file loaded.')
-                    return
-                end
-            elseif S{'noaugments','noaugs'}:contains(v:lower()) then
-                noaugments = true
-                onlyaugmented = nil
-            elseif S{'onlyaugmented','onlyaugs'}:contains(v:lower()) then
-                onlyaugmented = true
-                noaugments = nil
-            elseif S{'mini','minify'}:contains(v:lower()) then
-                minify = true
-            elseif S{'copy','clipboard'}:contains(v:lower()) then
-                clipboard = true
-            elseif v:lower() == 'mainjob' then
-                use_job_in_filename = true
-            elseif v:lower() == 'mainsubjob' then
-                use_subjob_in_filename = true
-            elseif v:lower() == 'overwrite' then
-                overwrite_existing = true
-            elseif S{'filename','file','f'}:contains(v:lower()) then
-                named_file = true
-            else
-                if named_file then
-                    filename = v
-                end
+    local named_file = false
+    local filename = false
+    for i=1,#options do
+        if S{'filename','file','f'}:contains(options[i]) then
+            filename = table.remove(options,i+1)
+            if not filename then
+                msg.addon_msg(123,'Cannot export to named file because a filename was not provided.')
+                return
             end
+            named_file = table.remove(options,i)
+            break
         end
     end
+
+    local options = S(options):map(string.lower)
+
+    local targinv = not (options* S{'inventory','inv','i'}):empty()
+    local all_items = options:contains('all')
+    local wearable = options:contains('wearable')
+    local all_sets = not (options * S{'sets','set','s'}):empty()
+    if all_sets and (not user_env or not user_env.sets) then
+        msg.addon_msg(123,'Cannot export the sets table of the current file because there is no file loaded.')
+        return
+    end
+
+    local noaugments = not (options * S{'noaugments','noaugs'}):empty()
+    if noaugments then onlyaugmented = false end
+
+    local onlyaugmented = not (options * S{'onlyaugmented','onlyaugs'}):empty()
+    if onlyaugmented then noaugments = false end
+
+    local minify = not (options * S{'mini','minify'}):empty()
+    local clipboard = not (options * S{'copy','clipboard'}):empty()
+    local use_job_in_filename = options:contains('mainjob')
+    local use_subjob_in_filename = options:contains('mainsubjob')
+    local overwrite_existing = options:contains('overwrite')
 
     local buildmsg = 'Exporting '
     if all_items then
@@ -80,6 +73,12 @@ function export_set(options)
         buildmsg = buildmsg..'your current sets table'
     else
         buildmsg = buildmsg..'your currently equipped gear'
+    end
+
+    if noaugments then
+        buildmsg = buildmsg..' (omitting augments)'
+    elseif onlyaugmented then
+        buildmsg = buildmsg..' (only augmented items)'
     end
 
     if clipboard then
@@ -100,14 +99,10 @@ function export_set(options)
         end
     end
 
-    if noaugments then
-        buildmsg = buildmsg..' noaugments.'
-    elseif onlyaugmented then
-        buildmsg = buildmsg..' onlyaugmented.'
-    end
 
     msg.addon_msg(123,buildmsg)
 
+    local item_list = T{}
     if all_items then
         for i = 0, #res.bags do
             item_list:extend(get_item_list(items[res.bags[i].english:gsub(' ', ''):lower()]))
@@ -142,13 +137,15 @@ function export_set(options)
                         name = res.items[item_tab.id][language],
                         slot = slot_name
                         }
-                    local augments = extdata.decode(item_tab).augments or {}
-                    local aug_str = ''
-                    for aug_ind,augment in pairs(augments) do
-                        if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
-                    end
-                    if string.len(aug_str) > 0 then
-                        item_list[slot_map[slot_name]+1].augments = aug_str
+                    if not noaugments then
+                        local augments = extdata.decode(item_tab).augments or {}
+                        local aug_str = ''
+                        for aug_ind,augment in pairs(augments) do
+                            if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
+                        end
+                        if string.len(aug_str) > 0 then
+                            item_list[slot_map[slot_name]+1].augments = aug_str
+                        end
                     end
                 else
                     msg.addon_msg(123,'You are wearing an item that is not in the resources yet.')
@@ -179,7 +176,7 @@ function export_set(options)
     local newline = minify and '' or '\n'
     for i,v in ipairs(item_list) do
         if v.name ~= empty then
-            if v.augments and not noaugments then
+            if v.augments then
                 --Advanced set table
                 output = output .. '    '..v.slot..'={ name="'..v.name..'", augments={'..v.augments..'}},'..newline
             elseif not onlyaugmented then
@@ -192,7 +189,7 @@ function export_set(options)
     if clipboard then
         windower.copy_to_clipboard(output)
     else
-        
+
         if not windower.dir_exists(windower.addon_path..'data/export') then
             windower.create_dir(windower.addon_path..'data/export')
         end
