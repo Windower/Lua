@@ -32,6 +32,18 @@ windower.register_event('addon command', function(target, ...)
     end):sconcat():gsub('<(%a+)id>', function(target_string)
         local entity = windower.ffxi.get_mob_by_target(target_string)
         return entity and entity.id or '<' .. target_string .. 'id>'
+    end):gsub('%${(.-)}', function(target_string)
+        if not target_string then
+            error("Lua tokens must contain a valid Lua string to evaluate")
+        elseif target_string:sub(1, 6) ~= "return" then
+            target_string = "return "..target_string
+        end
+        local func = assert(loadstring(target_string), "The Lua string provided is invalid")
+        local success, result = pcall(func)
+        if not success then
+            error("Lua token evaluation failed. "..tostring(result))
+        end
+        return result and tostring(result) or ""
     end)
 
     local player = windower.ffxi.get_player()
