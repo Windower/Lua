@@ -26,3 +26,12 @@ Examples:
 /ta <stnpc>
 //send Mymule /ma "Blizzard" <laststid>
 ```
+
+## Sending dynamic values
+
+Dynamic values can be sent to the receiver by using custom Lua tokens in the format ${lua code here}.
+
+Examples:
+```
+//send @party /p Hi, my name is ${windower.ffxi.get_player().name}!
+```
