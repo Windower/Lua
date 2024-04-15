@@ -90,18 +90,13 @@ end
 
 -- Checks if a table is an array, only having sequential integer keys.
 function table.isarray(t)
-    local count = 0
-    for _, _ in pairs(t) do
-        count = count + 1
-    end
-
-    return count == #t
+    return table.count(t) == #t
 end
 
 -- Returns the number of elements in a table.
 function table.length(t)
     local count = 0
-    for _ in pairs(t) do
+    for _ in table.it(t) do
         count = count + 1
     end
 
@@ -123,7 +118,7 @@ end
 
 -- Returns true if searchval is in t.
 function table.contains(t, searchval)
-    for key, val in pairs(t) do
+    for val in table.it(t) do
         if val == searchval then
             return true
         end
@@ -148,7 +143,8 @@ function table.extend(t, t_extend)
     if type(t_extend) ~= 'table' then
         return table.append(t, t_extend)
     end
-    for _, val in ipairs(t_extend) do
+
+    for val in table.it(t_extend) do
         table.append(t, val)
     end
 
@@ -164,7 +160,7 @@ function table.count(t, fn)
     end
 
     local count = 0
-    for _, val in pairs(t) do
+    for val in table.it(t) do
         if fn(val) then
             count = count + 1
         end
@@ -247,7 +243,6 @@ function table.keyset(t)
         return setmetatable(res, _meta.S)
     end
 
-    local res = {}
     local i = 0
     for key in pairs(t) do
         i = i + 1
@@ -578,7 +573,7 @@ function table.empty(t, rec)
         return next(t) == nil
     end
 
-    for _, val in pairs(t) do
+    for val in table.it(t) do
         if type(val) ~= 'table' then
             return false;
         else
