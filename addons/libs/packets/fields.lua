@@ -1296,7 +1296,7 @@ fields.incoming[0x00A] = L{
     {ctype='signed short',      label='DEX'},                                   -- CE
     {ctype='signed short',      label='VIT'},                                   -- D0
     {ctype='signed short',      label='AGI'},                                   -- D2
-    {ctype='signed short',      label='IND'},                                   -- F4
+    {ctype='signed short',      label='INT'},                                   -- F4
     {ctype='signed short',      label='MND'},                                   -- D6
     {ctype='signed short',      label='CHR'},                                   -- D8
     {ctype='signed short',      label='STR Bonus'},                             -- DA
