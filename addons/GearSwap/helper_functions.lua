@@ -1072,10 +1072,12 @@ function spell_complete(rline)
     end
 
     if rline.skill and tonumber(rline.skill) then
+        rline.skill_id = rline.skill
         rline.skill = res.skills[rline.skill][language]
     end
 
     if rline.element and tonumber(rline.element) then
+        rline.element_id = rline.element
         rline.element = res.elements[rline.element][language]
     end
 
