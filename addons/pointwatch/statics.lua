@@ -28,10 +28,9 @@
 --Default settings file:
 default_settings = {
     strings = {
-        default = "string.format('%d/%dXP %sMerits XP/hr:%.1fk %sJP CP/hr:%.1fk %d/%dEP EP/hr:%.1fk',xp.current,xp.tnl,max_color('%5.2f':format(math.floor(lp.current/lp.tnm*100)/100+lp.number_of_merits),lp.current/lp.tnm+lp.number_of_merits,lp.maximum_merits,58,147,191),math.floor(xp.rate/100)/10,max_color('%6.2f':format(math.floor(cp.current/cp.tnjp*100)/100+cp.number_of_job_points),cp.current/cp.tnjp+cp.number_of_job_points,500,58,147,191),math.floor(cp.rate/100)/10,ep.current,ep.tnml,math.floor(ep.rate/100)/10)",
-        dynamis = "string.format('%d/%dXP %sMerits XP/hr:%.1fk %sJP CP/hr:%.1fk %d/%dEP %s  %s',xp.current,xp.tnl,max_color('%5.2f':format(math.floor(lp.current/lp.tnm*100)/100+lp.number_of_merits),lp.current/lp.tnm+lp.number_of_merits,lp.maximum_merits,58,147,191),math.floor(xp.rate/100)/10,max_color('%6.2f':format(math.floor(cp.current/cp.tnjp*100)/100+cp.number_of_job_points),cp.current/cp.tnjp+cp.number_of_job_points,500,58,147,191),math.floor(cp.rate/100)/10,ep.current,ep.tnml,dynamis.KIs,dynamis.time_remaining or 0)",
-        abyssea = "string.format('%d/%dXP %sMerits XP/hr:%.1fk %sJP CP/hr:%.1fk %d/%dEP Amber:%d Azure:%d Ruby:%d Pearl:%d Ebon:%d Silver:%d Gold:%d Time-Remaining:%d',xp.current,xp.tnl,max_color('%5.2f':format(math.floor(lp.current/lp.tnm*100)/100+lp.number_of_merits),lp.current/lp.tnm+lp.number_of_merits,lp.maximum_merits,58,147,191),math.floor(xp.rate/100)/10,max_color('%6.2f':format(math.floor(cp.current/cp.tnjp*100)/100+cp.number_of_job_points),cp.current/cp.tnjp+cp.number_of_job_points,500,58,147,191),math.floor(cp.rate/100)/10,ep.current,ep.tnml,abyssea.amber or 0,abyssea.azure or 0,abyssea.ruby or 0,abyssea.pearlescent or 0,abyssea.ebon or 0,abyssea.silvery or 0,abyssea.golden or 0,abyssea.time_remaining or 0)",
-        ep = "string.format('ML%d %d/%dEP EP/hr:%.1fk',ep.true_master_level,ep.current,ep.tnml,math.floor(ep.rate/100)/10)",
+        default = "string.format('%d/%dXP %sMerits XP/hr:%.1fk %sJP CP/hr:%.1fk ML%d %d/%dEP EP/hr:%.1fk',xp.current,xp.tnl,max_color('%5.2f':format(math.floor(lp.current/lp.tnm*100)/100+lp.number_of_merits),lp.current/lp.tnm+lp.number_of_merits,lp.maximum_merits,58,147,191),math.floor(xp.rate/100)/10,max_color('%6.2f':format(math.floor(cp.current/cp.tnjp*100)/100+cp.number_of_job_points),cp.current/cp.tnjp+cp.number_of_job_points,500,58,147,191),math.floor(cp.rate/100)/10,ep.master_level,ep.current,ep.tnml,math.floor(ep.rate/100)/10)",
+        dynamis = "string.format('%d/%dXP %sMerits XP/hr:%.1fk %sJP CP/hr:%.1fk ML%d %d/%dEP %s  %s',xp.current,xp.tnl,max_color('%5.2f':format(math.floor(lp.current/lp.tnm*100)/100+lp.number_of_merits),lp.current/lp.tnm+lp.number_of_merits,lp.maximum_merits,58,147,191),math.floor(xp.rate/100)/10,max_color('%6.2f':format(math.floor(cp.current/cp.tnjp*100)/100+cp.number_of_job_points),cp.current/cp.tnjp+cp.number_of_job_points,500,58,147,191),math.floor(cp.rate/100)/10,ep.master_level,ep.current,ep.tnml,dynamis.KIs,dynamis.time_remaining or 0)",
+        abyssea = "string.format('%d/%dXP %sMerits XP/hr:%.1fk %sJP CP/hr:%.1fk ML%d %d/%dEP Amber:%d Azure:%d Ruby:%d Pearl:%d Ebon:%d Silver:%d Gold:%d Time-Remaining:%d',xp.current,xp.tnl,max_color('%5.2f':format(math.floor(lp.current/lp.tnm*100)/100+lp.number_of_merits),lp.current/lp.tnm+lp.number_of_merits,lp.maximum_merits,58,147,191),math.floor(xp.rate/100)/10,max_color('%6.2f':format(math.floor(cp.current/cp.tnjp*100)/100+cp.number_of_job_points),cp.current/cp.tnjp+cp.number_of_job_points,500,58,147,191),math.floor(cp.rate/100)/10,ep.master_level,ep.current,ep.tnml,abyssea.amber or 0,abyssea.azure or 0,abyssea.ruby or 0,abyssea.pearlescent or 0,abyssea.ebon or 0,abyssea.silvery or 0,abyssea.golden or 0,abyssea.time_remaining or 0)",
     },
     text_box_settings = {
         pos = {
@@ -175,7 +174,7 @@ function initialize()
         rate = 0,
         tnml = 0,
         master_level = 0,
-        true_master_level = 0;
+        synced_master_level = 0;
     }
     
     sparks = {
