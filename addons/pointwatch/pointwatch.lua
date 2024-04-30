@@ -36,7 +36,7 @@ require('chat')
 
 _addon.name = 'PointWatch'
 _addon.author = 'Byrth'
-_addon.version = 0.220327
+_addon.version = 0.240420
 _addon.command = 'pw'
 
 settings = config.load('data\\settings.xml',default_settings)
@@ -120,7 +120,8 @@ packet_handlers = {
         accolades.current = p['Unity Points']
         ep.current = p['Current Exemplar Points']
         ep.tnml = p['Required Exemplar Points']
-        ep.master_level = p['Master Level']
+        ep.master_level = tnml[p['Required Exemplar Points']]
+        ep.synced_master_level = p['Master Level']
     end,
     [0x063] = function(org)
         local p = packets.parse('incoming',org)
