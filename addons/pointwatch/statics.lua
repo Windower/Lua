@@ -69,7 +69,6 @@ approved_commands = {show={n=0},hide={n=0},pos={n=2,t='number'},pos_x={n=1,t='nu
     font={n=2,t='string'},size={n=1,t='number'},pad={n=1,t='number'},color={n=3,t='number'},alpha={n=1,t='number'},
     transparency={n=1,t='number'},bg_color={n=3,t='number'},bg_alpha={n=1,t='number'},bg_transparency={n=1,t='number'}}
 
-
 -- Dynamis TE lists:
 city_table = {Crimson=10,Azure=10,Amber=10,Alabaster=15,Obsidian=15}
 other_table = {Crimson=10,Azure=10,Amber=10,Alabaster=10,Obsidian=20}
@@ -113,7 +112,7 @@ tnml = {
     [258409] = 30,
     [307400] = 31,
     [353012] = 32,
-    [395691] = 33,
+    [395651] = 33,
     [435673] = 34,
     [473392] = 35,
     [509085] = 36,
@@ -145,7 +144,6 @@ function initialize()
         maximum_job_points = 500,
     }
 
-    
     xp = {
         registry = {},
         total = 0,
@@ -198,7 +196,6 @@ function initialize()
         update_time = 0,
         time_remaining = 0,
     }
-    
     
     local info = windower.ffxi.get_info()
     
