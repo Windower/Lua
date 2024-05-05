@@ -123,6 +123,8 @@ command2_list = {
     ['kneel']=emote_table,
     ['laugh']=emote_table,
     ['muted']=emote_table,
+    ['kneel']=emote_table,
+    ['laugh']=emote_table,
     ['no']=emote_table,
     ['nod']=emote_table,
     ['yes']=emote_table,
@@ -190,6 +192,7 @@ language = 'english' -- windower.ffxi.get_info()['language']:lower()
 -----------------------------------------------------------------------------------
 function make_abil(ind,res,id)
     validabils[ind] = validabils[ind] or L{}
+    if res == "items" and validabils[ind].n > 0 then return end
     validabils[ind]:append({res=res,id=id})
 end
 
