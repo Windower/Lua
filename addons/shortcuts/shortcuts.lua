@@ -117,16 +117,10 @@ default_aliases = {
     cw5="Curing Waltz V",
     hw="Healing Waltz"
 }
-default_settings = {
-    include_items = false,
-}
 
 aliases = config.load('data/aliases.xml', default_aliases)
-settings = config.load('data/settings.xml', default_settings)
 config.save(aliases)
-config.save(settings)
 setmetatable(aliases,nil)
-setmetatable(settings,nil)
 
 
 require 'statics'
@@ -374,15 +368,6 @@ function interp_text(splitline,offset,modified)
     local finalized_action_name_normalized_as_item = strip_non_alphanumeric_keep_plus_fix_hq(finalized_action_name)
     local finalized_action_name_normalized_as_nonitem = strip_non_alphanumeric_convert_digits_to_roman(finalized_action_name)
 
-    
-    log(preliminary_action_name)
-    log(preliminary_action_name_normalized_as_item)
-    log(preliminary_action_name_normalized_as_nonitem)
-    log('normalized: ', normalized_preliminary_action_name)
-    log('finalized')
-    log(finalized_action_name_normalized_as_item)
-    log(finalized_action_name_normalized_as_nonitem)
-    
     -- Note: The normalized 'item' name is almost strictly more specific than
     -- the normalized 'nonitem' name, and thus the former must be searched
     -- before the latter to avoid falsely matching the wrong entry.
