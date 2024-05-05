@@ -344,10 +344,11 @@ end
 ---- string (sometimes '') depending what the logic says to do.
 ---- Sends a command if the command needs to be changed.
 -----------------------------------------------------------------------------------
+require("logger")
 function interp_text(splitline,offset,modified)
     -- Assume there was not a target suffix on the command.
     local preliminary_action_name = table.concat(splitline,' ',1+offset,splitline.n)
-    local preliminary_action_name_normalized_as_item = strip_non_alphanumeric_keep_plus(preliminary_action_name)
+    local preliminary_action_name_normalized_as_item = strip_non_alphanumeric_keep_plus_fix_hq(preliminary_action_name)
     local preliminary_action_name_normalized_as_nonitem = strip_non_alphanumeric_convert_digits_to_roman(preliminary_action_name)
 
     -- Note: The normalized 'item' name is almost strictly more specific than
@@ -371,9 +372,16 @@ function interp_text(splitline,offset,modified)
     end
 
     -- Re-normalize the action name, but using the finalized name
-    local finalized_action_name_normalized_as_item = strip_non_alphanumeric_keep_plus(finalized_action_name)
+    local finalized_action_name_normalized_as_item = strip_non_alphanumeric_keep_plus_fix_hq(finalized_action_name)
     local finalized_action_name_normalized_as_nonitem = strip_non_alphanumeric_convert_digits_to_roman(finalized_action_name)
 
+    log(preliminary_action_name)
+    log(preliminary_action_name_normalized_as_item)
+    log(preliminary_action_name_normalized_as_nonitem)
+    log('normalized: ', normalized_preliminary_action_name)
+    log('finalized')
+    log(finalized_action_name_normalized_as_item)
+    log(finalized_action_name_normalized_as_nonitem)
     -- Note: The normalized 'item' name is almost strictly more specific than
     -- the normalized 'nonitem' name, and thus the former must be searched
     -- before the latter to avoid falsely matching the wrong entry.

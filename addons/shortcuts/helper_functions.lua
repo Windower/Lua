@@ -107,7 +107,37 @@ function strip_non_alphanumeric_keep_plus(name)
     return name:gsub('[^%w+]',''):lower()
 end
 
+-----------------------------------------------------------------------------------
+--Name: strip_non_alphanumeric_keep_plus_fix_hq()
+--Args:
+---- name (string): Name to be stripped
+-----------------------------------------------------------------------------------
+--Returns:
+---- string with a gsubbed version of name that removes non-alphanumeric characters,
+-------- but allows the character '+', and forces the string to lower-case. Does not
+-------- convert numbers to roman numerals. If the resulting string ends with a 
+-------- number or numbers, will add a + in front of those numbers
+-----------------------------------------------------------------------------------
 
+function strip_non_alphanumeric_keep_plus_fix_hq(name)
+	return name:gsub('[^%w+]',''):lower():gsub('(%d+)$',fixhq):gsub("[+]+", "+")
+	--[[
+	local first_step = name:gsub('[^%w+]',''):lower()
+	local second_step = first_step:gsub('(?<!e)(%d+)',fixhq)
+	local second_step2 = first_step:gsub('(%d+)$',fixhq):gsub("[+]+", "+")
+	local second_step3 = windower.regex.replace(first_step, '(?<=(e)(\\d+))', fixhq)
+	log(first_step)
+	log(second_step)
+	log(second_step2)
+	log(second_step3)
+	return second_step2
+	]]
+end
+
+function fixhq(num)
+	log("here: %s":format(num))
+	return "+" .. num
+end
 -----------------------------------------------------------------------------------
 --Name: to_roman()
 --Args:
