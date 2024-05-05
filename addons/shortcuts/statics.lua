@@ -37,11 +37,11 @@ validabils = {}
 -- List of valid prefixes to be interpreted with the resources. The values currently have no use.
 command_list = {['ja']='job_abilities',['jobability']='job_abilities',['so']='spells',['song']='spells',['ma']='spells',['magic']='spells',['nin']='spells',['ninjutsu']='spells',
 	['ra']='Ranged Attack',['range']='Ranged Attack',['throw']='Ranged Attack',['shoot']='Ranged Attack',['monsterskill']='monster_skills',['ms']='monster_skills',
-	['ws']='weapon_skills',['weaponskill']='weapon_skills',['item']='Ability',['pet']='job_abilities',['mo']='mounts',['mount']='mounts'}
-    
+	['ws']='weapon_skills',['weaponskill']='weapon_skills',['item']='items',['pet']='job_abilities',['mo']='mounts',['mount']='mounts'}
+
 in_game_res_commands = {['ja']='/ja',['jobability']='/ja',['pet']='/ja',
     ['so']='/ma',['song']='/ma',['ma']='/ma',['magic']='/ma',['nin']='/ma',['ninjutsu']='/ma',
-    ['monsterskill']='/ms',['ms']='/ms',['ws']='/ws',['weaponskill']='/ws',
+    ['monsterskill']='/ms',['ms']='/ms',['ws']='/ws',['weaponskill']='/ws',['item']='/item',
 	['ra']='/ra',['range']='/ra',['throw']='/ra',['shoot']='/ra',['mount']='/mo',['mo']='/mo'}
 
 -- List of other commands that might use name completion.
@@ -159,8 +159,8 @@ command2_list = {
     ['returnfaith']=new_cmd_entry(Party_targets,{all=No_targets}),
     ['bstpet']=new_cmd_entry(No_targets,{['1']=BST_targets,['2']=BST_targets,['3']=BST_targets,['4']=BST_targets,['5']=BST_targets,['6']=BST_targets,['7']=BST_targets}),
     }
-	
-unhandled_list = {['p']=true,['s']=true,['sh']=true,['yell']=true,['echo']=true,['t']=true,['l']=true,['breaklinkshell']=true,['item']=true}
+
+unhandled_list = {['p']=true,['s']=true,['sh']=true,['yell']=true,['echo']=true,['t']=true,['l']=true,['breaklinkshell']=true}
 
 -- List of commands to be ignored
 ignore_list = {['equip']=true,['raw']=true,['fish']=true,['dig']=true,['range']=true,['map']=true,['hide']=true,['jump']=true,['attackoff']=true,['quest']=true,['recruitlist']=true,['rlist']=true,['statustimer']=true,['recycle']=true}
@@ -174,7 +174,7 @@ st_targs = T{'<st>','<stpc>','<stal>','<stnpc>','<stpt>'}
 targ_reps = {t='<t>',me='<me>',ft='<ft>',scan='<scan>',bt='<bt>',lastst='<lastst>',r='<r>',pet='<pet>',p0='<p0>',p1='<p1>',p2='<p2>',p3='<p3>',p4='<p4>',
 	p5='<p5>',a10='<a10>',a11='<a11>',a12='<a12>',a13='<a13>',a14='<a14>',a15='<a15>',a20='<a20>',a21='<a21>',a22='<a22>',a23='<a23>',a24='<a24>',a25='<a25>',
 	st='<st>',stpc='<stpc>',stal='<stal>',stnpc='<stnpc>',stpt='<stpt>',focust='<focust>'}
-	
+
 language = 'english' -- windower.ffxi.get_info()['language']:lower()
 
 
@@ -196,9 +196,10 @@ end
 -- Iterate through resources and make validabils.
 function validabils_it(resource)
     for id,v in pairs(res[resource]) do
-        if (not v.monster_level and v.prefix) or (v.monster_level and v.monster_level ~= -1 and v.ja:sub(1,1) ~= '#' ) then
+        if (not v.monster_level and v.prefix) or (v.monster_level and v.monster_level ~= -1 and v.ja:sub(1,1) ~= '#' ) or (v.category == 'Usable') then
         -- Monster Abilities contains a large number of player-usable moves (but not monstrosity-usable). This excludes them.
-            make_abil(strip(v.english),resource,id)
+            local name = resource ~= 'items' and strip_non_alphanumeric_convert_digits_to_roman(v.english) or strip_non_alphanumeric_keep_plus(v.english)
+            make_abil(name,resource,id)
         end
     end
 end
@@ -208,3 +209,4 @@ validabils_it('job_abilities')
 validabils_it('weapon_skills')
 validabils_it('monster_skills')
 validabils_it('mounts')
+validabils_it('items')

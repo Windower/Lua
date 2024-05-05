@@ -80,20 +80,64 @@ function bracket_closer(str,opener,closer)
 end
 
 -----------------------------------------------------------------------------------
---Name: strip()
+--Name: strip_non_alphanumeric_convert_digits_to_roman()
 --Args:
----- name (string): Name to be slugged
+---- name (string): Name to be stripped
 -----------------------------------------------------------------------------------
 --Returns:
 ---- string with a gsubbed version of name that removes non-alphanumeric characters,
 -------- forces the string to lower-case, and converts numbers to Roman numerals,
 -------- which are upper case.
 -----------------------------------------------------------------------------------
-function strip(name)
+function strip_non_alphanumeric_convert_digits_to_roman(name)
 	return name:gsub('[^%w]',''):lower():gsub('(%d+)',to_roman)
 end
 
+-----------------------------------------------------------------------------------
+--Name: strip_non_alphanumeric_keep_plus()
+--Args:
+---- name (string): Name to be stripped
+-----------------------------------------------------------------------------------
+--Returns:
+---- string with a gsubbed version of name that removes non-alphanumeric characters,
+-------- but allows the character '+', and forces the string to lower-case. Does not
+-------- convert numbers to roman numerals.
+-----------------------------------------------------------------------------------
+function strip_non_alphanumeric_keep_plus(name)
+    return name:gsub('[^%w+]',''):lower()
+end
 
+-----------------------------------------------------------------------------------
+--Name: strip_non_alphanumeric_keep_plus_fix_hq()
+--Args:
+---- name (string): Name to be stripped
+-----------------------------------------------------------------------------------
+--Returns:
+---- string with a gsubbed version of name that removes non-alphanumeric characters,
+-------- but allows the character '+', and forces the string to lower-case. Does not
+-------- convert numbers to roman numerals. If the resulting string ends with a 
+-------- number or numbers, will add a + in front of those numbers
+-----------------------------------------------------------------------------------
+
+function strip_non_alphanumeric_keep_plus_fix_hq(name)
+	return name:gsub('[^%w+]',''):lower():gsub('(%d+)$',fixhq):gsub("[+]+", "+")
+	--[[
+	local first_step = name:gsub('[^%w+]',''):lower()
+	local second_step = first_step:gsub('(?<!e)(%d+)',fixhq)
+	local second_step2 = first_step:gsub('(%d+)$',fixhq):gsub("[+]+", "+")
+	local second_step3 = windower.regex.replace(first_step, '(?<=(e)(\\d+))', fixhq)
+	log(first_step)
+	log(second_step)
+	log(second_step2)
+	log(second_step3)
+	return second_step2
+	]]
+end
+
+function fixhq(num)
+	log("here: %s":format(num))
+	return "+" .. num
+end
 -----------------------------------------------------------------------------------
 --Name: to_roman()
 --Args:
@@ -185,6 +229,8 @@ function check_usability(player,resource,id)
     elseif resource == 'monster_skills' and player.main_job_id == 23 and (res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[id] or 0) <= player.main_job_level then
         return true
     elseif resource == 'mounts' and math.floor((windower.packets.last_incoming(0x0AE):byte(math.floor(id/8)+5)%2^(id%8+1))/2^(id%8)) == 1 then
+        return true
+    elseif resource == 'items' then
         return true
     end
 end
