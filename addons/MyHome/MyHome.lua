@@ -39,7 +39,7 @@ log_flag = true
 lang = string.lower(windower.ffxi.get_info().language)
 item_info = {
     [1]={id=28540,japanese='デジョンリング',english='"Warp Ring"',slot=13},
-    [2]={id=17588,japanese='トリートスタッフII',english="Treat Staff II",slot=0},
+    [2]={id=17588,japanese='トリートスタッフII',english='"Treat Staff II"',slot=0},
     [3]={id=17040,japanese='デジョンカジェル',english='"Warp Cudgel"',slot=0},
     [4]={id=4181,japanese='呪符デジョン',english='"Instant Warp"'}}
 
