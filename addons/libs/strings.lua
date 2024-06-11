@@ -110,7 +110,7 @@ do
                 return process(str, from, to, function(byte)
                     return
                         (byte < 0x80 or byte >= 0xA1 and byte <= 0xDF) and 1 or
-                        (byte >= 0x80 and byte <= 0x9F or byte >= 0xE0 and byte <= 0xEF or byte >= 0xFA and byte <= 0xFC) and 2 or
+                        (byte >= 0x1E and byte <= 0x1F or byte >= 0x80 and byte <= 0x9F or byte >= 0xE0 and byte <= 0xEF or byte >= 0xFA and byte <= 0xFC) and 2 or
                         byte == 0xFD and 6
                 end)
             end,
@@ -167,7 +167,7 @@ do
         },
         [string.encoding.shift_jis] = {
             a = shift_jis_letter,
-            c = control,
+            c = function(b) return control(b) or b >= 0x1E00 and b <= 0x1FFF or b >= 0xFD00000000FD and b <= 0xFDFFFFFFFFFD end,
             d = digit,
             l = lower,
             p = function(b) return punctuation(b) or b >= 0x8140 and b <= 0x81FC or b >= 0x849F and b <= 0x84BE or b >= 0x8740 and b <= 0x849C end,
@@ -738,7 +738,7 @@ do
             local pos = 1
             local startpos, endpos
             local match
-            while pos <= to do
+            while pos <= to + 1 do
                 startpos, endpos = str:find(sep, encoding, pos, to, raw)
                 if not startpos then
                     count = count + 1
