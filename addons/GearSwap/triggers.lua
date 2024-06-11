@@ -51,12 +51,12 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
     if splitline.n == 0 then return end
 
     local command = splitline[1]
-    local bstpet = command == '/bstpet'
+    local bstpet = (command == '/bstpet' and tonumber(splitline[2]))
     local unified_prefix = unify_prefix[command]
     local abil, temptarg, temp_mob_arr
     if splitline[2] and not bstpet then
         abil = splitline[2]:gsub(string.char(7),' '):lower() -- Why am I removing \x7?
-    elseif splitline[2] and bstpet and tonumber(splitline[2]) then
+    elseif splitline[2] and bstpet then
         local pet_abilities = {}
         for _,v in ipairs(windower.ffxi.get_abilities().job_abilities) do
             if v >= bstpet_range.min and v <= bstpet_range.max then
