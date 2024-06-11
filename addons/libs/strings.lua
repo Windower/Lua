@@ -167,7 +167,7 @@ do
         },
         [string.encoding.shift_jis] = {
             a = shift_jis_letter,
-            c = function(b) return control(b) or b >= 0x1E00 and b <= 0x1FFF end,
+            c = function(b) return control(b) or b >= 0x1E00 and b <= 0x1FFF or b >= 0xFD00000000FD and b <= 0xFDFFFFFFFFFD end,
             d = digit,
             l = lower,
             p = function(b) return punctuation(b) or b >= 0x8140 and b <= 0x81FC or b >= 0x849F and b <= 0x84BE or b >= 0x8740 and b <= 0x849C end,
@@ -738,7 +738,7 @@ do
             local pos = 1
             local startpos, endpos
             local match
-            while pos <= to do
+            while pos <= to + 1 do
                 startpos, endpos = str:find(sep, encoding, pos, to, raw)
                 if not startpos then
                     count = count + 1
