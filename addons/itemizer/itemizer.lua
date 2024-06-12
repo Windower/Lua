@@ -377,7 +377,13 @@ windower.register_event('outgoing text', function()
             local parsed_text = item_count and text:match(' (.+) (%d+)$') or text:match(' (.+)')
             local mid_name = parsed_text:match('"(.+)"') or parsed_text:match('\'(.+)\'') or parsed_text:match('(.+) ')
             local full_name = parsed_text:match('(.+)')
+			
+			-- Fix to add LUA escape character for the imatch regex below when looking up by ID
+			mid_name = mid_name:gsub('-', '%%-')
+			mid_name = mid_name:gsub('+', '%%+')
+		
             local id = item_names:find(string.imatch-{mid_name}) or item_names:find(string.imatch-{full_name})
+
             if id then
                 if not inventory_items:contains(id) and not wardrobe_items:contains(id) then
                     return reschedule(text, {id}, items)
