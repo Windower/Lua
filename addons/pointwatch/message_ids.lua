@@ -186,10 +186,14 @@ local messages = {
     }
 }
 
+for zone, t in pairs(messages) do
+    t.update = true
+end
+
 local function update_offset(zone_id)
     local z_string = 'z' .. tostring(zone_id)
     local m = messages[z_string]
-    if m and m.name then
+    if m and m.update then
         -- convert dialog entry to dialog ID
         local dialog = require('dialog')
         local search_phrase = string.char(
@@ -211,7 +215,21 @@ local function update_offset(zone_id)
         end
 
         m.offset = res[1]
-        m.name = nil
+        m.update = nil
+        local s = {}
+        local n = 0
+        for zone, t in pairs(messages) do
+            if not t.update then
+                n = n + 1
+                s[n] = t.name .. '\t' .. tostring(t.offset)
+            end
+        end
+        if n > 0 then
+            local f = io.open(windower.addon_path .. '/data/dia.log', 'w')
+            f:write(os.date() .. '\n' .. table.concat(s, '\n'))
+            f:close()
+        end
+    end
     end
 end
 
