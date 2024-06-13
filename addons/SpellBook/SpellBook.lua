@@ -19,7 +19,7 @@ spell_types = {
 }
 
 windower.register_event('addon command', function (command, ...)
-    local args = L{...}
+    local args = {...}
     local jobs = build_job_list()
 
     command = command and command:lower() or 'current'
