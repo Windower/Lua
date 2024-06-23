@@ -28,7 +28,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --]]
 
-
 _addon.name    = "Omen"
 _addon.author  = "Braden, Sechs, Sevu"
 _addon.version = "1.6"
@@ -36,6 +35,7 @@ _addon.commands = {"omen", "om"}
 
 config = require('config')
 texts = require('texts')
+messages = require('messages')
 
 defaults = T{}
 defaults.bg = {alpha = 50, blue = 0, green = 0, red = 0, visible = true}
