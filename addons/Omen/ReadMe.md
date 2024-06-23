@@ -41,6 +41,3 @@ Settings such as UI position, text colors, and visibility can be configured in `
 - Braden
 - Sechs
 - Sevu
-
-## License
-This Addon is licensed under the MIT License - see the `LICENSE` file for details.
