@@ -55,4 +55,4 @@ return {
     init="%d: Restore at least 500 HP %d+ %a+.",
     eval="%d: You have restored at least 500 HP %d+ %a+.",
     fail="%d: You have failed to restore at least 500 HP %d+ %a+."}
-}
+} 
