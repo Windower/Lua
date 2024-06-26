@@ -133,8 +133,8 @@ This is what an example file called `Arcon_THF.lua` in the addon's `data` folder
 
 ```lua
 WAR = {
-    ['Ctrl+2'] = 'input /ja "Provoke" <me>',
-    ['Ctrl+3'] = 'input /ja "Warcry" <me>',
+    ['Ctrl+2'] = 'input /ja "Provoke" <t>',
+    ['Ctrl+3'] = 'input /ja "Warcry" <t>',
     ['Ctrl+4'] = 'input /ja "Aggressor" <me>',
     ['Ctrl+5'] = 'input /ja "Berserk" <me>',
     ['Alt+2'] = 'input /ja "Defender" <me>',
