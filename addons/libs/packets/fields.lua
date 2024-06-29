@@ -3031,12 +3031,12 @@ fields.incoming[0x061] = L{
     {ctype='unsigned short',    label='Attack'},                                -- 30
     {ctype='unsigned short',    label='Defense'},                               -- 32
     {ctype='signed short',      label='Fire Resistance'},                       -- 34
-    {ctype='signed short',      label='Wind Resistance'},                       -- 36
-    {ctype='signed short',      label='Lightning Resistance'},                  -- 38
-    {ctype='signed short',      label='Light Resistance'},                      -- 3A
-    {ctype='signed short',      label='Ice Resistance'},                        -- 3C
-    {ctype='signed short',      label='Earth Resistance'},                      -- 3E
-    {ctype='signed short',      label='Water Resistance'},                      -- 40
+    {ctype='signed short',      label='Ice Resistance'},                        -- 36
+    {ctype='signed short',      label='Wind Resistance'},                       -- 38
+    {ctype='signed short',      label='Earth Resistance'},                      -- 3A
+    {ctype='signed short',      label='Lightning Resistance'},                  -- 3C
+    {ctype='signed short',      label='Water Resistance'},                      -- 3E
+    {ctype='signed short',      label='Light Resistance'},                      -- 40
     {ctype='signed short',      label='Dark Resistance'},                       -- 42
     {ctype='unsigned short',    label='Title',           fn=title},             -- 44
     {ctype='unsigned short',    label='Nation rank'},                           -- 46
