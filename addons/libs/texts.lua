@@ -589,6 +589,10 @@ function texts.hover(t, x, y)
 
     local pos_x, pos_y = windower.text.get_location(meta[t].name)
     local off_x, off_y = windower.text.get_extents(meta[t].name)
+
+    if meta[t].settings.flags.right then
+        pos_x = pos_x - off_x
+    end
     
     return (pos_x <= x and x <= pos_x + off_x
         or pos_x >= x and x >= pos_x + off_x)
