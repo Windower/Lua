@@ -192,7 +192,9 @@ storages_order         = S(res.bags:map(string.gsub-{' ', ''} .. string.lower ..
 
     return index1 < index2
 end)
-storage_slips_order    = L{'slip 01', 'slip 02', 'slip 03', 'slip 04', 'slip 05', 'slip 06', 'slip 07', 'slip 08', 'slip 09', 'slip 10', 'slip 11', 'slip 12', 'slip 13', 'slip 14', 'slip 15', 'slip 16', 'slip 17', 'slip 18', 'slip 19', 'slip 20', 'slip 21', 'slip 22', 'slip 23', 'slip 24', 'slip 25', 'slip 26', 'slip 27', 'slip 28', 'slip 29', 'slip 30'}
+local storage_slips_order = slips.storages:map(function(id)
+    return 'slip ' .. res.items[id].english:lower():match('^storage slip (.*)$')
+end)
 merged_storages_orders = storages_order + storage_slips_order + L{'key items'}
 
 function search(query, export)    
