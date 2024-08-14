@@ -190,17 +190,14 @@ dialog.decode_string = dialog.encode_string
 -- return a file descriptor for it in "read/binary" mode.
 function dialog.open_dat_by_zone_id(zone_id, language)
     local dat_id
-    if zone_id > 299 then
-        -- The English dialog files are currently 300 ids
-        -- ahead of the Japanese dialog files. If a zone with
-        -- id 300 or greater is added, SE will have to move to
-        -- a new range of ids which someone will need to locate.
-        print('Dialog library: zone id out of range.')
-        return
-    elseif zone_id > 255 then
-        dat_id = zone_id + 85035
+    if zone_id < 1000 or zone_id > 1299 then
+        if zone_id > 255 then
+            dat_id = zone_id + 85035
+        else
+            dat_id = zone_id + 6120
+        end
     else
-        dat_id = zone_id + 6120
+        dat_id = zone_id + 67211
     end
     if language == 'english' then
         dat_id = dat_id + 300
