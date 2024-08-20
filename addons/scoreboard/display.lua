@@ -201,7 +201,7 @@ function Display:update()
             else
                 percent = '(0%)'
             end
-            display_table:append('%-25s%7d%8s %7s':format(v[1], v[2], percent, dps))
+            display_table:append('%-25s%7.0f%8s %7s':format(v[1], v[2], percent, dps))
         end
         alli_damage = alli_damage + v[2] -- gather this even for players not displayed
         player_lines = player_lines + 1
@@ -283,7 +283,7 @@ function Display:report_summary (...)
 
     local elements = T{}
     for k, v in pairs(damage_table) do
-        elements:append('%s %d(%.1f%%)':format(v[1], v[2], 100 * v[2]/total_damage))
+        elements:append('%s %.0f(%.1f%%)':format(v[1], v[2], 100 * v[2]/total_damage))
     end
 
     -- Send the report to the specified chatmode
