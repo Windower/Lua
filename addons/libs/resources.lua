@@ -176,7 +176,7 @@ bit_slots = {
     },
     flags = {
         values = {
-            [0x0001] = 'Flag00',
+            [0x0001] = 'Wall-mounted',
             [0x0002] = 'Flag01',
             [0x0004] = 'Obtainable from Goblin Box',
             [0x0008] = 'Usable inside Mog Garden',
