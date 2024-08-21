@@ -757,16 +757,25 @@ parse.o[0x100] = function(data)
     end
 end
 
+
 function initialize_packet_parsing()
+    local packets_queue = {}
+    local packets_order = {}
+
     for i,v in pairs(parse.i) do
         if i ~= 0x028 then
-            local lastpacket = windower.packets.last_incoming(i)
-            if lastpacket then
-                v(lastpacket)
-            end
-            if i == 0x63 and lastpacket and lastpacket:byte(5) ~= 9 then
-                -- Not receiving an accurate buff line on load because the wrong 0x063 packet was sent last
+            local p, ts = windower.packets.last_incoming(i)
+            if p then
+                packets_queue[ts] = { id = i, data = p }
+                packets_order[#packets_order +1] = ts
             end
         end
+    end
+    
+    table.sort(packets_order)
+    
+    for _,ts in ipairs(packets_order) do
+        local p = packets_queue[ts]
+        parse.i[p.id](p.data)
     end
 end
