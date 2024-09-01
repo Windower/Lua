@@ -25,39 +25,42 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 function export_set(options)
-    local item_list = T{}
-    local targinv,all_items,minify,all_sets,use_job_in_filename,use_subjob_in_filename,overwrite_existing,named_file
-    if #options > 0 then
-        for _,v in ipairs(options) do
-            if S{'inventory','inv','i'}:contains(v:lower()) then
-                targinv = true
-            elseif v:lower() == 'all' then
-                all_items = true
-            elseif v:lower() == 'wearable' then
-                wearable = true
-            elseif S{'mini'}:contains(v:lower()) then
-                minify = true
-            elseif S{'sets','set','s'}:contains(v:lower()) then
-                all_sets = true
-                if not user_env or not user_env.sets then
-                    msg.addon_msg(123,'Cannot export the sets table of the current file because there is no file loaded.')
-                    return
-                end
-            elseif v:lower() == 'mainjob' then
-                use_job_in_filename = true
-            elseif v:lower() == 'mainsubjob' then
-                use_subjob_in_filename = true
-            elseif v:lower() == 'overwrite' then
-                overwrite_existing = true
-            elseif S{'filename','file','f'}:contains(v:lower()) then
-                named_file = true
-            else
-                if named_file then
-                    filename = v
-                end
+    local named_file = false
+    local filename = false
+    for i=1,#options do
+        if S{'filename','file','f'}:contains(options[i]) then
+            filename = table.remove(options,i+1)
+            if not filename then
+                msg.addon_msg(123,'Cannot export to named file because a filename was not provided.')
+                return
             end
+            named_file = table.remove(options,i)
+            break
         end
     end
+
+    local options = S(options):map(string.lower)
+
+    local targinv = not (options* S{'inventory','inv','i'}):empty()
+    local all_items = options:contains('all')
+    local wearable = options:contains('wearable')
+    local all_sets = not (options * S{'sets','set','s'}):empty()
+    if all_sets and (not user_env or not user_env.sets) then
+        msg.addon_msg(123,'Cannot export the sets table of the current file because there is no file loaded.')
+        return
+    end
+
+    local noaugments = not (options * S{'noaugments','noaugs'}):empty()
+    if noaugments then onlyaugmented = false end
+
+    local onlyaugmented = not (options * S{'onlyaugmented','onlyaugs'}):empty()
+    if onlyaugmented then noaugments = false end
+
+    local minify = not (options * S{'mini','minify'}):empty()
+    local clipboard = not (options * S{'copy','clipboard'}):empty()
+    local use_job_in_filename = options:contains('mainjob')
+    local use_subjob_in_filename = options:contains('mainsubjob')
+    local overwrite_existing = options:contains('overwrite')
 
     local buildmsg = 'Exporting '
     if all_items then
@@ -72,26 +75,34 @@ function export_set(options)
         buildmsg = buildmsg..'your currently equipped gear'
     end
 
-    buildmsg = buildmsg..' as a lua file.'
-
-    if use_job_in_filename then
-        buildmsg = buildmsg..' (Naming format: Character_JOB)'
-    elseif use_subjob_in_filename then
-        buildmsg = buildmsg..' (Naming format: Character_JOB_SUB)'
-    elseif named_file then
-        buildmsg = buildmsg..' (Named: Character_'..filename..')'
+    if noaugments then
+        buildmsg = buildmsg..' (omitting augments)'
+    elseif onlyaugmented then
+        buildmsg = buildmsg..' (only augmented items)'
     end
 
-    if overwrite_existing then
-        buildmsg = buildmsg..' Will overwrite existing files with same name.'
+    if clipboard then
+        buildmsg = buildmsg..' to clipboard.'
+    else
+        buildmsg = buildmsg..' as a lua file.'
+
+        if use_job_in_filename then
+            buildmsg = buildmsg..' (Naming format: Character_JOB)'
+        elseif use_subjob_in_filename then
+            buildmsg = buildmsg..' (Naming format: Character_JOB_SUB)'
+        elseif named_file then
+            buildmsg = buildmsg..' (Named: Character_'..filename..')'
+        end
+
+        if overwrite_existing then
+            buildmsg = buildmsg..' Will overwrite existing files with same name.'
+        end
     end
+
 
     msg.addon_msg(123,buildmsg)
 
-    if not windower.dir_exists(windower.addon_path..'data/export') then
-        windower.create_dir(windower.addon_path..'data/export')
-    end
-
+    local item_list = T{}
     if all_items then
         for i = 0, #res.bags do
             item_list:extend(get_item_list(items[res.bags[i].english:gsub(' ', ''):lower()]))
@@ -126,13 +137,15 @@ function export_set(options)
                         name = res.items[item_tab.id][language],
                         slot = slot_name
                         }
-                    local augments = extdata.decode(item_tab).augments or {}
-                    local aug_str = ''
-                    for aug_ind,augment in pairs(augments) do
-                        if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
-                    end
-                    if string.len(aug_str) > 0 then
-                        item_list[slot_map[slot_name]+1].augments = aug_str
+                    if not noaugments then
+                        local augments = extdata.decode(item_tab).augments or {}
+                        local aug_str = ''
+                        for aug_ind,augment in pairs(augments) do
+                            if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
+                        end
+                        if string.len(aug_str) > 0 then
+                            item_list[slot_map[slot_name]+1].augments = aug_str
+                        end
                     end
                 else
                     msg.addon_msg(123,'You are wearing an item that is not in the resources yet.')
@@ -158,56 +171,49 @@ function export_set(options)
         end
     end
 
+    local output = 'sets.exported={\n'
 
-    if not windower.dir_exists(windower.addon_path..'data/export') then
-        windower.create_dir(windower.addon_path..'data/export')
-    end
-
-    local path = windower.addon_path..'data/export/'..player.name
-
-    if use_job_in_filename then
-        path = path..'_'..windower.ffxi.get_player().main_job
-    elseif use_subjob_in_filename then
-        path = path..'_'..windower.ffxi.get_player().main_job..'_'..windower.ffxi.get_player().sub_job
-    elseif named_file then
-        path = path..'_'..filename
-    else
-        path = path..os.date(' %Y-%m-%d %H-%M-%S')
-    end
-
-    if (not overwrite_existing) and windower.file_exists(path..'.lua') then
-        path = path..' '..os.clock()
-    end
-
-    local f = io.open(path..'.lua','w+')
-    if minify then
-        f:write('sets.exported={\n')
-        for i,v in ipairs(item_list) do
-            if v.name ~= empty then
-                if v.augments then
-                    --Advanced set table
-                    f:write(v.slot..'={ name="'..v.name..'", augments={'..v.augments..'}},')
-                else
-                    f:write(v.slot..'="'..v.name..'",')
-                end
+    local newline = minify and '' or '\n'
+    for i,v in ipairs(item_list) do
+        if v.name ~= empty then
+            if v.augments then
+                --Advanced set table
+                output = output .. '    '..v.slot..'={ name="'..v.name..'", augments={'..v.augments..'}},'..newline
+            elseif not onlyaugmented then
+                output = output .. '    '..v.slot..'="'..v.name..'",'..newline
             end
         end
-        f:write('\n}')
-    else
-        f:write('sets.exported={\n')
-        for i,v in ipairs(item_list) do
-            if v.name ~= empty then
-                if v.augments then
-                    --Advanced set table
-                    f:write('    '..v.slot..'={ name="'..v.name..'", augments={'..v.augments..'}},\n')
-                else
-                    f:write('    '..v.slot..'="'..v.name..'",\n')
-                end
-            end
-        end
-        f:write('}')
     end
-    f:close()
+    output = output .. '}'
+
+    if clipboard then
+        windower.copy_to_clipboard(output)
+    else
+
+        if not windower.dir_exists(windower.addon_path..'data/export') then
+            windower.create_dir(windower.addon_path..'data/export')
+        end
+
+        local path = windower.addon_path..'data/export/'..player.name
+
+        if use_job_in_filename then
+            path = path..'_'..windower.ffxi.get_player().main_job
+        elseif use_subjob_in_filename then
+            path = path..'_'..windower.ffxi.get_player().main_job..'_'..windower.ffxi.get_player().sub_job
+        elseif named_file then
+            path = path..'_'..filename
+        else
+            path = path..os.date(' %Y-%m-%d %H-%M-%S')
+        end
+
+        if (not overwrite_existing) and windower.file_exists(path..'.lua') then
+            path = path..' '..os.clock()
+        end
+
+        local f = io.open(path..'.lua','w+')
+        f:write(output)
+        f:close()
+    end
 end
 
 function unpack_names(ret_tab,up,tab_level,unpacked_table,exported)
