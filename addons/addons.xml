@@ -858,4 +858,11 @@
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>https://github.com/lili-ffxi</support>
   </addon>
+  <addon>
+    <name>AutoEx</name>
+    <author>Elidyr</author>
+    <description>AutoExec Add-on Replacement</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://github.com/eLiidyr</support>
+  </addon>
 </addons>
