@@ -177,7 +177,7 @@ slot_map.back = 15
 
 
 
-gearswap_disabled = false
+gearswap_disabled = true
 seen_0x063_type9 = false
 delay_0x063_v9 = false
 vana_offset = 572662306+1009810800
