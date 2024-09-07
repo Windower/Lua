@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'GearSwap'
-_addon.version = '0.938'
+_addon.version = '0.939'
 _addon.author = 'Byrth'
 _addon.commands = {'gs','gearswap'}
 
@@ -131,6 +131,7 @@ require 'flow'
 require 'triggers'
 
 initialize_packet_parsing()
+gearswap_disabled = false
 
 windower.register_event('load',function()
     windower.debug('load')
