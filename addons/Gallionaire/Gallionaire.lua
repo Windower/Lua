@@ -85,31 +85,36 @@ function induct_data()
     if not windower.ffxi.get_info().logged_in then
         return
     end
-    
     local packet = packets.new('outgoing', 0x115, {})
     packets.inject(packet)
 end
 
 initialization()
 
-windower.register_event('incoming chunk',function(id,org,modi,is_injected,is_blocked)
-    if is_injected then return end
-    if id ~= 0x118 then
+local last_update_time = 0
+local update_interval = 5 -- might want to adjust this 
+
+windower.register_event('incoming chunk',function(id, org, modi, is_injected, is_blocked)
+    if is_injected or id ~= 0x118 then return end
+    local current_time = os.clock()
+    if current_time - last_update_time < update_interval then
         return
     end
     
     local p = packets.parse('incoming', org)
     local new_gallimaufry = p["Gallimaufry"]
 
-if start_up then
+    if start_up then
         previous_gallimaufry = new_gallimaufry
         start_up = false
-else
-		earned_gallimaufry = earned_gallimaufry + (new_gallimaufry - previous_gallimaufry)
-end
-		previous_gallimaufry = new_gallimaufry
-		update_display()
+    elseif new_gallimaufry ~= previous_gallimaufry then
+        earned_gallimaufry = earned_gallimaufry + (new_gallimaufry - previous_gallimaufry)
+        previous_gallimaufry = new_gallimaufry
+        update_display()
+    end
+    last_update_time = current_time
 end)
+
 
 -- Display settings
 local settings = config.load({
@@ -131,7 +136,7 @@ local gallimaufry_record = settings.gallimaufry_record
 local in_sortie_zone = false
 local thresholds = {10000, 20000, 30000, 40000, 50000, 60000}
 
--- For displaying inspirational message at milestones and play sounds
+-- Function to display inspirational message at milestones and play sounds
 last_threshold = 0
 
 function display_message(earned_gallimaufry)
@@ -168,7 +173,7 @@ local function interpolate_color(start_color, end_color, fraction)
     return {red = red, green = green, blue = blue}
 end
 
--- Determines the color based on gallimaufry count
+-- Function to determine the interpolated color based on gallimaufry count
 local function determine_color(gallimaufry)
     local thresholds = {
         {value = 0, color = {red = 255, green = 0, blue = 0}},       -- Red
@@ -210,7 +215,7 @@ local shard_metal_ids = {
 
 
 local function has_item(item_id)
-    local temp_items = windower.ffxi.get_items(3)  
+    local temp_items = windower.ffxi.get_items(3) 
     for _, item in ipairs(temp_items) do
         if item.id == item_id then
             return true
@@ -219,10 +224,9 @@ local function has_item(item_id)
     return false
 end
 
-
+-- Function to generate the display string for the shards and metals
 local function get_sector_display()
     local display_str = ""
-
     local displayed_keys = { "A", "B", "C", "D", "E", "F", "G", "H" }
     for _, sector in ipairs(displayed_keys) do
         local ids = shard_metal_ids[sector]
@@ -233,7 +237,6 @@ local function get_sector_display()
     return display_str
 end
 
--- Function to update the display text
 function update_display()
 
 		
@@ -258,18 +261,16 @@ function update_display()
         -- Update display with formatted text
         display:text(text)
         
-        -- Display message based on earned_gallimaufry
         display_message(earned_gallimaufry)
 
 end
-math.randomseed(os.time())
-local function generate_random_number(min,max)
-    -- Seed the RNG using the time
-    
 
-    -- Generate and return a random number 
+math.randomseed(os.time())
+
+local function generate_random_number(min,max)
     return math.random(min, max)
 end
+
 --[[
 	 text we want to listen for and associated soundclips,  using this dictionary table structure; one can define as many scenarios as desired.
 	 this is setup for the MB setup, but could be modified to include the melee method, just copy these dictionary lines and add the weaponskills you are likely to 
@@ -392,7 +393,7 @@ windower.register_event('addon command', function(...)
     end
 end)
 
--- Save to record when the addon is unloaded or the player zones out
+-- Save the record when the addon is unloaded or the player zones out
 function save_record()
     if earned_gallimaufry > 1 and earned_gallimaufry > gallimaufry_record then
         gallimaufry_record = earned_gallimaufry
@@ -415,7 +416,6 @@ local function check_zone()
     if zone_id == 275 or zone_id == 133 or zone_id == 189 then 
 		in_sortie_zone = true
 		coroutine.schedule(function()
-          -- display:show()
 		   update_display()
        end, 2) 
 
@@ -423,9 +423,7 @@ local function check_zone()
 		save_record()
 		in_sortie_zone = false
 		coroutine.schedule(function()
-        --    display:hide()
         end, 1) 
-        --windower.add_to_chat(207, 'Not in Sortie zone.')
     end
 end
 
