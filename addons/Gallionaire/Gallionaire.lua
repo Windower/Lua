@@ -131,7 +131,7 @@ local gallimaufry_record = settings.gallimaufry_record
 local in_sortie_zone = false
 local thresholds = {10000, 20000, 30000, 40000, 50000, 60000}
 
--- Function to display inspirational message at milestones and play sounds
+-- For displaying inspirational message at milestones and play sounds
 last_threshold = 0
 
 function display_message(earned_gallimaufry)
@@ -168,7 +168,7 @@ local function interpolate_color(start_color, end_color, fraction)
     return {red = red, green = green, blue = blue}
 end
 
--- Function to determine the interpolated color based on gallimaufry count
+-- Determines the color based on gallimaufry count
 local function determine_color(gallimaufry)
     local thresholds = {
         {value = 0, color = {red = 255, green = 0, blue = 0}},       -- Red
@@ -196,6 +196,43 @@ function format_with_commas(amount)
     local formatted = tostring(amount):reverse():gsub("(%d%d%d)", "%1,"):reverse()
     return formatted:sub(1,1) == "," and formatted:sub(2) or formatted
 end
+
+local shard_metal_ids = {
+    A = { shard = 9906, metal = 9918 },  
+    B = { shard = 9907, metal = 9919 },
+    C = { shard = 9908, metal = 9920 },
+    D = { shard = 9909, metal = 9921 },
+    E = { shard = 9910, metal = 9922 },
+    F = { shard = 9911, metal = 9923 },
+    G = { shard = 9912, metal = 9924 },
+    H = { shard = 9913, metal = 9925 },
+}
+
+
+local function has_item(item_id)
+    local temp_items = windower.ffxi.get_items(3)  
+    for _, item in ipairs(temp_items) do
+        if item.id == item_id then
+            return true
+        end
+    end
+    return false
+end
+
+
+local function get_sector_display()
+    local display_str = ""
+
+    local displayed_keys = { "A", "B", "C", "D", "E", "F", "G", "H" }
+    for _, sector in ipairs(displayed_keys) do
+        local ids = shard_metal_ids[sector]
+        local shard_color = has_item(ids.shard) and "\\cs(0,255,0)🟢\\cr" or "⚪"
+        local metal_color = has_item(ids.metal) and "\\cs(0,255,0)🟢\\cr" or "⚪"
+        display_str = display_str .. sector .. ": " .. shard_color .. metal_color .. "  "
+    end
+    return display_str
+end
+
 -- Function to update the display text
 function update_display()
 
@@ -204,14 +241,16 @@ function update_display()
         local color = determine_color(earned_gallimaufry)
         
         -- Format the text with earned_gallimaufry in a specific color
-        local text = string.format(
-            'Gallimaufry: %s / %s    |   Instance Record: %s   |   \\cs(%d,%d,%d)Instance Gallimaufry: %s\\cr',
-            format_with_commas(previous_gallimaufry),
-			format_with_commas(gallimaufryGoal),
-            format_with_commas(gallimaufry_record),
-            color.red, color.green, color.blue,
-            format_with_commas(earned_gallimaufry)
-        )
+         local shard_metal_display = get_sector_display()
+		local text = string.format(
+        'Gallimaufry: %s / %s    |   Instance Record: %s   |   \\cs(%d,%d,%d)Instance Gallimaufry: %s\\cr   Shard/Metal  %s',
+        format_with_commas(previous_gallimaufry),
+        format_with_commas(gallimaufryGoal),
+        format_with_commas(gallimaufry_record),
+        color.red, color.green, color.blue,
+        format_with_commas(earned_gallimaufry),
+        shard_metal_display
+    )
         -------------  ***    Fonts   Verdana   Impact    Lucida Console    Verdana and impact were close 2nd and 3rd
         -- white
         display:color(255, 255, 255)
@@ -279,7 +318,7 @@ windower.register_event('incoming text', function(original, modified, original_m
 				windower.play_sound(data.sound2)
 					end
 				end
-				break -- Exit the loop after matching text
+				break 
 			end
 		end
 	end
@@ -312,23 +351,11 @@ local function toggleSound()
 	config.save(settings)
 end
 
---[[
-windower.register_event('status change', function(new_status_id, old_status_id)
-	if new_status_id == 1 then 
-		local target = windower.ffxi.get_mob_by_target('t') 
-			if target and (target.name == "Ghatjot" or target.name == "Dhartok" or target.name == "Degei" or target.name == "Skomora" or
-			target.name == "Triboulex" or target.name == "Leshonn" or target.name == "Gartell" or target.name == "Aita") then
-				windower.add_to_chat(123, 'You have entered combat!')
-				windower.play_sound(sound_paths.metal)
-			end
-	end
-end)
-]]
 windower.register_event('login', function(name)
     player_name = name
 end)
 
--- Addon commands
+-- Commands
 windower.register_event('addon command', function(...)
     local args = {...}
     if args[1] == 'setgoal' and tonumber(args[2]) then
@@ -365,7 +392,7 @@ windower.register_event('addon command', function(...)
     end
 end)
 
--- Save the highest record when the addon is unloaded or the player zones out
+-- Save to record when the addon is unloaded or the player zones out
 function save_record()
     if earned_gallimaufry > 1 and earned_gallimaufry > gallimaufry_record then
         gallimaufry_record = earned_gallimaufry
@@ -425,3 +452,13 @@ notice('Welcome to Gallionaire \n//ga help  for a list of commands.')
             check_zone()
         end , 1)
 end)
+
+function display_updatinator()
+	local currentzone = windower.ffxi.get_info()['zone']
+	while(zone_id == 275 or zone_id == 133 or zone_id == 189) do
+
+		update_display()
+		coroutine.sleep(5)
+	end 
+end
+display_updatinator()
