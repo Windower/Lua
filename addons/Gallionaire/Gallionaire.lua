@@ -299,7 +299,7 @@ local function contains_all_words(text, words)
 end
 
 windower.register_event('incoming text', function(original, modified, original_mode, modified_mode)
-    if toggle_sound then--and (zone_id == 275 or zone_id == 133 or zone_id == 189) 
+    if toggle_sound and (zone_id == 275 or zone_id == 133 or zone_id == 189) then
 		for _, data in pairs(scenarios) do
 			if contains_all_words(original, data.words) then
 				randomNumber = generate_random_number(1,18)
