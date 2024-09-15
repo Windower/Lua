@@ -25,7 +25,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 --[[
     Gallimaufry Tracker addon for Windower 4
-    Tracks gallimaufry earned in Sortie per run, total held and goal and displays it on screen
+    Tracks gallimaufry earned in Sortie per run, total held and displays it on screen
     with messages and sound effects at gallimaufry thresholds.
     More to come!
 ]]
@@ -118,14 +118,14 @@ end)
 
 -- Display settings
 local settings = config.load({
-    pos = {x = 100, y = 100},
+    pos = {x = 301, y = -5},
     bg = {alpha = 255, red = 0, green = 0, blue = 40},
-    text = {size = 12, font = 'Comic Sans MS', red = 255, green = 255, blue = 255},
-    padding = 6,
+    text = {size = 10, font = 'Comic Sans MS', red = 255, green = 255, blue = 255},
+    padding = 1,
     gallimaufry_record = 0,
-    gallimaufryGoal = 2500000
+    --gallimaufryGoal = 2500000
 })
-	gallimaufryGoal = settings.gallimaufryGoal
+	--gallimaufryGoal = settings.gallimaufryGoal
 -- UI elements
 local display = texts.new('', settings, settings)
 display:pos(settings.pos.x, settings.pos.y)
@@ -215,7 +215,7 @@ local shard_metal_ids = {
 
 
 local function has_item(item_id)
-    local temp_items = windower.ffxi.get_items(3) 
+    local temp_items = windower.ffxi.get_items(0) 
     for _, item in ipairs(temp_items) do
         if item.id == item_id then
             return true
@@ -230,9 +230,9 @@ local function get_sector_display()
     local displayed_keys = { "A", "B", "C", "D", "E", "F", "G", "H" }
     for _, sector in ipairs(displayed_keys) do
         local ids = shard_metal_ids[sector]
-        local shard_color = has_item(ids.shard) and "\\cs(0,255,0)🟢\\cr" or "⚪"
-        local metal_color = has_item(ids.metal) and "\\cs(0,255,0)🟢\\cr" or "⚪"
-        display_str = display_str .. sector .. ": " .. shard_color .. metal_color .. "  "
+        local shard_color = has_item(ids.shard) and "\\cs(0,255,0)√\\cr" or " "
+        local metal_color = has_item(ids.metal) and "\\cs(0,255,0)√\\cr" or " "
+        display_str = display_str .. sector .. ":" .. shard_color .."|".. metal_color .. " "
     end
     return display_str
 end
@@ -246,9 +246,8 @@ function update_display()
         -- Format the text with earned_gallimaufry in a specific color
          local shard_metal_display = get_sector_display()
 		local text = string.format(
-        'Gallimaufry: %s / %s    |   Instance Record: %s   |   \\cs(%d,%d,%d)Instance Gallimaufry: %s\\cr   Shard/Metal  %s',
+        'Gallimaufry: %s   |   Instance Record: %s   |   \\cs(%d,%d,%d)Instance Gallimaufry:  %s\\cr  |  Shard/Metal  %s  ',
         format_with_commas(previous_gallimaufry),
-        format_with_commas(gallimaufryGoal),
         format_with_commas(gallimaufry_record),
         color.red, color.green, color.blue,
         format_with_commas(earned_gallimaufry),
@@ -265,12 +264,12 @@ function update_display()
 
 end
 
+
 math.randomseed(os.time())
 
 local function generate_random_number(min,max)
     return math.random(min, max)
 end
-
 --[[
 	 text we want to listen for and associated soundclips,  using this dictionary table structure; one can define as many scenarios as desired.
 	 this is setup for the MB setup, but could be modified to include the melee method, just copy these dictionary lines and add the weaponskills you are likely to 
@@ -300,7 +299,7 @@ local function contains_all_words(text, words)
 end
 
 windower.register_event('incoming text', function(original, modified, original_mode, modified_mode)
-    if toggle_sound and (zone_id == 275 or zone_id == 133 or zone_id == 189) then
+    if toggle_sound then--and (zone_id == 275 or zone_id == 133 or zone_id == 189) 
 		for _, data in pairs(scenarios) do
 			if contains_all_words(original, data.words) then
 				randomNumber = generate_random_number(1,18)
@@ -319,12 +318,17 @@ windower.register_event('incoming text', function(original, modified, original_m
 				windower.play_sound(data.sound2)
 					end
 				end
-				break 
+				break
 			end
 		end
 	end
     local text,mode = modified, tonumber(original_mode)
-    
+	if string.find(text, _addon.name) or (not string.find(text, 'metal') or string.find(text, 'shard')) then
+    update_display()
+    coroutine.sleep(2)
+    return
+	end
+
     if mode ~= 121 and mode ~= 148 then
         return
     end
@@ -359,6 +363,7 @@ end)
 -- Commands
 windower.register_event('addon command', function(...)
     local args = {...}
+--[[
     if args[1] == 'setgoal' and tonumber(args[2]) then
         local new_goal = tonumber(args[2])
         gallimaufryGoal = new_goal
@@ -366,7 +371,8 @@ windower.register_event('addon command', function(...)
         config.save(settings)
         windower.add_to_chat(207, 'Gallimaufry goal set to ' .. new_goal)
         update_display()
-    elseif args[1] == 'reset' then
+]]
+    if args[1] == 'reset' then
         earned_gallimaufry = 0
         update_display()
 	elseif args[1] == 'reload' or args[1] == 'r' then
@@ -381,8 +387,8 @@ windower.register_event('addon command', function(...)
         display:hide()
 	elseif args[1] == 'help' then
         windower.add_to_chat(200,'Gallionaire help:')
-        windower.add_to_chat(200,'Commands: \n//ga setgoal\n//ga reset\n//ga save / s\n//ga toggle / t\n//ga reload / r ')
-        windower.add_to_chat(200,'setgoal #####: changes the gallimaufry goal amount')
+        windower.add_to_chat(200,'Commands: \n//ga reset\n//ga save / s\n//ga toggle / t\n//ga reload / r ')
+        --windower.add_to_chat(200,'setgoal #####: changes the gallimaufry goal amount')
         windower.add_to_chat(200,'reset : sets the earned gallimaufry to 0 ')
         windower.add_to_chat(200,'save / s: saves earned to Record if greater #')
 		windower.add_to_chat(200,'togglesound / ts: toggle sound fx off & on (default On).')
@@ -393,7 +399,7 @@ windower.register_event('addon command', function(...)
     end
 end)
 
--- Save the record when the addon is unloaded or the player zones out
+-- Save the highest record when the addon is unloaded or the player zones out
 function save_record()
     if earned_gallimaufry > 1 and earned_gallimaufry > gallimaufry_record then
         gallimaufry_record = earned_gallimaufry
@@ -453,7 +459,7 @@ end)
 
 function display_updatinator()
 	local currentzone = windower.ffxi.get_info()['zone']
-	while(zone_id == 275 or zone_id == 133 or zone_id == 189) do
+	while(currentzone == 275 or currentzone == 133 or currentzone == 189) do
 
 		update_display()
 		coroutine.sleep(5)
