@@ -215,7 +215,7 @@ local shard_metal_ids = {
 
 
 local function has_item(item_id)
-    local temp_items = windower.ffxi.get_items(0) 
+    local temp_items = windower.ffxi.get_items(3) 
     for _, item in ipairs(temp_items) do
         if item.id == item_id then
             return true
