@@ -28,7 +28,7 @@
 
 _addon.name = 'invtracker'
 _addon.author = 'sylandro'
-_addon.version = '1.0.0'
+_addon.version = '1.0.1'
 _addon.language = 'English'
 
 config = require('config')
@@ -382,6 +382,10 @@ function update_treasure_only()
         skip_block_if_enabled(s.mogWardrobe.visible,items.enabled_wardrobe2,s.mogWardrobe.maxColumns,items.max_wardrobe2)
         skip_block_if_enabled(s.mogWardrobe.visible,items.enabled_wardrobe3,s.mogWardrobe.maxColumns,items.max_wardrobe3)
         skip_block_if_enabled(s.mogWardrobe.visible,items.enabled_wardrobe4,s.mogWardrobe.maxColumns,items.max_wardrobe4)
+        skip_block_if_enabled(s.mogWardrobe.visible,items.enabled_wardrobe5,s.mogWardrobe.maxColumns,items.max_wardrobe5)
+        skip_block_if_enabled(s.mogWardrobe.visible,items.enabled_wardrobe6,s.mogWardrobe.maxColumns,items.max_wardrobe6)
+        skip_block_if_enabled(s.mogWardrobe.visible,items.enabled_wardrobe7,s.mogWardrobe.maxColumns,items.max_wardrobe7)
+        skip_block_if_enabled(s.mogWardrobe.visible,items.enabled_wardrobe8,s.mogWardrobe.maxColumns,items.max_wardrobe8)
         skip_block_if_enabled(s.tempInventory.visible,true,s.tempInventory.maxColumns,items.temporary.max)
         update_treasure_bag(s.treasury,items.treasure)
     end
@@ -402,7 +406,11 @@ function update_if_different_size(packet_data)
           or size_changed(s.mogWardrobe.visible,items.enabled_wardrobe,items.max_wardrobe,p['Wardrobe Size'])
           or size_changed(s.mogWardrobe.visible,items.enabled_wardrobe2,items.max_wardrobe2,p['Wardrobe 2 Size'])
           or size_changed(s.mogWardrobe.visible,items.enabled_wardrobe3,items.max_wardrobe3,p['Wardrobe 3 Size'])
-          or size_changed(s.mogWardrobe.visible,items.enabled_wardrobe4,items.max_wardrobe4,p['Wardrobe 4 Size']) then
+          or size_changed(s.mogWardrobe.visible,items.enabled_wardrobe4,items.max_wardrobe4,p['Wardrobe 4 Size'])
+          or size_changed(s.mogWardrobe.visible,items.enabled_wardrobe5,items.max_wardrobe5,p['Wardrobe 5 Size'])		  
+          or size_changed(s.mogWardrobe.visible,items.enabled_wardrobe6,items.max_wardrobe6,p['Wardrobe 6 Size'])		  
+          or size_changed(s.mogWardrobe.visible,items.enabled_wardrobe7,items.max_wardrobe7,p['Wardrobe 7 Size'])		  
+          or size_changed(s.mogWardrobe.visible,items.enabled_wardrobe8,items.max_wardrobe8,p['Wardrobe 8 Size']) then
             refresh_all = true
         end
     end
@@ -454,6 +462,10 @@ function update_items()
     update_bag(s.mogWardrobe,items.wardrobe2,items.max_wardrobe2,items.enabled_wardrobe2)
     update_bag(s.mogWardrobe,items.wardrobe3,items.max_wardrobe3,items.enabled_wardrobe3)
     update_bag(s.mogWardrobe,items.wardrobe4,items.max_wardrobe4,items.enabled_wardrobe4)
+    update_bag(s.mogWardrobe,items.wardrobe5,items.max_wardrobe5,items.enabled_wardrobe5)
+    update_bag(s.mogWardrobe,items.wardrobe6,items.max_wardrobe6,items.enabled_wardrobe6)
+    update_bag(s.mogWardrobe,items.wardrobe7,items.max_wardrobe7,items.enabled_wardrobe7)
+    update_bag(s.mogWardrobe,items.wardrobe8,items.max_wardrobe8,items.enabled_wardrobe8)
     update_temp_bag(s.tempInventory,items.temporary)
 end
 
