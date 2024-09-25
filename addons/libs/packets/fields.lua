@@ -3409,7 +3409,13 @@ fields.incoming[0x08D] = L{
 types.alliance_member = L{
     {ctype='unsigned int',      label='ID',                 fn=id},             -- 00
     {ctype='unsigned short',    label='Index',              fn=index},          -- 04
-    {ctype='unsigned short',    label='Flags',              fn=bin+{2}},        -- 06
+    {ctype='bit[2]',            label='Party Index'},                           -- 06:01
+    {ctype='boolbit',           label='Party Leader'},                          -- 06:03
+    {ctype='boolbit',           label='Alliance Leader'},                       -- 06:04
+    {ctype='bit[2]',            label='Quartermaster'},                         -- 06:05
+    {ctype='boolbit',           label='Linkshell #1 Linkshell'},                -- 06:07
+    {ctype='boolbit',           label='Linkshell #1 Pearlsack'},                -- 06:08
+    {ctype='unsigned char',     label='_unknown1',          fn=bin+{1}},        -- 07    
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 08
     {ctype='unsigned short',    label='_unknown2'},                             -- 0A    Always 0?
 }
