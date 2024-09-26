@@ -70,8 +70,10 @@ local function accept_roe(id)
     id = tonumber(id)
     
     if not id or _roe.complete[id] or _roe.active[id] then return end
-    if id and id >= 4008 and id <= 4021 then return end
+    if id and id >= 3768 and id <= 3995 then return end 
+    if id and id >= 4008 and id <= 4021 then return end 
     
+	
     local p = packets.new('outgoing', 0x10c, {['RoE Quest'] = id })
     packets.inject(p)
 end
