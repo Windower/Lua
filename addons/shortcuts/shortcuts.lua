@@ -177,7 +177,6 @@ windower.register_event('outgoing text',function(original,modified)
         lastsent = ''
         return modified
     end
-
     -- Otherwise, dump the inputs into command_logic()
     return command_logic(temp_org,modified)
 end)
@@ -341,7 +340,18 @@ end
 function interp_text(splitline,offset,modified)
     local temptarg,abil
     local no_targ_abil = strip(table.concat(splitline,' ',1+offset,splitline.n))
-        
+    local greek_letter = ''
+    local greek_conversion = ''
+    local concat_splitline = _raw.table.concat(splitline)
+
+    for char_code, letter in pairs(greek_letters) do
+        if string.find(concat_splitline, char_code) then
+            greek_letter = letter
+            greek_conversion = char_code
+            break
+        end
+    end
+    
     if validabils[no_targ_abil] then
         abil = no_targ_abil
     elseif splitline.n > 1 then
@@ -351,8 +361,7 @@ function interp_text(splitline,offset,modified)
     if temptarg then abil = _raw.table.concat(splitline,' ',1+offset,splitline.n-1)
     elseif not abil then abil = _raw.table.concat(splitline,' ',1+offset,splitline.n) end
 
-    local strippedabil = strip(abil) -- Slug the ability
-
+    local strippedabil = strip(abil)..greek_letter -- Slug the ability
     if validabils[strippedabil] then
         local options,nonoptions,num_opts, r_line = {},{},0
         local player = windower.ffxi.get_player()
@@ -394,8 +403,9 @@ function interp_text(splitline,offset,modified)
             logfile:flush()
         end
         debug_chat('390 comp '..lastsent:sub(2):gsub('"([^ ]+)"', '%1'):lower()..'   ||    '..table.concat(splitline,' ',1,splitline.n):gsub('"([^ ]+)"', '%1'):lower())
+        lastsent = lastsent:gsub(greek_letter, greek_conversion)
         if offset == 1 and in_game_res_commands[splitline[1]] and in_game_res_commands[splitline[1]] == out_tab.prefix and
-            ('"'..out_tab.name..'" '..out_tab.target):gsub('"([^ ]+)"', '%1'):lower() == table.concat(splitline,' ',2,splitline.n):gsub('"([^ ]+)"', '%1'):lower() then
+            ('"'..out_tab.name..'" '..out_tab.target):gsub('"([^ ]+)"', '%1'):lower() == table.concat(splitline,' ',2,splitline.n):gsub(greek_conversion, greek_letter):gsub('"([^ ]+)"', '%1'):lower() then
             debug_chat('400 return '..lastsent)
             return lastsent,true
         else

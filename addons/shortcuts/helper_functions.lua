@@ -90,9 +90,8 @@ end
 -------- which are upper case.
 -----------------------------------------------------------------------------------
 function strip(name)
-	return name:gsub('[^%w]',''):lower():gsub('(%d+)',to_roman)
+	return name:gsub('[^%wαβγδ]',''):lower():gsub('(%d+)',to_roman)
 end
-
 
 -----------------------------------------------------------------------------------
 --Name: to_roman()
