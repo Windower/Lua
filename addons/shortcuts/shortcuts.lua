@@ -403,13 +403,12 @@ function interp_text(splitline,offset,modified)
             logfile:flush()
         end
         debug_chat('390 comp '..lastsent:sub(2):gsub('"([^ ]+)"', '%1'):lower()..'   ||    '..table.concat(splitline,' ',1,splitline.n):gsub('"([^ ]+)"', '%1'):lower())
+        lastsent = lastsent:gsub(greek_letter, greek_conversion)
         if offset == 1 and in_game_res_commands[splitline[1]] and in_game_res_commands[splitline[1]] == out_tab.prefix and
             ('"'..out_tab.name..'" '..out_tab.target):gsub('"([^ ]+)"', '%1'):lower() == table.concat(splitline,' ',2,splitline.n):gsub(greek_conversion, greek_letter):gsub('"([^ ]+)"', '%1'):lower() then
             debug_chat('400 return '..lastsent)
-            lastsent = lastsent:gsub(greek_letter, greek_conversion)
             return lastsent,true
         else
-            lastsent = lastsent:gsub(greek_letter, greek_conversion)
             debug_chat('403 input '..lastsent)
             windower.send_command('@input '..lastsent)
             return '',false
