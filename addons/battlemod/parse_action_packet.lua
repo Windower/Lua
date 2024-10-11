@@ -800,7 +800,9 @@ function get_spell(act)
             if abil_ID > 256 then -- WZ_RECOVER_ALL is used by chests in Limbus
                 spell = res.monster_abilities[abil_ID]
                 if not spell then
-                    spell = {english= 'Special Attack'}
+                    spell = {english = 'Special Attack'}
+                elseif T{3123, 3124, 3125, 3126}:contains(abil_ID) then
+                    spell[language] = string.gsub(spell.name, greek_replacement[abil_ID].ori, greek_replacement[abil_ID].rep)
                 end
             elseif abil_ID <= 256 then
                 spell = res.weapon_skills[abil_ID]

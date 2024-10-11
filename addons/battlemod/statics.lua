@@ -100,6 +100,12 @@ replacements_map = {
     }
 }
 
+greek_replacement = {
+    [3123] = {ori = 'α', rep = string.char(131,191)},
+    [3124] = {ori = 'β', rep = string.char(131,192)},
+    [3125] = {ori = 'γ', rep = string.char(131,193)},
+    [3126] = {ori = 'δ', rep = string.char(131,194)},
+}
 corsair_rolls = {
     [98] = {[5] = ' (Lucky Roll!)', [9] = ' (Unlucky Roll!)'},      -- Fighter's Roll
     [99] = {[3] = ' (Lucky Roll!)', [7] = ' (Unlucky Roll!)'},      -- Monk's Roll
