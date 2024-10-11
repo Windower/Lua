@@ -177,6 +177,12 @@ targ_reps = {t='<t>',me='<me>',ft='<ft>',scan='<scan>',bt='<bt>',lastst='<lastst
 	
 language = 'english' -- windower.ffxi.get_info()['language']:lower()
 
+greek_letters = {
+    [string.char(131, 191)] = 'α',
+    [string.char(131, 192)] = 'β',
+    [string.char(131, 193)] = 'γ',
+    [string.char(131, 194)] = 'δ'
+}
 
 -----------------------------------------------------------------------------------
 --Name: make_abil()
