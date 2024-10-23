@@ -35,12 +35,12 @@ local box_list = {
     end,
 
     get_index_of = function(self, value)
-            return self._by_value[value]
+        return self._by_value[value]
     end
 }
 local meta = {
     __index = function(t,k)
-            return t._ordered[k]
+        return t._ordered[k]
     end,
 }
 setmetatable(box_list, meta)
