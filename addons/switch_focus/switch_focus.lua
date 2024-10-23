@@ -8,6 +8,7 @@ require('tables')
 require('strings')
 local box_list = require('box_list')
 
+local help_text = 'switch_focus addon commands:\n'
 local back_name
 local switch = {cmd = {}}
 
@@ -20,6 +21,12 @@ function switch.command(cmd, ...)
 end
 windower.register_event('addon command', switch.command)
 
+help_text = help_text .. "  help      - prints this menu :D\n"
+function switch.cmd.help()
+    print(help_text)
+end
+
+help_text = help_text .. "  to <name> - switch focus to specified character, name can be a partial.\n"
 function switch.cmd.to(args)
     local name = args[1]
 
@@ -32,21 +39,45 @@ function switch.cmd.to(args)
             end
         end
     end
-
-    windower.send_ipc_message(string.format('to,%s,%s', windower.ffxi.get_player().name:lower(), name:lower()))
+    local player_name = windower.ffxi.get_player().name:lower()
+    windower.send_ipc_message(string.format('to,%s,%s', player_name, name:lower()))
     coroutine.sleep(0.1)
 
     if (windower.has_focus()) then
-        windower.send_ipc_message(string.format('to,%s,@lobby', windower.ffxi.get_player().name:lower(), name:lower()))
+        windower.send_ipc_message(string.format('to,%s,@lobby', player_name, name:lower()))
     end
 end
 
+help_text = help_text .. "  back      - switch focus back to character that last sent you focus.\n"
 function switch.cmd.back()
     if back_name then
         windower.send_ipc_message(string.format('to,%s,%s', windower.ffxi.get_player().name:lower(), back_name:lower()))
     end
 end
 
+help_text = help_text .. "  (n)ext    - switch focus to next character in alphabetical order.\n              if switch fails checks for any box in lobby to give focus to.\n"
+function switch.cmd.next()
+    local player_name = windower.ffxi.get_player().name:lower()
+    local index = box_list:get_index_of(player_name)
+
+    local next = box_list[(index % box_list:len()) + 1]
+    while (next ~= player_name) do
+        switch.cmd.to({next})
+        coroutine.sleep(0.1)
+
+        if (not windower.has_focus()) then
+            break
+        end
+
+        windower.send_ipc_message('clear,' .. next)
+        box_list:remove(next)
+
+        next = box_list[(index % box_list:len()) + 1]
+    end
+end
+switch.cmd.n = switch.cmd.next
+
+help_text = help_text .. "  (p)rev    - switch focus to previous character in alphabetical order.\n"
 function switch.cmd.prev()
     local name = windower.ffxi.get_player().name:lower()
     local index = box_list:get_index_of(name)
@@ -67,27 +98,6 @@ function switch.cmd.prev()
     end
 end
 switch.cmd.p = switch.cmd.prev
-
-function switch.cmd.next()
-    local name = windower.ffxi.get_player().name:lower()
-    local index = box_list:get_index_of(name)
-
-    local next = box_list[(index % box_list:len()) + 1]
-    while (next ~= name) do
-        switch.cmd.to({next})
-        coroutine.sleep(0.1)
-
-        if (not windower.has_focus()) then
-            break
-        end
-
-        windower.send_ipc_message('clear,' .. next)
-        box_list:remove(next)
-
-        next = box_list[(index % box_list:len()) + 1]
-    end
-end
-switch.cmd.n = switch.cmd.next
 
 switch.ipc = {}
 local function ipc_message(raw_msg)
