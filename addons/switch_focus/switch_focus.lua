@@ -13,10 +13,10 @@ local back_name
 local switch = {cmd = {}}
 
 function switch.command(cmd, ...)
-    local args = T{...}:map(string.lower) or {}
-    cmd = cmd and cmd:lower() or 'help'
-    if switch.cmd[cmd] then
-        switch.cmd[cmd](args)
+    local args = T{...}:map(string.lower)
+    local command = switch.cmd[cmd and cmd:lower() or 'help']
+    if command then
+        command(args)
     end
 end
 windower.register_event('addon command', switch.command)
@@ -102,8 +102,7 @@ switch.cmd.p = switch.cmd.prev
 switch.ipc = {}
 local function ipc_message(raw_msg)
     raw_msg = raw_msg and raw_msg:lower()
-    print(raw_msg)
-    local msg = string.split(''..raw_msg, ',')
+    local msg = string.split(raw_msg, ',')
     if switch.ipc[msg[1]] then
         switch.ipc[msg[1]](msg)
     end
@@ -114,7 +113,7 @@ function switch.ipc.to(msg)
     local from_name = msg[2]
     local to_name = msg[3]
     local player =  windower.ffxi.get_player()
-    if windower.has_focus ~= true and ((player and to_name == player.name:lower()) or (to_name == '@lobby' and not windower.ffxi.get_info().logged_in)) then
+    if not windower.has_focus() and ((player and to_name == player.name:lower()) or (to_name == '@lobby' and not windower.ffxi.get_info().logged_in)) then
         back_name = from_name
         windower.take_focus()
     end
