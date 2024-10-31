@@ -1,0 +1,45 @@
+<?xml version="1.1" ?>
+<settings>
+    <global>
+        <bg>
+            <alpha>255</alpha>
+            <blue>40</blue>
+            <green>0</green>
+            <red>0</red>
+            <visible>true</visible>
+        </bg>
+        <flags>
+            <bold>false</bold>
+            <bottom>false</bottom>
+            <draggable>true</draggable>
+            <italic>false</italic>
+            <right>false</right>
+        </flags>
+        <gallimaufryGoal>2500000</gallimaufryGoal>
+        <gallimaufry_record>0</gallimaufry_record>
+        <padding>2</padding>
+        <pos>
+            <x>119</x>
+            <y>-5</y>
+        </pos>
+        <text>
+            <alpha>255</alpha>
+            <blue>255</blue>
+            <font>Comic Sans MS</font>
+            <fonts>
+
+            </fonts>
+            <green>255</green>
+            <red>255</red>
+            <size>12</size>
+            <stroke>
+                <alpha>255</alpha>
+                <blue>0</blue>
+                <green>0</green>
+                <red>0</red>
+                <width>0</width>
+            </stroke>
+        </text>
+        <toggle_sound>true</toggle_sound>
+    </global>
+</settings>
