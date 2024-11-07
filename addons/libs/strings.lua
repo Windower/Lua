@@ -109,9 +109,10 @@ do
             [string.encoding.shift_jis] = function(str, from, to)
                 return process(str, from, to, function(byte)
                     return
-                        (byte < 0x80 or byte >= 0xA1 and byte <= 0xDF) and 1 or
-                        (byte >= 0x1E and byte <= 0x1F or byte >= 0x80 and byte <= 0x9F or byte >= 0xE0 and byte <= 0xEF or byte >= 0xFA and byte <= 0xFC) and 2 or
-                        byte == 0xFD and 6
+                        byte == 0xFD and 6 or
+                        ((byte >= 0x81 and byte <= 0x9F) or (byte >= 0xE0 and byte <= 0xEF)) and 2 or
+                        (byte < 0x80 or (byte >= 0x40 and byte <= 0x7E) or (byte >= 0x80 and byte <= 0xFC)) and 1 or
+                        nil
                 end)
             end,
             [string.encoding.binary] = function(str, from, to)
