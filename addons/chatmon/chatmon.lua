@@ -83,6 +83,13 @@ end
 
 local function chat_handler(message, _, mode)
     local chat_mode = chat_res[mode]
+
+    if chat_mode == nil then
+        print(string.format('Chatmon error: unknown chat mode = %d', mode))
+        print(string.format('  msg = %s', message))
+        return
+    end
+
     if chat_mode.name == 'emote' then -- emote triggers check match against the sender name not message text.
         return
     end
