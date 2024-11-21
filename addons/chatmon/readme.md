@@ -63,10 +63,10 @@
 ```lua
 { from = S{ "say" }, notFrom = S{ "shout" }, match = "*Nif*", notMatch = "*Nifl*", notSenderName = "Arcon" sound = "IncomingTalk.wav"},
 ```
-trigger exampe:
+triggers exampe:
 > Iyroku : Hi Nif
 
-does not trigger example:
+does not triggers example:
 > Arcon : Hi Nif
 
 > Iyroku : Hi Nifl
@@ -75,8 +75,8 @@ does not trigger example:
 ```lua
 { from = S{ "all" }, match = "*Beserk*", notMatch = "*Mountain Sheep*", sound = "SomeCustomSound.wav"},
 ```
-trigger exampe:
+triggers exampe:
 > [Muspelheim] Beserk 🡒 Muspelheim
 
-does not trigger example:
+does not triggers example:
 > [Mountain Sheep] Beserk 🡒 Muspelheim
