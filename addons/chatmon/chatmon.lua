@@ -74,7 +74,7 @@ local function check_triggers(from, text)
 
     for _, trigger in ipairs(triggers) do
         local match = get_match(trigger.match)
-        if (trigger.from:contains('all') or trigger.from:contains(from)) and not trigger.notFrom:contains(from) and windower.wc_match(text, match) and not windower.wc_match(text, trigger.notMatch) then
+        if trigger.from:contains(from) and not trigger.notFrom:contains(from) and windower.wc_match(text, match) and not windower.wc_match(text, trigger.notMatch) then
             play_sound(trigger.sound)
             return
         end
