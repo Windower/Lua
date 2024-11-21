@@ -72,6 +72,7 @@ local function check_triggers(from, text)
         return
     end
 
+    text = windower.convert_auto_trans(text)
     for _, trigger in ipairs(triggers) do
         local match = get_match(trigger.match)
         if trigger.from:contains(from) and not trigger.notFrom:contains(from) and windower.wc_match(text, match) and not windower.wc_match(text, trigger.notMatch) then
