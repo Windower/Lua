@@ -82,6 +82,11 @@ local function check_triggers(from, text)
 end
 
 local function chat_handler(message, _, mode)
+    local chat_mode = chat_res[mode]
+    if chat_mode.name == 'emote' then -- emote triggers check match against the sender name not message text.
+        return
+    end
+
     check_triggers(chat_res[mode].name, message)
 end
 windower.register_event('chat message', chat_handler)
