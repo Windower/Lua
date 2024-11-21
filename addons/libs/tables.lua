@@ -90,7 +90,7 @@ end
 
 -- Checks if a table is an array, only having sequential integer keys.
 function table.isarray(t)
-    return table.count(t) == #t
+    return table.length(t) == #t
 end
 
 -- Returns the number of elements in a table.

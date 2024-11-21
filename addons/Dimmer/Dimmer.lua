@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.]]
 
 _addon.name = 'Dimmer'
 _addon.author = 'Chiaia'
-_addon.version = '1.1.1'
+_addon.version = '1.1.2'
 _addon.commands = {'dim','dimmer'}
 
 require('logger')
@@ -40,7 +40,7 @@ item_info = {
     [1]={id=26176,japanese='Ｄ．ホラリング',english='"Dim. Ring (Holla)"',slot=13},
     [2]={id=26177,japanese='Ｄ．デムリング',english='"Dim. Ring (Dem)"',slot=13},
     [3]={id=26178,japanese='Ｄ．メアリング',english='"Dim. Ring (Mea)"',slot=13},
-    [4]={id=10385,japanese="キュムラスマスク+1",english="Cumulus Masque +1",slot=4},
+    [4]={id=10385,japanese="キュムラスマスク+1",english='"Cumulus Masque +1"',slot=4},
 }
 
 function search_item()

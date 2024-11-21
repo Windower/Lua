@@ -133,7 +133,7 @@ This is what an example file called `Arcon_THF.lua` in the addon's `data` folder
 
 ```lua
 WAR = {
-    ['Ctrl+2'] = 'input /ja "Provoke" <me>',
+    ['Ctrl+2'] = 'input /ja "Provoke" <t>',
     ['Ctrl+3'] = 'input /ja "Warcry" <me>',
     ['Ctrl+4'] = 'input /ja "Aggressor" <me>',
     ['Ctrl+5'] = 'input /ja "Berserk" <me>',
@@ -144,7 +144,7 @@ JA = {
     ['Ctrl+1'] = 'input /ja "Perfect Dodge" <me>',
     ['Ctrl+2'] = 'input /ja "Sneak Attack" <me>',
     ['Ctrl+3'] = 'input /ja "Trick Attack" <me>',
-    ['Ctrl+4'] = 'input /ja "Bully" <me>',
+    ['Ctrl+4'] = 'input /ja "Bully" <t>',
     ['Ctrl+5'] = 'input /ja "Hide" <me>',
     ['Alt+2'] = WAR,                -- Goes to WAR sub table
     ['Alt+4'] = 'input /ja "Collaborator" <stpt>',

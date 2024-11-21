@@ -28,7 +28,7 @@ windower.register_event('addon command', function(target, ...)
     end
 
     local command = T{...}:map(string.strip_format .. windower.convert_auto_trans):map(function(str)
-        return str:find(' ', string.encoding.shift_jis) and str:enclose('"') or str
+        return str:find(' ', string.encoding.shift_jis, true) and str:enclose('"') or str
     end):sconcat():gsub('<(%a+)id>', function(target_string)
         local entity = windower.ffxi.get_mob_by_target(target_string)
         return entity and entity.id or '<' .. target_string .. 'id>'
@@ -72,7 +72,7 @@ windower.register_event('ipc message', function (msg)
         return
     end
 
-    local split = msg:split(' ', string.encoding.shift_jis, 3)
+    local split = msg:split(' ', string.encoding.shift_jis, 3, false, true)
     if #split < 3 or split[1] ~= 'send' then
         return
     end
