@@ -47,42 +47,22 @@ local function play_sound(sound)
     end
 end
 
-local function get_match(match)
-    if match ~= '<name>' then
-        return match
-    end
-
-    -- this is done to have parity with the old plugin.
-    local player_name = windower.ffxi.get_player().name:lower()
-    return '* ' .. player_name .. '|'
-                .. player_name .. ' *|*\''
-                .. player_name .. '\'*|*('
-                .. player_name .. ')*|'
-                .. player_name .. '|* '
-                .. player_name .. ' *|* '
-                .. player_name .. '? *|* '
-                .. player_name .. '?|'
-                .. player_name .. '? *|'
-                .. player_name .. '?|*<'
-                .. player_name .. '>*'
-end
-
-local function check_triggers(from, text)
+local function check_triggers(from, text, sender)
     if windower.has_focus() and settings.DisableOnFocus then
         return
     end
 
     text = windower.convert_auto_trans(text)
+    local event = {from = from, text = text, sender = sender or ''}
     for _, trigger in ipairs(triggers) do
-        local match = get_match(trigger.match)
-        if trigger.from:contains(from) and not trigger.notFrom:contains(from) and windower.wc_match(text, match) and not windower.wc_match(text, trigger.notMatch) then
+        if trigger:check(event) then
             play_sound(trigger.sound)
             return
         end
     end
 end
 
-local function chat_handler(message, _, mode)
+local function chat_handler(message, sender, mode)
     local chat_mode = chat_res[mode]
 
     if chat_mode == nil then
@@ -95,7 +75,7 @@ local function chat_handler(message, _, mode)
         return
     end
 
-    check_triggers(chat_res[mode].name, message)
+    check_triggers(chat_res[mode].name, message, sender)
 end
 windower.register_event('chat message', chat_handler)
 

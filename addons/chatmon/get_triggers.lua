@@ -1,3 +1,4 @@
+local trigger_class = require('trigger_class')
 local get_triggers = {}
 
 function get_triggers.by_name(name)
@@ -11,7 +12,12 @@ function get_triggers.by_name(name)
         triggers_loader = loadfile(windower.addon_path .. "/data/triggers/global.lua")
     end
 
-    return triggers_loader and triggers_loader()
+    local triggers = triggers_loader and triggers_loader()
+    for key, value in pairs(triggers) do
+        triggers[key] = trigger_class:new(value)
+    end
+
+    return triggers
 end
 
 return get_triggers
