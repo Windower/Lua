@@ -53,6 +53,7 @@ local function check_triggers(from, text, sender)
     end
 
     text = windower.convert_auto_trans(text)
+    text = text:strip_color()
     local event = {from = from, text = text, sender = sender or ''}
     for _, trigger in ipairs(triggers) do
         if trigger:check(event) then
