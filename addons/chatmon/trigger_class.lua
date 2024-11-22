@@ -40,11 +40,11 @@ function field_checkers.notMatch(trigger, event)
     return not windower.wc_match(event.text, match)
 end
 
-function field_checkers.senderMatch(trigger, event)
+function field_checkers.sender(trigger, event)
     return windower.wc_match(event.sender, trigger.senderMatch)
 end
 
-function field_checkers.notSenderMatch(trigger, event)
+function field_checkers.notSender(trigger, event)
     return windower.wc_match(event.sender, trigger.notSenderMatch)
 end
 

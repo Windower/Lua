@@ -43,13 +43,13 @@
 
   * Ex. you can have `Niflheim` this would prevent the match of `Nif*` from playing the sound if the full the text being evaluated is is `Niflheim`
 
-* `senderName`: text you want to match the sender's name.
+* `sender`: text you want to match the sender's name.
 
   * only valid for multi-player commuication channels. i.e. `say`, `shout`, `linkshell`, ect...
 
   * does not work with `all`, `tell`, `emotes`, `invite` or `examine`
 
-* `notSenderName`: text you do not want to match the sender's name.
+* `notSender`: text you do not want to match the sender's name.
 
   * only valid for multi-player commuication channels. i.e. `say`, `shout`, `linkshell`, ect...
 
