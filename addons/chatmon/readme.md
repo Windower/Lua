@@ -61,7 +61,7 @@
 
 #### This example triggers when any player other than Arcon says something containing Nif but not if they Nifl:
 ```lua
-{ from = S{ "say" }, notFrom = S{ "shout" }, match = "*Nif*", notMatch = "*Nifl*", notSenderName = "Arcon" sound = "IncomingTalk.wav"},
+{ from = S{ "say" }, notFrom = S{ "shout" }, match = "*Nif*", notMatch = "*Nifl*", notSender = "Arcon" sound = "IncomingTalk.wav"},
 ```
 triggers exampe:
 > Iyroku : Hi Nif
