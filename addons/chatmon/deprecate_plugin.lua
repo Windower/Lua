@@ -108,8 +108,7 @@ global:write(trigger_text)
 global:close()
 
 local settings = {}
-local truthy_set = S{'true', 't', 'yes', 'y', 'on', 'o'}
-settings.DisableOnFocus = not truthy_set:contains(string.lower(chatmon_plugin_xml.settings.DisableOnFocus))
+settings.DisableOnFocus = false
 settings.SoundInterval = tonumber(chatmon_plugin_xml.settings.SoundInterval)
 
 coroutine.schedule(function()
