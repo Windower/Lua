@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'chatmon'
-_addon.version = '1.0.5'
+_addon.version = '1.1,0'
 _addon.author = 'WindowerDevTeam'
 _addon.commands = {'chatmon'}
 
