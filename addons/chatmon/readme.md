@@ -37,7 +37,7 @@
 
   * `<name>` Can be used as a special flag to cover your character name in a number of common contexts.
 
-  * When the trigger source is `tell`, `emotes`, `invite`, or `examine` the text evaluated for match is the **senders name** all other sources evaluate the message text.
+  * When the trigger source is `tell`, `emote`, `invite`, or `examine` the text evaluated for match is the **senders name** all other sources evaluate the message text.
 
 * `notMatch`: Text you would like to **not** match for the trigger sound to be played, this would allow you to filter out terms you know might conflit with your match string.
 
@@ -47,13 +47,13 @@
 
   * Only valid for multi-player commuication channels. i.e. `say`, `shout`, `linkshell`, ect...
 
-  * Does not work with `all`, `tell`, `emotes`, `invite` or `examine`
+  * Does not work with `all`, `tell`, `emote`, `invite` or `examine`
 
 * `notSender`: Text you do not want to match the sender's name.
 
   * Only valid for multi-player commuication channels. i.e. `say`, `shout`, `linkshell`, ect...
 
-  * Does not work with `all`, `tell`, `emotes`, `invite` or `examine`
+  * Does not work with `all`, `tell`, `emote`, `invite` or `examine`
 
 * `sound`: This is the path to the sound file you want to play, if just a file name is given the file will be assumed to be in the `sounds` folder in the chatmon file directory.
 
