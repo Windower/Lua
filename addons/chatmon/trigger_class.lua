@@ -51,7 +51,6 @@ end
 function trigger_class:check(event)
     for k in pairs(self) do
         if field_checkers[k] and not field_checkers[k](self, event) then
-            print(k)
             return false
         end
     end
