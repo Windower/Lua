@@ -59,8 +59,7 @@ function trigger_class:check(event)
 end
 
 function trigger_class:new(o)
-    setmetatable(o, meta)
-    return o
+    return setmetatable(o, meta)
 end
 
 return trigger_class
