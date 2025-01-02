@@ -120,6 +120,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
                 storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
             elseif unified_prefix == '/ra' then
                 r_line = copy_entry(resources_ranged_attack)
+                r_line.range = '25' -- temp
                 storedcommand = command..' '
             end
             
@@ -137,6 +138,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
                         -- Item use packet handling here
                         if bit.band(spell.target.spawn_type, 2) == 2 and find_inventory_item(spell.id) then
                             --0x36 packet
+                            spell.action_type = 'Trade'
                             if spell.target.distance <= 6 then
                                 command_registry[ts].proposed_packet = assemble_menu_item_packet(spell.target.id,spell.target.index,spell.id)
                             else
@@ -156,6 +158,10 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
                         return true
                     end
                 else
+                    if spell.prefix == '/item' and bit.band(spell.target.spawn_type, 2) == 2 and find_inventory_item(spell.id) then
+                        --0x36 packet
+                        spell.action_type = 'Trade'
+                    end
                     return equip_sets('pretarget',-1,spell)
                 end
 			else
