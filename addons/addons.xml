@@ -873,7 +873,7 @@
     <support>https://github.com/lili-ffxi</support>
   </addon>
   <addon>
-    <name>debuginfo</name>
+    <name>diagnostics</name>
     <author>Lili</author>
     <description>Simple diagnostic tool for common Windower installation problems.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
