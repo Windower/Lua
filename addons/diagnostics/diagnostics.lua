@@ -45,7 +45,7 @@ windower.register_event('addon command', function(...)
     local args = S{...}
 
     if args:contains('help') then
-        log('//debug <flags>')
+        log('//diag <flags>')
         log('  Available flags: log console copy file help')
         log('  log: prints the output to chatlog (default)')
         log('  console: prints the output to console')
