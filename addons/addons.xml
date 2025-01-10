@@ -873,6 +873,13 @@
     <support>https://github.com/lili-ffxi</support>
   </addon>
   <addon>
+    <name>debuginfo</name>
+    <author>Lili</author>
+    <description>Simple diagnostic tool for common Windower installation problems.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://github.com/lili-ffxi</support>
+  </addon>
+  <addon>
     <name>AutoEx</name>
     <author>Elidyr</author>
     <description>AutoExec Add-on Replacement</description>
