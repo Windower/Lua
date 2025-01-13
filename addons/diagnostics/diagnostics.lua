@@ -37,9 +37,8 @@ local get_dir = windower.get_dir
 local windower_path = windower.windower_path
 local ffxi_path = windower.ffxi_path
 local pol_path = windower.pol_path
--- local launcher_path = windower.launcher_path
 
-local dlls = { 'd3d8.dll', 'dxgi.dll', 'ddraw.dll', 'd3dimm.dll', 'd3d9.dll', '.*%.conf' }
+local files = { 'd3d8%.dll', 'dxgi%.dll', 'ddraw%.dll', 'd3dimm%.dll', 'd3d9%.dll', '.*%.conf' }
 
 windower.register_event('addon command', function(...)
     local args = S{...}
@@ -69,22 +68,22 @@ windower.register_event('addon command', function(...)
     -- Look for cases of mismatched foldername\addonname.lua
     local addons_path = windower_path .. 'addons\\'
     local addons = get_dir(addons_path)
-    for _,name in pairs(addons) do
+    for _, name in pairs(addons) do
         if name ~= 'libs' then
-            if not windower.file_exists('%s%s\\%s.lua':format(addons_path,name,name)) then
+            if not windower.file_exists('%s%s\\%s.lua':format(addons_path, name, name)) then
                 report:append('Mismatched addon folder: ' .. name)
             end
         end
     end
 
     -- Look for graphics enhancement dlls and config files
-    for i,folder in ipairs({ ffxi_path, pol_path, launcher_path }) do
+    for i, folder in ipairs({ ffxi_path, pol_path, launcher_path }) do
         local files = get_dir(folder)
 
-        for _,name in pairs(files) do
+        for _, name in pairs(files) do
             local name = name:lower()
-            for _, pattern in ipairs(dlls) do
-                if pattern:find('%%') and name:match(pattern) or name == pattern then
+            for _, pattern in ipairs(files) do
+                if name:match(pattern) then
                     report:append('%s found in %s':format(name, folder))
                 end
             end
@@ -103,11 +102,11 @@ windower.register_event('addon command', function(...)
         flog(outputfile, '\n' .. msg)
         log('Output saved to', outputfile)
     end
-    
+
     if args:contains('console') or (args:contains('log') and not windower.ffxi.get_info().logged_in) then
         print(msg)
     end
-    
+
     if args:contains('log') or args:length() == 0 then
         log(msg)
     end
