@@ -40,7 +40,7 @@ require('chat')
 
 -- load message constants
 
-messages, offsets = require('messages')
+messages, offsets = unpack(require('messages'))
 
 -- config
 
