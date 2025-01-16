@@ -67,22 +67,22 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
             abil = res.job_abilities[pet_abilities[tonumber(splitline[2])]].name:gsub(string.char(7),' '):lower() -- .name, or .english?
         end
     end
-    
+
     if validabils[language][unified_prefix] and validabils[language][unified_prefix][abil] then
         temptarg, temp_mob_arr = valid_target(splitline[3])
     elseif validabils[language][unified_prefix] then
         temptarg, temp_mob_arr = valid_target(splitline[2])
     end
-    
+
     if unified_prefix and temptarg and (validabils[language][unified_prefix][abil] or unified_prefix=='/ra') then
         if st_flag then
             st_flag = nil
             return modified
         elseif temp_mob_arr then
             refresh_globals()
-            
+
             local r_line, find_monster_skill
-            
+
             function find_monster_skill(abil)
                 local line = false
                 if player.species and player.species.tp_moves then
@@ -96,7 +96,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
                 end
                 return line
             end
-            
+
             if unified_prefix == '/ma' then
                 r_line = copy_entry(res.spells[validabils[language][unified_prefix][abil]])
                 storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
@@ -122,21 +122,22 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
                 r_line = copy_entry(resources_ranged_attack)
                 storedcommand = command..' '
             end
-            
+
             r_line.name = r_line[language]
             local spell = spell_complete(r_line)
             spell.target = temp_mob_arr
             spell.action_type = action_type_map[command]
-            
+
             if filter_pretarget(spell) then
                 if tonumber(splitline[splitline.n]) then
                     -- If the target is a number
                     local ts = command_registry:new_entry(spell)
-                    
+
                     if spell.prefix == '/item' then
                         -- Item use packet handling here
                         if bit.band(spell.target.spawn_type, 2) == 2 and find_inventory_item(spell.id) then
                             --0x36 packet
+                            spell.action_type = 'Trade'
                             if spell.target.distance <= 6 then
                                 command_registry[ts].proposed_packet = assemble_menu_item_packet(spell.target.id,spell.target.index,spell.id)
                             else
@@ -156,6 +157,10 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
                         return true
                     end
                 else
+                    if spell.prefix == '/item' and bit.band(spell.target.spawn_type, 2) == 2 and find_inventory_item(spell.id) then
+                        --0x36 packet
+                        spell.action_type = 'Trade'
+                    end
                     return equip_sets('pretarget',-1,spell)
                 end
 			else
