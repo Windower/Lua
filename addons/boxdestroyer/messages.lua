@@ -31,7 +31,7 @@ local outdated = function(old)
 end
 
 local get_dat_path = function(dat)
-    local ffxi_path = windower.ffxi_path
+    local ffxi_path = windower.ffxi_path .. '/'
     for i = 1, 9 do
         local vtable = assert(io.open(ffxi_path .. (i == 1 and 'VTABLE.DAT' or 'ROM' .. i .. '/VTABLE' .. i .. '.DAT'), 'rb'))
         vtable:seek('set', dat)
