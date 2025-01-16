@@ -38,7 +38,7 @@ local windower_path = windower.windower_path
 local ffxi_path = windower.ffxi_path
 local pol_path = windower.pol_path
 
-local files = { 'd3d8%.dll', 'dxgi%.dll', 'ddraw%.dll', 'd3dimm%.dll', 'd3d9%.dll', '.*%.conf' }
+local patterns = { 'd3d8%.dll', 'dxgi%.dll', 'ddraw%.dll', 'd3dimm%.dll', 'd3d9%.dll', '.*%.conf' }
 
 windower.register_event('addon command', function(...)
     local args = S{...}
@@ -82,7 +82,7 @@ windower.register_event('addon command', function(...)
 
         for _, name in pairs(files) do
             local name = name:lower()
-            for _, pattern in ipairs(files) do
+            for _, pattern in ipairs(patterns) do
                 if name:match(pattern) then
                     report:append('%s found in %s':format(name, folder))
                 end
