@@ -28,7 +28,7 @@
 
 _addon.name = 'diagnostics'
 _addon.author = 'Lili'
-_addon.version = '1.1.0'
+_addon.version = '1.1.2'
 _addon.command = 'diag'
 
 require('logger')
@@ -59,11 +59,11 @@ windower.register_event('addon command', function(...)
 
     local report = L{}
 
-    report:append('Windower path: ' .. windower_path)
-    report:append(' Launcher version: ' .. windower_settings.launcher_version)
-    report:append(' Hook version: ' .. windower_settings.hook_version)
-    report:append('FFXI path: ' .. ffxi_path)
-    report:append(' Client version: ' .. windower_settings.ffxi_version)
+    report:append('Windower path: %s':format(windower_path))
+    report:append(' Launcher version: %s (%s)':format(windower_settings.launcher_version, windower_settings.branch))
+    report:append(' Hook version: %s':format(windower_settings.hook_version))
+    report:append('FFXI path: %s':format(ffxi_path))
+    report:append(' Client version: %s':format(windower_settings.ffxi_version))
 
     -- Look for cases of mismatched foldername\addonname.lua
     local addons_path = windower_path .. 'addons\\'
@@ -93,7 +93,7 @@ windower.register_event('addon command', function(...)
     local msg = report:concat('\n')
 
     if args:contains('copy') then
-        windower.copy_to_clipboard(msg)
+        windower.copy_to_clipboard('```\n' .. msg .. '\n```')
         log('Output copied to clipboard.')
     end
 
