@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -- addon information
 
 _addon.name = 'boxdestroyer'
-_addon.version = '1.0.6'
+_addon.version = '2.0.0'
 _addon.command = 'boxdestroyer'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
