@@ -10,7 +10,11 @@ local windower_settings = windower.get_windower_settings()
 local file = files.new('data/message_ids.lua')
 
 local load_messages = function()
-    return file:exists() and loadstring(assert(file:read()))() or nil
+    if not file:exists() then
+        return nil, nil
+    end
+
+    return loadstring(assert(file:read()))()
 end
 
 local get_versions = function(version)
