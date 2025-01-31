@@ -28,12 +28,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'chatmon'
-_addon.version = '1.1.2'
+_addon.version = '1.1.3'
 _addon.author = 'WindowerDevTeam'
 _addon.commands = {'chatmon'}
 
 require('sets')
-require('strings')
+require('chat')
 local config = require('config')
 local chat_res = require('resources').chat
 local plugin_settings = require('deprecate_plugin')
