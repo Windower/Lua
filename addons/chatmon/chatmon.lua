@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon = {}
 _addon.name = 'chatmon'
-_addon.version = '1.1.3'
+_addon.version = '1.1.4'
 _addon.author = 'WindowerDevTeam'
 _addon.commands = {'chatmon'}
 
@@ -81,7 +81,7 @@ local function check_triggers(from, text, sender)
     end
 
     text = windower.convert_auto_trans(text)
-    text = text:strip_color()
+    text = text:strip_colors()
     local event = {from = from, text = text, sender = sender or ''}
     for _, trigger in ipairs(triggers) do
         if trigger:check(event) then
