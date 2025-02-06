@@ -158,6 +158,13 @@
     <support>http://www.ffxiah.com/player/Ragnarok/Ikonic</support>
   </addon>
   <addon>
+    <name>ChatMon</name>
+    <author>nifim</author>
+    <description>Port of chatmon plugin, create audible alert in response to chat events.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://discord.gg/aUrHCvk</support>
+  </addon>
+  <addon>
     <name>Clock</name>
     <author>Arcon</author>
     <description>Displays an on-screen clock in a custom format with options to display several different time zones.</description>
@@ -663,6 +670,13 @@
     <support>https://github.com/sebyg666/Lua/tree/4.1-dev/addons/SubTarget</support>
   </addon>
   <addon>
+    <name>switch_focus</name>
+    <author>nifim</author>
+    <description>switch focus to another character running the addon on the same computer.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://discord.gg/aUrHCvk</support>
+  </addon>
+  <addon>
     <name>TargetInfo</name>
     <author>Arcon</author>
     <description>Displays information about your current target in memory.</description>
@@ -859,10 +873,24 @@
     <support>https://github.com/lili-ffxi</support>
   </addon>
   <addon>
+    <name>diagnostics</name>
+    <author>Lili</author>
+    <description>Simple diagnostic tool for common Windower installation problems.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://github.com/lili-ffxi</support>
+  </addon>
+  <addon>
     <name>AutoEx</name>
     <author>Elidyr</author>
     <description>AutoExec Add-on Replacement</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>https://github.com/eLiidyr</support>
+  </addon>
+  <addon>
+    <name>Tickle</name>
+    <author>ragns</author>
+    <description>Displays the time remaining until your next resting tick.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://discord.gg/aUrHCvk</support>
   </addon>
 </addons>

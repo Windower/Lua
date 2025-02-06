@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 -- addon information
 
 _addon.name = 'boxdestroyer'
-_addon.version = '1.0.6'
+_addon.version = '2.0.0'
 _addon.command = 'boxdestroyer'
 _addon.author = 'Seth VanHeulen (Acacia@Odin)'
 
@@ -40,7 +40,7 @@ require('chat')
 
 -- load message constants
 
-require('messages')
+messages, offsets = unpack(require('messages'))
 
 -- config
 
@@ -51,6 +51,7 @@ defaults = {
     DisplayRemainingCombinations = false,
 }
 settings = config.load(defaults)
+
 -- global constants
 
 default = {
@@ -293,7 +294,7 @@ function display(id, chances)
         end
     end
     local clue_value,guess_value = calculate_odds(id,chances)
-    local result = clue_value > guess_value and remaining ~= 1 and 'examining the lock' or 'guessing %d (%d%%)':format(guess_number, probability)
+    local result = clue_value > guess_value and remaining ~= 1 and 'examining the lock' or ('guessing %d (%d%%)'):format(guess_number, probability)
     local formatted_result = settings.HighlightResult and result:color(settings.HighlightColor) or result
     windower.add_to_chat(207, 'boxdestroyer recommends ' .. formatted_result)
 

@@ -200,14 +200,16 @@ function texts.new(str, settings, root_settings)
     windower.text.create(m.name)
 
     amend(m.settings, default_settings)
-    if m.root_settings then
-        config.save(m.root_settings)
-    end
+    if _libs.config then
+        if m.root_settings then
+            _libs.config.save(m.root_settings)
+        end
 
-    if _libs.config and m.root_settings and settings then
-        _libs.config.register(m.root_settings, apply_settings, t, settings)
-    else
-        apply_settings(_, t, settings)
+        if m.root_settings and settings then
+            _libs.config.register(m.root_settings, apply_settings, t, m.settings)
+        else
+            apply_settings(_, t, settings)
+        end
     end
 
     if str then
@@ -457,7 +459,7 @@ function texts.transparency(t, transparency)
     if not transparency then
         return 1 - meta[t].settings.text.alpha/255
     end
-    
+
     texts.alpha(t,math.floor(255*(1-transparency)))
 end
 
@@ -532,7 +534,7 @@ function texts.bg_transparency(t, transparency)
     if not transparency then
         return 1 - meta[t].settings.bg.alpha/255
     end
-    
+
     texts.bg_alpha(t, math.floor(255*(1-transparency)))
 end
 
@@ -560,7 +562,7 @@ function texts.stroke_transparency(t, transparency)
     if not transparency then
         return 1 - meta[t].settings.text.stroke.alpha/255
     end
-    
+
     texts.stroke_alpha(t,math.floor(255 * (1 - transparency)))
 end
 
@@ -593,7 +595,7 @@ function texts.hover(t, x, y)
     if meta[t].settings.flags.right then
         pos_x = pos_x - off_x
     end
-    
+
     return (pos_x <= x and x <= pos_x + off_x
         or pos_x >= x and x >= pos_x + off_x)
     and (pos_y <= y and y <= pos_y + off_y
@@ -653,8 +655,8 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
     -- Mouse left release
     elseif type == 2 then
         if dragged then
-            if meta[dragged.text].root_settings then
-                config.save(meta[dragged.text].root_settings)
+            if _libs.config and meta[dragged.text].root_settings then
+                _libs.config.save(meta[dragged.text].root_settings)
             end
             dragged = nil
             return true

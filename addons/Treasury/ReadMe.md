@@ -35,6 +35,10 @@ This will either clear the specified list (for the current character only) or li
 
 Lots/passes on all items currently in the pool
 
+`//treasury done`
+
+Passes on all items currently in the pool that have not been lotted or passed yet. Equivalent to the in-game 'Done' menu command.
+
 `//treasury clearall`
 
 Clears all character-specific settings (it will keep global settings)
