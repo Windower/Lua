@@ -204,12 +204,12 @@ function texts.new(str, settings, root_settings)
         if m.root_settings then
             _libs.config.save(m.root_settings)
         end
+    end
 
-        if m.root_settings and settings then
-            _libs.config.register(m.root_settings, apply_settings, t, m.settings)
-        else
-            apply_settings(_, t, settings)
-        end
+    if _libs.config and m.root_settings and settings then
+        _libs.config.register(m.root_settings, apply_settings, t, m.settings)
+    else
+        apply_settings(_, t, settings)
     end
 
     if str then
