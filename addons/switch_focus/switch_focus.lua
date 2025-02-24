@@ -1,6 +1,6 @@
 _addon = {}
 _addon.name = 'switch_focus'
-_addon.version = '1.0.0'
+_addon.version = '1.1.0'
 _addon.author = 'WindowerDevTeam'
 _addon.commands = {'swf', 'switch', 'switch_focus'}
 
@@ -11,6 +11,7 @@ local box_list = require('box_list')
 local help_text = 'switch_focus addon commands:\n'
 local back_name
 local switch = {cmd = {}}
+local switch_ack = false
 
 function switch.command(cmd, ...)
     local args = T{...}:map(string.lower)
@@ -62,10 +63,13 @@ function switch.cmd.next()
 
     local next = box_list[(index % box_list:len()) + 1]
     while (next ~= player_name) do
+        switch_ack = false
         switch.cmd.to({next})
+
         coroutine.sleep(0.1)
 
-        if (not windower.has_focus()) then
+        if (switch_ack or not windower.has_focus()) then
+            switch_ack = false
             break
         end
 
@@ -84,10 +88,13 @@ function switch.cmd.prev()
 
     local prev = box_list[((index - 2) % box_list:len()) + 1]
     while (next ~= name) do
+        switch_ack = false
         switch.cmd.to({prev})
+
         coroutine.sleep(0.1)
 
-        if (not windower.has_focus()) then
+        if (switch_ack or not windower.has_focus()) then
+            switch_ack = false
             break
         end
 
@@ -115,7 +122,16 @@ function switch.ipc.to(msg)
     local player =  windower.ffxi.get_player()
     if not windower.has_focus() and ((player and to_name == player.name:lower()) or (to_name == '@lobby' and not windower.ffxi.get_info().logged_in)) then
         back_name = from_name
+        windower.send_ipc_message(string.format('ack,%s,%s', from_name, to_name))
         windower.take_focus()
+    end
+end
+
+function switch.ipc.ack(msg)
+    local from_name = msg[2]
+    local player =  windower.ffxi.get_player()
+    if player and from_name == player.name:lower() then
+        switch_ack = true
     end
 end
 
