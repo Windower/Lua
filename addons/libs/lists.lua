@@ -105,7 +105,9 @@ function list.last(l, i)
 end
 
 function list.insert(l, i, el)
-    l.n = l.n + 1
+    if not l[i] then
+        l.n = l.n + 1
+    end
     table.insert(l, i, el)
 end
 
