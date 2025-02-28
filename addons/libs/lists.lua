@@ -105,9 +105,11 @@ function list.last(l, i)
 end
 
 function list.insert(l, i, el)
-    if not l[i] then
-        l.n = l.n + 1
+    if i > l.n then
+        (_raw.error or error)('Trying to insert outside of list range (%u/%u): %s':format(i, l.n, tostring(el))
     end
+
+    l.n = l.n + 1
     table.insert(l, i, el)
 end
 
