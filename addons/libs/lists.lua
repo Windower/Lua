@@ -37,7 +37,7 @@ _meta.L.__newindex = function(l, k, v)
         if k >= 1 and k <= l.n then
             rawset(l, k, v)
         else
-            (warning or print)('Trying to assign outside of list range (%u/%u): %s':format(k, l.n, tostring(v)))
+            (warning or print)('Trying to assign outside of list range (%u/%u): %s'):format(k, l.n, tostring(v)))
         end
 
     else
