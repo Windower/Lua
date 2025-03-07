@@ -1972,7 +1972,8 @@ end
 
 function decode.AssaultLog(itemid, str) 
     local missions = T{
-        [2491] = T { -- "Leujaoam Log"
+        [2491] = T {
+            -- "Leujaoam Log"
             [1] = "Leujaom Cleansing",
             [2] = "Orichalcum Survey",
             [3] = "Escort Professor Chanoix",
@@ -1985,7 +1986,8 @@ function decode.AssaultLog(itemid, str)
             [10] = "Bloody Rhondo"
     
         },
-        [2492] = T{ -- "Mamool Ja Journal"
+        [2492] = T{
+            -- "Mamool Ja Journal"
             [1] = "Imperial Agent Rescue",
             [2] = "Preemptive Strike",
             [3] = "Sagelord Elimination",
@@ -1998,7 +2000,8 @@ function decode.AssaultLog(itemid, str)
             [10] = "The Susanoo Shuffle"
         },
     
-        [2493] = T{ -- "Lebros Chronicle"
+        [2493] = T{
+            -- "Lebros Chronicle"
             [1] = "Excavation Duty",
             [2] = "Lebros Supplies",
             [3] = "Troll Fugitives",
@@ -2010,7 +2013,8 @@ function decode.AssaultLog(itemid, str)
             [9] = "Operation: Black Pearl",
             [10] = "Better than One",
         },
-        [2494] = T{ -- "Periqia Diary"
+        [2494] = T{
+            -- "Periqia Diary"
             [1] = "Seagull Grounded",
             [2] = "Requiem",
             [3] = "Saving Private Ryaaf",
@@ -2022,7 +2026,8 @@ function decode.AssaultLog(itemid, str)
             [9] = "Wake the Puppet",
             [10] = "The Price Is Right",
         },
-        [2495] = T{ -- "Ilrusi Ledger"
+        [2495] = T{
+            -- "Ilrusi Ledger"
             [1] = "Golden Salvage",
             [2] = "Lamia No.13",
             [3] = "Extermination",
@@ -2039,7 +2044,8 @@ function decode.AssaultLog(itemid, str)
     local names = missions[itemid]
     local flags = {str:unpack("<q10")}
     local data = T{flags}:key_map(function(id) return names[id] end)    
-    local rettab = {type='Assault Log',
+    local rettab = {
+        type='Assault Log',
         completed = S{data},
         flags = flags,
     }
@@ -2208,8 +2214,6 @@ id_mapping = {
     [2493] = functions.call+{decode.AssaultLog+{2493}},
     [2494] = functions.call+{decode.AssaultLog+{2494}},
     [2495] = functions.call+{decode.AssaultLog+{2495}},
-
-
     }
 
 
