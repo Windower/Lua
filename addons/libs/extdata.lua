@@ -1972,87 +1972,87 @@ end
 
 function decode.AssaultLog(itemid, str) 
     local missions = T{
-        [2491] = T{
+        [2491] = {
             -- "Leujaoam Log"
-            [1] = "Leujaom Cleansing",
-            [2] = "Orichalcum Survey",
-            [3] = "Escort Professor Chanoix",
-            [4] = "Shanarha Grass Conservation",
-            [5] = "Counting Sheep",
-            [6] = "Supplies Recovery",
-            [7] = "Azure Experiments",
-            [8] = "Imperial Code",
-            [9] = "Red Versus Blue",
-            [10] = "Bloody Rhondo"
-    
+            [1] = {name="Leujaom Cleansing"},
+            [2] = {name="Orichalcum Survey"},
+            [3] = {name="Escort Professor Chanoix"},
+            [4] = {name="Shanarha Grass Conservation"},
+            [5] = {name="Counting Sheep"},
+            [6] = {name="Supplies Recovery"},
+            [7] = {name="Azure Experiments"},
+            [8] = {name="Imperial Code"},
+            [9] = {name="Red Versus Blue"},
+            [10] = {name="Bloody Rhondo"},
         },
-        [2492] = T{
+        [2492] = {
             -- "Mamool Ja Journal"
-            [1] = "Imperial Agent Rescue",
-            [2] = "Preemptive Strike",
-            [3] = "Sagelord Elimination",
-            [4] = "Breaking Morale",
-            [5] = "The Double Agent",
-            [6] = "Imperial Treasure Retrieval",
-            [7] = "Blitzkrieg",
-            [8] = "Marids in the Mist",
-            [9] = "Azure Ailments",
-            [10] = "The Susanoo Shuffle"
+            [1] = {name="Imperial Agent Rescue"},
+            [2] = {name="Preemptive Strike"},
+            [3] = {name="Sagelord Elimination"},
+            [4] = {name="Breaking Morale"},
+            [5] = {name="The Double Agent"},
+            [6] = {name="Imperial Treasure Retrieval"},
+            [7] = {name="Blitzkrieg"},
+            [8] = {name="Marids in the Mist"},
+            [9] = {name="Azure Ailments"},
+            [10] = {name="The Susanoo Shuffle"},
         },
     
-        [2493] = T{
+        [2493] = {
             -- "Lebros Chronicle"
-            [1] = "Excavation Duty",
-            [2] = "Lebros Supplies",
-            [3] = "Troll Fugitives",
-            [4] = "Evade and Escape",
-            [5] = "Siegemaster Assassination",
-            [6] = "Apkallu Breeding",
-            [7] = "Wamoura Farm Raid",
-            [8] = "Egg Conservation",
-            [9] = "Operation: Black Pearl",
-            [10] = "Better than One",
+            [1] = {name="Excavation Duty"},
+            [2] = {name="Lebros Supplies"},
+            [3] = {name="Troll Fugitives"},
+            [4] = {name="Evade and Escape"},
+            [5] = {name="Siegemaster Assassination"},
+            [6] = {name="Apkallu Breeding"},
+            [7] = {name="Wamoura Farm Raid"},
+            [8] = {name="Egg Conservation"},
+            [9] = {name="Operation: Black Pearl"},
+            [10] = {name="Better than One"},
         },
-        [2494] = T{
+        [2494] = {
             -- "Periqia Diary"
-            [1] = "Seagull Grounded",
-            [2] = "Requiem",
-            [3] = "Saving Private Ryaaf",
-            [4] = "Shooting Down the Baron",
-            [5] = "Building Bridges",
-            [6] = "Stop the Bloodshed",
-            [7] = "Defuse the Threat",
-            [8] = "Operation: Snake Eyes",
-            [9] = "Wake the Puppet",
-            [10] = "The Price Is Right",
+            [1] = {name="Seagull Grounded"},
+            [2] = {name="Requiem"},
+            [3] = {name="Saving Private Ryaaf"},
+            [4] = {name="Shooting Down the Baron"},
+            [5] = {name="Building Bridges"},
+            [6] = {name="Stop the Bloodshed"},
+            [7] = {name="Defuse the Threat"},
+            [8] = {name="Operation: Snake Eyes"},
+            [9] = {name="Wake the Puppet"},
+            [10] = {name="The Price Is Right"},
         },
-        [2495] = T{
+        [2495] = {
             -- "Ilrusi Ledger"
-            [1] = "Golden Salvage",
-            [2] = "Lamia No.13",
-            [3] = "Extermination",
-            [4] = "Demolition Duty",
-            [5] = "Searat Salvation",
-            [6] = "Apkallu Seizure",
-            [7] = "Lost and Found",
-            [8] = "Deserter",
-            [9] = "Desperately Seeking Cephalopods",
-            [10] = "Bellerophon's Bliss",
+            [1] = {name="Golden Salvage"},
+            [2] = {name="Lamia No.13"},
+            [3] = {name="Extermination"},
+            [4] = {name="Demolition Duty"},
+            [5] = {name="Searat Salvation"},
+            [6] = {name="Apkallu Seizure"},
+            [7] = {name="Lost and Found"},
+            [8] = {name="Deserter"},
+            [9] = {name="Desperately Seeking Cephalopods"},
+            [10] = {name="Bellerophon's Bliss"},
         },
     }
 
     local names = missions[itemid]
     local flags = T{str:unpack("<q10")}
-    local data = flags:key_map(function(id) return names[id] end)    
+    for key, val in ipairs(flags) do
+        names[key].completed = val
+    end
+
     local rettab = {
         type='Assault Log',
-        completed = data,
+        completed = names,
         flags = flags,
     }
     return rettab
 end
-
- 
 
 function decode.BonanzaMarble(str)
     local event_list = {
