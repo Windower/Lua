@@ -1970,6 +1970,90 @@ function decode.Reflector(str)
     return rettab
 end
 
+function decode.AssaultLog(itemid, str) 
+    local missions = T{
+        [2491] = T{
+            -- "Leujaoam Log"
+            [1] = "Leujaom Cleansing",
+            [2] = "Orichalcum Survey",
+            [3] = "Escort Professor Chanoix",
+            [4] = "Shanarha Grass Conservation",
+            [5] = "Counting Sheep",
+            [6] = "Supplies Recovery",
+            [7] = "Azure Experiments",
+            [8] = "Imperial Code",
+            [9] = "Red Versus Blue",
+            [10] = "Bloody Rhondo"
+    
+        },
+        [2492] = T{
+            -- "Mamool Ja Journal"
+            [1] = "Imperial Agent Rescue",
+            [2] = "Preemptive Strike",
+            [3] = "Sagelord Elimination",
+            [4] = "Breaking Morale",
+            [5] = "The Double Agent",
+            [6] = "Imperial Treasure Retrieval",
+            [7] = "Blitzkrieg",
+            [8] = "Marids in the Mist",
+            [9] = "Azure Ailments",
+            [10] = "The Susanoo Shuffle"
+        },
+    
+        [2493] = T{
+            -- "Lebros Chronicle"
+            [1] = "Excavation Duty",
+            [2] = "Lebros Supplies",
+            [3] = "Troll Fugitives",
+            [4] = "Evade and Escape",
+            [5] = "Siegemaster Assassination",
+            [6] = "Apkallu Breeding",
+            [7] = "Wamoura Farm Raid",
+            [8] = "Egg Conservation",
+            [9] = "Operation: Black Pearl",
+            [10] = "Better than One",
+        },
+        [2494] = T{
+            -- "Periqia Diary"
+            [1] = "Seagull Grounded",
+            [2] = "Requiem",
+            [3] = "Saving Private Ryaaf",
+            [4] = "Shooting Down the Baron",
+            [5] = "Building Bridges",
+            [6] = "Stop the Bloodshed",
+            [7] = "Defuse the Threat",
+            [8] = "Operation: Snake Eyes",
+            [9] = "Wake the Puppet",
+            [10] = "The Price Is Right",
+        },
+        [2495] = T{
+            -- "Ilrusi Ledger"
+            [1] = "Golden Salvage",
+            [2] = "Lamia No.13",
+            [3] = "Extermination",
+            [4] = "Demolition Duty",
+            [5] = "Searat Salvation",
+            [6] = "Apkallu Seizure",
+            [7] = "Lost and Found",
+            [8] = "Deserter",
+            [9] = "Desperately Seeking Cephalopods",
+            [10] = "Bellerophon's Bliss",
+        },
+    }
+
+    local names = missions[itemid]
+    local flags = {str:unpack("<q10")}
+    local data = T{flags}:key_map(function(id) return names[id] end)    
+    local rettab = {
+        type='Assault Log',
+        completed = S{data},
+        flags = flags,
+    }
+    return rettab
+end
+
+ 
+
 function decode.BonanzaMarble(str)
     local event_list = {
         [0x00] = 'CS Event Race',
@@ -2108,7 +2192,7 @@ typ_mapping = {
     --[17] = decode.ChocoboTicket, -- Chocobo Ticket and Completion Certificate
     [18] = decode.SoulPlate, -- Soul Plates
     [19] = decode.Reflector, -- Soul Reflectors
-    --[20] = decode.SalvageLog, -- Salvage Logs for the Mythic quest
+    --[20] = decode.AssaultLog, -- Assault Logs for the Mythic quest
     [21] = decode.BonanzaMarble, -- Mog Bonanza Marbles
     --[22] = decode.MazeTabulaM, -- MMM Maze Tabula M
     --[23] = decode.MazeTabulaR, -- MMM Maze Tabula R
@@ -2125,6 +2209,11 @@ id_mapping = {
     [0] = decode.EmptySlot,
     [4237] = decode.Hourglass,
     [5414] = decode.Lamp,
+    [2491] = decode.AssaultLog+{2491},
+    [2492] = decode.AssaultLog+{2492},
+    [2493] = decode.AssaultLog+{2493},
+    [2494] = decode.AssaultLog+{2494},
+    [2495] = decode.AssaultLog+{2495},
     }
 
 
