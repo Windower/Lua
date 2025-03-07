@@ -1972,7 +1972,7 @@ end
 
 function decode.AssaultLog(itemid, str) 
     local missions = T{
-        [2491] = T {
+        [2491] = T{
             -- "Leujaoam Log"
             [1] = "Leujaom Cleansing",
             [2] = "Orichalcum Survey",
@@ -2209,11 +2209,11 @@ id_mapping = {
     [0] = decode.EmptySlot,
     [4237] = decode.Hourglass,
     [5414] = decode.Lamp,
-    [2491] = functions.call+{decode.AssaultLog+{2491}}, -- I'm sorry
-    [2492] = functions.call+{decode.AssaultLog+{2492}},
-    [2493] = functions.call+{decode.AssaultLog+{2493}},
-    [2494] = functions.call+{decode.AssaultLog+{2494}},
-    [2495] = functions.call+{decode.AssaultLog+{2495}},
+    [2491] = decode.AssaultLog+{2491},
+    [2492] = decode.AssaultLog+{2492},
+    [2493] = decode.AssaultLog+{2493},
+    [2494] = decode.AssaultLog+{2494},
+    [2495] = decode.AssaultLog+{2495},
     }
 
 
