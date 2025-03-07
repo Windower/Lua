@@ -2042,11 +2042,11 @@ function decode.AssaultLog(itemid, str)
     }
 
     local names = missions[itemid]
-    local flags = {str:unpack("<q10")}
-    local data = T{flags}:key_map(function(id) return names[id] end)    
+    local flags = T{str:unpack("<q10")}
+    local data = flags:key_map(function(id) return names[id] end)    
     local rettab = {
         type='Assault Log',
-        completed = S{data},
+        completed = data,
         flags = flags,
     }
     return rettab
