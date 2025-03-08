@@ -157,9 +157,11 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
                         return true
                     end
                 else
-                    if spell.prefix == '/item' and bit.band(spell.target.spawn_type, 2) == 2 and find_inventory_item(spell.id) then
-                        --0x36 packet
-                        spell.action_type = 'Trade'
+                    if spell.prefix == '/item' and spell.target.type ~= 'NONE' then
+                        if bit.band(spell.target.spawn_type, 2) == 2 and find_inventory_item(spell.id) then
+                            --0x36 packet
+                            spell.action_type = 'Trade'
+                        end
                     end
                     return equip_sets('pretarget',-1,spell)
                 end
