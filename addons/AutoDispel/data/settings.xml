@@ -1,0 +1,12 @@
+<?xml version="1.1" ?>
+<settings>
+    <global>
+        <WatchFor>
+            dream flower,
+            bubble curtain
+        </WatchFor>
+        <!-- You don't need to use <t> in the command, it will be added automatically -->
+        <DoCommand>/ma "Dispel"</DoCommand>
+        <ExecDelay>2</ExecDelay>
+    </global>
+</settings>
