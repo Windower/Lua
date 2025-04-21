@@ -59,6 +59,7 @@ windower.register_event('outgoing chunk',function(id,org,mod,inj)
                 else
                     v.status = "sent"
                 end
+                break
             end
         end
         if pop_index then
