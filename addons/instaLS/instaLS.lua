@@ -28,7 +28,7 @@ _addon.name = 'instaLS'
 _addon.version = 0.220213
 _addon.author = 'Byrth'
 
-linkshell_inventories_loaded = false -- true
+linkshell_inventories_loaded = true
 queue = {}
 require 'strings'
 bit = require 'bit'
@@ -48,7 +48,7 @@ windower.register_event('incoming chunk', function(id,org)
 end)
 
 windower.register_event('outgoing chunk',function(id,org,mod,inj)
-    if id == 0xB5 and not inj and mod:byte(5) == 0 and #queue > 0 then -- and org:unpack('z',7) == message
+    if id == 0xB5 and not inj and mod:byte(5) == 0 and #queue > 0 then
         local pop_index, outpack = nil, nil
         for i, v in pairs(queue) do
             -- Not injected, message currently queued
