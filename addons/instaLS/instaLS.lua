@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'instaLS'
-_addon.version = 0.220213
+_addon.version = 0.250421
 _addon.author = 'Byrth'
 
 linkshell_inventories_loaded = true
