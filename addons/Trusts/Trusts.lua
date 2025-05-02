@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 _addon.name='Trusts'
 _addon.author='from20020516'
-_addon.version='1.1'
+_addon.version='1.2'
 _addon.commands={'trusts','tru'}
 
 config = require('config')
@@ -69,14 +69,7 @@ end)
 windower.register_event('addon command',function(...)
     cmd = {...}
     if cmd[1] == 'help' then
-        local chat = windower.add_to_chat
-        local color = string.color
-        chat(1,'Trusts - Command List:')
-        chat(207,'//tru '..color('save <setname>',166,160)..' --Save trusts in current party.')
-        chat(207,'//tru '..color('<setname>',166,160)..' --Calls trusts you saved.')
-        chat(207,'//tru '..color('list',166,160)..' --Lists your saved sets.')
-        chat(207,'//tru '..color('random',166,160)..' --What\'s your fortune today?')
-        chat(207,'//tru '..color('check',166,160)..' --List of unlearned trusts. gotta catch \'em all!')
+        show_help()
     elseif cmd[1] == 'save' then
         save_set(cmd[2])
     elseif cmd[1] == 'check' then
@@ -88,19 +81,35 @@ windower.register_event('addon command',function(...)
     end
 end)
 
+function show_help()
+    local chat = windower.add_to_chat
+    local color = string.color
+    chat(1,'Trusts - Command List:')
+    chat(207,'//tru '..color('save <setname>',166,160)..' --Save trusts in current party.')
+    chat(207,'//tru '..color('<setname>',166,160)..' --Calls trusts you saved.')
+    chat(207,'//tru '..color('list',166,160)..' --Lists your saved sets.')
+    chat(207,'//tru '..color('random',166,160)..' --What\'s your fortune today?')
+    chat(207,'//tru '..color('check',166,160)..' --List of unlearned trusts. gotta catch \'em all!')
+end
+
 function save_set(set)
+    if not set then
+        windower.add_to_chat(207, string.color('No set name provided.', 167)..' //tru '..string.color('save <setname>', 166, 160)..' --Save trusts in current party.')
+        return
+    end
+
     settings.sets[set] = {}
     local trust_ind = 0
     local get_party = windower.ffxi.get_party()
-    for i=1,5 do
+    for i = 1, 5 do
         local trust = get_party['p'..i]
         if trust and trust.mob.spawn_type == 14 then
             trust_ind = trust_ind + 1
-            settings.sets[set][tostring(trust_ind)]=trusts:with('models',trust.mob.models[1])[lang]
+            settings.sets[set][tostring(trust_ind)] = trusts:with('models', trust.mob.models[1])[lang]
         end
     end
     settings:save('all')
-    log('set '..set..' saved.')
+    log('Set "'..set..'" saved.')
 end
 
 function list_sets()
@@ -192,7 +201,7 @@ function call_set(set)
                             table.insert(queue,entity)
                         else
                             table.remove(retr,table.find(retr,party_ind[i]))
-                            error('You aren\'t trusted by '..entity.english..'.')
+                            windower.add_to_chat(207,'You aren\'t trusted by '..entity.english..'.')
                         end
                     else
                         table.remove(retr,table.find(retr,party_ind[i]))
@@ -218,7 +227,7 @@ function call_set(set)
             end
         end
     else
-        error('Unknown set name '..(set or ''))
+        windower.add_to_chat(207,'Unknown set name '..(set or ''))
     end
     --if /retr then wait at least 3secs.
     local delay = (limit - #party_ind) == 0 and math.max(0,settings.wait.retrall + time - os.clock()) or 0

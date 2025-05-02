@@ -276,6 +276,10 @@ do
                 elseif c == '[' then
                     local set = {}
                     local next = iterator()
+                    local negate = next == '^'
+                    if negate then
+                        next = iterator()
+                    end
                     while next ~= ']' do
                         local add = next == '%' and iterator() or next
                         if add == nil then
@@ -287,7 +291,9 @@ do
 
                     pattern[count] = {
                         type = types.match,
-                        value = function(b) return set[b] end,
+                        value = negate
+                            and function(b) return not set[b] end
+                            or function(b) return set[b] end,
                     }
                 elseif c == '^' then
                     if count > 1 then
@@ -740,10 +746,11 @@ do
 
             local res = {}
             local count = 0
-            local pos = 1
+            local pos = from or 1
             local startpos, endpos
             local match
-            while pos <= to + 1 do
+            local length = to or #str
+            while pos <= length + 1 do
                 startpos, endpos = str:find(sep, encoding, pos, to, raw)
                 if not startpos then
                     count = count + 1
@@ -777,7 +784,7 @@ do
                 encoding, maxsplit, include, raw, from, to = string.encoding.ascii, encoding, maxsplit, include, raw, from
             end
 
-            local res, key = split(str, sep, encoding, maxsplit, include, raw, from or 1, to or #str)
+            local res, key = split(str, sep, encoding, maxsplit, include, raw, from, to)
 
             if _meta.L then
                 res.n = key

@@ -17,6 +17,8 @@ _libs.lists = list
 _raw = _raw or {}
 _raw.table = _raw.table or {}
 
+local notify = warning or print
+
 _meta = _meta or {}
 _meta.L = {}
 
@@ -37,12 +39,11 @@ _meta.L.__newindex = function(l, k, v)
         if k >= 1 and k <= l.n then
             rawset(l, k, v)
         else
-            (warning or print)('Trying to assign outside of list range (%u/%u): %s':format(k, l.n, tostring(v)))
+            notify(('Trying to assign outside of list range (%u/%u): %s'):format(k, l.n, tostring(v)))
         end
 
     else
-        (warning or print)('Trying to assign to non-numerical list index:', k)
-
+        notify('Trying to assign to non-numerical list index:', k)
     end
 end
 _meta.L.__class = 'List'
@@ -86,7 +87,7 @@ function list.equals(l1, l2)
         return false
     end
 
-    for key = 1, l.n do
+    for key = 1, l1.n do
         if rawget(l1, key) ~= rawget(l2, key) then
             return false
         end
@@ -94,6 +95,8 @@ function list.equals(l1, l2)
 
     return true
 end
+
+_meta.L.__eq = list.equals
 
 function list.append(l, el)
     l.n = l.n + 1
@@ -105,8 +108,12 @@ function list.last(l, i)
 end
 
 function list.insert(l, i, el)
-    l.n = l.n + 1
-    table.insert(l, i, el)
+    if i <= l.n + 1 then
+        l.n = l.n + 1
+        table.insert(l, i, el)
+    else
+        notify(('Trying to insert outside of list range (%u/%u): %s'):format(i, l.n, tostring(el)))
+    end
 end
 
 function list.remove(l, i)
@@ -267,20 +274,6 @@ function list.it(l)
     end
 end
 
-function list.equals(l1, l2)
-    if l1.n ~= l2.n then
-        return false
-    end
-
-    for key = 1, l1.n do
-        if rawget(l1, key) ~= rawget(l2, key) then
-            return false
-        end
-    end
-
-    return true
-end
-
 function list.slice(l, from, to)
     local n = l.n
 
@@ -320,15 +313,24 @@ function list.clear(l)
 end
 
 function list.copy(l, deep)
-    deep = deep ~= false and true
+    deep = deep ~= false
     local res = {}
 
-    for key = 1, l.n do
-        local value = rawget(l, key)
-        if deep and type(value) == 'table' then
-            res[key] = (not rawget(value, copy) and value.copy or table.copy)(value)
-        else
-            res[key] = value
+    if deep then
+        for key = 1, l.n do
+            local value = rawget(l, key)
+            if type(value) == 'table' then
+                local mt = getmetatable(value)
+                local index = mt and mt.__index
+                local copy = type(index) == 'function' and index(value, 'copy') or type(index) == 'table' and value.copy or table.copy
+                res[key] = copy(value, deep)
+            else
+                res[key] = value
+            end
+        end
+    else
+        for key = 1, l.n do
+            res[key] = rawget(l, key)
         end
     end
 
@@ -422,7 +424,7 @@ function list.format(l, trail, subs)
     for i = 1, l.n do
         local add = tostring(l[i])
         if trail == 'csv' and add:match('[,"]') then
-            res = res .. add:gsub('"', '""'):enclose('"')
+            res = res .. '"' .. add:gsub('"', '""') .. '"'
         else
             res = res .. add
         end

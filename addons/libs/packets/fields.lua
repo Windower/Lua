@@ -106,7 +106,7 @@ do
     end
 
     bufftime = function(ts)
-        return fn(1009810800 + (ts / 60) + 0x100000000 / 60 * 9) -- increment last number every 2.27 years
+        return fn(1009810800 + (ts / 60) + 0x100000000 / 60 * 10) -- increment last number every 2.27 years
     end
 end
 
@@ -3426,6 +3426,20 @@ fields.incoming[0x0A0] = L{
 }
 
 --0x0AA, 0x0AC, and 0x0AE are all bitfields where the lsb indicates whether you have index 0 of the related resource.
+fields.incoming[0x0AA] = L{
+    {ctype='data[0x80]',        label='Spells'},                                -- 04
+}
+
+fields.incoming[0x0AC] = L{
+    {ctype='data[0x40]',        label='Weapon Skills'},                         -- 04
+    {ctype='data[0x40]',        label='Job Abilities'},                         -- 44
+    {ctype='data[0x40]',        label='Pet Abilities'},                         -- 84
+    {ctype='data[0x20]',        label='Job Traits'},                            -- C4
+}
+
+fields.incoming[0x0AE] = L{
+    {ctype='data[7]',        label='Mounts'},                                -- 04
+}
 
 -- Moblin Maze Mongers information
 -- It appears that they anticipated a substantial expansion of the system,
