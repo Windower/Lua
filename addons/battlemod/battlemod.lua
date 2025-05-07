@@ -184,7 +184,7 @@ windower.register_event('incoming text',function (original, modified, color, col
         end
     end
     
-    return modified,color
+    return modified, color_m
 end)
 
 function bm_message(original)
