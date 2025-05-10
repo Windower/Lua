@@ -30,7 +30,7 @@ _addon.author = 'Byrth'
 
 linkshell_inventories_loaded = true
 queue = {}
-require 'strings'
+require('strings')
 bit = require 'bit'
 
 function translate_escape(str)
@@ -50,9 +50,10 @@ end)
 windower.register_event('outgoing chunk',function(id,org,mod,inj)
     if id == 0xB5 and not inj and mod:byte(5) == 0 and #queue > 0 then
         local pop_index, outpack = nil, nil
+        local msg = org:sub(6)
         for i, v in pairs(queue) do
             -- Not injected, message currently queued
-            if string.find(org, v.message) then
+            if string.find(msg, v.message) then
                 outpack = mod:sub(1,4)..string.char(v.chatmode)..mod:sub(6)
                 if v.status == "seen" then
                     pop_index = i
@@ -73,7 +74,14 @@ end)
 
 windower.register_event('incoming text',function(org, mod, col)
     if #queue > 0 then
-        local a,b = string.find(mod,windower.ffxi.get_player().name)
+        local player = windower.ffxi.get_player()
+        if not player or not player.name then
+            return
+        end
+        local a,b = string.find(mod,player.name)
+        if a == nil then
+            return
+        end
         local pop_index, retarr = nil, nil
         for i,v in pairs(queue) do
             if string.find(org,translate_escape(v.message)) then
