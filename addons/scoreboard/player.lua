@@ -48,7 +48,7 @@ function Player:new (o)
     }
     attrs.name = o.name
     o = attrs
-    if o.name:match('^Skillchain%(') then
+    if o.name:match('^Skillchain%(') or o.name:match('^SC:') then
         o.is_sc = true
     else
         o.is_sc = false
@@ -148,7 +148,7 @@ function Player:get_name() return self.name end
 return Player
 
 --[[
-Copyright (c) 2013, Jerry Hebert
+Copyright © 2013, Jerry Hebert
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
