@@ -12,13 +12,6 @@
     <support>http://forums.windower.net/topic/21775-random-question-thread/</support>
   </addon>
   <addon>
-    <name>AEcho</name>
-    <description>Automatically uses echo drops when you get silenced. Also, uses send to send a message to an alt that you got debuffed.</description>
-    <author>Nitrous (Shiva)</author>
-    <support>https://discord.gg/aUrHCvk</support>
-    <bugtracker>https://github.com/nitrous24/Lua/issues</bugtracker>
-  </addon>
-  <addon>
     <name>AnnounceTarget</name>
     <author>JoshK6656, Sechs</author>
     <description>Creates special manual or automatic chat messages conveying advanced information about some specific targets</description>
