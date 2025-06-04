@@ -577,6 +577,7 @@ function create_mob_name(actionpacket)
     else
         return actor
     end
+end
 
 config.register(settings, function(settings)
     update_dps_clock:loop(settings.UpdateFrequency)
