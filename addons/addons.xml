@@ -432,13 +432,6 @@
     <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
   </addon>
   <addon>
-    <name>pet_fix</name>
-    <author>Byrth</author>
-    <description>Temporary addon that fixes a null pointer animation error with pets that is causing crashes.</description>
-    <bugtracker>https://github.com/Byrth/Lua-Byrth/issues</bugtracker>
-    <support>https://discord.gg/aUrHCvk</support>
-  </addon>
-  <addon>
     <name>PetSchool</name>
     <author>Banggugyangu</author>
     <description>A helper addon for PUPs using spellcast, it informs spellcast of pet casting (healing or nuking).</description>
