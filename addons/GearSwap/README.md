@@ -16,15 +16,17 @@ Commands (<> indicates a field. You do not actually have to use <>s):
 ** gs eval <string> : This command evaluates the <string> as Lua code in the global gearswap environment (not the user environment, which is in the user_env table). It is only available when debugmode is on.
 * gs showswaps : Shows when your gear successfully changes and what it changes to.
 * gs load <string> : (or l <string>) Attempts to load the first version of <string> found, assuming it is a file path relative to 9 potential base directories, in this order:
-** ..GearSwap/libs-dev/<string>
-** ..GearSwap/libs/<string>
-** GearSwap/data/<character_name>/<string>
-** GearSwap/data/common/<string>
-** GearSwap/data/<string>
-** APPDATA/Windower/GearSwap/<character_name>/<string>
-** APPDATA/Windower/GearSwap/common/<string>
-** APPDATA/Windower/GearSwap/<string>
-** ..Windower/addons/libs/<string>
+  
+  * ..GearSwap/libs-dev/<string>
+  * ..GearSwap/libs/<string>
+  * GearSwap/data/<character_name>/<string>
+  * GearSwap/data/common/<string>
+  * GearSwap/data/<string>
+  * APPDATA/Windower/GearSwap/<character_name>/<string>
+  * APPDATA/Windower/GearSwap/common/<string>
+  * APPDATA/Windower/GearSwap/<string>
+  * ..Windower/addons/libs/<string>
+
 * gs reload : Reloads the current user file.
 * gs export <options> : Exports your currently equipped gear, inventory, or all the items in your current Lua files' sets into GearSwap .lua or spellcast .xml format. Takes options "inventory", "all", "wearable", "sets", and "xml." Defaults to currently equipped gear and lua otherwise. Also exports appropriate advanced set tables with augments for currently equipped gear and inventory.
 * gs enable <slot> : Enables equip commands targeting a specified slot. "All" will allow all equip commands. Providing no slot argument will enable user GearSwap file execution, if it was disabled.
