@@ -642,7 +642,7 @@ do
                 return _raw.string.match(str, pattern, from)
             end
 
-            return process(str, string.find(str, pattern, adjust_from(str, from), false, encoding, adjust_to(str, to)))
+            return process(str, string.find(str, pattern, encoding, adjust_from(str, from), adjust_to(str, to), false))
         end
     end
 
