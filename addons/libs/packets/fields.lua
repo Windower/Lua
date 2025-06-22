@@ -4045,6 +4045,9 @@ fields.incoming[0x118] = L{
     {ctype='signed int',        label='Domain Points Earned Today'},                -- 88
     {ctype='signed int',        label='Mog Segments'},                              -- 8C
     {ctype='signed int',        label='Gallimaufry'},                               -- 90
+    {ctype='signed int',        label='Imperial Standing Accolades'},               -- 94
+    {ctype='signed int',        label='Temenos Units'},                             -- 98
+    {ctype='signed int',        label='Apollyon Units'},                            -- 9C
 }
 
 types.ability_recast = L{
