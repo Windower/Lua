@@ -334,6 +334,7 @@ end)
 
 
 windower.register_event('addon command', function(command)
+    command = command or 'help'
     if command:lower() == 'help' then
         windower.add_to_chat(8,'DistancePlus: Valid Modes are //DP <command>:')
         windower.add_to_chat(8,' Gun, Bow, Xbow, Magic, JA')

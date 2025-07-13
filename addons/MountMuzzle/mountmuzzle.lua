@@ -29,12 +29,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon.name = 'Mount Muzzle'
 _addon.description = 'Change or remove the default mount music.'
 _addon.author = 'Sjshovan (Apogee) sjshovan@gmail.com'
-_addon.version = '0.9.5'
+_addon.version = '0.9.6'
 _addon.commands = {'mountmuzzle', 'muzzle', 'mm'}
 
 local _logger = require('logger')
 local _config = require('config')
 local _packets = require('packets')
+local _resources = require('resources')
 
 require('constants')
 require('helpers')
@@ -42,7 +43,8 @@ require('helpers')
 local needs_inject = false
 
 local defaults = {
-    muzzle = muzzles.silent.name
+    muzzle = muzzles.silent.name,
+    custom = {}
 }
 
 local settings = _config.load(defaults)
@@ -55,6 +57,7 @@ local help = {
         buildHelpCommandEntry('list', 'Display the available muzzle types.'),
         buildHelpCommandEntry('set <muzzle>', 'Set the current muzzle to the given muzzle type.'),
         buildHelpCommandEntry('get', 'Display the current muzzle.'),
+        buildHelpCommandEntry('custom <mount> <track_number>', 'Associate a specific BGM track with a mount for the Custom muzzle type.'),
         buildHelpCommandEntry('default', 'Set the current muzzle to the default (Silent).'),
         buildHelpCommandEntry('unload', 'Unload Mount Muzzle.'),
         buildHelpCommandEntry('reload', 'Reload Mount Muzzle.'),
@@ -70,6 +73,7 @@ local help = {
         buildHelpTypeEntry(muzzles.mount.name:ucfirst(), muzzles.mount.description),
         buildHelpTypeEntry(muzzles.chocobo.name:ucfirst(), muzzles.chocobo.description),
         buildHelpTypeEntry(muzzles.zone.name:ucfirst(), muzzles.zone.description),
+        buildHelpTypeEntry(muzzles.custom.name:ucfirst(), muzzles.custom.description),
         buildHelpSeperator('=', 23),
     },
     about = {
@@ -87,10 +91,13 @@ local help = {
             s = muzzles.silent.name,
             m = muzzles.mount.name,
             c = muzzles.chocobo.name,
-            z = muzzles.zone.name
+            z = muzzles.zone.name,
+            u = muzzles.custom.name
         }
     }
 }
+
+local possible_mounts = _resources.mounts:map(function(mount) return mount.name:lower() end)
 
 function display_help(table_help)
     for index, command in pairs(table_help) do
@@ -126,6 +133,11 @@ function setMuzzle(muzzle)
     settings:save()
 end
 
+function setCustom(mount, song)
+    settings.custom[mount] = song
+    settings:save()
+end
+
 function playerInReive()
     return getPlayerBuffs():contains(player.buffs.reiveMark)
 end
@@ -137,7 +149,7 @@ function playerIsMounted()
         return _player.status == player.statuses.mounted or getPlayerBuffs():contains(player.buffs.mounted)
     end
     
-    return false 
+    return false
 end
 
 function muzzleValid(muzzle)
@@ -159,10 +171,10 @@ function requestInject()
     needs_inject = true
 end
 
-function handleInjectionNeeds() 
+function handleInjectionNeeds()
     if needs_inject and playerIsMounted() then
         injectMuzzleMusic()
-        needs_inject = false; 
+        needs_inject = false;
     end
 end
 
@@ -171,7 +183,7 @@ function tryInject()
     handleInjectionNeeds()
 end
 
-windower.register_event('login', 'load', 'zone change', function() 
+windower.register_event('login', 'load', 'zone change', function()
     tryInject()
 end)
 
@@ -181,21 +193,21 @@ windower.register_event('addon command', function(command, ...)
     else 
         return display_help(help.commands)
     end
-    
+
     local command_args = {...}
     local respond = false
     local response_message = ''
     local success = true
-    
+
     if command == 'list' or command == 'l' then
         display_help(help.types)
 
     elseif command == 'set' or command == 's' then
         respond = true
-        
+
         local muzzle = tostring(command_args[1]):lower()
         local from_alias = help.aliases.muzzles[muzzle]
-        
+
         if (from_alias ~= nil) then
             muzzle = from_alias
         end
@@ -207,6 +219,20 @@ windower.register_event('addon command', function(command, ...)
             requestInject()
             setMuzzle(muzzle)
             response_message = 'Updated current muzzle to %s.':format(muzzle:ucfirst():color(colors.secondary))
+        end
+
+    elseif command == 'custom' or command == 'c' then
+        respond = true
+
+        local mount = command_args[1]:lower()
+        local song = tonumber(command_args[2])
+        if not possible_mounts:contains(mount) then
+            success = false
+            response_message = 'Unknown mount %s.':format(mount:color(colors.secondary))
+        else
+            setCustom(mount, song)
+            requestInject()
+            response_message = 'Set music for %s to track %s, %s.':format(mount:color(colors.secondary), tostring(song), songs[song]:color(colors.secondary))
         end
 
     elseif command == 'get' or command == 'g' then
@@ -222,7 +248,7 @@ windower.register_event('addon command', function(command, ...)
 
     elseif command == 'reload' or command == 'r' then
         windower.send_command('lua r mountmuzzle')
-    
+
     elseif command == 'unload' or command == 'u' then
         respond = true
         response_message = 'Thank you for using Mount Muzzle. Goodbye.'
@@ -231,7 +257,7 @@ windower.register_event('addon command', function(command, ...)
 
     elseif command == 'about' or command == 'a' then
         display_help(help.about)
-        
+
     elseif command == 'help' or command == 'h' then
         display_help(help.commands)
     else
@@ -243,19 +269,29 @@ windower.register_event('addon command', function(command, ...)
             buildCommandResponse(response_message, success)
         )
     end
-    
+
     handleInjectionNeeds()
 end)
 
 windower.register_event('incoming chunk', function(id, data)
-     if id == packets.inbound.music_change.id then
+    if id == packets.inbound.music_change.id then
         local packet = _packets.parse('incoming', data)
-        
+
         if packet['BGM Type'] == music.types.mount then
-            packet['Song ID'] = resolveCurrentMuzzle().song
-            return _packets.build(packet)
+           packet['Song ID'] = resolveCurrentMuzzle().song
+           return _packets.build(packet)
         end
-        
+
         tryInject()
+    end
+end)
+
+windower.register_event('outgoing chunk', function(id, data)
+    if id == packets.outbound.action.categories.mount then
+        if getMuzzle() == 'custom' then
+            local packet = _packets.parse('outgoing', data)
+            local current_mount = packet['Param']
+            muzzles.custom.song = settings.custom[possible_mounts[current_mount]]
+        end
     end
 end)
