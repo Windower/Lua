@@ -32,7 +32,7 @@ default_settings.UpdateFrequency = 0.5
 default_settings.combinepets = true
 default_settings.oneperline = false
 default_settings.compactsc = false
-default_settings.compactpets = false
+default_settings.creditpetdamagetoowner = false
 
 default_settings.display = {}
 default_settings.display.pos = {}
@@ -98,6 +98,7 @@ windower.register_event('addon command', function()
             sb_output('sb stat <stat> [<player>] : Shows specific damage stats. Respects filters. If player isn\'t specified, stats for everyone are displayed.')
             sb_output('  Valid stats are: '..dps_db.player_stat_fields:tostring():stripchars('{}"'))
             sb_output('sb set <flag> <value> : Sets configuration variables')
+            sb_output('  Valid flags are: CombinePets, NumPlayers, BGTransparency, Font, SBColor, ShowAlliDPS, ResetFilters, ShowFellow, OnePerLine, CompactSC, CreditPetDamageToOwner')
         elseif command == 'pos' then
             if params[2] then
                 local posx, posy = tonumber(params[1]), tonumber(params[2])
@@ -112,105 +113,102 @@ windower.register_event('addon command', function()
             end
 
             local setting = params[1]
-            if setting == 'combinepets' then
-                if params[2] == 'true' then
+            if setting:lower() == 'combinepets' then
+                if params[2]:lower() == 'true' then
                     settings.combinepets = true
-                elseif params[2] == 'false' then
+                elseif params[2]:lower() == 'false' then
                     settings.combinepets = false
                 else
-                    error("Invalid value for 'combinepets'. Must be true or false.")
+                    error("Invalid value for 'CombinePets'. Must be true or false.")
                     return
                 end
                 settings:save()
-                sb_output("Setting 'combinepets' set to " .. tostring(settings.combinepets))
-            elseif setting == 'numplayers' then
+                sb_output("Setting 'CombinePets' set to " .. tostring(settings.combinepets))
+            elseif setting:lower() == 'numplayers' then
                 settings.numplayers = tonumber(params[2])
                 settings:save()
                 display:update()
-                sb_output("Setting 'numplayers' set to " .. settings.numplayers)
-            elseif setting == 'bgtransparency' then
+                sb_output("Setting 'NumPlayers' set to " .. settings.numplayers)
+            elseif setting:lower() == 'bgtransparency' then
                 settings.display.bg.alpha  = tonumber(params[2])
                 settings:save()
                 display:update()
-                sb_output("Setting 'bgtransparency' set to " .. settings.display.bg.alpha)
-            elseif setting == 'font' then
+                sb_output("Setting 'BGTransparency' set to " .. settings.display.bg.alpha)
+            elseif setting:lower() == 'font' then
                 settings.display.text.font = params[2]
                 settings:save()
                 display:update()
-                sb_output("Setting 'font' set to " .. settings.display.text.font)
-            elseif setting == 'sbcolor' then
+                sb_output("Setting 'Font' set to " .. settings.display.text.font)
+            elseif setting:lower() == 'sbcolor' then
                 settings.sbcolor = tonumber(params[2])
                 settings:save()
-                sb_output("Setting 'sbcolor' set to " .. settings.sbcolor)
-            elseif setting == 'showallidps' then
-                if params[2] == 'true' then
+                sb_output("Setting 'SBColor' set to " .. settings.sbcolor)
+            elseif setting:lower() == 'showallidps' then
+                if params[2]:lower() == 'true' then
                     settings.showallidps = true
-                elseif params[2] == 'false' then
+                elseif params[2]:lower() == 'false' then
                     settings.showallidps = false
                 else
-                    error("Invalid value for 'showallidps'. Must be true or false.")
+                    error("Invalid value for 'ShowAlliDPS'. Must be true or false.")
                     return
                 end
-                
                 settings:save()
-                sb_output("Setting 'showalldps' set to " .. tostring(settings.showallidps))
-            elseif setting == 'resetfilters' then
-                if params[2] == 'true' then
+                sb_output("Setting 'ShowAlliDPS' set to " .. tostring(settings.showallidps))
+            elseif setting:lower() == 'resetfilters' then
+                if params[2]:lower() == 'true' then
                     settings.resetfilters = true
-                elseif params[2] == 'false' then
+                elseif params[2]:lower() == 'false' then
                     settings.resetfilters = false
                 else
-                    error("Invalid value for 'resetfilters'. Must be true or false.")
+                    error("Invalid value for 'ResetFilters'. Must be true or false.")
                     return
                 end
-                
                 settings:save()
-                sb_output("Setting 'resetfilters' set to " .. tostring(settings.resetfilters))
-            elseif setting == 'showfellow' then
-                if params[2] == 'true' then
+                sb_output("Setting 'ResetFilters' set to " .. tostring(settings.resetfilters))
+            elseif setting:lower() == 'showfellow' then
+                if params[2]:lower() == 'true' then
                     settings.showfellow = true
-                elseif params[2] == 'false' then
+                elseif params[2]:lower() == 'false' then
                     settings.showfellow = false
                 else
-                    error("Invalid value for 'showfellow'. Must be true or false.")
+                    error("Invalid value for 'ShowFellow'. Must be true or false.")
                     return
                 end
-                
                 settings:save()
-                sb_output("Setting 'showfellow' set to " .. tostring(settings.showfellow))
-            elseif setting == 'oneperline' then
-                if params[2] == 'true' then
+                sb_output("Setting 'ShowFellow' set to " .. tostring(settings.showfellow))
+            elseif setting:lower() == 'oneperline' then
+                if params[2]:lower() == 'true' then
                     settings.oneperline = true
-                elseif params[2] == 'false' then
+                elseif params[2]:lower() == 'false' then
                     settings.oneperline = false
                 else
-                    error("Invalid value for 'oneperline'. Must be true or false.")
+                    error("Invalid value for 'OnePerLine'. Must be true or false.")
                     return
                 end
                 settings:save()
-                sb_output("Setting 'oneperline' set to " .. tostring(settings.oneperline))
-            elseif setting == 'compactsc' then
-                if params[2] == 'true' then
+                sb_output("Setting 'OnePerLine' set to " .. tostring(settings.oneperline))
+            elseif setting:lower() == 'compactsc' then
+                if params[2]:lower() == 'true' then
                     settings.compactsc = true
-                elseif params[2] == 'false' then
+                elseif params[2]:lower() == 'false' then
                     settings.compactsc = false
                 else
-                    error("Invalid value for 'compactsc'. Must be true or false.")
+                    error("Invalid value for 'CompactSC'. Must be true or false.")
                     return
                 end
                 settings:save()
-                sb_output("Setting 'compactsc' set to " .. tostring(settings.compactsc))
-            elseif setting == 'compactpets' then
-                if params[2] == 'true' then
-                    settings.compactpets = true
-                elseif params[2] == 'false' then
-                    settings.compactpets = false
+                sb_output("Setting 'CompactSC' set to " .. tostring(settings.compactsc))
+            elseif setting:lower() == 'creditpetdamagetoowner' then
+                if params[2]:lower() == 'true' then
+                    settings.creditpetdamagetoowner = true
+                elseif params[2]:lower() == 'false' then
+                    settings.creditpetdamagetoowner = false
                 else
-                    error("Invalid value for 'compactpets'. Must be true or false.")
+                    error("Invalid value for 'CreditPetDamageToOwner'. Must be true or false.")
                     return
                 end
                 settings:save()
-                sb_output("Setting 'compactpets' set to " .. tostring(settings.compactpets))
+                sb_output("Setting 'CreditPetDamageToOwner' set to " .. tostring(settings.creditpetdamagetoowner))
             end
         elseif command == 'reset' then
             reset()
@@ -490,8 +488,7 @@ function action_handler(raw_actionpacket)
                             300,301,302,385,386,387,388,
                             389,390,391,392,393,394,395,
                             396,397,398,732,767,768,769,770}:contains(add.message_id) then
-                            actor_name = string.format("Skillchain(%s%s)", actor_name:sub(1, 3),
-                                                        actor_name:len() > 3 and '.' or '')
+                            actor_name = string.format("Skillchain (%s%s)", actor_name:sub(1, 3))
                         end
                     else
                         if T{196,223,288,289,290,291,292,
@@ -545,35 +542,18 @@ ActionPacket.open_listener(action_handler)
 function create_mob_name(actionpacket)
     local actor = actionpacket:get_actor_name()
     local result = ''
-    local owner = find_pet_owner_name(actionpacket)
+    local owner, pet = find_pet_owner_name(actionpacket)
     if owner ~= nil then
-        if string.len(actor) > 8 then
-            result = string.sub(actor, 1, 7)..'.'
-        else
-            result = actor
-        end
-        if settings.combinepets then
-            if settings.compactpets then
-                result = 'Pets:'
-            else
-                result = actor
-            end
-            if settings.combinepets then
-                result = ''
-            else
-                result = actor
-            end
-            if pet then
-                result = '('..owner..')'..' '..pet
-            end
-        else
+        if pet == nil then
             return actor
-        end
-        if settings.compactpets then
-            result = result..string.sub(owner, 1, 11)
+        elseif settings.combinepets then
+            result = "Pets"
+        elseif settings.creditpetdamagetoowner then
+            result = owner
         else
-            result = result..' ('..string.sub(owner, 1, 3)..'.)'
+            result = string.sub(pet, 1, 8) .. " (" .. string.sub(owner, 1, 3) .. ")"
         end
+        return result
     else
         return actor
     end
