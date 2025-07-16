@@ -488,7 +488,7 @@ function action_handler(raw_actionpacket)
                             300,301,302,385,386,387,388,
                             389,390,391,392,393,394,395,
                             396,397,398,732,767,768,769,770}:contains(add.message_id) then
-                            actor_name = string.format("Skillchain (%s%s)", actor_name:sub(1, 3))
+                            actor_name = string.format("Skillchain (%s)", actor_name:sub(1, 3))
                         end
                     else
                         if T{196,223,288,289,290,291,292,
