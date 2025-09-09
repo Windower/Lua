@@ -129,7 +129,7 @@ function displayabilities(distance,master_pet_distance,s,t)
         ability_distance = res.job_abilities[ability].range
         if distance and ability_name and (ability_type == 'JobAbility' or ability_type == 'PetCommand' or ability_type == 'BloodPactRage' or ability_type == 'BloodPactWard' or ability_type == 'Monster' or ability_type == 'Step') and ability_en ~= "Flourishes II" then 
             if ability_targets.Self ~= true then
-                if ability_distance ~= 0 and distance < (t.model_size + ability_distance * range_mult[ability_distance] + s.model_size) and distance ~= 0 then 
+                if distance < (t.model_size + ability_distance * range_mult[ability_distance] + s.model_size) and distance ~= 0 then 
                     list = list..'\\cs(0,255,0)'..ability_name..'\\cs(255,255,255)'..'\n'
                 else
                     list = list..'\\cs(255,255,255)'..ability_name..'\n'
