@@ -29,6 +29,7 @@ _addon.author  = 'Zubis'
 _addon.version = '1.0.2'
 _addon.command = 'SpellCheck'
 
+local functions = require('functions')
 require('sets')
 require('tables')
 res = require('resources')
@@ -75,7 +76,7 @@ function display_spell_count(command)
     
     --Get all, current and missing spells 
     all_spells = res.spells:type(spell_type[command]):keyset()
-    current_spells = T(windower.ffxi.get_spells()):filter(boolean._true):keyset()   
+    current_spells = T(windower.ffxi.get_spells()):filter(functions.equals(true)):keyset()
     
     missing_spells = all_spells - current_spells
     current_spells = all_spells * current_spells
