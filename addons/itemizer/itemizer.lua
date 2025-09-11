@@ -1,6 +1,6 @@
 _addon.name = 'Itemizer'
 _addon.author = 'Ihina'
-_addon.version = '3.1.0.0'
+_addon.version = '3.1.0.1'
 _addon.command = 'itemizer'
 
 require('luau')
@@ -194,7 +194,7 @@ windower.register_event('unhandled command', function(command, ...)
             return
         end
 
-        local item_name = args:concat(' ')
+        local item_name = windower.from_shift_jis(args:concat(' '))
  
         local item_ids = (S(res.items:name(windower.wc_match-{item_name})) + S(res.items:name_log(windower.wc_match-{item_name}))):map(table.get-{'id'})
         if item_ids:length() == 0 then
@@ -336,12 +336,14 @@ windower.register_event('outgoing text', function()
     return function(text)
         -- Ninjutsu
         if settings.AutoNinjaTools and (text:startswith('/ma ') or text:startswith('/nin ') or text:startswith('/magic ') or text:startswith('/ninjutsu ')) then
+            local text_utf8 = windower.from_shift_jis(text)
             local name
             for pattern in patterns:it() do
-                local match = text:match(pattern)
+                local match = text_utf8:match(pattern)
                 if match then
-                    if ninjutsu:with('name', string.imatch-{match}) then
-                        name = match:lower():capitalize():match('%w+')
+                    local spell = ninjutsu:with('name', string.imatch-{match, string.encoding.utf8})
+                    if spell then
+                        name = spell.en:match('%w+')
                         break
                     end
                 end
@@ -374,10 +376,11 @@ windower.register_event('outgoing text', function()
                 end
             end
 
-            local parsed_text = item_count and text:match(' (.+) (%d+)$') or text:match(' (.+)')
+            local text_utf8 = windower.from_shift_jis(text)
+            local parsed_text = item_count and text_utf8:match(' (.+) (%d+)$') or text_utf8:match(' (.+)')
             local mid_name = parsed_text:match('"(.+)"') or parsed_text:match('\'(.+)\'') or parsed_text:match('(.+) ')
             local full_name = parsed_text:match('(.+)')
-            local id = item_names:find(string.imatch-{mid_name}) or item_names:find(string.imatch-{full_name})
+            local id = item_names:find(string.imatch-{mid_name, string.encoding.utf8}) or item_names:find(string.imatch-{full_name, string.encoding.utf8})
             if id then
                 if not inventory_items:contains(id) and not wardrobe_items:contains(id) then
                     return reschedule(text, {id}, items)
