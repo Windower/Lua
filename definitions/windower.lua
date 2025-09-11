@@ -46,7 +46,7 @@ windower = {
 
     ---Executes a file on the system. Activity remains on the current window.
     ---@param file string The path to the file.
-    ---@param arguments table List of arguments to pass.
+    ---@param arguments string[] List of arguments to pass.
     ---@return nil
     execute = function(file, arguments) end,
 
@@ -57,7 +57,7 @@ windower = {
 
     ---Returns a table of files and directories within one directory.
     ---@param path string The path to the directory.
-    ---@return table #List of file/directory names.
+    ---@return string[] #List of file and directory names.
     get_dir = function(path) end,
 
     ---Returns the contents of the clipboard, or `nil` if the clipboard is empty or contains non-text content.
@@ -65,7 +65,7 @@ windower = {
     get_from_clipboard = function() end,
 
     ---Returns the currently set in-game chat filters.
-    ---@return table #Chat filter settings.
+    ---@return (0|1)[] #Chat filter settings.
     get_chat_filters = function() end,
 
     ---Returns a table of the user's Windower settings.
@@ -87,8 +87,7 @@ windower = {
     ---@return integer ... Handles to registered functions.
     register_event = function(...) end,
 
-    ---Sends an IPC message to all other Windower instances that have the same addon loaded.
-    ---This message is handled by the ipc message event.
+    ---Sends an IPC message to all other Windower instances that have the same addon loaded. This message is handled by the `"ipc message"` event.
     ---@param msg string Message to send.
     ---@return nil
     send_ipc_message = function(msg) end,
