@@ -6,6 +6,25 @@
 ---@field windower_path string Absolute path to the running Windower instance directory.
 ---@field addon_path string Absolute path to the current addon directory.
 windower = {
+
+	---Outputs a message to the chatlog.
+	---The chatmode argument roughly corresponds to color.
+	---@param mode integer Chat mode to use.
+	---@param msg string Message to write.
+	---@return nil
+	add_to_chat = function(mode, msg) end,
+
+	---Creates the final directory in the path.
+	---Will error if a middle directory does not exist.
+	---@param path string The path to the folder.
+	---@return boolean, string|nil #Status and error message.
+	create_dir = function(path) end,
+
+	---Removes all auto-translate formatting, if present, from the input string.
+	---@param str string Input string optionally containing auto-translated blocks.
+	---@return string Input string with auto translate blocks replace with plain text equivalents.
+	convert_auto_trans = function(str) end,
+
 	---Checks whether or not a file exists.
 	---@param path string Absolute file path to check.
 	---@return boolean #Whether or not the provided path exists
@@ -20,6 +39,20 @@ windower = {
 	---@param ... any Any number of event names, followed by a function to execute.
 	---@return integer ... Handles to registered functions.
 	register_event = function(...) end,
+
+
+	---This function opens a URL in the default browser. Similar to chatmon, it suffers the same limitation of some incompatibility, particularly with Firefox.
+	---@param url string - URL to open.
+	open_url = function(url) end,
+
+	---Searches str for pattern. Allowed tokens:
+	---	      ? matches any one character;
+	---       * matches arbitrary many characters;
+	---      \| alternation, matches either the left of it or the right of it
+	---@param str string Input string to match
+	---@param pattern string Pattern to match against
+	---@return boolean #True if str matches pattern
+	wc_match = function(str, pattern) end,
 
 	---FFXI in-game related functions.
 	---@class windower.ffxi
