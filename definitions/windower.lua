@@ -937,6 +937,125 @@ windower = {
         set_visibility = function(prim_name, visible) end,
     },
 
+    ---Basic text object functions. For more advanced functionality (draggable,
+    ---updatable, persistent properties), see the Texts Library.
+    ---@class windower.text
+    text = {
+        ---Creates a text object.
+        ---@param name string Identifier for the text object.
+        ---@return nil
+        create = function(name) end,
+
+        ---Destroys a text object.
+        ---@param name string Identifier for the text object.
+        ---@return nil
+        delete = function(name) end,
+
+        ---Returns the width and height of the text object.
+        ---@param name string Identifier for the text object.
+        ---@return number x, number y #Size in pixels.
+        get_extents = function(name) end,
+
+        ---Returns the x and y coordinates of the top-left corner.
+        ---@param name string Identifier for the text object.
+        ---@return number x, number y #Position in pixels.
+        get_location = function(name) end,
+
+        ---Sets the background border size in pixels.
+        ---@param name string Identifier for the text object.
+        ---@param px integer Border size in pixels.
+        ---@return nil
+        set_bg_border_size = function(name, px) end,
+
+        ---Sets the background color.
+        ---@param name string Identifier for the text object.
+        ---@param alpha integer Alpha value (0–255).
+        ---@param red integer Red value (0–255).
+        ---@param green integer Green value (0–255).
+        ---@param blue integer Blue value (0–255).
+        ---@return nil
+        set_bg_color = function(name, alpha, red, green, blue) end,
+
+        ---Toggles background visibility.
+        ---@param name string Identifier for the text object.
+        ---@param visible boolean Whether the background is visible.
+        ---@return nil
+        set_bg_visibility = function(name, visible) end,
+
+        ---Enables or disables bold font.
+        ---@param name string Identifier for the text object.
+        ---@param bold boolean `true` for bold, `false` for normal.
+        ---@return nil
+        set_bold = function(name, bold) end,
+
+        ---Sets the font color.
+        ---@param name string Identifier for the text object.
+        ---@param alpha integer Alpha value (0–255).
+        ---@param red integer Red value (0–255).
+        ---@param green integer Green value (0–255).
+        ---@param blue integer Blue value (0–255).
+        ---@return nil
+        set_color = function(name, alpha, red, green, blue) end,
+
+        ---Sets font. Accepts multiple fonts as fallbacks if the previous is not installed
+        ---@param name string Identifier for the text object.
+        ---@param ... string Font names in order of preference.
+        ---@return nil
+        set_font = function(name, ...) end,
+
+        ---Sets the font size.
+        ---@param name string Identifier for the text object.
+        ---@param size integer Font size in points.
+        ---@return nil
+        set_font_size = function(name, size) end,
+
+        ---Enables or disables italic font.
+        ---@param name string Identifier for the text object.
+        ---@param italic boolean `true` for italic, `false` for normal.
+        ---@return nil
+        set_italic = function(name, italic) end,
+
+        ---Moves the text object to the specified coordinates.
+        ---@param name string Identifier for the text object.
+        ---@param x integer X position in pixels.
+        ---@param y integer Y position in pixels.
+        ---@return nil
+        set_location = function(name, x, y) end,
+
+        ---Enables or disables right justification.
+        ---@param name string Identifier for the text object.
+        ---@param justified boolean `true` for right-justified, `false` for left.
+        ---@return nil
+        set_right_justified = function(name, justified) end,
+
+        ---Sets the outline stroke color.
+        ---@param name string Identifier for the text object.
+        ---@param alpha integer Alpha value (0–255).
+        ---@param red integer Red value (0–255).
+        ---@param green integer Green value (0–255).
+        ---@param blue integer Blue value (0–255).
+        ---@return nil
+        set_stroke_color = function(name, alpha, red, green, blue) end,
+
+        ---Sets the outline stroke width in pixels.
+        ---@param name string Identifier for the text object.
+        ---@param width number Stroke width in pixels.
+        ---@return nil
+        set_stroke_width = function(name, width) end,
+
+        ---Sets the displayed text.
+        ---@param name string Identifier for the text object.
+        ---@param text string The content to display.
+        ---@return nil
+        set_text = function(name, text) end,
+
+        ---Toggles text object visibility.
+        ---@param name string Identifier for the text object.
+        ---@param visible boolean Whether the text is visible.
+        ---@return nil
+        set_visibility = function(name, visible) end,
+    },
+
     ---@class windower.windower_settings
     ---@field profile_name string Name of the selected Windower profile.
     ---@field branch string Name of the current branch of the Windower installation (stable or dev).
