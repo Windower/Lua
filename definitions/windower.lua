@@ -1056,6 +1056,42 @@ windower = {
         set_visibility = function(name, visible) end,
     },
 
+    ---Functions to manipulate the in-game chatbox.
+    ---@class windower.chat
+    chat = {
+        ---Inserts text into the current chat input at a given position.
+        ---If no `position` is specified it will add it at the current cursor position.
+        ---@param text string The text to add to the input.
+        ---@param position [number] Optional cursor position to insert at.
+        ---@return nil
+        add_to_input = function(text, position) end,
+
+        ---Retrieves the current chat input and cursor position.
+        ---This will contain encoded auto-translate phrases.
+        ---@return string text, number position #Current input and cursor position.
+        get_input = function() end,
+
+        ---Submits text as if typed and sent in chat.
+        ---@param text string The text to input.
+        ---@return nil
+        input = function(text) end,
+
+        ---Checks if the chat box is currently open.
+        ---@return boolean #`true` if open, `false` otherwise.
+        is_open = function() end,
+
+        ---Pastes the clipboard contents into the chat input.
+        ---@return nil
+        paste = function() end,
+
+        ---Replaces the current chat input and moves the cursor.
+        ---The cursor is set to the provided value, or, if omitted, at the end of the new input text.
+        ---@param text string The new input text.
+        ---@param position [number] Optional new cursor position (defaults to end).
+        ---@return nil
+        set_input = function(text, position) end,
+    },
+
     ---@class windower.windower_settings
     ---@field profile_name string Name of the selected Windower profile.
     ---@field branch string Name of the current branch of the Windower installation (stable or dev).
