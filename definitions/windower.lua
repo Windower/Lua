@@ -6,43 +6,46 @@
 ---@field windower_path string Absolute path to the running Windower instance directory.
 ---@field addon_path string Absolute path to the current addon directory.
 windower = {
+    ---Checks if the Windower instance has focus.
+    ---@return boolean #Whether the instance has focus.
+    has_focus = function() end,
 
-    ---Outputs a message to the chatlog.
-    ---The chatmode argument roughly corresponds to color.
-    ---@param mode integer Chat mode to use.
-    ---@param msg string Message to write.
+    ---Takes focus from any application (does nothing if already focused).
     ---@return nil
-    add_to_chat = function(mode, msg) end,
-
-    ---Creates the final directory in the path. Will error if an intermediate directory does not exist.
-    ---@param path string The path to the folder.
-    ---@return boolean, string|nil #Status and error message.
-    create_dir = function(path) end,
-
-    ---Evaluates all auto-translate blocks in a string with the text for the current language of the game.
-    ---@param str string Input string.
-    ---@return string #Input string with auto-translate blocks replaced with plain text equivalents.
-    convert_auto_trans = function(str) end,
+    take_focus = function() end,
 
     ---Copies the provided string to the clipboard.
     ---@param str string String to copy.
     ---@return nil
     copy_to_clipboard = function(str) end,
 
-    ---Prints all arguments to the debug log, prepended by thread ID and addon name.
-    ---@param ... any Any number/type of arguments to be printed.
+    ---Returns the contents of the clipboard, or `nil` if the clipboard is empty or contains non-text content.
+    ---@return string | nil #Clipboard contents.
+    get_from_clipboard = function() end,
+
+    ---Executes a Windower command.
+    ---@param command string Command to execute. Separate multiple commands with `;` inside the string.
     ---@return nil
-    debug = function(...) end,
+    send_command = function(command) end,
 
-    ---Checks if a path is a valid directory.
-    ---@param path string Absolute path to check.
-    ---@return boolean #Whether or not the directory exists.
-    dir_exists = function(path) end,
+    ---Outputs a message to the chatlog. The chatmode argument roughly corresponds to color.
+    ---@param mode integer Chat mode to use.
+    ---@param msg string Message to write.
+    ---@return nil
+    add_to_chat = function(mode, msg) end,
 
-    ---Checks if a path is a valid a file.
-    ---@param path string Absolute path to check.
-    ---@return boolean #Whether or not the file exists.
-    file_exists = function(path) end,
+    ---Returns the currently set in-game chat filters.
+    ---@return (0|1)[] #Chat filter settings.
+    get_chat_filters = function() end,
+
+    ---Gets information on the current camera.
+    ---@return windower.camera #Camera data.
+    get_camera = function() end,
+
+    ---Sends an IPC message to all other Windower instances that have the same addon loaded. This message is handled by the `"ipc message"` event.
+    ---@param msg string Message to send.
+    ---@return nil
+    send_ipc_message = function(msg) end,
 
     ---Executes a file on the system. Activity remains on the current window.
     ---@param file string The path to the file.
@@ -50,47 +53,39 @@ windower = {
     ---@return nil
     execute = function(file, arguments) end,
 
-    ---Converts a Shift_JIS (FFXI flavor) string to UTF-8.
-    ---@param str string The string to convert.
-    ---@return string #UTF-8 string.
-    from_shift_jis = function(str) end,
-
-    ---Returns names of file and directory within one directory.
-    ---@param path string The path to the directory.
-    ---@return string[] #List of file and directory names.
-    get_dir = function(path) end,
-
-    ---Returns the contents of the clipboard, or `nil` if the clipboard is empty or contains non-text content.
-    ---@return string | nil #Clipboard contents.
-    get_from_clipboard = function() end,
-
-    ---Returns the currently set in-game chat filters.
-    ---@return (0|1)[] #Chat filter settings.
-    get_chat_filters = function() end,
-
-    ---Returns a table of the user's Windower settings.
-    ---@return windower.windower_settings
-    get_windower_settings = function() end,
+    ---Opens a URL in the default browser.
+    ---@param url string URL to open.
+    ---@return nil
+    open_url = function(url) end,
 
     ---Plays a sound file. Only .wav is supported.
     ---@param path string The path to the file.
     ---@return nil
     play_sound = function(path) end,
 
-    ---Executes a Windower command.
-    ---@param command string Command to execute. Separate multiple commands with `;` inside the string.
-    ---@return nil
-    send_command = function(command) end,
+    ---Checks if a path is a valid a file.
+    ---@param path string Absolute path to check.
+    ---@return boolean #Whether or not the file exists.
+    file_exists = function(path) end,
 
-    ---Registers a function to run on the provided event.
-    ---@param ... any Any number of event names, followed by a function to execute.
-    ---@return integer ... Handles to registered functions.
-    register_event = function(...) end,
+    ---Checks if a path is a valid directory.
+    ---@param path string Absolute path to check.
+    ---@return boolean #Whether or not the directory exists.
+    dir_exists = function(path) end,
 
-    ---Sends an IPC message to all other Windower instances that have the same addon loaded. This message is handled by the `"ipc message"` event.
-    ---@param msg string Message to send.
-    ---@return nil
-    send_ipc_message = function(msg) end,
+    ---Returns names of file and directory within one directory.
+    ---@param path string The path to the directory.
+    ---@return string[] #List of file and directory names.
+    get_dir = function(path) end,
+
+    ---Creates the final directory in the path. Will error if an intermediate directory does not exist.
+    ---@param path string The path to the folder.
+    ---@return boolean, string|nil #Status and error message.
+    create_dir = function(path) end,
+
+    ---Returns a table of the user's Windower settings.
+    ---@return windower.windower_settings
+    get_windower_settings = function() end,
 
     ---Changes the name of a mob. Can cause crashes.
     ---@param id integer ID of the mob.
@@ -98,20 +93,10 @@ windower = {
     ---@return nil
     set_mob_name = function(id, name) end,
 
-    ---Converts a UTF-8 string to Shift_JIS (FFXI flavor).
-    ---@param str string The string to convert.
-    ---@return string #Shift_JIS string.
-    to_shift_jis = function(str) end,
-
-    ---Unregisters a previously registered event handler.
-    ---@param ... integer IDs of the event handlers to unregister.
-    ---@return nil
-    unregister_event = function(...) end,
-
-    ---Opens a URL in the default browser.
-    ---@param url string URL to open.
-    ---@return nil
-    open_url = function(url) end,
+    ---Evaluates all auto-translate blocks in a string with the text for the current language of the game.
+    ---@param str string Input string.
+    ---@return string #Input string with auto-translate blocks replaced with plain text equivalents.
+    convert_auto_trans = function(str) end,
 
     ---Checks a string for a pattern match with wildcard support. Allowed tokens:<br>
     ---`?` matches any one character<br>
@@ -122,13 +107,34 @@ windower = {
     ---@return boolean #Whether or not the string matches the pattern.
     wc_match = function(str, pattern) end,
 
-    ---Checks if the Windower instance has focus.
-    ---@return boolean #Whether the instance has focus.
-    has_focus = function() end,
+    ---Registers a function to run on the provided event.
+    ---@param ... any Any number of event names, followed by a function to execute.
+    ---@return integer ... Handles to registered functions.
+    register_event = function(...) end,
 
-    ---Takes focus from any application (does nothing if already focused).
+    ---Unregisters a previously registered event handler.
+    ---@param ... integer IDs of the event handlers to unregister.
     ---@return nil
-    take_focus = function() end,
+    unregister_event = function(...) end,
+
+    ---Prints all arguments to the debug log, prepended by thread ID and addon name.
+    ---@param ... any Any number/type of arguments to be printed.
+    ---@return nil
+    debug = function(...) end,
+
+    ---Converts a Shift_JIS (FFXI flavor) string to UTF-8.
+    ---@param str string The string to convert.
+    ---@return string #UTF-8 string.
+    from_shift_jis = function(str) end,
+
+    ---Converts a UTF-8 string to Shift_JIS (FFXI flavor).
+    ---@param str string The string to convert.
+    ---@return string #Shift_JIS string.
+    to_shift_jis = function(str) end,
+
+    ---Gets information on the item currently displayed on-screen.
+    ---@return windower.item_display | nil #The displayed item, if any is being displayed, otherwise `nil`.
+    get_item_display = function() end,
 
     ---FFXI in-game related functions.
     ---@class windower.ffxi
@@ -1102,4 +1108,29 @@ windower = {
     ---@field window_x_pos integer Horizontal window position.
     ---@field window_y_pos integer Vertical window position.
     windower_settings = {},
+
+    ---@class windower.camera
+    ---@field matrix number[][] View matrix of the camera, a two-dimensional four-by-four 1-indexed array.
+    ---@field matrix_inverse number[][] Inverse of the view matrix of the camera, a two-dimensional four-by-four 1-indexed array.
+    ---@field projection_matrix number[][] Projection matrix of the camera, a two-dimensional four-by-four 1-indexed array.
+    ---@field x number X position in world-space.
+    ---@field y number Y position in world-space.
+    ---@field z number Z position in world-space.
+    ---@field orientation_x number X orientation in world-space.
+    ---@field orientation_y number Y orientation in world-space.
+    ---@field orientation_z number Z orientation in world-space.
+    ---@field orientation_w number W orientation in world-space.
+    ---@field aspect number Aspect ratio.
+    ---@field fov_v number Vertical field of view.
+    ---@field fov_h number Horizontal field of view.
+    ---@field valid boolean Whether or not the data is valid (valid signatures and non-zero view matrix determinant).
+    camera = {},
+
+    ---@class windower.item_display
+    ---@field id integer The item ID, as specified in the [items resources](https://github.com/Windower/Resources/blob/master/resources_data/items.lua).
+    ---@field bag integer | nil The bag ID, as specified in the [bags resources](https://github.com/Windower/Resources/blob/master/resources_data/bags.lua), if the item is owned by the player, otherwise `nil`.
+    ---@field index integer | nil The index within a bag, if the item is owned by the player, otherwise `nil`.
+    ---@field signature string | nil The signature on the item, if the item is signed, otherwise `nil`.
+    ---@field augment string | nil The augment data as a binary string, if the item is augmented, otherwise `nil`.
+    item_display = {},
 }
