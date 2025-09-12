@@ -55,7 +55,7 @@ windower = {
     ---@return string #UTF-8 string.
     from_shift_jis = function(str) end,
 
-    ---Returns a table of files and directories within one directory.
+    ---Returns names of file and directory within one directory.
     ---@param path string The path to the directory.
     ---@return string[] #List of file and directory names.
     get_dir = function(path) end,
@@ -937,8 +937,7 @@ windower = {
         set_visibility = function(prim_name, visible) end,
     },
 
-    ---Basic text object functions. For more advanced functionality (draggable,
-    ---updatable, persistent properties), see the Texts Library.
+    ---Basic text object functions. For more advanced functionality (draggable, updatable, persistent properties), see the `texts` library.
     ---@class windower.text
     text = {
         ---Creates a text object.
@@ -997,7 +996,7 @@ windower = {
         ---@return nil
         set_color = function(name, alpha, red, green, blue) end,
 
-        ---Sets font. Accepts multiple fonts as fallbacks if the previous is not installed
+        ---Sets the font. Accepts multiple fonts as fallbacks if the previous is not installed
         ---@param name string Identifier for the text object.
         ---@param ... string Font names in order of preference.
         ---@return nil
@@ -1009,9 +1008,9 @@ windower = {
         ---@return nil
         set_font_size = function(name, size) end,
 
-        ---Enables or disables italic font.
+        ---Enables or disables italic font style.
         ---@param name string Identifier for the text object.
-        ---@param italic boolean `true` for italic, `false` for normal.
+        ---@param italic boolean `true` to enable and `false` to disable italic style.
         ---@return nil
         set_italic = function(name, italic) end,
 
@@ -1059,10 +1058,9 @@ windower = {
     ---Functions to manipulate the in-game chatbox.
     ---@class windower.chat
     chat = {
-        ---Inserts text into the current chat input at a given position.
-        ---If no `position` is specified it will add it at the current cursor position.
+        ---Inserts text into the current chat input at a given position. If `position` is not specified it will add it at the current cursor position.
         ---@param text string The text to add to the input.
-        ---@param position [number] Optional cursor position to insert at.
+        ---@param position? number Cursor position to insert at.
         ---@return nil
         add_to_input = function(text, position) end,
 
@@ -1084,8 +1082,7 @@ windower = {
         ---@return nil
         paste = function() end,
 
-        ---Replaces the current chat input and moves the cursor.
-        ---The cursor is set to the provided value, or, if omitted, at the end of the new input text.
+        ---Replaces the current chat input and moves the cursor. The cursor is set to the provided value, or, if omitted, at the end of the new input text.
         ---@param text string The new input text.
         ---@param position [number] Optional new cursor position (defaults to end).
         ---@return nil
@@ -1094,7 +1091,7 @@ windower = {
 
     ---@class windower.windower_settings
     ---@field profile_name string Name of the selected Windower profile.
-    ---@field branch string Name of the current branch of the Windower installation (stable or dev).
+    ---@field branch "stable" | "dev" Name of the current branch of the Windower installation.
     ---@field ffxi_version string FFXI version.
     ---@field launcher_version string Windower launcher version.
     ---@field hook_version string Windower hook version.
