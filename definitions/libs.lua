@@ -1,5 +1,6 @@
 ---@meta
 
+_addon = {}
 _libs = {}
 _meta = {}
 _raw = {}
