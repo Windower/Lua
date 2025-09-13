@@ -1128,6 +1128,27 @@ windower = {
 
     ---Extended regular expression functions.
     ---@class windower.regex
+    regex = {
+        ---Searches a string for a pattern using full regex support.
+        ---@param str string The string to search.
+        ---@param pattern string The regular expression pattern.
+        ---@return table? #Table of matches and capture groups, or nil if no match.
+        match = function(str, pattern) end,
+
+        ---Replaces all occurrences of a pattern in a string.
+        ---@param str string The string to search.
+        ---@param pattern string The regular expression pattern.
+        ---@param replace string|table|function If string, the replacement text. If table, a lookup table keyed by match. If function, receives the match and returns replacement.
+        ---@return string #The resulting string after replacements.
+        replace = function(str, pattern, replace) end,
+
+        ---Splits a string on a regex pattern.
+        ---@param str string The string to split.
+        ---@param pattern string The regular expression pattern.
+        ---@return string[] #List of substrings.
+        split = function(str, pattern) end,
+    },
+
     ---@class windower.windower_settings
     ---@field profile_name string Name of the selected Windower profile.
     ---@field branch "stable" | "dev" Name of the current branch of the Windower installation.
