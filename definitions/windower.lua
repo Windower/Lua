@@ -1095,6 +1095,39 @@ windower = {
         set_input = function(text, position) end,
     },
 
+    ---Functions to manipulate the Windower console.
+    ---@class windower.console
+    console = {
+        ---Erases all text currently in the Windower console.
+        ---@return nil
+        clear = function() end,
+
+        ---Closes the Windower console (same as pressing the console key).
+        ---@return nil
+        close = function() end,
+
+        ---Opens the Windower console (same as pressing the console key).
+        ---@return nil
+        open = function() end,
+
+        ---Moves the Windower console to the specified position.
+        ---@param x number Horizontal position in pixels.
+        ---@param y number Vertical position in pixels.
+        ---@return nil
+        set_position = function(x, y) end,
+
+        ---Returns whether the console is currently open.
+        ---@return boolean #`true` if visible, `false` otherwise.
+        visible = function() end,
+
+        ---Writes a string to the Windower console.
+        ---@param text string The text to write.
+        ---@return nil
+        write = function(text) end,
+    },
+
+    ---Extended regular expression functions.
+    ---@class windower.regex
     ---@class windower.windower_settings
     ---@field profile_name string Name of the selected Windower profile.
     ---@field branch "stable" | "dev" Name of the current branch of the Windower installation.
