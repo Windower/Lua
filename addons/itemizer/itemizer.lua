@@ -5,7 +5,6 @@ _addon.command = 'itemizer'
 
 require('luau')
 local packets = require('packets')
-local libitems = {}  -- preparation for future item library
 
 defaults = {}
 defaults.AutoNinjaTools = true
@@ -38,9 +37,8 @@ defaults.UseUniversalTools.Yain        = false
 
 settings = config.load(defaults)
 bag_ids = res.bags:key_map(string.gsub-{' ', ''} .. string.lower .. table.get-{'english'} .. table.get+{res.bags}):map(table.get-{'id'})
--- Remove temporary and recycle bags, because items cannot be moved from/to there, as such they're irrelevant to Itemizer
+-- Remove temporary bag, because items cannot be moved from/to there, as such it's irrelevant to Itemizer
 bag_ids.temporary = nil
-bag_ids.recycle = nil
 
 --Added this function for first load on new version. Because of the newly added features that weren't there before.
 windower.register_event("load", "login", function()
@@ -57,43 +55,13 @@ windower.register_event("load", "login", function()
     end
 end)
 
-libitems.get_bag_info = windower.ffxi.get_bag_info
-libitems.get_items = windower.ffxi.get_items
-libitems.get_item = windower.ffxi.get_item
-libitems.put_item = windower.ffxi.put_item
-
-libitems.move_item = function(source, slot, count, destination)
-    if not (source or slot or destination) or source == destination then
-        return false
-    end
-
-    local p = packets.new('outgoing', 0x029, {
-        ['Count'] = count,
-        ['Bag'] = source,
-        ['Target Bag'] = destination,
-        ['Current Index'] = slot,
-        ['Target Index'] = 0x52 -- fixed value when moving across bags according to packets lib
-    })
-
-    packets.inject(p)
-end
-
-libitems.stack = function(bag_id)
-    if not bag_id or type(bag_id) ~= 'number' or bag_id == 0 then
-        return
-    end
-
-    local p = packets.new('outgoing', 0x03A, { ['Bag'] = bag_id })
-    packets.inject(p)
-end
-
 find_items = function(ids, bag, limit)
     local res = S{}
     local found = 0
 
-    for bag_index, bag_name in bag_ids:filter(table.get-{'enabled'} .. libitems.get_bag_info):it() do
+    for bag_index, bag_name in bag_ids:filter(table.get-{'enabled'} .. windower.ffxi.get_bag_info):it() do
         if not bag or bag_index == bag then
-            for _, item in ipairs(libitems.get_items(bag_index)) do
+            for _, item in ipairs(windower.ffxi.get_items(bag_index)) do
                 if ids:contains(item.id) then
                     local count = limit and math.min(limit, item.count) or item.count
                     found = found + count
@@ -179,7 +147,7 @@ local function validate_bag(bag_name, purpose)
         error(('Specify a valid %s bag.'):format(purpose))
         return nil
     end
-    if not libitems.get_bag_info(bag_id).enabled then
+    if not windower.ffxi.get_bag_info(bag_id).enabled then
         error('%s currently not enabled':format(res.bags[bag_id].name))
         return nil
     end
@@ -231,7 +199,7 @@ windower.register_event('unhandled command', function(command, ...)
             args:remove()
         end
 
-        local destination_bag_info = libitems.get_bag_info(destination_bag)
+        local destination_bag_info = windower.ffxi.get_bag_info(destination_bag)
         if destination_bag_info.max - destination_bag_info.count == 0 then
             error('Not enough space in %s to move items.':format(res.bags[destination_bag].name))
             return
@@ -256,18 +224,18 @@ windower.register_event('unhandled command', function(command, ...)
         end
 
         for match in matches:it() do
-            libitems.move_item(match.bag, match.slot, match.count, destination_bag)
+            windower.ffxi.move_item(match.bag, destination_bag, match.slot, match.count)
 
             if settings.AutoStack and command ~= 'get' and match.count < res.items[match.id].stack then
-                libitems.stack(destination_bag)
+                windower.ffxi.stack_items(destination_bag)
             end
         end
 
     elseif command == 'stack' then
         log('Stacking items in all currently accessible bags.')
 
-        for bag_index in bag_ids:filter(table.get-{'enabled'} .. libitems.get_bag_info):it() do
-            libitems.stack(bag_index)
+        for bag_index in bag_ids:filter(table.get-{'enabled'} .. windower.ffxi.get_bag_info):it() do
+            windower.ffxi.stack_items(bag_index)
         end
     end
 end)
@@ -324,7 +292,7 @@ active = S{}
 -- Returning true resends the command in settings.Delay seconds
 -- Returning false doesn't resend the command and executes it
 collect_item = function(id, items)
-    items = items or {inventory = libitems.get_items(bag_ids.inventory)}
+    items = items or {inventory = windower.ffxi.get_items(bag_ids.inventory)}
 
     local item = T(items.inventory):with('id', id)
     if item then
@@ -341,7 +309,7 @@ collect_item = function(id, items)
     local match = find_items(S{id}, nil, 1):it()()
 
     if match then
-        libitems.get_item(match.bag, match.slot, match.count)
+        windower.ffxi.get_item(match.bag, match.slot, match.count)
 
         -- Add currently processing ID to set of active IDs
         active:add(id)
@@ -354,8 +322,8 @@ end
 
 reschedule = function(text, ids, items)
     if not items then
-        local info = libitems.get_bag_info(bag_ids.inventory)
-        items = {inventory = libitems.get_items(bag_ids.inventory)}
+        local info = windower.ffxi.get_bag_info(bag_ids.inventory)
+        items = {inventory = windower.ffxi.get_items(bag_ids.inventory)}
         items.max_inventory = info.max
         items.count_inventory = info.count
     end
@@ -400,7 +368,7 @@ windower.register_event('outgoing text', function()
 
         -- Item usage
         elseif settings.AutoItems and text:startswith('/item ') then
-            local items = libitems.get_items()
+            local items = windower.ffxi.get_items()
             local inventory_items = S{}
             local wardrobe_items = S{}
             for bag in bag_ids:keyset():it() do
