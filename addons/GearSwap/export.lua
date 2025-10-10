@@ -79,7 +79,7 @@ function export_set(options)
         return
     end
 
-    local overwrite_existing = contains_any('overwrite') or nil
+    local overwrite_existing = contains_any('overwrite')
 
     local buildmsg = 'Exporting '
     if all_items then
@@ -210,10 +210,10 @@ function export_set(options)
 
     if compact then
         local slots_order = {
-            { "main", "sub", "range", "ammo" },
-            { "head", "neck", "left_ear", "right_ear" },
-            { "body", "hands", "left_ring", "right_ring" },
-            { "back", "waist", "legs", "feet" },
+            { 'main', 'sub', 'range', 'ammo' },
+            { 'head', 'neck', 'left_ear', 'right_ear' },
+            { 'body', 'hands', 'left_ring', 'right_ring' },
+            { 'back', 'waist', 'legs', 'feet' },
         }
 
         local item_list = item_list:rekey('slot')
@@ -235,7 +235,7 @@ function export_set(options)
             end
 
             if #line > 0 then
-                output = output .. "    " .. table.concat(line, " ") .. newline
+                output = output .. '    ' .. table.concat(line, ' ') .. newline
             end
         end
 
@@ -247,10 +247,10 @@ function export_set(options)
             ['right_ring'] = 'Ring2',
         }
 
-        output = "{{Guide Equipment Set\n|Set Name Background=\n|Set Name Text Color=\n|Set Name Text Shadow=\n"
-        output = output .. "|Set Name=%s\n|Set Border Color=\n":format(setname or 'Exported')
-        output = output .. "|Equipment Set = Exported by %s on %s\n":format(player.name, os.date(' %Y-%m-%d %H-%M-%S'))
-        output = output .. "{{Equipment Set\n|CaptionTop = %s\n|CaptionBottom = Exported\n":format(setname or 'Exported')
+        output = '{{Guide Equipment Set\n|Set Name Background=\n|Set Name Text Color=\n|Set Name Text Shadow=\n'
+        output = output .. '|Set Name=%s\n|Set Border Color=\n':format(setname or 'Exported')
+        output = output .. '|Equipment Set = Exported by %s on %s\n':format(player.name, os.date(' %Y-%m-%d %H-%M-%S'))
+        output = output .. '{{Equipment Set\n|CaptionTop = %s\n|CaptionBottom = Exported\n':format(setname or 'Exported')
 
         for i,v in ipairs(item_list) do
             if v.name ~= empty then
@@ -264,7 +264,7 @@ function export_set(options)
             end
         end
 
-        output = output .. "|List = y\n|Background = \n}}\n|Equipment Set Notes =\n}"
+        output = output .. '|List = y\n|Background = \n}}\n|Equipment Set Notes =\n}'
 
     else
         for i,v in ipairs(item_list) do
@@ -272,10 +272,8 @@ function export_set(options)
                 if v.augments then
                     --Advanced set table
                     output = output .. '    %s={ name="%s", augments={%s}},':format(v.slot, v.name, v.augments)
-                    -- output = output .. '    '..v.slot..'={ name="'..v.name..'", augments={'..v.augments..'}},'
                 elseif not onlyaugmented then
                     output = output .. '    %s="%s",':format(v.slot, v.name)
-                    -- output = output .. '    '..v.slot..'="'..v.name..'",'
                 end
                 output = output .. newline
             end
