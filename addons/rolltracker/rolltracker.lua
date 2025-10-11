@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'RollTracker'
-_addon.version = '1.8.0.0'
+_addon.version = '1.8.1.0'
 _addon.author = 'Balloon'
 _addon.commands = {'rolltracker','rt'}
 
@@ -244,13 +244,27 @@ function RollEffect(rollid, rollnum)
 
     --I'm handling one roll a bit odd, so I need to deal with it separately.
     --Which is stupid, I know, but look at how I've done most of this.
+    --Note: Rostam, Lanun Knife, and Comm. Knife do not check for Augment Path.
+    --Item Name         ID      Roll+
+    --Rostam            21581   8
+    --Lanun Knife       21580   7
+    --Regal Necklace    26038   7
+    --Comm. Knife       21579   6
+    --Barataria Ring    28548   5
+    --Merirosvo Ring    28547   3
     if rollName == "Companion\'s" then
         local hpVal = rollVal[1]
         local tpVal = rollVal[2]
-        if gearTable[9] == 26038 or rollPlusBonus then
+        if gearTable[0] == 21581 or rollPlusBonus then
+            hpVal =  hpVal + (rollInfo[rollid][17][1]*8)
+            tpVal = tpVal  + (rollInfo[rollid][17][2]*8)
+        elseif gearTable[0] == 21580 or gearTable[9] == 26038 or rollPlusBonus then
             hpVal =  hpVal + (rollInfo[rollid][17][1]*7)
             tpVal = tpVal  + (rollInfo[rollid][17][2]*7)
             rollPlusBonus = true
+        elseif gearTable[0] == 21579 or rollPlusBonus then
+            hpVal =  hpVal + (rollInfo[rollid][17][1]*6)
+            tpVal = tpVal  + (rollInfo[rollid][17][2]*6)
         elseif gearTable[13] == 28548 or gearTable[14]== 28548 or rollPlusBonus then
             hpVal =  hpVal + (rollInfo[rollid][17][1]*5)
             tpVal = tpVal  + (rollInfo[rollid][17][2]*5)
@@ -265,8 +279,14 @@ function RollEffect(rollid, rollnum)
 
     --If there's no Roll Val can't add to it
     if rollVal ~= '?' then
-        if gearTable[9] == 26038 or rollPlusBonus then
+        if gearTable[0] == 21581 or rollPlusBonus then
+            rollVal = rollVal + (rollInfo[rollid][17]*8)
+            rollPlusBonus = true
+        elseif gearTable[0] == 21580 or gearTable[9] == 26038 or rollPlusBonus then
             rollVal = rollVal + (rollInfo[rollid][17]*7)
+            rollPlusBonus = true
+        elseif gearTable[0] == 21579 or rollPlusBonus then
+            rollVal = rollVal + (rollInfo[rollid][17]*6)
             rollPlusBonus = true
         elseif gearTable[13] == 28548 or gearTable[14] == 28548 or rollPlusBonus then
             rollVal = rollVal + (rollInfo[rollid][17]*5)
