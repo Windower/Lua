@@ -1,4 +1,4 @@
--- Copyright © 2014-2015, Cairthenn
+-- Copyright Â© 2014-2015, Cairthenn
 -- All rights reserved.
 
 -- Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@ _addon.name = 'InfoReplacer'
 _addon.version = '2.0'
 _addon.command = 'inforeplacer'
 
+local functions = require('functions')
 require('tables')
 require('strings')
 require('logger')
@@ -69,7 +70,7 @@ windower.register_event('addon command', function(command, ...)
             return
         end
 
-        custom[args[1]] = args[2]:fn()
+        custom[args[1]] = functions.const(args[2])
         raw[args[1]] = args[2]
         fns[args[1]] = nil
 
