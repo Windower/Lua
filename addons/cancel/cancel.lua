@@ -25,15 +25,15 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'Cancel'
-_addon.version = '1.0'
+_addon.version = '1.1'
 _addon.author = 'Byrth'
 _addon.commands = {'cancel'}
 
-res = require 'resources'
+local res = require('resources')
+local packets = require('packets')
 
 name_index = {}
 language = windower.ffxi.get_info().language:lower()
-
 
 windower.register_event('addon command',function (...)
 	local command = table.concat({...},' ')
@@ -53,5 +53,5 @@ windower.register_event('addon command',function (...)
 end)
 
 function cancel(id)
-	windower.packets.inject_outgoing(0xF1,string.char(0xF1,0x04,0,0,id%256,math.floor(id/256),0,0)) -- Inject the cancel packet
+	packets.inject(packets.new('outgoing', 0x0F1, { Buff = id })) -- Inject the cancel packet
 end
