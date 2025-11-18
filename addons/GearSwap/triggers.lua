@@ -29,7 +29,7 @@
 
 -----------------------------------------------------------------------------------
 --Name: outgoing_text(original,modified,blocked,ffxi)
---Desc: Searches the client's outgoing text for GearSwap handled commands and 
+--Desc: Searches the client's outgoing text for GearSwap handled commands and
 --      returns '' if it finds one. Otherwise returns the command unaltered.
 --Args:
 ---- original - String entered by the user
@@ -43,11 +43,11 @@
 windower.register_event('outgoing text',function(original,modified,blocked,ffxi,extra_stuff,extra2)
     windower.debug('outgoing text')
     if gearswap_disabled then return modified end
-    
+
     local splitline = windower.from_shift_jis(windower.convert_auto_trans(modified)):gsub('<wait[%s%d%.]*>',''):gsub('"(.-)"',function(str)
             return ' '..str:gsub(' ',string.char(7))..' '
         end):split(' '):filter(-'')
-    
+
     if splitline.n == 0 then return end
 
     local command = splitline[1]
@@ -128,6 +128,10 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
             spell.target = temp_mob_arr
             spell.action_type = action_type_map[command]
 
+            if spell.prefix == '/item' and spell.target.type ~= 'NONE' and bit.band(spell.target.spawn_type, 2) then
+                spell.action_type = 'Trade'
+            end
+
             if filter_pretarget(spell) then
                 if tonumber(splitline[splitline.n]) then
                     -- If the target is a number
@@ -135,9 +139,8 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
 
                     if spell.prefix == '/item' then
                         -- Item use packet handling here
-                        if bit.band(spell.target.spawn_type, 2) == 2 and find_inventory_item(spell.id) then
+                        if spell.action_type == 'Trade' and find_inventory_item(spell.id) then
                             --0x36 packet
-                            spell.action_type = 'Trade'
                             if spell.target.distance <= 6 then
                                 command_registry[ts].proposed_packet = assemble_menu_item_packet(spell.target.id,spell.target.index,spell.id)
                             else
@@ -157,12 +160,6 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
                         return true
                     end
                 else
-                    if spell.prefix == '/item' and spell.target.type ~= 'NONE' then
-                        if bit.band(spell.target.spawn_type, 2) == 2 and find_inventory_item(spell.id) then
-                            --0x36 packet
-                            spell.action_type = 'Trade'
-                        end
-                    end
                     return equip_sets('pretarget',-1,spell)
                 end
 			else
@@ -188,9 +185,9 @@ end)
 parse.i[0x028] = function (data)
     local act = windower.packets.parse_action(data)
     if gearswap_disabled or act.category == 1 then return end
-    
+
 --    local spell_res = ActionPacket.new(act):get_spell()
-        
+
     --print(((res[unpackedaction.resource] or {})[unpackedaction.spell_id] or {}).english,unpackedaction.type,unpackedaction.value,unpackedaction.interruption)
     local temp_player_mob_table,temp_pet,pet_id = windower.ffxi.get_mob_by_index(player.index)
     if temp_player_mob_table and temp_player_mob_table.pet_index then
@@ -203,25 +200,25 @@ parse.i[0x028] = function (data)
     if act.actor_id ~= player.id and act.actor_id ~= pet_id then
         return -- If the action is not being used by the player, the pet, or is a melee attack then abort processing.
     end
-    
+
     local prefix = ''
-    
-    if act.actor_id == pet_id then 
+
+    if act.actor_id == pet_id then
         prefix = 'pet_'
     end
-    
+
     local spell = get_spell(act)
 --    if not spell_res or (spell.english ~= spell_res.english) then print('Did not match.',spell.english,spell_res) end
-    
+
     if spell then logit('\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell[language])..' '..tostring(act.category))
     else logit('\n\nNil spell detected') end
-    
+
     if spell and spell[language] then
         spell.target = target_complete(windower.ffxi.get_mob_by_id(act.targets[1].id))
         spell.action_type = action_type_map[unify_prefix[spell.prefix or 'Monster']]
     elseif S{84,78}:contains(act.targets[1].actions[1].message) then -- "Paralyzed" and "too far away" respectively
         local ts,tab = command_registry:delete_by_id(act.targets[1].id)
-        if tab and tab.spell and tab.spell.prefix == '/pet' then 
+        if tab and tab.spell and tab.spell.prefix == '/pet' then
             tab.spell.interrupted = true
             equip_sets('pet_aftercast',nil,tab.spell)
         elseif tab and tab.spell then
@@ -233,17 +230,17 @@ parse.i[0x028] = function (data)
         if debugging.general then windower.send_command('input /echo Incoming Action packet did not generate a spell/aftercast.')end
         return
     end
-    
+
     --[[4 (action message) = "out of range" when attempting to melee something that's too far away
        78 (action message) = "too far away" when attempting to engage or cast magic on something that's too far away
        78 (action) = "too far away" when attempting to WS something that's too far away
        154 (action message) - "out of range" when attempting to use a JA on something that's too far away. param_1 is the JA ID]]
-       
+
     -- Paralysis of JAs/spells/etc. and Out of Range messages for avatars both send two action packets when they occur.
     -- The first packet is a paralysis packet that contains the message and spell-appropriate information.
     -- The second packet contains the interruption code and no useful information as far as I can see.
     -- The same occurs for items, except that they are both category 9 messages.
-    
+
     -- For some reason avatar Out of Range messages send two packets (Category 4 and Category 7)
     -- Category 4 contains real information, while Category 7 does not.
     -- I do not know if this will affect automatons being interrupted.
@@ -308,8 +305,8 @@ parse.i[0x029] = function (data)
     arr.actor_index = data:unpack('H',0x15)
     arr.target_index = data:unpack('H',0x17)
     arr.message_id = data:unpack('H',0x19)%32768
-    
-    
+
+
     windower.debug('action message')
     if T{6,20,113,406,605,646}:contains(arr.message_id) then -- death messages
         local ts,tab = command_registry:delete_by_id(arr.target_id)
@@ -320,7 +317,7 @@ parse.i[0x029] = function (data)
         end
         return
     end
-    
+
     local tempplay = windower.ffxi.get_player()
     local prefix = ''
     if arr.actor_id ~= tempplay.id then
@@ -334,11 +331,11 @@ parse.i[0x029] = function (data)
             return
         end
     end
-    
+
     if unable_to_use:contains(arr.message_id) then
         logit('\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt')
         local ts,tab = command_registry:find_by_time()
-        
+
         if tab and tab.spell then
             tab.spell.interrupted = true
             tab.spell.action_type = 'Interruption'
