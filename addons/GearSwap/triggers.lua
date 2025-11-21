@@ -128,7 +128,7 @@ windower.register_event('outgoing text',function(original,modified,blocked,ffxi,
             spell.target = temp_mob_arr
             spell.action_type = action_type_map[command]
 
-            if spell.prefix == '/item' and spell.target.type ~= 'NONE' and bit.band(spell.target.spawn_type, 2) then
+            if spell.prefix == '/item' and spell.target.type ~= 'NONE' and bit.band(spell.target.spawn_type, 2) == 2 then
                 spell.action_type = 'Trade'
             end
 
