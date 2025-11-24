@@ -463,9 +463,6 @@ windower.register_event('addon command', function (...)
             windower.send_command('gt daysx '..args[3])
         elseif args[2] == 'y' or args[2] == 'posy' then
             windower.send_command('gt daysy '..args[3])
-        elseif args[2] == 'show' then
-            gt.gtd:show()
-            log('Showing day display.')
         elseif args[2] == 'hide' then
             gt.gtd:hide()
             log('Day display hidden.')
@@ -474,7 +471,8 @@ windower.register_event('addon command', function (...)
         else
             local asnum = tonumber(args[2])
             if not asnum or asnum < 1 or asnum > 8 then
-                log('Invalid command for //gt days')
+                gt.gtd:show()
+                log('Showing day display.')
             else
                 gt.numdays = asnum
                 settings.numdays = asnum
