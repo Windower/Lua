@@ -459,10 +459,6 @@ windower.register_event('addon command', function (...)
                 gt.gtd:alpha(inalpha)
                 log('Day transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
             end
-        elseif tonumber(args[2]) > 0 and tonumber(args[2]) < 9 then
-            gt.numdays = tonumber(args[2])
-            settings.numdays = tonumber(args[2])
-            day_change(windower.ffxi.get_info().day)
         elseif args[2] == 'x' or args[2] == 'posx' then
             windower.send_command('gt daysx '..args[3])
         elseif args[2] == 'y' or args[2] == 'posy' then
@@ -473,8 +469,15 @@ windower.register_event('addon command', function (...)
         elseif args[2] == 'reset' then
             gt.gtd:pos(0,0)
         else
-            gt.gtd:show()
-            log('Showing day display.')
+            local asnum = tonumber(args[2])
+            if not asnum or asnum < 1 or asnum > 8 then
+                gt.gtd:show()
+                log('Showing day display.')
+            else
+                gt.numdays = asnum
+                settings.numdays = asnum
+                day_change(windower.ffxi.get_info().day)
+            end
         end
     elseif args[1] == 'axis' then
         if args[2] == 'vertical' then
