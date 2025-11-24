@@ -452,6 +452,7 @@ windower.register_event('addon command', function (...)
             log('Showing time display.')
         end
     elseif args[1] == 'days' then
+        local asnum = tonumber(args[2])
         if args[2] == 'alpha' then
             inalpha = tostring(args[3]):zfill(3)
             inalpha = inalpha+0
@@ -459,9 +460,9 @@ windower.register_event('addon command', function (...)
                 gt.gtd:alpha(inalpha)
                 log('Day transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
             end
-        elseif tonumber(args[2]) ~= nil and tonumber(args[2]) > 0 and tonumber(args[2]) < 9 then
-            gt.numdays = tonumber(args[2])
-            settings.numdays = tonumber(args[2])
+        elseif asnum and asnum > 0 and asnum < 9 then
+            gt.numdays = asnum
+            settings.numdays = asnum
             day_change(windower.ffxi.get_info().day)
         elseif args[2] == 'x' or args[2] == 'posx' then
             windower.send_command('gt daysx '..args[3])
