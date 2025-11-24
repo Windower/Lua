@@ -459,7 +459,7 @@ windower.register_event('addon command', function (...)
                 gt.gtd:alpha(inalpha)
                 log('Day transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
             end
-        elseif tonumber(args[2]) > 0 and tonumber(args[2]) < 9 then
+        elseif tonumber(args[2]) ~= nil and tonumber(args[2]) > 0 and tonumber(args[2]) < 9 then
             gt.numdays = tonumber(args[2])
             settings.numdays = tonumber(args[2])
             day_change(windower.ffxi.get_info().day)
