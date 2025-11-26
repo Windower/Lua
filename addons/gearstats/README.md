@@ -104,7 +104,7 @@ Set the current gear stats as baseline for comparison
 
 Compare the current gear stats with baseline stats
 
-- `//gearstats diff`
+- `//gearstats filediff`
 
 Compare the current gear stats with baseline stats and write to file
 
