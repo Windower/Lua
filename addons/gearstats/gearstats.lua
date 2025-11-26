@@ -48,6 +48,7 @@ defaults = {
     mapping_table = {},
     merge_pet_stats = true,
     line_wrap = 80,
+    print_gear_name = true,
 }
 
 defaults.mapping_table["Accuracy"] = "Acc"
@@ -77,7 +78,13 @@ settings = {}
 
 gameinfo = {
 	equipment = {},
-	equipment_stats = {}
+	equipment_set = {},
+	equipment_stats = {},
+	base_set = {},
+	base_stats = {},
+	diff_set = {},
+	diff_stats = {},
+	slots = L{"main","sub","range","ammo","head","body","hands","legs","feet","neck","left_ear","right_ear","left_ring","right_ring","waist","back"},
 }
 
 --- Generic Functions
@@ -212,6 +219,7 @@ local function extract_stats_from_str(str, prefix)
     local stats = {}
     -- General string replacement
     str = str:gsub('(Converts )([%d%.]+)(%%?[%a%s]+)','%1%3: %2'):gsub('%s%s',' ')
+    str = str:gsub('(taken)(:)%s?([^%d])','%1 effect: %3'):gsub('%s%s',' ')
     str = str:gsub('(%a)[%-](%a)','%1 %2')
     local match = str:match('^\".*\"$')
     if match then
@@ -333,10 +341,10 @@ end
 function update_gear()
 	gameinfo.equipment_stats = {}
 	gameinfo.equipment = {}
+	gameinfo.equipment_set = {}
     local equipment = windower.ffxi.get_items('equipment')
     local bags = L{0,8,10,11,12,13,14,15,16}
-    local slots = L{"main","sub","range","ammo","head","body","hands","legs","feet","neck","waist","back","left_ear","right_ear","left_ring","right_ring"}
-    for slot in slots:it() do
+    for slot in gameinfo.slots:it() do
         local index = equipment[slot]
         local bag = equipment[slot.."_bag"]
         local gear = {}
@@ -386,6 +394,7 @@ function update_gear()
             table_merge(gameinfo.equipment_stats, gear.stats)
         end
         gameinfo.equipment[slot] = gear
+        gameinfo.equipment_set[slot] = gear.name or nil
     end
     -- Merge the stats from Pet into the Individual pet types
     if settings.merge_pet_stats and gameinfo.equipment_stats['Pet'] then
@@ -399,20 +408,15 @@ function update_gear()
     merge_stats(gameinfo.equipment_stats)
 end
 
-commands = T{}
-
-commands['trace'] = {
-help = "Trace log - toggle | on | off ",
-func = function(args)
-    if not args[1] then
-        gameinfo.trace = not gameinfo.trace
-    elseif args[1]:lower() == 'on' then
-        gameinfo.trace = true
-    elseif args[1]:lower() == 'off' then
-        gameinfo.trace = false
-    end
-    addon_message('Trace logs '..flag_to_string(gameinfo.trace))
-end}
+function print_equip_set(equip_set)
+	local output = L{}
+	for slot in gameinfo.slots:it() do
+		if equip_set[slot] ~= nil then
+			output:append("%s=\"%s\"":format(slot, equip_set[slot]))
+		end
+	end
+	return output:concat(",")
+end
 
 function print_stats_table(stats, prefix, priority_list, mapping_table, split)
     local done_list = L{}
@@ -425,7 +429,7 @@ function print_stats_table(stats, prefix, priority_list, mapping_table, split)
                 if mapping_table[name] ~= nil then
                     name = mapping_table[name]
                 end
-                local str = "%s:%d":format(name, stats[key])
+                local str = "%s:%s":format(name, tostring(stats[key]))
                 if (message:len() + str:len() > settings.line_wrap) then
                     output:append(message)
                     message = ''
@@ -447,7 +451,7 @@ function print_stats_table(stats, prefix, priority_list, mapping_table, split)
         message = ''
     end
     local sub_prefix = 'Skill'
-    if prefix:len() then
+    if prefix:len() > 0 then
         sub_prefix = prefix..':'..sub_prefix
     end
     for key, value in pairs(stats) do
@@ -490,23 +494,123 @@ function print_stats_table(stats, prefix, priority_list, mapping_table, split)
         output:append(message)
         message = ''
     end
-    return output:concat('\n')
+    local output_msg = output:concat('\n')
+    for key, value in pairs(stats) do
+        if type(value) == 'table' then
+        	local str = print_stats_table(value, key, settings.priority_list, settings.mapping_table, false)
+        	if str:len() > 0 then
+            	output_msg = output_msg..'\n'..str
+            end
+        end
+    end
+    return output_msg
 end
+
+function calc_diff_stats(base_stats, new_stats)
+	local merged_key = L{}
+	local diff_stats = {}
+	for key, value in pairs(new_stats) do
+		if base_stats[key] == nil then
+			diff_stats[key] = value
+		else
+			if type(value) == 'table' then
+				diff_stats[key] = calc_diff_stats(base_stats[key], new_stats[key])
+			elseif type(value) == 'number' and type(base_stats[key]) == 'number' then
+				diff_stats[key] = value - base_stats[key]
+				if diff_stats[key] == 0 then
+					-- remove if no change
+					diff_stats[key] = nil
+				end
+			else
+				base_str = tostring(base_stats[key])
+				new_str = tostring(value)
+				if (base_str ~= new_str) then
+					diff_stats[key] = new_str
+				end
+			end
+		end
+		merged_key:append(key)
+	end
+	-- Handle remaining entries, not found in new_stats
+	for key, value in pairs(base_stats) do
+		if not merged_key:contains(key) then
+			if type(value) == 'table' then
+				diff_stats[key] = calc_diff_stats(base_stats[key], {})
+			elseif type(value) == 'number' then
+				diff_stats[key] = - value
+			else
+				diff_stats[key] = ''
+			end
+			merged_key:append(key)
+		end
+	end
+	return diff_stats
+end
+
+commands = T{}
+
+commands['trace'] = {
+help = "Trace log - toggle | on | off ",
+func = function(args)
+    if not args[1] then
+        gameinfo.trace = not gameinfo.trace
+    elseif args[1]:lower() == 'on' then
+        gameinfo.trace = true
+    elseif args[1]:lower() == 'off' then
+        gameinfo.trace = false
+    end
+    addon_message('Trace logs '..flag_to_string(gameinfo.trace))
+end}
 
 commands['print'] = {
 help = "Print the stats of current gear",
 func = function(args)
+	local output = ''
     update_gear()
     addon_message("Generating Equipment Stats")
-    output = print_stats_table(gameinfo.equipment_stats, '', settings.priority_list, settings.mapping_table, true)
-    for key, value in pairs(gameinfo.equipment_stats) do
-        if type(value) == 'table' then
-            output = output..'\n'..print_stats_table(value, key, settings.priority_list, settings.mapping_table, false)
-        end
+    if settings.print_gear_name then
+    	output = print_equip_set(gameinfo.equipment_set)
     end
+    if output:len() > 0 then
+    	output = output.."\n"
+    end
+    output = output .. print_stats_table(gameinfo.equipment_stats, '', settings.priority_list, settings.mapping_table, true)
     for str in output:gmatch("([^\n]+)") do
     	addon_message(str)
     end
+end}
+
+commands['base'] = {
+help = "Set the current gear stats as baseline",
+func = function(args)
+    update_gear()
+    gameinfo.base_stats = gameinfo.equipment_stats
+    gameinfo.base_set = gameinfo.equipment_set
+    addon_message("Setting Equipment Stats as baseline")
+end}
+
+commands['diff'] = {
+help = "Compare the current gear stats with baseline",
+func = function(args)
+	local output = ''
+    update_gear()
+    addon_message("Comparing current equipment stats with baseline")
+    gameinfo.diff_set = calc_diff_stats(gameinfo.base_set, gameinfo.equipment_set)
+    gameinfo.diff_stats = calc_diff_stats(gameinfo.base_stats, gameinfo.equipment_stats)
+    if settings.print_gear_name then
+    	output = print_equip_set(gameinfo.diff_set)
+    end
+    if output:len() > 0 then
+    	output = output.."\n"
+    end
+    output = output .. print_stats_table(gameinfo.diff_stats, '', settings.priority_list, settings.mapping_table, true)
+    if output:len() == 0 then
+    	addon_message("No change detected in stats")
+    else
+	    for str in output:gmatch("([^\n]+)") do
+	    	addon_message(str)
+	    end
+	end
 end}
 
 commands['file'] = {
@@ -518,12 +622,38 @@ func = function(args)
     addon_message("Generating Equipment Stats to %s":format(filename))
     local args_str = args:concat(' ')
     local header = "=====[ %s ]======\n":format(args_str)
-    output = print_stats_table(gameinfo.equipment_stats, '', settings.priority_list, settings.mapping_table, true)
-    for key, value in pairs(gameinfo.equipment_stats) do
-        if type(value) == 'table' then
-            output = output..'\n'..print_stats_table(value, key, settings.priority_list, settings.mapping_table, false)
-        end
+    local output = ''
+    if settings.print_gear_name then
+    	output = print_equip_set(gameinfo.equipment_set)
     end
+    if output:len() > 0 then
+    	output = output.."\n"
+    end
+    output = output..print_stats_table(gameinfo.equipment_stats, '', settings.priority_list, settings.mapping_table, true)
+    output = header..output.."\n"
+    local file = files.new(filename, true)
+    file:append(output, true)
+end}
+
+commands['filediff'] = {
+help = "Save the diff of current gear to file, arguments are added as header message",
+func = function(args)
+    update_gear()
+    local player = windower.ffxi.get_player()
+    local filename = "data/"..player.name:lower().."_"..player.main_job..".txt"
+    addon_message("Generating Equipment Stats to %s":format(filename))
+    local args_str = args:concat(' ')
+    local header = "=====[ %s ]======\n":format(args_str)
+    local output = ''
+    gameinfo.diff_set = calc_diff_stats(gameinfo.base_set, gameinfo.equipment_set)
+    gameinfo.diff_stats = calc_diff_stats(gameinfo.base_stats, gameinfo.equipment_stats)
+    if settings.print_gear_name then
+    	output = print_equip_set(gameinfo.diff_set)
+    end
+    if output:len() > 0 then
+    	output = output.."\n"
+    end
+    output = output..print_stats_table(gameinfo.diff_stats, '', settings.priority_list, settings.mapping_table, true)
     output = header..output.."\n"
     local file = files.new(filename, true)
     file:append(output, true)

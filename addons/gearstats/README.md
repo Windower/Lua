@@ -96,6 +96,18 @@ The arguments after the `file` command will be inserted into the header line.
 	Set - Increases Accuracy, Ranged Accuracy, and Magic Accuracy:2
 	Set - Augments Double Attack:1
 
+- `//gearstats base`
+
+Set the current gear stats as baseline for comparison
+
+- `//gearstats diff`
+
+Compare the current gear stats with baseline stats
+
+- `//gearstats diff`
+
+Compare the current gear stats with baseline stats and write to file
+
 - `//gearstats merge_pet_stats < toggle | on | off>`
 
 Merge the Pet: statistics into Automation, Wyvern or Avatar and hide it
