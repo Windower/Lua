@@ -53,7 +53,7 @@ function equip_sets(swap_type,ts,...)
     end
 
     windower.debug(tostring(swap_type)..' enter')
-    if showphase or debugging.general then msg.debugging(8,windower.to_shift_jis(tostring(swap_type))..' enter') end
+    if showphase or debugging.general then msg.debugging(windower.to_shift_jis(tostring(swap_type))..' enter') end
 
     local cur_equip = table.reassign({},update_equipment())
 
@@ -92,7 +92,7 @@ function equip_sets(swap_type,ts,...)
 
     if not val1 then val1 = {}
         if debugging.general then
-            msg.debugging(8,'val1 error')
+            msg.debugging('val1 error')
         end
     end
 
@@ -249,7 +249,7 @@ function equip_sets_exit(swap_type,ts,val1)
                         end
                     end
                 else
-                    msg.debugging(8,"Hark, what weird prefix through yonder window breaks? "..tostring(val1.prefix))
+                    msg.debugging("Hark, what weird prefix through yonder window breaks? "..tostring(val1.prefix))
                 end
             end
 

@@ -814,7 +814,7 @@ function cmd_reg:new_entry(sp)
     end
     rawset(self,ts,{pretarget_cast_delay=0, precast_cast_delay=0, cancel_spell=false, new_target=false, current_event='nascent', spell=sp, timestamp=ts,target_arrow={x=0,y=0,z=0}})
     if debugging.command_registry then
-        msg.addon_msg('Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(self[ts])))
+        msg.addon_msg(123,'Creating a new command_registry entry: '..windower.to_shift_jis(tostring(ts)..' '..tostring(self[ts])))
     end
     return ts
 end
