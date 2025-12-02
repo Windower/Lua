@@ -97,7 +97,7 @@ function change_target(name)
     end
     if name and type(name)=='string' then
         if valid_target(name) then
-            _,_global.new_target = valid_target(name)
+            _global.new_target = valid_target(name)
         else
             error('\nGearSwap: change_target() was passed an invalid value ('..tostring(name)..'). (must be a valid target)', 2)
         end
