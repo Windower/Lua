@@ -189,6 +189,7 @@ world = make_user_table()
 buffactive = make_user_table()
 alliance = make_user_table()
 st_targs = {['<st>']=true,['<stpc>']=true,['<stal>']=true,['<stnpc>']=true,['<stpt>']=true}
+st_flag = false
 current_file = nil
 disable_table = {false,false,false,false,false,false,false,false,false,false,false,false,false,false,false}
 disable_table[0] = false
