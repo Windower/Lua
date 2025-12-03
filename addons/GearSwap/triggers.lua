@@ -45,7 +45,7 @@ windower.register_event('outgoing text', function(original, modified)
     end
 
     local splitline = windower.from_shift_jis(windower.convert_auto_trans(modified)):gsub('<wait[%s%d%.]*>', ''):gsub('"(.-)"', function(str)
-            return ' '..str:gsub(' ',string.char(7))..' '
+            return ' '..str:gsub(' ', string.char(7))..' '
         end):split(' '):filter(-'')
 
     if splitline.n == 0 then
@@ -58,7 +58,7 @@ windower.register_event('outgoing text', function(original, modified)
     local abil, temp_mob_arr
 
     if splitline[2] and not bstpet then
-        abil = splitline[2]:gsub(string.char(7),' '):lower() -- Why am I removing \x7?
+        abil = splitline[2]:gsub(string.char(7), ' '):lower() -- Why am I removing \x7?
     elseif splitline[2] and bstpet then
         local pet_abilities = {}
         for _, v in ipairs(windower.ffxi.get_abilities().job_abilities) do
