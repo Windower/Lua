@@ -45,7 +45,7 @@ windower.register_event('outgoing text', function(original, modified)
     end
 
     local splitline = windower.from_shift_jis(windower.convert_auto_trans(modified)):gsub('<wait[%s%d%.]*>', ''):gsub('"(.-)"', function(str)
-            return ' '..str:gsub(' ', string.char(7))..' '
+            return ' ' .. str:gsub(' ', string.char(7)) .. ' '
         end):split(' '):filter(-'')
 
     if splitline.n == 0 then
@@ -106,28 +106,28 @@ windower.register_event('outgoing text', function(original, modified)
 
     if unified_prefix == '/ma' then
         r_line = copy_entry(res.spells[validabils[language][unified_prefix][abil]])
-        storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
+        storedcommand = command .. ' "' .. windower.to_shift_jis(r_line[language]) .. '" '
     elseif unified_prefix == '/ms' and find_monster_skill(abil) then
         r_line = find_monster_skill(abil)
-        storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
+        storedcommand = command .. ' "' .. windower.to_shift_jis(r_line[language]) .. '" '
     elseif unified_prefix == '/ws' then
         r_line = copy_entry(res.weapon_skills[validabils[language][unified_prefix][abil]])
-        storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
+        storedcommand = command .. ' "' .. windower.to_shift_jis(r_line[language]) .. '" '
     elseif unified_prefix == '/ja' then
         r_line = copy_entry(res.job_abilities[validabils[language][unified_prefix][abil]])
         if bstpet then
-            storedcommand = command..' '..splitline[2]
+            storedcommand = command .. ' ' .. splitline[2]
         else
-            storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
+            storedcommand = command .. ' "' .. windower.to_shift_jis(r_line[language]) .. '" '
         end
     elseif unified_prefix == '/item' then
         r_line = copy_entry(res.items[validabils[language][unified_prefix][abil]])
         r_line.prefix = '/item'
         r_line.type = 'Item'
-        storedcommand = command..' "'..windower.to_shift_jis(r_line[language])..'" '
+        storedcommand = command .. ' "' .. windower.to_shift_jis(r_line[language]) .. '" '
     elseif unified_prefix == '/ra' then
         r_line = copy_entry(resources_ranged_attack)
-        storedcommand = command..' '
+        storedcommand = command .. ' '
     end
 
     r_line.name = r_line[language]
