@@ -219,7 +219,6 @@ function equip_sets_exit(swap_type,ts,val1)
             end
 
             -- Compose a proposed packet for the given action (this should be possible after pretarget)
-            command_registry[ts].spell = val1
             if val1.target and val1.target.id and val1.target.index and val1.prefix and unify_prefix[val1.prefix] then
                 if val1.prefix == '/item' then
                     -- Item use packet handling here
