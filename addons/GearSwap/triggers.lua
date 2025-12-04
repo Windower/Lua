@@ -58,7 +58,7 @@ windower.register_event('outgoing text', function(original, modified)
     local abil, temp_mob_arr
 
     if splitline[2] and not bstpet then
-        abil = splitline[2]:gsub(string.char(7), ' '):lower() -- Why am I removing \x7?
+        abil = splitline[2]:gsub(string.char(7), ' '):lower()
     elseif splitline[2] and bstpet then
         local pet_abilities = {}
         for _, v in ipairs(windower.ffxi.get_abilities().job_abilities) do
@@ -143,36 +143,36 @@ windower.register_event('outgoing text', function(original, modified)
         return equip_sets('filtered_action', -1, spell)
     end
 
-    if not tonumber(splitline[splitline.n]) then
-        -- If the target is not a number
+    if not tonumber(spell.target.raw) then
         return equip_sets('pretarget', -1, spell)
     end
 
-    -- If the target is a number
-    local ts = command_registry:new_entry(spell)
+    if filter_precast(spell) then
+        local ts = command_registry:new_entry(spell)
 
-    if spell.prefix == '/item' then
-        -- Item use packet handling here
-        if spell.action_type == 'Trade' and find_inventory_item(spell.id) then
-            --0x36 packet
-            if spell.target.distance <= 6 then
-                command_registry[ts].proposed_packet = assemble_menu_item_packet(spell.target.id, spell.target.index, spell.id)
-            else
-                 windower.add_to_chat(67, 'Target out of range.')
-                 return true
+        if spell.prefix == '/item' then
+            -- Item use packet handling here
+            if spell.action_type == 'Trade' and find_inventory_item(spell.id) then
+                --0x36 packet
+                if spell.target.distance <= 6 then
+                    command_registry[ts].proposed_packet = assemble_menu_item_packet(spell.target.id, spell.target.index, spell.id)
+                else
+                     windower.add_to_chat(67, 'Target out of range.')
+                     return true
+                end
+            elseif find_usable_item(spell.id) then
+                --0x37 packet
+                command_registry[ts].proposed_packet = assemble_use_item_packet(spell.target.id, spell.target.index, spell.id)
             end
-        elseif find_usable_item(spell.id) then
-            --0x37 packet
-            command_registry[ts].proposed_packet = assemble_use_item_packet(spell.target.id, spell.target.index, spell.id)
+        else
+            command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id, spell.target.index, outgoing_action_category_table[unify_prefix[spell.prefix]], spell.id, initialize_arrow_offset(spell.target))
         end
-    else
-        command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id, spell.target.index, outgoing_action_category_table[unify_prefix[spell.prefix]], spell.id, initialize_arrow_offset(spell.target))
-    end
 
-    -- The packets created above should not be used.
-    if command_registry[ts].proposed_packet then
-        equip_sets('precast', ts, spell)
-        return true
+        -- The packets created above should not be used.
+        if command_registry[ts].proposed_packet then
+            equip_sets('precast', ts, spell)
+            return true
+        end
     end
 
     return modified
