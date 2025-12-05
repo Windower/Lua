@@ -219,7 +219,7 @@ function equip_sets_exit(swap_type,ts,val1)
             end
 
             -- Compose a proposed packet for the given action (this should be possible after pretarget)
-            if val1.target and val1.target.id and val1.target.index and val1.prefix and unify_prefix[val1.prefix] then
+            if val1.target.id and val1.target.index then
                 if val1.prefix == '/item' then
                     -- Item use packet handling here
                     if bit.band(val1.target.spawn_type, 2) == 2 and find_inventory_item(val1.id) then
@@ -252,7 +252,7 @@ function equip_sets_exit(swap_type,ts,val1)
                 end
             end
 
-            if ts and command_registry[ts] and val1.target then
+            if ts and command_registry[ts] then
                 if st_targs[val1.target.raw] then
                 -- st targets
                     st_flag = true
