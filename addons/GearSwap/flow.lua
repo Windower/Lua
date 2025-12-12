@@ -228,6 +228,7 @@ function equip_sets_exit(swap_type, ts, val1)
                 if val1.prefix == '/item' then
                     -- Item use packet handling here
                     if bit.band(val1.target.spawn_type, 2) == 2 and find_inventory_item(val1.id) then
+                        val1.action_type = 'Trade'
                         -- 0x36 packet
                         if val1.target.distance <= 6 then
                             command_registry[ts].proposed_packet = assemble_menu_item_packet(val1.target.id, val1.target.index, val1.id)
