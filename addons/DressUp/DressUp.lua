@@ -87,9 +87,9 @@ windower.register_event('logout', function()
 end)
 
 windower.register_event('job change',function(job)
-    if load_profile(res.jobs[job].short) then
+    if load_profile(res.jobs[job].name_short) then
         update_model(info.self.index)
-        notice('Loaded profile: ' .. res.jobs[job].short)
+        notice('Loaded profile: ' .. res.jobs[job].name_short)
     elseif load_profile(res.jobs[job].name) then
         update_model(info.self.index)
         notice('Loaded profile: ' .. res.jobs[job].name)
