@@ -52,7 +52,6 @@ local blu_spells = res.spells:type('BlueMagic')
 local function find_blu_spell(monster_ability_name)
     for i,v in pairs(blu_spells) do
         if (v.english == monster_ability_name) then
-            print(v.english)
             return v.id
         end
     end
