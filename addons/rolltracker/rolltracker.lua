@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'RollTracker'
-_addon.version = '1.9.0.0'
+_addon.version = '1.8.2.0'
 _addon.author = 'Balloon, Aragan' 
 _addon.commands = {'rolltracker','rt'}
 _addon.update = 'update by Aurthor Aragan 2024' 
@@ -35,47 +35,74 @@ chat = require('chat')
 chars = require('chat.chars')
 packets = require('packets')
 
-local texts = require('texts')
+texts = require('texts')
 
+local hudText
+local hudVisible = false
+local hudTimestamp = 0
+local lastHudSave = 0
 
--- RollTracker HUD settings (custom HUD for rolls)
-local rt_hud          = texts.new() -- Create a new text object for the HUD
-local rt_hud_visible  = false       -- Boolean to track if the HUD is currently visible
-local rt_hud_timestamp = 0          -- Timestamp to track when the HUD was last shown
-local rt_hud_duration  = 50         -- Duration (in seconds) to show the HUD
-
--- Function to initialize the HUD settings
-local function rt_init_hud()
-    rt_hud:pos(900, 300) -- Set the position of the HUD on the screen (x=900, y=300)
-    rt_hud:bg_color(0, 0, 0) -- Set the background color of the HUD to black (RGB: 0, 0, 0)
-    rt_hud:bg_alpha(80) -- Set the background transparency (alpha) to 80 (out of 255)
-    rt_hud:color(255, 255, 255) -- Set the text color to white (RGB: 255, 255, 255)
-    rt_hud:font('Arial') -- Set the font of the text to Arial
-    rt_hud:size(12) -- Set the font size to 12
-    rt_hud:hide() -- Initially hide the HUD
+local function initHud()
+    if hudText then return end
+    hudText = texts.new({
+        pos = {x = 900, y = 300},
+        bg = {alpha = 80, red = 0, green = 0, blue = 0},
+        text = {font = 'Arial', size = 12, alpha = 255, red = 255, green = 255, blue = 255},
+        flags = {draggable = true},
+        padding = 6,
+    })
+    hudText:hide()
 end
 
--- Function to display the HUD with a message
-local function rt_show_hud(msg)
-    rt_hud:text(msg) -- Set the text of the HUD to the provided message
-    rt_hud:show() -- Show the HUD on the screen
-    rt_hud_visible   = true -- Mark the HUD as visible
-    rt_hud_timestamp = os.time() -- Record the current time as the timestamp
+local function applyHudSettings()
+    if not hudText or not settings then return end
+    hudText:pos(settings.hudX or 900, settings.hudY or 300)
+    pcall(function() hudText:draggable(settings.hudDrag ~= false) end)
 end
 
-windower.register_event('load', function()
-    rt_init_hud()
-end)
+local function showHud(msg)
+    if not settings or not settings.hud then return end
+    initHud()
+    applyHudSettings()
+    hudText:text(msg)
+    hudText:show()
+    hudVisible = true
+    hudTimestamp = os.time()
+end
+
+local function hideHud()
+    if hudText and hudVisible then
+        hudText:hide()
+    end
+    hudVisible = false
+end
 
 windower.register_event('prerender', function()
-    if rt_hud_visible and os.time() - rt_hud_timestamp >= rt_hud_duration then
-        rt_hud:hide()
-        rt_hud_visible = false
+    if settings and settings.hud and hudVisible and settings.hudTime and settings.hudTime > 0 then
+        if os.time() - hudTimestamp >= settings.hudTime then
+            hideHud()
+        end
+    end
+
+    if settings and settings.hud and hudText then
+        local x, y = hudText:pos()
+        if type(x) == 'table' then
+            y = x.y
+            x = x.x
+        end
+        if type(x) == 'number' and type(y) == 'number' then
+            if x ~= settings.hudX or y ~= settings.hudY then
+                local now = os.clock()
+                if now - lastHudSave >= 0.5 then
+                    settings.hudX = x
+                    settings.hudY = y
+                    config.save(settings, 'all')
+                    lastHudSave = now
+                end
+            end
+        end
     end
 end)
-
-
-
 
 defaults = {}
 defaults.autostopper = true
@@ -84,6 +111,12 @@ defaults.effected = 1
 defaults.fold = 1
 defaults.luckyinfo = true
 
+defaults.hud = false
+defaults.hudTime = 5
+defaults.hudX = 900
+defaults.hudY = 300
+defaults.hudDrag = true
+defaults.view = 'all'
 settings = config.load(defaults)
 
 windower.register_event('addon command',function (...)
@@ -92,6 +125,10 @@ windower.register_event('addon command',function (...)
         if cmd[1]:lower() == "help" then
             log('To toggle rolltracker from allowing/stopping rolls type: //rolltracker autostop')
             log('To toggle rolltracker from showing/hiding Lucky Info type: //rolltracker luckyinfo')
+            log('To toggle HUD on/off type: //rolltracker hud [on|off|toggle|status]')
+            log('To set HUD time (seconds) type: //rolltracker hudtime <seconds>')
+            log('To set HUD position type: //rolltracker hudpos <x> <y>')
+            log('To view rolls from self/others/all type: //rolltracker view <self|others|all>')
         elseif cmd[1]:lower() == "autostop" then
             if settings.autostopper then
                settings.autostopper = false
@@ -107,6 +144,69 @@ windower.register_event('addon command',function (...)
             else
                settings.luckyinfo = true
                log('Lucky/Unlucky Info will now be displayed.')
+            end
+        elseif cmd[1]:lower() == "hud" then
+            local sub = cmd[2] and cmd[2]:lower() or "toggle"
+            if sub == "on" then
+                settings.hud = true
+                initHud()
+                applyHudSettings()
+                log('HUD Enabled.')
+            elseif sub == "off" then
+                settings.hud = false
+                hideHud()
+                log('HUD Disabled.')
+            elseif sub == "status" then
+                log('HUD: ' .. (settings.hud and 'ON' or 'OFF'))
+            else
+                settings.hud = not settings.hud
+                if not settings.hud then
+                    hideHud()
+                else
+                    initHud()
+                    applyHudSettings()
+                end
+                log('HUD: ' .. (settings.hud and 'ON' or 'OFF'))
+            end
+        elseif cmd[1]:lower() == "hudtime" then
+            local t = tonumber(cmd[2])
+            if t then
+                settings.hudTime = t
+                log('HUD Time: ' .. tostring(settings.hudTime) .. 's')
+            else
+                log('Usage: //rolltracker hudtime <seconds>')
+            end
+        elseif cmd[1]:lower() == "hudpos" then
+            local x = tonumber(cmd[2])
+            local y = tonumber(cmd[3])
+            if x and y then
+                settings.hudX = x
+                settings.hudY = y
+                initHud()
+                applyHudSettings()
+                log('HUD Position: ' .. tostring(x) .. ', ' .. tostring(y))
+            else
+                log('Usage: //rolltracker hudpos <x> <y>')
+            end
+        elseif cmd[1]:lower() == "hudlock" then
+            settings.hudDrag = false
+            applyHudSettings()
+            log('HUD Drag: OFF')
+        elseif cmd[1]:lower() == "hudunlock" then
+            settings.hudDrag = true
+            initHud()
+            applyHudSettings()
+            log('HUD Drag: ON')
+        elseif cmd[1]:lower() == "view" then
+            local mode = cmd[2] and cmd[2]:lower() or ""
+            if mode == "me" or mode == "my" or mode == "mine" then
+                mode = "self"
+            end
+            if mode == "self" or mode == "others" or mode == "all" then
+                settings.view = mode
+                log('View Mode: ' .. settings.view)
+            else
+                log('Usage: //rolltracker view <self|others|all>')
             end
         end
         config.save(settings, 'all')
@@ -222,6 +322,14 @@ windower.register_event('action', function(act)
         local rollID = act.param
         local rollNum = act.targets[1].actions[1].param
 
+        if settings and settings.view and player and player.id then
+            if settings.view == 'self' and rollActor ~= player.id then
+                return
+            elseif settings.view == 'others' and rollActor == player.id then
+                return
+            end
+        end
+
         -- anonymous function that checks if the player.id is in the targets without wrapping it in another layer of for loops.
         if
             function(act)
@@ -258,8 +366,6 @@ windower.register_event('action', function(act)
                 luckChat = string.char(31,167).." (Unlucky!)"
             end
 
-
-
             -- HUD details (roll number + Lucky/Unlucky numbers)
             local lucky_num   = rollInfo[rollID][15]
             local unlucky_num = rollInfo[rollID][16]
@@ -277,15 +383,14 @@ windower.register_event('action', function(act)
             end
             if rollNum == 12 and #rollMembers > 0 then
                 windower.add_to_chat(1, string.char(31,167)..amountHit..'Bust! '..chat.controls.reset..chars.implies..' '..membersHit..' '..chars.implies..' ('..rollInfo[rollID][rollNum+1]..rollInfo[rollID][14]..')')
-                rt_show_hud(string.format('%s Roll\nBust!%s', rollInfo[rollID][1], hud_lu))
+                showHud(string.format('%s Roll\nBust!%s', rollInfo[rollID][1], hud_lu))
             else
                 windower.add_to_chat(1, amountHit..membersHit..chat.controls.reset..' '..chars.implies..' '..rollInfo[rollID][1]..' Roll '..chars['circle' .. rollNum]..luckChat..string.char(31,13)..' (+'..rollBonus..')'..BustRate(rollNum, rollActor)..ReportRollInfo(rollID, rollActor))
-                rt_show_hud(string.format('%s Roll %d%s\n+%s%s', rollInfo[rollID][1], rollNum, hud_status, rollBonus, hud_lu))
+                showHud(string.format('%s Roll %d%s\n+%s%s', rollInfo[rollID][1], rollNum, hud_status, rollBonus, hud_lu))
             end
         end
     end
 end)
-
 
 function RollEffect(rollid, rollnum)
     if rollnum == 13 then
@@ -392,7 +497,6 @@ function RollEffect(rollid, rollnum)
 
     return rollVal..rollInfo[rollid][14]
 end
-
 
 function BustRate(rollNum, rollActor)
     if rollNum <= 5 or rollNum == 11 or rollActor ~= player.id or settings.bust == 0 then
