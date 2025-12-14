@@ -25,14 +25,57 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'RollTracker'
-_addon.version = '1.8.1.1'
-_addon.author = 'Balloon'
+_addon.version = '1.9.0.0'
+_addon.author = 'Balloon, Aragan' 
 _addon.commands = {'rolltracker','rt'}
+_addon.update = 'update by Aurthor Aragan 2024' 
 
 require('luau')
 chat = require('chat')
 chars = require('chat.chars')
 packets = require('packets')
+
+local texts = require('texts')
+
+
+-- RollTracker HUD settings (custom HUD for rolls)
+local rt_hud          = texts.new() -- Create a new text object for the HUD
+local rt_hud_visible  = false       -- Boolean to track if the HUD is currently visible
+local rt_hud_timestamp = 0          -- Timestamp to track when the HUD was last shown
+local rt_hud_duration  = 50         -- Duration (in seconds) to show the HUD
+
+-- Function to initialize the HUD settings
+local function rt_init_hud()
+    rt_hud:pos(900, 300) -- Set the position of the HUD on the screen (x=900, y=300)
+    rt_hud:bg_color(0, 0, 0) -- Set the background color of the HUD to black (RGB: 0, 0, 0)
+    rt_hud:bg_alpha(80) -- Set the background transparency (alpha) to 80 (out of 255)
+    rt_hud:color(255, 255, 255) -- Set the text color to white (RGB: 255, 255, 255)
+    rt_hud:font('Arial') -- Set the font of the text to Arial
+    rt_hud:size(12) -- Set the font size to 12
+    rt_hud:hide() -- Initially hide the HUD
+end
+
+-- Function to display the HUD with a message
+local function rt_show_hud(msg)
+    rt_hud:text(msg) -- Set the text of the HUD to the provided message
+    rt_hud:show() -- Show the HUD on the screen
+    rt_hud_visible   = true -- Mark the HUD as visible
+    rt_hud_timestamp = os.time() -- Record the current time as the timestamp
+end
+
+windower.register_event('load', function()
+    rt_init_hud()
+end)
+
+windower.register_event('prerender', function()
+    if rt_hud_visible and os.time() - rt_hud_timestamp >= rt_hud_duration then
+        rt_hud:hide()
+        rt_hud_visible = false
+    end
+end)
+
+
+
 
 defaults = {}
 defaults.autostopper = true
@@ -40,76 +83,34 @@ defaults.bust = 1
 defaults.effected = 1
 defaults.fold = 1
 defaults.luckyinfo = true
-defaults.channel = {}
-defaults.channel.roll = 1 -- This should be 101, but the current default is 1
-defaults.channel.warn = 1
-defaults.color = {}
-defaults.color.bonus = 13
-defaults.color.lucky = 158
-defaults.color.warn = 159
-defaults.color.unlucky = 167
 
 settings = config.load(defaults)
 
 windower.register_event('addon command',function (...)
     cmd = {...}
-    local command = ((cmd[1] ~= nil) and cmd[1]:lower()) or "help"
-
-    if command == "autostop" then
-        if settings.autostopper then
-           settings.autostopper = false
-           log('Will no longer stop Double-UP on a Lucky Roll.')
-        else
-           settings.autostopper = true
-           log('Will stop Double-UP on a Lucky Roll.')
+    if cmd[1] ~= nil then
+        if cmd[1]:lower() == "help" then
+            log('To toggle rolltracker from allowing/stopping rolls type: //rolltracker autostop')
+            log('To toggle rolltracker from showing/hiding Lucky Info type: //rolltracker luckyinfo')
+        elseif cmd[1]:lower() == "autostop" then
+            if settings.autostopper then
+               settings.autostopper = false
+               log('Will no longer stop Double-UP on a Lucky Roll.')
+            else
+               settings.autostopper = true
+               log('Will stop Double-UP on a Lucky Roll.')
+            end
+        elseif cmd[1]:lower() == "luckyinfo" then
+            if settings.luckyinfo then
+               settings.luckyinfo = false
+               log('Lucky/Unlucky Info will no longer be displayed.')
+            else
+               settings.luckyinfo = true
+               log('Lucky/Unlucky Info will now be displayed.')
+            end
         end
-    elseif command == "luckyinfo" then
-        if settings.luckyinfo then
-           settings.luckyinfo = false
-           log('Lucky/Unlucky Info will no longer be displayed.')
-        else
-           settings.luckyinfo = true
-           log('Lucky/Unlucky Info will now be displayed.')
-        end
-    elseif command == "channel" then
-        local subcommand = ((cmd[2] ~= nil) and cmd[2]:lower()) or "help"
-        if subcommand == "help" then
-            log('Chat Channels: roll(' .. settings.channel.roll .. '), warn(' .. settings.channel.warn .. ')')
-            return
-        end
-        if settings.channel[subcommand] == nil then
-            log('Valid chat channels are: roll and warn')
-            return
-        end
-        local channel = tonumber(((cmd[3] ~= nil) and cmd[3]) or 0)
-        if (channel == nil) or (channel < 1) or (channel > 255) then
-            log('Valid channnel values are 1 through 255')
-            return
-        end
-        settings.channel[subcommand] = channel
-        log('Chat Channel set to ' .. channel)
-    elseif command == "color" then
-        local subcommand = ((cmd[2] ~= nil) and cmd[2]:lower()) or "help"
-        if subcommand == "help" then
-            log('Colors: bonus(' .. settings.color.bonus .. '), lucky(' .. settings.color.lucky .. '), unlucky(' .. settings.color.unlucky .. '), warn(' .. settings.color.warn .. ')')
-            return
-        end
-        if settings.color[subcommand] == nil then
-            log('Valid color types are: roll, bonus, lucky, unlucky, and warn')
-            return
-        end
-        local color = tonumber(((cmd[3] ~= nil) and cmd[3]) or 0)
-        if (color == nil) or (color < 1) or (color > 255) then
-            log('Valid color values are 1 through 255')
-            return
-        end
-        settings.color[subcommand] = color
-        log('Color for \'' .. subcommand .. '\' set to ' .. color)
-    else
-        printHelp()
-        return
+        config.save(settings, 'all')
     end
-    config.save(settings, 'all')
 end)
 
 --This is done because GearSwap swaps out too fast, and sometimes things aren't reported in memory.
@@ -124,19 +125,6 @@ windower.register_event('incoming chunk', function(id, data)
 
     end
 end)
-
-function printHelp()
-    log('rt autostop : Toggle allowing/stopping rolls')
-    log('rt luckyinfo : Toggle showing/hiding Lucky Info')
-    log('rt channel : Show current chat channels for rolltracker messages')
-    log('rt channel roll <channel> : Set the chat channel for rolls (1-255, ex. 101)')
-    log('rt channel warn <channel> : Set the chat channel for warnings (1-255, ex. 101)')
-    log('rt color : Show current color settings')
-    log('rt color bonus <color> : Set the color for the Roll Bonus text (1-255, ex. 158)')
-    log('rt color lucky <color> : Set the color for the Lucky text (1-255, ex. 158)')
-    log('rt color unlucky <color> : Set the color for the Unlucky text (1-255, ex. 167)')
-    log('rt color warn <color> : Set the color for warning messages (1-255, ex. 159)')
-end
 
 function getGear(slot)
     local equip = windower.ffxi.get_items()['equipment']
@@ -264,19 +252,35 @@ windower.register_event('action', function(act)
             isLucky = false
             if rollNum == rollInfo[rollID][15] or rollNum == 11 then
                 isLucky = true
-                windower.add_to_chat(settings.channel.roll, 'Lucky roll!':color(settings.color.lucky))
-                luckChat = " (Lucky!)":color(settings.color.lucky)
+                windower.add_to_chat(158,'Lucky roll!')
+                luckChat = string.char(31,158).." (Lucky!)"
             elseif rollNum == rollInfo[rollID][16] then
-                luckChat = " (Unlucky!)":color(settings.color.unlucky)
+                luckChat = string.char(31,167).." (Unlucky!)"
             end
 
 
+
+            -- HUD details (roll number + Lucky/Unlucky numbers)
+            local lucky_num   = rollInfo[rollID][15]
+            local unlucky_num = rollInfo[rollID][16]
+
+            local hud_lu = ''
+            if settings.luckyinfo then
+                hud_lu = string.format('\nLucky: %d  Unlucky: %d', lucky_num, unlucky_num)
+            end
+
+            local hud_status = ''
+            if rollNum == lucky_num or rollNum == 11 then
+                hud_status = ' (Lucky!)'
+            elseif rollNum == unlucky_num then
+                hud_status = ' (Unlucky!)'
+            end
             if rollNum == 12 and #rollMembers > 0 then
-                local bustchat = amountHit..'Bust! '..chat.controls.reset..chars.implies..' '..membersHit..' '..chars.implies..' ('..rollInfo[rollID][rollNum+1]..rollInfo[rollID][14]..')'
-                windower.add_to_chat(settings.channel.roll, bustchat:color(settings.color.bust))
+                windower.add_to_chat(1, string.char(31,167)..amountHit..'Bust! '..chat.controls.reset..chars.implies..' '..membersHit..' '..chars.implies..' ('..rollInfo[rollID][rollNum+1]..rollInfo[rollID][14]..')')
+                rt_show_hud(string.format('%s Roll\nBust!%s', rollInfo[rollID][1], hud_lu))
             else
-                local bonuschat = ' (+'..rollBonus..')'
-                windower.add_to_chat(settings.channel.roll, amountHit..membersHit..chat.controls.reset..' '..chars.implies..' '..rollInfo[rollID][1]..' Roll '..chars['circle' .. rollNum]..luckChat.. bonuschat:color(settings.color.bonus) ..BustRate(rollNum, rollActor)..ReportRollInfo(rollID, rollActor))
+                windower.add_to_chat(1, amountHit..membersHit..chat.controls.reset..' '..chars.implies..' '..rollInfo[rollID][1]..' Roll '..chars['circle' .. rollNum]..luckChat..string.char(31,13)..' (+'..rollBonus..')'..BustRate(rollNum, rollActor)..ReportRollInfo(rollID, rollActor))
+                rt_show_hud(string.format('%s Roll %d%s\n+%s%s', rollInfo[rollID][1], rollNum, hud_status, rollBonus, hud_lu))
             end
         end
     end
@@ -418,7 +422,7 @@ windower.register_event('outgoing text', function(original, modified)
     modified = original
     if cleaned:match('/jobability \"?Double.*Up') or cleaned:match('/ja \"?Double.*Up') then
         if isLucky and settings.autostopper and rollActor == player.id then
-            windower.add_to_chat(settings.channel.warn, 'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.':color(settings.color.warn))
+            windower.add_to_chat(159,'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.')
             isLucky = false
             modified = ""
         end
@@ -435,7 +439,7 @@ windower.register_event('outgoing text', function(original, modified)
             modified = cleaned
             ranMultiple = false
         else
-            windower.add_to_chat(settings.channel.warn, 'No \'Bust\'. Fold again to continue.':color(settings.color.warn))
+            windower.add_to_chat(159, 'No \'Bust\'. Fold again to continue.')
             ranMultiple = true
             modified = ""
         end
