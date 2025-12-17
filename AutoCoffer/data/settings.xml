@@ -1,0 +1,14 @@
+<?xml version="1.1" ?>
+<settings>
+    <global>
+        <debug>true</debug>
+        <delay_offset>0</delay_offset>
+        <ignore>
+            <trump card case>true</trump card case>
+        </ignore>
+        <max_uses>0</max_uses>
+    </global>
+    <aragan>
+        <debug>false</debug>
+    </aragan>
+</settings>
