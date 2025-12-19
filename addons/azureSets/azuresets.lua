@@ -28,8 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 _addon.name = 'AzureSets'
-_addon.version = '1.23'
-_addon.author = 'Nitrous (Shiva)'
+_addon.version = '1.24.3'
+_addon.author = 'Nitrous (Shiva), Gojito (Leviathan - Subjob Support)'
 _addon.commands = {'aset','azuresets','asets'}
 
 require('tables')
@@ -57,7 +57,64 @@ slot09='Blank Gaze', slot10='Radiant Breath', slot11='Light of Penance', slot12=
 slot13='Death Ray', slot14='Eyes On Me', slot15='Sandspray'
 }
 
+-- Subjob-specific spell sets (limited to 16 slots)
+defaults.spellsets.sub_default = T{}
+
 settings = config.load(defaults)
+
+-- Constants
+local BLU_JOB_ID = 16
+local MAIN_JOB_SLOTS = 20
+local SUB_JOB_SLOTS = 16  -- Subjob BLU gets 16 spell slots
+
+-------------------------------------------------------------------------------
+-- Helper Functions for Main/Sub Job Detection
+-------------------------------------------------------------------------------
+
+-- Returns true if the player has BLU as either main or sub job
+function has_blu_access()
+    local player = windower.ffxi.get_player()
+    if not player then return false end
+    return player.main_job_id == BLU_JOB_ID or player.sub_job_id == BLU_JOB_ID
+end
+
+-- Returns true if BLU is the main job
+function is_main_blu()
+    local player = windower.ffxi.get_player()
+    if not player then return false end
+    return player.main_job_id == BLU_JOB_ID
+end
+
+-- Returns true if BLU is the sub job (and not main)
+function is_sub_blu()
+    local player = windower.ffxi.get_player()
+    if not player then return false end
+    return player.main_job_id ~= BLU_JOB_ID and player.sub_job_id == BLU_JOB_ID
+end
+
+-- Returns the maximum number of spell slots available
+function get_max_slots()
+    if is_main_blu() then
+        return MAIN_JOB_SLOTS
+    elseif is_sub_blu() then
+        return SUB_JOB_SLOTS
+    end
+    return 0
+end
+
+-- Returns descriptive string for current BLU job status
+function get_blu_status()
+    if is_main_blu() then
+        return "main"
+    elseif is_sub_blu() then
+        return "sub"
+    end
+    return "none"
+end
+
+-------------------------------------------------------------------------------
+-- Core Functions
+-------------------------------------------------------------------------------
 
 function initialize()
     spells = res.spells:type('BlueMagic')
@@ -68,23 +125,40 @@ windower.register_event('load', initialize:cond(function() return windower.ffxi.
 
 windower.register_event('login', initialize)
 
-windower.register_event('job change', initialize:cond(function(job) return job == 16 end))
+-- Initialize when changing to BLU as main OR when subjob changes to BLU
+windower.register_event('job change', function(main_job, main_job_level, sub_job, sub_job_level)
+    if main_job == BLU_JOB_ID or sub_job == BLU_JOB_ID then
+        initialize()
+    end
+end)
 
 function set_spells(spellset, setmode)
-    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then
-        error('Main job not set to Blue Mage.')
+    if not has_blu_access() then
+        error('You do not have Blue Mage as main or sub job.')
         return
     end
     if settings.spellsets[spellset] == nil then
         error('Set not defined: '..spellset)
         return
     end
+    
+    -- Validate spell count for subjob
+    local max_slots = get_max_slots()
+    local spellset_size = settings.spellsets[spellset]:length()
+    
+    if is_sub_blu() and spellset_size > max_slots then
+        notice('Warning: Spellset "'..spellset..'" has '..spellset_size..' spells, but sub BLU only supports '..max_slots..' slots.')
+        notice('Only the first '..max_slots..' spells will be set.')
+    end
+    
     if is_spellset_equipped(settings.spellsets[spellset]) then
         log(spellset..' was already equipped.')
         return
     end
 
-    log('Starting to set '..spellset..'.')
+    local job_type = get_blu_status()
+    log('Starting to set '..spellset..' ('..job_type..' BLU).')
+    
     if setmode:lower() == 'clearfirst' then
         remove_all_spells()
         set_spells_from_spellset:schedule(settings.setspeed, spellset, 'add')
@@ -96,31 +170,39 @@ function set_spells(spellset, setmode)
 end
 
 function is_spellset_equipped(spellset)
-    return S(spellset):map(string.lower) == S(get_current_spellset())
+    local current = get_current_spellset()
+    if not current then return false end
+    return S(spellset):map(string.lower) == S(current)
 end
 
 function set_spells_from_spellset(spellset, setPhase)
     local setToSet = settings.spellsets[spellset]
     local currentSet = get_current_spellset()
+    local max_slots = get_max_slots()
 
     if setPhase == 'remove' then
         -- Remove Phase
         for k,v in pairs(currentSet) do
             if not setToSet:contains(v:lower()) then
-                setSlot = k
-                local slotToRemove = tonumber(k:sub(5, k:len()))
-
-                windower.ffxi.remove_blue_magic_spell(slotToRemove)
-                --log('Removed spell: '..v..' at #'..slotToRemove)
-                set_spells_from_spellset:schedule(settings.setspeed, spellset, 'remove')
-                return
+                -- Safely extract slot number from key
+                local slotToRemove = nil
+                if type(k) == 'string' and k:sub(1, 4) == 'slot' then
+                    slotToRemove = tonumber(k:sub(5))
+                end
+                
+                if slotToRemove then
+                    windower.ffxi.remove_blue_magic_spell(slotToRemove)
+                    set_spells_from_spellset:schedule(settings.setspeed, spellset, 'remove')
+                    return
+                end
             end
         end
     end
+    
     -- Did not find spell to remove. Start set phase
-    -- Find empty slot:
+    -- Find empty slot (respecting max_slots for subjob)
     local slotToSetTo
-    for i = 1, 20 do
+    for i = 1, max_slots do
         local slotName = 'slot%02u':format(i)
         if currentSet[slotName] == nil then
             slotToSetTo = i
@@ -131,14 +213,26 @@ function set_spells_from_spellset(spellset, setPhase)
     if slotToSetTo ~= nil then
         -- We found an empty slot. Find a spell to set.
         for k,v in pairs(setToSet) do
-            if not currentSet:contains(v:lower()) then
+            -- Skip spells beyond max slot count for subjob
+            -- Safely extract slot number from key (e.g., "slot01" -> 1)
+            local slotNum = nil
+            if type(k) == 'string' and k:sub(1, 4) == 'slot' then
+                slotNum = tonumber(k:sub(5))
+            end
+            
+            -- Only process if we have a valid slot number within range
+            if slotNum and slotNum <= max_slots and not currentSet:contains(v:lower()) then
                 if v ~= nil then
                     local spellID = find_spell_id_by_name(v)
                     if spellID ~= nil then
-                        windower.ffxi.set_blue_magic_spell(spellID, tonumber(slotToSetTo))
-                        --log('Set spell: '..v..' ('..spellID..') at: '..slotToSetTo)
-                        set_spells_from_spellset:schedule(settings.setspeed, spellset, 'add')
-                        return
+                        -- Verify spell is available at current level for subjob
+                        if is_sub_blu() and not can_set_spell_as_sub(spellID) then
+                            notice('Skipping '..v..' - not available at sub job level.')
+                        else
+                            windower.ffxi.set_blue_magic_spell(spellID, tonumber(slotToSetTo))
+                            set_spells_from_spellset:schedule(settings.setspeed, spellset, 'add')
+                            return
+                        end
                     end
                 end
             end
@@ -146,8 +240,35 @@ function set_spells_from_spellset(spellset, setPhase)
     end
 
     -- Unable to find any spells to set. Must be complete.
-    log(spellset..' has been equipped.')
+    local job_type = get_blu_status()
+    log(spellset..' has been equipped ('..job_type..' BLU).')
     windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
+end
+
+-- Check if a spell can be set as subjob BLU (based on spell level vs sub job level)
+-- The spell.levels table is keyed by job ID and contains the required level for that job
+function can_set_spell_as_sub(spellID)
+    local spell = spells[spellID]
+    if not spell then return false end
+    
+    local player = windower.ffxi.get_player()
+    if not player then return false end
+    
+    -- Subjob level is capped at half main job level (max 99/2 = 49)
+    local sub_level = player.sub_job_level or 0
+    
+    -- spell.levels is a table: { [job_id] = required_level, ... }
+    -- If levels table doesn't exist or doesn't have BLU entry, assume level 1
+    if not spell.levels then return true end
+    
+    local spell_level = spell.levels[BLU_JOB_ID]
+    if spell_level == nil then 
+        -- BLU not in levels table - this shouldn't happen for BLU spells
+        -- but if it does, allow it
+        return true 
+    end
+    
+    return sub_level >= spell_level
 end
 
 function find_spell_id_by_name(spellname)
@@ -159,22 +280,39 @@ function find_spell_id_by_name(spellname)
     return nil
 end
 
-function set_single_spell(setspell,slot)
-    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then return nil end
+function set_single_spell(setspell, slot)
+    if not has_blu_access() then
+        error('You do not have Blue Mage as main or sub job.')
+        return nil
+    end
+    
+    local max_slots = get_max_slots()
+    if tonumber(slot) > max_slots then
+        error('Slot '..slot..' exceeds maximum available slots ('..max_slots..') for '..get_blu_status()..' BLU.')
+        return
+    end
 
-    local tmpTable = T(get_current_spellset())
+    local tmpTable = get_current_spellset()
+    if not tmpTable then
+        error('Unable to get current spell set.')
+        return
+    end
     for key,val in pairs(tmpTable) do
-        if tmpTable[key]:lower() == setspell then
+        if val and val:lower() == setspell then
             error('That spell is already set.')
             return
         end
     end
     if tonumber(slot) < 10 then slot = '0'..slot end
-    --insert spell add code here
+    
     for spell in spells:it() do
         if spell['english']:lower() == setspell then
-            --This is where single spell setting code goes.
-            --Need to set by spell id rather than name.
+            -- Check if spell is available at current level for subjob
+            if is_sub_blu() and not can_set_spell_as_sub(spell['id']) then
+                error('Spell "'..spell['english']..'" requires a higher BLU level than your sub job.')
+                return
+            end
+            
             windower.ffxi.set_blue_magic_spell(spell['id'], tonumber(slot))
             windower.send_command('@timers c "Blue Magic Cooldown" 60 up')
             tmpTable['slot'..slot] = setspell
@@ -184,19 +322,49 @@ function set_single_spell(setspell,slot)
 end
 
 function get_current_spellset()
-    if windower.ffxi.get_player().main_job_id ~= 16 then return nil end
-    return T(windower.ffxi.get_mjob_data().spells)
-    -- Returns all values but 512
-    :filter(function(id) return id ~= 512 end)
-    -- Transforms them from IDs to lowercase English names
-    :map(function(id) return spells[id].english:lower() end)
-    -- Transform the keys from numeric x or xx to string 'slot0x' or 'slotxx'
-    :key_map(function(slot) return 'slot%02u':format(slot) end)
+    if not has_blu_access() then return T{} end
+    
+    -- Use appropriate data source based on main vs sub job
+    local job_data
+    if is_main_blu() then
+        job_data = windower.ffxi.get_mjob_data()
+    else
+        job_data = windower.ffxi.get_sjob_data()
+    end
+    
+    -- Safety check: ensure we got valid job data
+    if not job_data or not job_data.spells then return T{} end
+    
+    local spell_data = job_data.spells
+    local max_slots = get_max_slots()
+    local result = T{}
+    
+    -- Manually iterate to avoid chained filter/map nil issues
+    for slot, id in pairs(spell_data) do
+        -- Validate slot is a number and within range
+        if type(slot) == 'number' and slot >= 1 and slot <= max_slots then
+            -- Skip empty slots (512 is the empty indicator)
+            if id ~= 512 then
+                -- Safely get spell name
+                local spell = spells[id]
+                if spell and spell.english then
+                    local slotName = 'slot%02u':format(slot)
+                    result[slotName] = spell.english:lower()
+                end
+            end
+        end
+    end
+    
+    return result
 end
 
 function remove_all_spells(trigger)
+    if not has_blu_access() then
+        error('You do not have Blue Mage as main or sub job.')
+        return
+    end
     windower.ffxi.reset_blue_magic_spells()
-    notice('All spells removed.')
+    notice('All spells removed ('..get_blu_status()..' BLU).')
 end
 
 function save_set(setname)
@@ -204,10 +372,17 @@ function save_set(setname)
         error('Please choose a name other than default.')
         return
     end
-    local curSpells = T(get_current_spellset())
+    local curSpells = get_current_spellset()
+    if not curSpells then
+        error('Unable to get current spell set.')
+        return
+    end
     settings.spellsets[setname] = curSpells
     settings:save('all')
-    notice('Set '..setname..' saved.')
+    
+    local job_type = get_blu_status()
+    local spell_count = curSpells:length()
+    notice('Set '..setname..' saved ('..spell_count..' spells, '..job_type..' BLU).')
 end
 
 function delete_set(setname)
@@ -222,25 +397,55 @@ end
 
 function get_spellset_list()
     log("Listing sets:")
+    local max_slots = get_max_slots()
+    local job_type = get_blu_status()
+    
     for key,_ in pairs(settings.spellsets) do
         if key ~= 'default' then
-            local it = 0
-            for i = 1, #settings.spellsets[key] do
-                it = it + 1
+            local spell_count = settings.spellsets[key]:length()
+            local warning = ''
+            if is_sub_blu() and spell_count > max_slots then
+                warning = ' [!exceeds sub limit]'
             end
-            log("\t"..key..' '..settings.spellsets[key]:length()..' spells.')
+            log("\t"..key..' '..spell_count..' spells.'..warning)
         end
+    end
+    
+    if has_blu_access() then
+        log('Current mode: '..job_type..' BLU ('..max_slots..' slots available)')
     end
 end
 
 function get_spellset_content(spellset)
+    if not settings.spellsets[spellset] then
+        error('Spellset "'..spellset..'" not found.')
+        return
+    end
     log('Getting '..spellset..'\'s spell list:')
     settings.spellsets[spellset]:print()
 end
 
+-- Display current status
+function show_status()
+    if not has_blu_access() then
+        log('You do not have Blue Mage as main or sub job.')
+        return
+    end
+    
+    local job_type = get_blu_status()
+    local max_slots = get_max_slots()
+    local current = get_current_spellset()
+    local used_slots = current and current:length() or 0
+    
+    log('AzureSets Status:')
+    log('  Job Mode: '..job_type..' BLU')
+    log('  Available Slots: '..max_slots)
+    log('  Used Slots: '..used_slots)
+end
+
 windower.register_event('addon command', function(...)
-    if windower.ffxi.get_player()['main_job_id'] ~= 16 --[[and windower.ffxi.get_player()['sub_job_id'] ~= 16]] then
-        error('You are not on (main) Blue Mage.')
+    if not has_blu_access() then
+        error('You do not have Blue Mage as main or sub job.')
         return nil
     end
     local args = T{...}
@@ -267,15 +472,22 @@ windower.register_event('addon command', function(...)
                 set_spells(args[1], args[2] or settings.setmode)
             end
         elseif comm == 'currentlist' then
-            get_current_spellset():print()
+            local current = get_current_spellset()
+            if current and current:length() > 0 then
+                current:print()
+            else
+                log('No spells currently set.')
+            end
         elseif comm == 'setlist' then
             get_spellset_list()
         elseif comm == 'spelllist' then
             if args[1] ~= nil then
                 get_spellset_content(args[1])
             end
+        elseif comm == 'status' then
+            show_status()
         elseif comm == 'help' then
-            local helptext = [[AzureSets - Command List:')
+            local helptext = [[AzureSets v1.24 - Command List (Now with Subjob Support!):
             1. removeall - Unsets all spells.
             2. spellset <setname> [ClearFirst|PreserveTraits] -- Set (setname)'s spells,
                              optional parameter: ClearFirst or PreserveTraits: overrides
@@ -287,9 +499,13 @@ windower.register_event('addon command', function(...)
             5. save <setname> -- Saves current spellset as (setname).
             6. delete <setname> -- Delete (setname) spellset.
             7. currentlist -- Lists currently set spells.
-            8. setlist -- Lists all spellsets.
+            8. setlist -- Lists all spellsets (marks sets exceeding sub BLU limit).
             9. spelllist <setname> -- List spells in (setname)
-            10. help --Shows this menu.]]
+            10. status -- Shows current BLU mode (main/sub) and slot availability.
+            11. help -- Shows this menu.
+            
+            Note: When using BLU as subjob, only 16 spell slots are available
+            and spells requiring higher BLU levels will be skipped.]]
             for _, line in ipairs(helptext:split('\n')) do
                 windower.add_to_chat(207, line..chat.controls.reset)
             end
