@@ -26,12 +26,24 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
 ]]
 
+
+--[[
+    AutoInvite (Enhanced Version)
+    Author: Registry + Modified by Aragan
+    Description:
+      - AutoAdd is enabled by default (invites anyone who sends you a /tell)
+      - Does not invite someone already in the party
+      - Supports on/off/status commands
+      - Fully English messages
+      - All original commands are available (whitelist / blacklist / keywords)
+]]
+
 require('luau')
 
 _addon.name = 'AutoInvite'
-_addon.author = 'Registry'
-_addon.commands = {'autoinvite','ai'}
-_addon.version = 1.0
+_addon.author = 'Registry + Aragan'
+_addon.commands = {'autoinvite','ainv'}
+_addon.version = 1.3
 _addon.language = 'english'
 
 defaults = T{}
@@ -41,39 +53,184 @@ defaults.blacklist = S{}
 defaults.keywords = S{}
 defaults.tellback = 'on'
 
--- Statuses that stop you from sending invites.
-statusblock = S{
-    'Dead', 'Event', 'Charmed'
-}
+statusblock = S{'Dead','Event','Charmed'}
 
--- Aliases to access correct modes based on supplied arguments.
 aliases = T{
-    wlist        = 'whitelist',
-    white        = 'whitelist',
-    whitelist    = 'whitelist',
-    blist        = 'blacklist',
-    black        = 'blacklist',
-    blacklist    = 'blacklist',
-    key            = 'keywords',
-    keyword        = 'keywords',
-    keywords    = 'keywords'    
+    wlist='whitelist', white='whitelist', whitelist='whitelist',
+    blist='blacklist', black='blacklist', blacklist='blacklist',
+    key='keywords', keyword='keywords', keywords='keywords'
 }
 
--- Aliases to access the add and item_to_remove routines.
-addstrs = S{'a', 'add', '+'}
-rmstrs = S{'r', 'rm', 'remove', '-'}
+addstrs = S{'a','add','+'}
+rmstrs = S{'r','rm','remove','-'}
+on = S{'on','yes','true'}
+off = S{'off','no','false'}
+modes = S{'whitelist','blacklist'}
 
--- Aliases for tellback mode.
-on = S{'on', 'yes', 'true'}
-off = S{'off', 'no', 'false'}
-
-modes = S{'whitelist', 'blacklist'}
-
--- Load settings from file
 settings = config.load(defaults)
 
--- Check for keyword
+---------------------------------------------------------------
+-- General Variables
+---------------------------------------------------------------
+autoadd_enabled = false
+addon_enabled = true
+
+---------------------------------------------------------------
+-- New Control Commands
+---------------------------------------------------------------
+windower.register_event('addon command', function(command, ...)
+    command = command and command:lower() or ''
+    local args = L{...}
+
+    
+    if command == 'help' then
+        windower.add_to_chat(207, '[AutoInvite] Available Commands:')
+        windower.add_to_chat(207, '  //ai on - Enable the addon.')
+        windower.add_to_chat(207, '  //ai off - Disable the addon.')
+        windower.add_to_chat(207, '  //ai toggle - Toggle the addon on/off.')
+        windower.add_to_chat(207, '  //ai status - Show the current status of the addon.')
+        windower.add_to_chat(207, '  //ai mode [whitelist|blacklist|status] - Change or view the current mode.')
+        windower.add_to_chat(207, '  //ai tellback [on|off|status] - Enable/disable auto-reply to /tell messages.')
+        windower.add_to_chat(207, '  //ai whitelist add [name] - Add a name to the whitelist.')
+        windower.add_to_chat(207, '  //ai whitelist remove [name] - Remove a name from the whitelist.')
+        windower.add_to_chat(207, '  //ai blacklist add [name] - Add a name to the blacklist.')
+        windower.add_to_chat(207, '  //ai blacklist remove [name] - Remove a name from the blacklist.')
+        windower.add_to_chat(207, '  //ai keywords add [word] - Add a keyword to the list.')
+        windower.add_to_chat(207, '  //ai keywords remove [word] - Remove a keyword from the list.')
+        windower.add_to_chat(207, '  //ai help - Show this help message.')
+        return
+    end
+    if command == 'on' then
+        addon_enabled = true
+        windower.add_to_chat(207, '[AutoInvite] AutoInvite enabled.')
+        return
+    elseif command == 'off' then
+        addon_enabled = false
+        windower.add_to_chat(207, '[AutoInvite] AutoInvite disabled.')
+        return
+    elseif command == 'toggle' then
+        addon_enabled = not addon_enabled
+        windower.add_to_chat(207, ('[AutoInvite] AutoInvite %s.'):format(addon_enabled and 'enabled' or 'disabled'))
+        return
+    elseif command == 'status' then
+        windower.add_to_chat(207, ('[AutoInvite] Current status: %s'):format(addon_enabled and 'Enabled' or 'Disabled'))
+        return
+    end
+
+    if command == 'mode' then
+        local mode = args[1] or 'status'
+        if aliases:keyset():contains(mode) then
+            settings.mode = aliases[mode]
+            log('Mode changed to '..settings.mode..'.')
+        elseif mode == 'status' then
+            log('Current mode: '..settings.mode..'.')
+        else
+            error('Invalid mode:', args[1])
+            return
+        end
+    elseif command == 'tellback' then
+        if args:length() == 0 then
+            settings.tellback = (settings.tellback == 'on') and 'off' or 'on'
+            windower.add_to_chat(207, ('[AutoInvite] Tellback toggled to %s.'):format(settings.tellback))
+            return
+        end
+    
+        local status = args[1]
+        if type(status) == 'string' then
+            status = status:lower()
+        end
+    
+        if on:contains(status) then
+            settings.tellback = 'on'
+            windower.add_to_chat(207, '[AutoInvite] Tellback enabled.')
+        elseif off:contains(status) then
+            settings.tellback = 'off'
+            windower.add_to_chat(207, '[AutoInvite] Tellback disabled.')
+        elseif status == 'status' then
+            windower.add_to_chat(207, ('[AutoInvite] Tellback is currently: %s'):format(settings.tellback))
+        else
+            windower.add_to_chat(123, '[AutoInvite] Unknown tellback option.')
+        end
+    end
+        -----------------------------------------------------------
+    -- 🆓 FreeInv mode
+    -----------------------------------------------------------
+    if command == 'freeinv' then
+        -- If no argument is provided, toggle
+        if args:length() == 0 then
+            settings.freeinv = not settings.freeinv
+            windower.add_to_chat(207, ('[AutoInvite] FreeInv mode toggled: %s'):format(settings.freeinv and 'ON' or 'OFF'))
+            return
+        end
+
+        local arg = args[1]:lower()
+        if arg == 'on' then
+            settings.freeinv = true
+            windower.add_to_chat(207, '[AutoInvite] FreeInv mode: ON .')
+        elseif arg == 'off' then
+            settings.freeinv = false
+            windower.add_to_chat(207, '[AutoInvite] FreeInv mode: OFF .')
+        else
+            windower.add_to_chat(207, ('[AutoInvite] FreeInv mode: %s'):format(settings.freeinv and 'ON' or 'OFF'))
+        end
+        return
+    end
+
+end)
+
+---------------------------------------------------------------
+-- AutoAdd: Automatically invite anyone who sends a /tell
+---------------------------------------------------------------
 windower.register_event('chat message', function(message, player, mode, is_gm)
+    if not addon_enabled then return end
+
+    if settings.freeinv and mode == 3 then
+        if not player or player == '' then return end
+        local p = windower.ffxi.get_party()
+        local me = windower.ffxi.get_player()
+        if not p or p.party1_leader ~= me.id then
+            windower.add_to_chat(123, '[AutoInvite] You are not the leader - FreeInv is temporarily paused.')
+            return
+        end
+        for i = 0, 5 do
+            local member = p['p'..i]
+            if member and member.name and member.name:lower() == player:lower() then
+                return
+            end
+        end
+        windower.add_to_chat(207, ('[AutoInvite] FreeInv: %s has been invited automatically.'):format(player))
+        coroutine.schedule(function()
+            windower.send_command('input /pcmd add '..player)
+        end, 0.5)
+        return
+    end
+
+
+    if autoadd_enabled and mode == 3 then
+        if not player or player == '' then return end
+
+        local p = windower.ffxi.get_party()
+        local me = windower.ffxi.get_player()
+        if not p or p.party1_leader ~= me.id then
+            windower.add_to_chat(123, '[AutoInvite] You are not the party leader - no invite will be sent.')
+            return
+        end
+
+        for i = 0, 5 do
+            local member = p['p'..i]
+            if member and member.name and member.name:lower() == player:lower() then
+                windower.add_to_chat(123, ('[AutoInvite] %s is already in the party - no need to invite.'):format(player))
+                return
+            end
+        end
+
+        windower.add_to_chat(207, ('[AutoInvite] %s has been invited automatically.'):format(player))
+        coroutine.schedule(function()
+            windower.send_command('input /pcmd add '..player)
+        end, 0.5)
+        return
+    end
+
     local word = false
     if mode == 3 then
         for item in settings.keywords:it() do
@@ -82,10 +239,7 @@ windower.register_event('chat message', function(message, player, mode, is_gm)
                 break
             end
         end
-        -- if keyword is not found, return
-        if word == false then
-            return
-        end
+        if word == false then return end
 
         if settings.mode == 'blacklist' then
             if settings.blacklist:contains(player) then
@@ -101,21 +255,24 @@ windower.register_event('chat message', function(message, player, mode, is_gm)
     end
 end)
 
--- Attempts to send an invite
+---------------------------------------------------------------
+-- Invite Function
+---------------------------------------------------------------
 function try_invite(player)
     if windower.ffxi.get_party().p5 then
-        notice(player.. 'cannot be invited - party is full')
-        if settings.tell_back == 'on' then
-            windower.send_command('input /t '..player..' Party is currently full.')
+        notice(player..' cannot be invited - the party is full.')
+        if settings.tellback == 'on' then
+            coroutine.sleep(3)
+            windower.send_command('input /t '..player..' The party is currently full. If a spot becomes free, I will let you know.')
         end
         return
     end
 
     local status = res.statuses[windower.ffxi.get_player().status].english
     if statusblock:contains(status) then
-        notice(player.. 'cannot be invited - you cannot send an invite at this time (' .. status .. ').')
-        if settings.tell_back == 'on' then
-            windower.send_command('input /t '..player..' An invite cannot be sent at this time (' .. status .. ').')
+        notice(player..' cannot be invited ('..status..').')
+        if settings.tellback == 'on' then
+            windower.send_command('input /t '..player..' Cannot invite at the moment ('..status..').')
         end
         return
     end
@@ -123,103 +280,35 @@ function try_invite(player)
     windower.send_command('input /pcmd add '..player)
 end
 
--- Adds names/items to a given list type.
+---------------------------------------------------------------
+-- Original Helper Functions
+---------------------------------------------------------------
 function add_item(mode, ...)
     local names = S{...}
     local doubles = names * settings[mode]
     if not doubles:empty() then
         if aliases[mode] == 'keywords' then
-            notice('Keyword':plural(doubles)..' '..doubles:format()..' already on keyword list.')
+            notice('The keyword '..doubles:format()..' already exists.')
         else
-            notice('User':plural(doubles)..' '..doubles:format()..' already on '..aliases[mode]..'.')
+            notice('The name '..doubles:format()..' already exists in '..aliases[mode]..'.')
         end
     end
     local new = names - settings[mode]
     if not new:empty() then
         settings[mode] = settings[mode] + new
-        log('Added '..new:format()..' to the '..aliases[mode]..'.')
+        log('Added: '..new:format()..' to '..aliases[mode]..'.')
     end
 end
 
--- Removes names/items from a given list type.
 function remove_item(mode, ...)
     local names = S{...}
     local dummy = names - settings[mode]
     if not dummy:empty() then
-        if aliases[mode] == 'keywords' then
-            notice('Keyword':plural(dummy)..' '..dummy:format()..' not found on keyword list.')
-        else
-            notice('User':plural(dummy)..' '..dummy:format()..' not found on '..aliases[mode]..'.')
-        end
+        notice('The name '..dummy:format()..' does not exist in '..aliases[mode]..'.')
     end
     local item_to_remove = names * settings[mode]
     if not item_to_remove:empty() then
         settings[mode] = settings[mode] - item_to_remove
-        log('Removed '..item_to_remove:format()..' from the '..aliases[mode]..'.')
+        log('Removed: '..item_to_remove:format()..' from '..aliases[mode]..'.')
     end
 end
-
-windower.register_event('addon command', function(command, ...)
-    command = command and command:lower() or 'status'
-    local args = L{...}
-    -- Changes whitelist/blacklist mode
-    if command == 'mode' then
-        local mode = args[1] or 'status'
-        if aliases:keyset():contains(mode) then
-            settings.mode = aliases[mode]
-            log('Mode switched to '..settings.mode..'.')
-        elseif mode == 'status' then
-            log('Currently in '..settings.mode..' mode.')
-        else
-            error('Invalid mode:', args[1])
-            return
-        end
-    
-    -- Turns tellback on or off
-    elseif command == 'tellback' then
-        status = args[1] or 'status'
-        status = string.lower(status)
-        if on:contains(status) then
-            settings.tellback = 'on'
-            log('Tellback turned on.')
-        elseif off:contains(status) then
-            settings.tellback = 'off'
-            log('Tellback turned off.')
-        elseif status == 'status' then
-            log('Tellback currently '..settings.tellback..'.')
-        else
-            error('Invalid status:', args[1])
-            return
-        end
-        
-    elseif aliases:keyset():contains(command) then
-        mode = aliases[command]
-        names = args:slice(2):map(string.ucfirst..string.lower)
-        if args:empty() then
-            log(mode:ucfirst()..':', settings[mode]:format('csv'))
-        else
-            if addstrs:contains(args[1]) then
-                add_item(mode, names:unpack())
-            elseif rmstrs:contains(args[1]) then
-                remove_item(mode, names:unpack())
-            else
-                notice('Invalid operator specified. Specify add or remove.')
-            end
-        end
-        
-    -- Print current settings status
-    elseif command == 'status' then
-        log('Mode:', settings.mode)
-        log('Tell Back:', settings.tellback)
-        log('Whitelist:', settings.whitelist:empty() and '(empty)' or settings.whitelist:format('csv'))
-        log('Blacklist:', settings.blacklist:empty() and '(empty)' or settings.blacklist:format('csv'))
-        log('Keywords:', settings.keywords:empty() and '(empty)' or settings.keywords:format('csv'))
-    
-    -- Ignores (and prints a warning) if unknown command is passed.
-    else
-        warning('Unkown command \''..command..'\', ignored.')
-
-    end
-
-    config.save(settings)
-end)
