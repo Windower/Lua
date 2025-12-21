@@ -42,7 +42,7 @@ require('luau')
 
 _addon.name = 'AutoInvite'
 _addon.author = 'Registry + Aragan'
-_addon.commands = {'autoinvite','ainv'}
+_addon.commands = {'autoinvite','ainv','ai'}
 _addon.version = 1.3
 _addon.language = 'english'
 
