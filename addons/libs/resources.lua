@@ -26,10 +26,9 @@ local resource_mt = {}
 
 -- The metatable for the root resource table
 local resources = setmetatable({}, {__index = function(t, k)
-    if fns[k] then
-        t[k] = setmetatable(fns[k](), resource_mt)
-        return t[k]
-    end
+    local fn = assert(k and fns[k], 'Unable to load resource "%s". Resource file not found!\n  Resolution: To attempt a force update of resources (and addons and libs), delete directory\n  "%s" and restart Windower.':format(tostring(k), (windower.windower_path..'updates'):gsub('\\','\\\\')))
+    t[k] = setmetatable(fn(), resource_mt)
+    return t[k]
 end})
 
 _libs.resources = resources
