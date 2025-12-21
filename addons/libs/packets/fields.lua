@@ -3457,7 +3457,7 @@ fields.incoming[0x0B5] = L{
 }
 
 -- Reservation Response
-packets.raw_fields.incoming[0x0BF] = L{
+fields.incoming[0x0BF] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 04
     {ctype='unsigned short',    label='Result'},                                -- 06   Success is 4, other values are failures
     {ctype='unsigned int',      label='_unknown2'},                             -- 08
