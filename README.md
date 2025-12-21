@@ -1,36 +1,90 @@
-Lua
-===
-Lua Addons and Scripts  
-Lua documentation can be found at the Windower Development wiki: https://dev.windower.net/
+# DoorHelper (Windower 4 Addon)
 
-Licensing
----------
-We require that all submissions to the Windower/Lua repository be licensed under the BSD license, reproduced below. To do this, simply place the license text in a comment at the top of each of your source files, and replace `<year>`, `<addon name>` and both instances of `<your name>` with appropriate values.
+Author: **Aragan**  
+Version: **1.6**  
 
-```
-Copyright © <year>, <your name>
-All rights reserved.
+DoorHelper is a Windower 4 addon that automatically interacts with nearby doors 
+By default, it only runs inside **Sortie**.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
 
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    * Neither the name of <addon name> nor the
-      names of its contributors may be used to endorse or promote products
-      derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL <your name> BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-```
+---
+
+## Features
+
+- **Auto Door Interaction**
+  - Scans nearby NPCs and interacts with the nearest “door-like” 
+
+- **Sortie-Only Mode (Default: ON)**
+  - When enabled, the addon logic only runs when you are inside the **Sortie** zone.
+
+
+- **Debug Mode**
+  - Prints Menu ID / NPC / Index / Zone when menu packets are received.
+
+---
+
+## Installation
+
+1. Create a folder:
+   - `Windower4/addons/DoorHelper/`
+
+2. Put the addon file inside that folder:
+   - `DoorHelper.lua`
+
+3. Load the addon in-game:
+   - `//lua l doorhelper`
+
+(Optional) Add it to your `scripts/init.txt` if you want it to auto-load.
+
+---
+
+## Commands
+
+DoorHelper supports these command aliases:
+
+- `//doorhelper ...`
+- `//dh ...`
+
+### Auto-Yes Mode
+
+- `//dh yes on`
+- `//dh yes off`
+- `//dh yes toggle`
+- `//dh yes status`
+
+### Debug Mode
+
+- `//dh debug on`
+- `//dh debug off`
+- `//dh debug toggle`
+- `//dh debug status`
+
+### Sortie-Only Mode
+
+- `//dh sortie on`  
+  Restrict the addon to Sortie only (default).
+
+- `//dh sortie off`  
+  Allow the addon to run in any zone (except for the safety rule for Auto-Yes in zone 72).
+
+- `//dh sortie toggle`
+- `//dh sortie status`
+
+### Skip Event
+
+- `//dh skip`  
+  Sends ESC a few times to try to close stuck menus/dialogs.
+
+
+---
+
+- **Too much spam in chat**
+  - Turn debug off:
+    - `//dh debug off`
+
+---
+
+## License
+
+Personal use / private distribution unless you specify otherwise.
