@@ -37,13 +37,11 @@ __meta.Packet = {
     end,
     __index = function(packet, key)
         local alias = packet._aliases[key]
-        return alias and packet[alias]
+        return alias and rawget(packet, alias)
     end,
     __newindex = function(packet, key, value)
         local alias = packet._aliases[key]
-        if alias then
-            packet[alias] = value
-        end
+        rawset(packet, alias or key, value)
     end,
 }
 
