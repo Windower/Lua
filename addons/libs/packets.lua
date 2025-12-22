@@ -334,15 +334,18 @@ function packets.parse(dir, data)
         data = data .. (0):char():rep(4 - rem)
     end
 
-    local res = setmetatable({}, __meta.Packet)
-    res._id, res._size, res._sequence = data:unpack('b9b7H')
-    res._size = res._size * 4
-    res._raw = data
-    res._dir = dir
-    res._name = packets.data[dir][res._id].name
-    res._description = packets.data[dir][res._id].description
-    res._data = data:sub(5)
-    res._aliases = {}
+    local id, size, sequence = data:unpack('b9b7H')
+    local res = setmetatable({
+        _id = id,
+        _size = size * 4,
+        _sequence = sequence,
+        _dir = dir,
+        _aliases = {},
+        _raw = data,
+        _data = data:sub(5),
+        _name = packets.data[dir][id].name,
+        _description = packets.data[dir][id].description,
+    }, __meta.Packet)
 
     local fields = packets.fields(dir, res._id, data)
     if not fields or #fields == 0 then
@@ -370,12 +373,13 @@ end
 function packets.new(dir, id, values, ...)
     values = values or {}
 
-    local packet = setmetatable({}, __meta.Packet)
-    packet._id = id
-    packet._dir = dir
-    packet._sequence = 0
-    packet._args = {...}
-    packet._aliases = {}
+    local packet = setmetatable({
+        _id = id,
+        _sequence = 0,
+        _dir = dir,
+        _aliases = {},
+        _args = {...},
+    }, __meta.Packet)
 
     local fields = packets.fields(packet._dir, packet._id, nil, ...)
     if not fields then
