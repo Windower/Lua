@@ -58,7 +58,7 @@ packets.raw_fields = require('packets/fields')
     Lengths for C data types.
 ]]
 
-local sizes = {
+local bit_sizes = {
     ['unsigned char']   =  8,
     ['unsigned short']  = 16,
     ['unsigned int']    = 32,
@@ -102,26 +102,26 @@ local parse_type = function(field)
     local count_num =  count_str and count_str:number() or 1
     local type_count = count_str and array and count_num or 1
 
-    local bits = (array and type_count or count_num) * sizes[type];
+    local bits = (array and type_count or count_num) * bit_sizes[type];
 
     return bits, type_count, type
 end
 
-local size
-size = function(fields, count)
+local bit_size
+bit_size = function(fields, count)
     -- A single field
     if fields.ctype then
         local bits, _, type = parse_type(fields)
-        return bits or type == 'char' and 8 or count and count * sizes[type] or 0
+        return bits or type == 'char' and 8 or count and count * bit_sizes[type] or 0
     end
 
     -- A reference field
     if fields.ref then
-        return size(fields.ref, count) * (fields.count == '*' and count or fields.count)
+        return bit_size(fields.ref, count) * (fields.count == '*' and count or fields.count)
     end
 
     return fields:reduce(function(acc, field)
-        return acc + size(field, count)
+        return acc + bit_size(field, count)
     end, 0)
 end
 
@@ -172,8 +172,8 @@ parse = function(fields, data, index, max, lookup, depth)
 
                     if not bits then
                         -- Determine length for pointer types (*)
-                        type_count = ((length - parsed_index) / sizes[type]):floor()
-                        bits = sizes[type] * type_count
+                        type_count = ((length - parsed_index) / bit_sizes[type]):floor()
+                        bits = bit_sizes[type] * type_count
 
                         field.ctype = ('%s[%u]'):format(type, type_count)
 
@@ -237,7 +237,7 @@ function packets.fields(dir, id, data, ...)
 
     if not data then
         local argcount = select('#', ...)
-        local bits = size(fields, argcount > 0 and select(argcount, ...) or nil)
+        local bits = bit_size(fields, argcount > 0 and select(argcount, ...) or nil)
         data = (0):char():rep(4 + 4 * ((bits or 0) / 32):ceil())
     end
 
@@ -406,7 +406,7 @@ function packets.new(dir, id, values, ...)
             elseif field.ctype == 'bool' or field.ctype == 'boolbit' then
                 packet[field.label] = false
 
-            elseif sizes[field.ctype] or field.ctype:startswith('bit') then
+            elseif bit_sizes[field.ctype] or field.ctype:startswith('bit') then
                 packet[field.label] = 0
 
             elseif field.ctype:startswith('char') or field.ctype:startswith('data') then
