@@ -256,7 +256,7 @@ windower.register_event('addon command', function(comm, ...)
             local attach = args:sconcat()
             add_attachment(attach,slot)
         end
-    elseif comm == 'equipset' then
+    elseif comm == 'equipset' or comm == 'e' or comm == 'equip' then
         if args[1] then
             attach_set(args[1])
         end
