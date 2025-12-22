@@ -35,6 +35,10 @@ __meta.Packet = {
 
         return res
     end,
+    __index = function(packet, key)
+        local alias = packet._aliases[key]
+        return alias and packet[alias]
+    end
 }
 
 --[[
@@ -332,6 +336,7 @@ function packets.parse(dir, data)
     res._name = packets.data[dir][res._id].name
     res._description = packets.data[dir][res._id].description
     res._data = data:sub(5)
+    res._aliases = {}
 
     local fields = packets.fields(dir, res._id, data)
     if not fields or #fields == 0 then
@@ -339,6 +344,12 @@ function packets.parse(dir, data)
     end
 
     local pack_str = fields:map(make_pack_string):concat()
+
+    for field in fields:it() do
+        if field.alias then
+            res._aliases[field.alias] = field.label
+        end
+    end
 
     for key, val in ipairs({res._data:unpack(pack_str)}) do
         local field = fields[key]
@@ -358,6 +369,7 @@ function packets.new(dir, id, values, ...)
     packet._dir = dir
     packet._sequence = 0
     packet._args = {...}
+    packet._aliases = {}
 
     local fields = packets.fields(packet._dir, packet._id, nil, ...)
     if not fields then
@@ -366,7 +378,15 @@ function packets.new(dir, id, values, ...)
     end
 
     for field in fields:it() do
-        packet[field.label] = values[field.label]
+        local value = values[field.label]
+        packet[field.label] = value
+
+        if field.alias then
+            packet._aliases[field.alias] = field.label
+            if value == nil then
+                packet[field.label] = values[field.alias]
+            end
+        end
 
         -- Data not set
         if not packet[field.label] then
