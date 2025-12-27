@@ -26,7 +26,7 @@ __meta.Packet = {
         local res = ('%s packet 0x%.3X (%s):'):format(packet._dir:capitalize(), packet._id, packet._name or 'Unrecognized packet')
 
         local raw = packets.build(packet)
-        for field in packets.fields(packet._dir, packet._id, raw):it() do
+        for field in packets.fields(packet._dir, packet._id, raw, unpack(packet._args)):it() do
             res = ('%s\n%s: %s'):format(res, field.label, tostring(packet[field.label]))
             if field.fn then
                 res = ('%s (%s)'):format(res, tostring(field.fn(packet[field.label], raw)))
@@ -43,6 +43,7 @@ __meta.Packet = {
         local alias = packet._aliases[key]
         rawset(packet, alias or key, value)
     end,
+    __class = 'Packet',
 }
 
 --[[
@@ -85,161 +86,164 @@ local pointer_pattern = '(.+)%*'
 -- Pattern to match fixed size array
 local array_pattern = '(.+)%[(.+)%]'
 
--- Function returns number of bytes, bits, items and type name
-local parse_type = function(field)
-    local ctype = field.ctype
+do
+    -- Function returns number of bytes, bits, items and type name
+    local parse_type = function(field)
+        local ctype = field.ctype
 
-    if ctype:endswith('*') then
-        return nil, 1, ctype:match(pointer_pattern):trim()
+        if ctype:endswith('*') then
+            return nil, 1, ctype:match(pointer_pattern):trim()
+        end
+
+        local type, count_str = ctype:match(array_pattern)
+        type = (type or ctype):trim()
+
+        local array = not non_array_types:contains(type)
+        local count_num =  count_str and count_str:number() or 1
+        local type_count = count_str and array and count_num or 1
+
+        local bits = (array and type_count or count_num) * bit_sizes[type];
+
+        return bits, type_count, type
     end
 
-    local type, count_str = ctype:match(array_pattern)
-    type = (type or ctype):trim()
+    local bit_size
+    bit_size = function(fields, count)
+        -- A single field
+        if fields.ctype then
+            local bits, _, type = parse_type(fields)
+            return bits or type == 'char' and (count or 1) * bit_sizes[type] or 0
+        end
 
-    local array = not non_array_types:contains(type)
-    local count_num =  count_str and count_str:number() or 1
-    local type_count = count_str and array and count_num or 1
+        -- A reference field
+        if fields.ref then
+            return bit_size(fields.ref, count) * (fields.count == '*' and count or fields.count)
+        end
 
-    local bits = (array and type_count or count_num) * bit_sizes[type];
-
-    return bits, type_count, type
-end
-
-local bit_size
-bit_size = function(fields, count)
-    -- A single field
-    if fields.ctype then
-        local bits, _, type = parse_type(fields)
-        return bits or type == 'char' and 8 or count and count * bit_sizes[type] or 0
+        return fields:reduce(function(acc, field)
+            return acc + bit_size(field, count)
+        end, 0)
     end
 
-    -- A reference field
-    if fields.ref then
-        return bit_size(fields.ref, count) * (fields.count == '*' and count or fields.count)
-    end
+    local parse
+    parse = function(fields, data, index, max, lookup, depth)
+        depth = depth or 0
+        max = max == '*' and 0 or max or 1
+        index = index or 32
 
-    return fields:reduce(function(acc, field)
-        return acc + bit_size(field, count)
-    end, 0)
-end
+        local res = L{}
+        local count = 0
+        local length = 8 * #data
+        while index < length do
+            count = count + 1
 
-local parse
-parse = function(fields, data, index, max, lookup, depth)
-    depth = depth or 0
-    max = max == '*' and 0 or max or 1
-    index = index or 32
+            local parsed = L{}
+            local parsed_index = index
+            for field in fields:it() do
+                if field.ctype then
+                    -- A regular type field
+                    field = table.copy(field)
+                    local bits, type_count, type = parse_type(field)
 
-    local res = L{}
-    local count = 0
-    local length = 8 * #data
-    while index < length do
-        count = count + 1
+                    if not non_array_types:contains(type) and (not bits or type_count > 1) then
+                        -- An array field with more than one entry, reparse recursively
+                        field.ctype = type
+                        local ext, new_index = parse(L{field}, data, parsed_index, not bits and '*' or type_count, nil, depth + 1)
+                        parsed = parsed + ext
+                        parsed_index = new_index
+                    else
+                        -- A non-array field or an array field with one entry
+                        if max ~= 1 then
+                            -- Append indices to labels
+                            if lookup then
+                                -- Look up index name in provided table
+                                local resource = lookup[1][count + lookup[2] - 1]
+                                field.label = ('%s %s'):format(resource and resource.english or ('Unknown %d'):format(count + lookup[2] - 1), field.label)
+                            else
+                                -- Just increment numerically
+                                field.label = ('%s %d'):format(field.label, count)
+                            end
+                        end
 
-        local parsed = L{}
-        local parsed_index = index
-        for field in fields:it() do
-            if field.ctype then
-                -- A regular type field
-                field = table.copy(field)
-                local bits, type_count, type = parse_type(field)
+                        if parsed_index % 8 ~= 0 and type ~= 'bit' and type ~= 'boolbit' then
+                            -- Adjust to byte boundary, if non-bit type
+                            parsed_index = 8 * (parsed_index / 8):ceil()
+                        end
 
-                if not non_array_types:contains(type) and (not bits or type_count > 1) then
-                    -- An array field with more than one entry, reparse recursively
-                    field.ctype = type
-                    local ext, new_index = parse(L{field}, data, parsed_index, not bits and '*' or type_count, nil, depth + 1)
+                        if not bits then
+                            -- Determine length for pointer types (*)
+                            type_count = ((length - parsed_index) / bit_sizes[type]):floor()
+                            bits = bit_sizes[type] * type_count
+
+                            count = max
+                        end
+
+                        field.type = type
+                        field.index = parsed_index
+                        field.length = bits
+                        field.count = type_count
+
+                        parsed:append(field)
+                        parsed_index = parsed_index + bits
+                    end
+                else
+                    -- A reference field, call the parser recursively
+                    local type_count = field.count
+                    if not type_count then
+                        -- If reference count not explicitly given it must be contained in the packet data
+                        type_count = data:byte(field.count_ref + 1)
+                    end
+
+                    local ext, new_index = parse(field.ref, data, parsed_index, type_count, field.lookup, depth + 1)
                     parsed = parsed + ext
                     parsed_index = new_index
-                else
-                    -- A non-array field or an array field with one entry
-                    if max ~= 1 then
-                        -- Append indices to labels
-                        if lookup then
-                            -- Look up index name in provided table
-                            local resource = lookup[1][count + lookup[2] - 1]
-                            field.label = ('%s %s'):format(resource and resource.english or ('Unknown %d'):format(count + lookup[2] - 1), field.label)
-                        else
-                            -- Just increment numerically
-                            field.label = ('%s %d'):format(field.label, count)
-                        end
-                    end
-
-                    if parsed_index % 8 ~= 0 and type ~= 'bit' and type ~= 'boolbit' then
-                        -- Adjust to byte boundary, if non-bit type
-                        parsed_index = 8 * (parsed_index / 8):ceil()
-                    end
-
-                    if not bits then
-                        -- Determine length for pointer types (*)
-                        type_count = ((length - parsed_index) / bit_sizes[type]):floor()
-                        bits = bit_sizes[type] * type_count
-
-                        field.ctype = ('%s[%u]'):format(type, type_count)
-
-                        count = max
-                    end
-
-                    field.type = type
-                    field.index = parsed_index
-                    field.length = bits
-                    field.count = type_count
-
-                    parsed:append(field)
-                    parsed_index = parsed_index + bits
                 end
+            end
+
+            if parsed_index <= length then
+                -- Only add parsed chunk, if within length boundary
+                res = res + parsed
+                index = parsed_index
             else
-                -- A reference field, call the parser recursively
-                local type_count = field.count
-                if not type_count then
-                    -- If reference count not explicitly given it must be contained in the packet data
-                    type_count = data:byte(field.count_ref + 1)
-                end
+                count = max
+            end
 
-                local ext, new_index = parse(field.ref, data, parsed_index, type_count, field.lookup, depth + 1)
-                parsed = parsed + ext
-                parsed_index = new_index
+            if count == max then
+                break
             end
         end
 
-        if parsed_index <= length then
-            -- Only add parsed chunk, if within length boundary
-            res = res + parsed
-            index = parsed_index
-        else
-            count = max
+        return res, index
+    end
+
+    -- Arguments are:
+    --  dir     'incoming' or 'outgoing'
+    --  id      Packet ID
+    --  data    Binary packet data, nil if creating a blank packet
+    --  ...     Any parameters taken by a packet constructor function
+    --          If a packet has a variable length field (e.g. char* or ref with count='*') the last value in here must be the count of that field
+    function packets.fields(dir, id, data, ...)
+        if class(dir) == 'Packet' then
+            return packets.fields(dir._dir, dir._id, dir._raw, unpack(dir._args))
         end
 
-        if count == max then
-            break
+        local fields = packets.raw_fields[dir][id]
+        if type(fields) == 'function' then
+            fields = fields(data, ...)
         end
+
+        if not fields then
+            return nil
+        end
+
+        if not data then
+            local argcount = select('#', ...)
+            local bits = bit_size(fields, argcount > 0 and select(argcount, ...) or nil)
+            data = ('\x00'):rep(4 + 4 * math.ceil((bits or 0) / 32))
+        end
+
+        return parse(fields, data)
     end
-
-    return res, index
-end
-
--- Arguments are:
---  dir     'incoming' or 'outgoing'
---  id      Packet ID
---  data    Binary packet data, nil if creating a blank packet
---  ...     Any parameters taken by a packet constructor function
---          If a packet has a variable length field (e.g. char* or ref with count='*') the last value in here must be the count of that field
-function packets.fields(dir, id, data, ...)
-    local fields = packets.raw_fields[dir][id]
-
-    if type(fields) == 'function' then
-        fields = fields(data, ...)
-    end
-
-    if not fields then
-        return nil
-    end
-
-    if not data then
-        local argcount = select('#', ...)
-        local bits = bit_size(fields, argcount > 0 and select(argcount, ...) or nil)
-        data = (0):char():rep(4 + 4 * ((bits or 0) / 32):ceil())
-    end
-
-    return parse(fields, data)
 end
 
 -- Type identifiers as declared in lpack.c
@@ -339,13 +343,13 @@ function packets.parse(dir, data)
         _sequence = sequence,
         _dir = dir,
         _aliases = {},
-        _raw = data,
-        _data = data:sub(5),
+        _args = {},
         _name = packets.data[dir][id].name,
         _description = packets.data[dir][id].description,
+        _raw = data,
     }, __meta.Packet)
 
-    local fields = packets.fields(dir, res._id, data)
+    local fields = packets.fields(res)
     if not fields or #fields == 0 then
         return res
     end
@@ -358,7 +362,7 @@ function packets.parse(dir, data)
         end
     end
 
-    for key, val in ipairs({res._data:unpack(pack_str)}) do
+    for key, val in ipairs({res._raw:sub(5):unpack(pack_str)}) do
         local field = fields[key]
         if field then
             res[field.label] = field.enc and val:decode(field.enc) or val
@@ -377,9 +381,11 @@ function packets.new(dir, id, values, ...)
         _dir = dir,
         _aliases = {},
         _args = {...},
+        _name = packets.data[dir][id].name,
+        _description = packets.data[dir][id].description,
     }, __meta.Packet)
 
-    local fields = packets.fields(packet._dir, packet._id, nil, ...)
+    local fields = packets.fields(packet)
     if not fields then
         warning(('Packet 0x%.3X not recognized.'):format(id))
         return packet
@@ -428,7 +434,7 @@ end
 
 -- Returns binary data from a packet
 function packets.build(packet)
-    local fields = packets.fields(packet._dir, packet._id, packet._raw, unpack(packet._args or {}))
+    local fields = packets.fields(packet)
     if not fields then
         error(('Packet 0x%.3X not recognized, unable to build.'):format(packet._id))
         return nil
@@ -452,7 +458,7 @@ function packets.inject(dir, id, values, ...)
         return nil
     end
 
-    local fields = packets.fields(packet._dir, packet._id, packet._raw)
+    local fields = packets.fields(packet)
     if not fields then
         error(('Packet 0x%.3X not recognized, unable to send.'):format(packet._id))
         return nil

@@ -1513,7 +1513,7 @@ fields.incoming[0x017] = function()
     local fields = func.incoming[0x017]
 
     return function(data, type)
-        return fields.base + (fields[type or data:byte(5)] or fields.default)
+        return fields.base + (fields[type or data and data:byte(5)] or fields.default)
     end
 end()
 
