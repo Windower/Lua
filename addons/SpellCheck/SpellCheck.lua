@@ -26,9 +26,10 @@
 
 _addon.name    = 'SpellCheck'
 _addon.author  = 'Zubis'
-_addon.version = '1.0.2'
+_addon.version = '1.0.3'
 _addon.command = 'SpellCheck'
 
+require('functions')
 require('sets')
 require('tables')
 res = require('resources')
@@ -40,9 +41,9 @@ spell_type = {whm='WhiteMagic',blm='BlackMagic',smn='SummonerPact',nin='Ninjutsu
 
 --Declare friendly name of spell types for chat output
 display_spell_type = {whm='White Magic',blm='Black Magic',smn='Summoner',nin='Ninjutsu',brd='Bard',blu='Blue Magic',geo='Geomancy',tru='Trust'}
-    
+
 --Register the base //SpellCheck command
-windower.register_event('addon command',function (command, ...)
+windower.register_event('addon command', function(command, ...)
     command = command and command:lower() or 'help'
     if command == 'help' or command == 'h' or command == '?' then
         display_help()
@@ -52,7 +53,7 @@ windower.register_event('addon command',function (command, ...)
         display_spell_count(command)
     end
 end)
-    
+
 --Display a basic help section
 function display_help()
     windower.add_to_chat(7, _addon.name .. ' v.' .. _addon.version)
@@ -69,17 +70,16 @@ end
 
 --Get spells
 function display_spell_count(command)
-
     missing_spells_len = 0
     missing_spell_names = {}
-    
-    --Get all, current and missing spells 
+
+    --Get all, current and missing spells
     all_spells = res.spells:type(spell_type[command]):keyset()
-    current_spells = T(windower.ffxi.get_spells()):filter(boolean._true):keyset()   
-    
+    current_spells = T(windower.ffxi.get_spells()):filter(functions.equals(true)):keyset()
+
     missing_spells = all_spells - current_spells
     current_spells = all_spells * current_spells
-        
+
     --Add missing spells to table for sorting
     for spell in missing_spells:it() do
         --Trust and spells must be processed separately
@@ -98,20 +98,20 @@ function display_spell_count(command)
             end
         end
     end
-    
+
     --Sort missing spells by name
     table.sort(missing_spell_names)
-    
+
     --If there are missing spells, display that they are about to be listed
     if missing_spells_len > 0 then
         windower.add_to_chat(7, 'SpellCheck: Listing missing ' .. display_spell_type[command] .. ' spells...')
     end
-    
+
     --List all missing spell names
     for i, spell in ipairs(missing_spell_names) do
       windower.add_to_chat(7, ' - Missing \'' .. spell .. '\'')
     end
-    
+
     --Display summary
     windower.add_to_chat(7, 'SpellCheck: You are missing ' .. missing_spells_len .. ' ' .. display_spell_type[command] .. ' spells.')
 end

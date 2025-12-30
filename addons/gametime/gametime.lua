@@ -252,7 +252,7 @@ config.register(settings, function()
     else
         gt.numdays = 8
     end
-    
+
 
     gt.gtd:text('${day|} ${MoonPhase|Unknown} (${MoonPct|-}%); ${WeekReport|}')
     local info = windower.ffxi.get_info()
@@ -301,11 +301,18 @@ function timeconvert2(basetime)
     return basetable[1]..':'..tostring(math.round(tostring(basetable[2]):slice(1,2) / (100/60))):zfill(2)
 end
 
+function tolog()
+    if settings.alert == true then
+        log('Day: '..gt.day..'; Moon: '..gt.MoonPhase..' ('..gt.MoonPct..'%);')
+    end
+end
+
 function moon_change()
     local info = windower.ffxi.get_info()
     gt.MoonPhase = res.moon_phases[info.moon_phase].english
     gt.MoonPct = info.moon
     gt.gtd:update(gt)
+    tolog()
 end
 
 function day_change(day)
@@ -327,7 +334,7 @@ function day_change(day)
     elseif (day == 'Darksday') then
         dlist = {'8','1','2','3','4','5','6','7'}
     end
-    
+
     dpos = 0
     daystring = ''
     while dpos < gt.numdays do
@@ -335,20 +342,14 @@ function day_change(day)
         dval = dlist[dpos]
         daystring = ''..daystring..gt.delimiter..' \\cs'..gt.days[(dval+0)][10]..gt.days[(dval+0)][settings.mode]
     end
-    
-    gt.day = day    
+
+    gt.day = day
     gt.WeekReport = daystring
     gt.gtd:update(gt)
     moon_change()
 end
 
-function tolog()
-    if settings.alert == true then
-        log('Day: '..gt.day..'; Moon: '..gt.MoonPhase..' ('..gt.MoonPct..'%);')
-    end
-end
-
-windower.register_event('day change', moon_change .. day_change)
+windower.register_event('day change', day_change)
 
 windower.register_event('moon change', moon_change)
 
@@ -359,23 +360,23 @@ windower.register_event('addon command', function (...)
         log('Positioning:')
         log('//gt [timex/timey/daysx/daysy] <pos> :: example: //gt timex 125')
         log('//gt [time/days] reset :: example: //gt days reset')
-        
+
         log('Text features:')
         log('//gt timeSize <size> :: example: //gt timeSize 10')
         log('//gt timeFont <fontName> :: example: //gt timeFont Verdana')
         log('//gt daySize <size> :: example: //gt daySize 10')
         log('//gt dayFont <fontName> :: example: //gt dayFont Verdana')
-        
+
         log('Visibility:')
         log('//gt [time/days] [show/hide] :: example //gt time hide')
         log('//gt axis [horizontal/vertical] :: week display axis')
         log('//gt [time/days] alpha 1-255. :: Sets the transparency. Lowest numbers = more transparent.')
         log('//gt mode 1-4 :: Fullday; Abbreviated; Element names; Compact')
-        
+
         log('Routes:')
         log('//gt route :: Displays route names.')
         log('//gt route [route name] :: Displays arrival time for route.')
-        
+
         log('Misc:')
         log('//gt zero [on/off] :: Displays the time with leading zeros. 04:05 instead of 4:05')
         log('//gt days [1-8] :: Limits the number of days displayed')
@@ -392,43 +393,43 @@ windower.register_event('addon command', function (...)
         else
             getroutes(args[2])
         end
-    
-    
-    
+
+
+
     ---CLI Arguments for Time font Size
     elseif args[1] == 'timeSize' then
-            gt.gtt:size(tonumber(args[2]))    
-            
+            gt.gtt:size(tonumber(args[2]))
+
     ---CLI Arguments for Time font type
     elseif args[1] == 'timeFont' then
-        gt.gtt:font(args[2])    
-            
+        gt.gtt:font(args[2])
+
     ---CLI Arguments for Day font Size
     elseif args[1] == 'daySize' then
-        gt.gtd:size(tonumber(args[2]))                
-    
+        gt.gtd:size(tonumber(args[2]))
+
     ---CLI Arguments for Day font type
     elseif args[1] == 'dayFont' then
-        gt.gtd:font(args[2])    
-    
+        gt.gtd:font(args[2])
+
     elseif args[1] == 'timex' then
         gt.gtt:pos_x(tonumber(args[2]))
-        
+
     elseif args[1] == 'timey' then
         gt.gtt:pos_y(tonumber(args[2]))
-        
+
     elseif args[1] == 'daysx' then
         gt.gtd:pos_x(tonumber(args[2]))
-        
+
     elseif args[1] == 'daysy' then
         gt.gtd:pos_y(tonumber(args[2]))
-        
+
     elseif args[1] == 'alert' then
         settings.alert = (settings.alert == false)
         gt.alert = settings.alert
         log('Show alerts in log when day / moon-phase changes: '..tostring(settings.alert))
         tolog()
-    
+
     elseif args[1] == 'time' then
         if args[2] == 'alpha' then
             inalpha = tostring(args[3]):zfill(3)
@@ -458,10 +459,6 @@ windower.register_event('addon command', function (...)
                 gt.gtd:alpha(inalpha)
                 log('Day transparency set to '..inalpha..' ('..math.round(100-(inalpha/2.55),0)..'%).')
             end
-        elseif tonumber(args[2]) > 0 and tonumber(args[2]) < 9 then
-            gt.numdays = tonumber(args[2])
-            settings.numdays = tonumber(args[2])
-            day_change(windower.ffxi.get_info().day)
         elseif args[2] == 'x' or args[2] == 'posx' then
             windower.send_command('gt daysx '..args[3])
         elseif args[2] == 'y' or args[2] == 'posy' then
@@ -472,8 +469,15 @@ windower.register_event('addon command', function (...)
         elseif args[2] == 'reset' then
             gt.gtd:pos(0,0)
         else
-            gt.gtd:show()
-            log('Showing day display.')
+            local asnum = tonumber(args[2])
+            if not asnum or asnum < 1 or asnum > 8 then
+                gt.gtd:show()
+                log('Showing day display.')
+            else
+                gt.numdays = asnum
+                settings.numdays = asnum
+                day_change(windower.ffxi.get_info().day)
+            end
         end
     elseif args[1] == 'axis' then
         if args[2] == 'vertical' then

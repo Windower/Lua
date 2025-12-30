@@ -18,9 +18,8 @@ porter [<slip> [<page>]] [owned]
 porter find
 ```
 Shows storable items found in all inventory bags.
-----
 
-##changelog##
+## changelog ##
 ### v1.20200419
 * **add**: New command, porter find.
 * **change**: Adjusted resource handling.

@@ -16,6 +16,12 @@ itemizer autoitems (shortened: ai)
 Toggles the auto-pulling of items from bags if not in your inventory. (Default: True)
 
 ```
+itemizer autostack (shortened: as)
+```
+
+Toggles the auto-stacking of items when moving items to non-inventory bags. (Default: True)
+
+```
 itemizer autoninjatools (shortened: ant)
 ```
 
@@ -41,11 +47,18 @@ put <item> <bag> [count]
 Places the specified item into the specified bag. If `count` is omitted only a single item is put away. If `count` is `all` all items will be put away.
 
 ```
-gets <item> [bag]
-puts <item> <bag>
+move <item> [source bag] <destination bag> [count]
 ```
 
-Same as the `get` and `put` variants if `all` was specified for the `count` argument.
+Moves the specified item from the specified source bag to the specified destination bag. If `source bag` is omitted it will fetch the item from any accessible bag, if available. If `count` is omitted only a single item is fetched. If `count` is `all` all items will be fetched.
+
+```
+gets <item> [bag]
+puts <item> <bag>
+moves <item> [source bag] <destination bag>
+```
+
+Same as the `get`, `put` and `move` variants if `all` was specified for the `count` argument.
 
 ### Notes
 

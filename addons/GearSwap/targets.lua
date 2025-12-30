@@ -29,24 +29,19 @@
 
 function valid_target(targ)
     local spelltarget = {}
-    local spell_targ
 
     if targ and pass_through_targs[targ] then
         local j = windower.ffxi.get_mob_by_target(targ)
-        if j then
-            spelltarget = target_complete(j)
-        end
+        spelltarget = target_complete(j)
         spelltarget.raw = targ
-        return targ, spelltarget
+        return spelltarget
     elseif targ then
         local id = tonumber(targ)
         if id then
             local j = windower.ffxi.get_mob_by_id(id)
-            if j then
-                spelltarget = target_complete(j)
-            end
+            spelltarget = target_complete(j)
             spelltarget.raw = targ
-            return targ, spelltarget
+            return spelltarget
         elseif targ ~= '' then
             local targ_name = targ:lower()
             local mob_array = windower.ffxi.get_mob_array()
@@ -54,12 +49,12 @@ function valid_target(targ)
                 if v.name:lower()==targ_name and (not v.is_npc or v.spawn_type == 14) then
                     spelltarget = target_complete(v)
                     spelltarget.raw = targ
-                    return targ, spelltarget
+                    return spelltarget
                 end
             end
         end
     end
-    return false, false
+    return false
 end
 
 function target_complete(mob_table)

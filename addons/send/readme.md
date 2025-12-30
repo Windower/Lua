@@ -12,7 +12,7 @@ Examples:
 
 //send @whm /ma "Haste" <me>
 
-//send Mymule //reload timers
+//send Mymule reload timers
 ```
 
 ## Sending entity IDs

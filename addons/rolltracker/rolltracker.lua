@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'RollTracker'
-_addon.version = '1.8.0.0'
+_addon.version = '1.8.1.1'
 _addon.author = 'Balloon'
 _addon.commands = {'rolltracker','rt'}
 
@@ -40,34 +40,76 @@ defaults.bust = 1
 defaults.effected = 1
 defaults.fold = 1
 defaults.luckyinfo = true
+defaults.channel = {}
+defaults.channel.roll = 1 -- This should be 101, but the current default is 1
+defaults.channel.warn = 1
+defaults.color = {}
+defaults.color.bonus = 13
+defaults.color.lucky = 158
+defaults.color.warn = 159
+defaults.color.unlucky = 167
 
 settings = config.load(defaults)
 
 windower.register_event('addon command',function (...)
     cmd = {...}
-    if cmd[1] ~= nil then
-        if cmd[1]:lower() == "help" then
-            log('To toggle rolltracker from allowing/stopping rolls type: //rolltracker autostop')
-            log('To toggle rolltracker from showing/hiding Lucky Info type: //rolltracker luckyinfo')
-        elseif cmd[1]:lower() == "autostop" then
-            if settings.autostopper then
-               settings.autostopper = false
-               log('Will no longer stop Double-UP on a Lucky Roll.')
-            else
-               settings.autostopper = true
-               log('Will stop Double-UP on a Lucky Roll.')
-            end
-        elseif cmd[1]:lower() == "luckyinfo" then
-            if settings.luckyinfo then
-               settings.luckyinfo = false
-               log('Lucky/Unlucky Info will no longer be displayed.')
-            else
-               settings.luckyinfo = true
-               log('Lucky/Unlucky Info will now be displayed.')
-            end
+    local command = ((cmd[1] ~= nil) and cmd[1]:lower()) or "help"
+
+    if command == "autostop" then
+        if settings.autostopper then
+           settings.autostopper = false
+           log('Will no longer stop Double-UP on a Lucky Roll.')
+        else
+           settings.autostopper = true
+           log('Will stop Double-UP on a Lucky Roll.')
         end
-        config.save(settings, 'all')
+    elseif command == "luckyinfo" then
+        if settings.luckyinfo then
+           settings.luckyinfo = false
+           log('Lucky/Unlucky Info will no longer be displayed.')
+        else
+           settings.luckyinfo = true
+           log('Lucky/Unlucky Info will now be displayed.')
+        end
+    elseif command == "channel" then
+        local subcommand = ((cmd[2] ~= nil) and cmd[2]:lower()) or "help"
+        if subcommand == "help" then
+            log('Chat Channels: roll(' .. settings.channel.roll .. '), warn(' .. settings.channel.warn .. ')')
+            return
+        end
+        if settings.channel[subcommand] == nil then
+            log('Valid chat channels are: roll and warn')
+            return
+        end
+        local channel = tonumber(((cmd[3] ~= nil) and cmd[3]) or 0)
+        if (channel == nil) or (channel < 1) or (channel > 255) then
+            log('Valid channnel values are 1 through 255')
+            return
+        end
+        settings.channel[subcommand] = channel
+        log('Chat Channel set to ' .. channel)
+    elseif command == "color" then
+        local subcommand = ((cmd[2] ~= nil) and cmd[2]:lower()) or "help"
+        if subcommand == "help" then
+            log('Colors: bonus(' .. settings.color.bonus .. '), lucky(' .. settings.color.lucky .. '), unlucky(' .. settings.color.unlucky .. '), warn(' .. settings.color.warn .. ')')
+            return
+        end
+        if settings.color[subcommand] == nil then
+            log('Valid color types are: roll, bonus, lucky, unlucky, and warn')
+            return
+        end
+        local color = tonumber(((cmd[3] ~= nil) and cmd[3]) or 0)
+        if (color == nil) or (color < 1) or (color > 255) then
+            log('Valid color values are 1 through 255')
+            return
+        end
+        settings.color[subcommand] = color
+        log('Color for \'' .. subcommand .. '\' set to ' .. color)
+    else
+        printHelp()
+        return
     end
+    config.save(settings, 'all')
 end)
 
 --This is done because GearSwap swaps out too fast, and sometimes things aren't reported in memory.
@@ -82,6 +124,19 @@ windower.register_event('incoming chunk', function(id, data)
 
     end
 end)
+
+function printHelp()
+    log('rt autostop : Toggle allowing/stopping rolls')
+    log('rt luckyinfo : Toggle showing/hiding Lucky Info')
+    log('rt channel : Show current chat channels for rolltracker messages')
+    log('rt channel roll <channel> : Set the chat channel for rolls (1-255, ex. 101)')
+    log('rt channel warn <channel> : Set the chat channel for warnings (1-255, ex. 101)')
+    log('rt color : Show current color settings')
+    log('rt color bonus <color> : Set the color for the Roll Bonus text (1-255, ex. 158)')
+    log('rt color lucky <color> : Set the color for the Lucky text (1-255, ex. 158)')
+    log('rt color unlucky <color> : Set the color for the Unlucky text (1-255, ex. 167)')
+    log('rt color warn <color> : Set the color for warning messages (1-255, ex. 159)')
+end
 
 function getGear(slot)
     local equip = windower.ffxi.get_items()['equipment']
@@ -134,7 +189,7 @@ windower.register_event('load', function()
         ['Ninja'] =         {10,13,15,40,18,20,25,5,28,30,50,'-15',' Evasion Bonus',4,8, 5,{'nin',15}},                                               -- Confirmed
         ['Puppet'] =        {5,8,35,11,14,18,2,22,26,30,40,'-8',' Pet: MAB/MAcc',3,7, 3,{'pup',12}},
         ['Rogue\'s'] =      {2,2,3,4,12,5,6,6,1,8,14,'-6','% Critical Hit Rate!',5,9, 1,{'thf',5}},
-        ['Runeist\'s'] =    {10,13,15,40,18,20,25,5,28,30,50,'-15',' Evasion Bonus',4,8, 5,{'run',15}},                                               -- Needs Eval
+        ['Runeist\'s'] =    {10,13,15,40,18,20,25,5,28,30,50,'-15',' Magic Evasion Bonus',4,8, 5,{'run',15}},                                               -- Needs Eval
         ['Samurai'] =       {8,32,10,12,14,4,16,20,22,24,40,'-10',' Store TP Bonus',2,6, 4,{'sam',10}},                                               -- Confirmed 1(Was bad),2,3,4,5,6,7,8,11 (I Wing Test)
         ['Scholar\'s'] =    {2,10,3,4,4,1,5,6,7,7,12,'-3','% Conserve MP',2,6, 1,{'sch',3}},                                                          --Needs Eval Source ATM: JP Wiki
         ['Tactician\'s'] =  {10,10,10,10,30,10,10,0,20,20,40,'-10',' Regain',5,8, 2,{nil,0},{5, 11100, 26930, 26931, 10}},                            -- Confirmed
@@ -209,17 +264,19 @@ windower.register_event('action', function(act)
             isLucky = false
             if rollNum == rollInfo[rollID][15] or rollNum == 11 then
                 isLucky = true
-                windower.add_to_chat(158,'Lucky roll!')
-                luckChat = string.char(31,158).." (Lucky!)"
+                windower.add_to_chat(settings.channel.roll, 'Lucky roll!':color(settings.color.lucky))
+                luckChat = " (Lucky!)":color(settings.color.lucky)
             elseif rollNum == rollInfo[rollID][16] then
-                luckChat = string.char(31,167).." (Unlucky!)"
+                luckChat = " (Unlucky!)":color(settings.color.unlucky)
             end
 
 
             if rollNum == 12 and #rollMembers > 0 then
-                windower.add_to_chat(1, string.char(31,167)..amountHit..'Bust! '..chat.controls.reset..chars.implies..' '..membersHit..' '..chars.implies..' ('..rollInfo[rollID][rollNum+1]..rollInfo[rollID][14]..')')
+                local bustchat = amountHit..'Bust! '..chat.controls.reset..chars.implies..' '..membersHit..' '..chars.implies..' ('..rollInfo[rollID][rollNum+1]..rollInfo[rollID][14]..')'
+                windower.add_to_chat(settings.channel.roll, bustchat:color(settings.color.bust))
             else
-                windower.add_to_chat(1, amountHit..membersHit..chat.controls.reset..' '..chars.implies..' '..rollInfo[rollID][1]..' Roll '..chars['circle' .. rollNum]..luckChat..string.char(31,13)..' (+'..rollBonus..')'..BustRate(rollNum, rollActor)..ReportRollInfo(rollID, rollActor))
+                local bonuschat = ' (+'..rollBonus..')'
+                windower.add_to_chat(settings.channel.roll, amountHit..membersHit..chat.controls.reset..' '..chars.implies..' '..rollInfo[rollID][1]..' Roll '..chars['circle' .. rollNum]..luckChat.. bonuschat:color(settings.color.bonus) ..BustRate(rollNum, rollActor)..ReportRollInfo(rollID, rollActor))
             end
         end
     end
@@ -244,13 +301,27 @@ function RollEffect(rollid, rollnum)
 
     --I'm handling one roll a bit odd, so I need to deal with it separately.
     --Which is stupid, I know, but look at how I've done most of this.
+    --Note: Rostam, Lanun Knife, and Comm. Knife do not check for Augment Path.
+    --Item Name         ID      Roll+
+    --Rostam            21581   8
+    --Lanun Knife       21580   7
+    --Regal Necklace    26038   7
+    --Comm. Knife       21579   6
+    --Barataria Ring    28548   5
+    --Merirosvo Ring    28547   3
     if rollName == "Companion\'s" then
         local hpVal = rollVal[1]
         local tpVal = rollVal[2]
-        if gearTable[9] == 26038 or rollPlusBonus then
+        if gearTable[0] == 21581 or rollPlusBonus then
+            hpVal =  hpVal + (rollInfo[rollid][17][1]*8)
+            tpVal = tpVal  + (rollInfo[rollid][17][2]*8)
+        elseif gearTable[0] == 21580 or gearTable[9] == 26038 or rollPlusBonus then
             hpVal =  hpVal + (rollInfo[rollid][17][1]*7)
             tpVal = tpVal  + (rollInfo[rollid][17][2]*7)
             rollPlusBonus = true
+        elseif gearTable[0] == 21579 or rollPlusBonus then
+            hpVal =  hpVal + (rollInfo[rollid][17][1]*6)
+            tpVal = tpVal  + (rollInfo[rollid][17][2]*6)
         elseif gearTable[13] == 28548 or gearTable[14]== 28548 or rollPlusBonus then
             hpVal =  hpVal + (rollInfo[rollid][17][1]*5)
             tpVal = tpVal  + (rollInfo[rollid][17][2]*5)
@@ -265,8 +336,14 @@ function RollEffect(rollid, rollnum)
 
     --If there's no Roll Val can't add to it
     if rollVal ~= '?' then
-        if gearTable[9] == 26038 or rollPlusBonus then
+        if gearTable[0] == 21581 or rollPlusBonus then
+            rollVal = rollVal + (rollInfo[rollid][17]*8)
+            rollPlusBonus = true
+        elseif gearTable[0] == 21580 or gearTable[9] == 26038 or rollPlusBonus then
             rollVal = rollVal + (rollInfo[rollid][17]*7)
+            rollPlusBonus = true
+        elseif gearTable[0] == 21579 or rollPlusBonus then
+            rollVal = rollVal + (rollInfo[rollid][17]*6)
             rollPlusBonus = true
         elseif gearTable[13] == 28548 or gearTable[14] == 28548 or rollPlusBonus then
             rollVal = rollVal + (rollInfo[rollid][17]*5)
@@ -341,7 +418,7 @@ windower.register_event('outgoing text', function(original, modified)
     modified = original
     if cleaned:match('/jobability \"?Double.*Up') or cleaned:match('/ja \"?Double.*Up') then
         if isLucky and settings.autostopper and rollActor == player.id then
-            windower.add_to_chat(159,'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.')
+            windower.add_to_chat(settings.channel.warn, 'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.':color(settings.color.warn))
             isLucky = false
             modified = ""
         end
@@ -358,7 +435,7 @@ windower.register_event('outgoing text', function(original, modified)
             modified = cleaned
             ranMultiple = false
         else
-            windower.add_to_chat(159, 'No \'Bust\'. Fold again to continue.')
+            windower.add_to_chat(settings.channel.warn, 'No \'Bust\'. Fold again to continue.':color(settings.color.warn))
             ranMultiple = true
             modified = ""
         end

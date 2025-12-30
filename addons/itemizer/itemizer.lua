@@ -1,9 +1,10 @@
 _addon.name = 'Itemizer'
 _addon.author = 'Ihina'
-_addon.version = '3.1.0.0'
+_addon.version = '3.2.0.0'
 _addon.command = 'itemizer'
 
 require('luau')
+local packets = require('packets')
 
 defaults = {}
 defaults.AutoNinjaTools = true
@@ -44,13 +45,13 @@ windower.register_event("load", "login", function()
     if not windower.ffxi.get_info().logged_in then
         return
     end
-        
+
     local _, _, saved   = settings.version:find("(%d+%.%d+%.)")
     local _, _, current = _addon.version:find("(%d+%.%d+%.)")
     if saved ~= current then
         log("Itemizer v%s: New features added. (use //itemizer help to find out about them)":format(_addon.version))
         settings.version = _addon.version
-        settings:save() 
+        settings:save()
     end
 end)
 
@@ -87,28 +88,22 @@ find_items = function(ids, bag, limit)
     return res, found
 end
 
-stack = function(bag_id)
-    if not bag_id or type(bag_id) ~= 'number' or bag_id == 0 then
-        return
-    end
-    windower.packets.inject_outgoing(0x03A, string.char(0x3A, 0x1E, 0, 0, bag_id, 0, 0, 0))
-end
-
 windower.register_event("addon command", function(command, arg2, ...)
     if command == 'help' then
         local helptext = [[Itemizer - Usage:
-    //get <item> [bag] [count] -- //gets <item> [bag] - Retrieves the specified item from the specified bag
-    //put <item> [bag] [count] -- //puts <item> [bag] - Places the specified item into the specified bag
+    //get <item> [bag] [count] -- //gets <item> [bag] - Retrieves the specified item from the specified bag to inventory.
+    //put <item> <bag> [count] -- //puts <item> <bag> - Places the specified item into the specified bag from inventory.
+    //move <item> [source] <destination> [count] -- //moves <item> [from] <to> - Moves the specified item from one bag to another. Source bag is optional.
     //stack -- Stacks all stackable items in all currently available bags
         Command List:
   1. Delay <delay> - Sets the time delay.
-  2. Autoninjatools - Toggles automatically getting ninja tools (Shortened ant)
-  3. Autoitems - Toggles automatically getting items from bags (shortened ai)
-  4. Useuniversaltool <spell> - Toggles using universal ninja tools for <spell> (shortened uut)
+  2. AutoNinjaTools - Toggles automatically getting ninja tools (Shortened ant)
+  3. AutoItems - Toggles automatically getting items from bags (shortened ai)
+  4. UseUniversalTool <spell> - Toggles using universal ninja tools for <spell> (shortened uut)
      i.e. uut katon  - will toggle katon either true or false depending on your setting
      all defaulted false.
-  5. Autostack - Toggles utomatically stacking items in the destination bag (shortened as, defaults true)
-  6. help - Shows this menu.]]
+  5. AutoStack - Toggles utomatically stacking items in the destination bag (shortened as, defaults true)
+  6. Help - Shows this menu.]]
         for _, line in ipairs(helptext:split('\n')) do
             log(line)
         end
@@ -143,14 +138,28 @@ windower.register_event("addon command", function(command, arg2, ...)
         settings:save()
     end
 end)
-        
+
+local handled_commands = S{ 'get', 'gets', 'put', 'puts', 'move', 'moves' }
+
+local function validate_bag(bag_name, purpose)
+    local bag_id = rawget(bag_ids, bag_name)
+    if not bag_id then
+        error(('Specify a valid %s bag.'):format(purpose))
+        return nil
+    end
+    if not windower.ffxi.get_bag_info(bag_id).enabled then
+        error('%s currently not enabled':format(res.bags[bag_id].name))
+        return nil
+    end
+    return bag_id
+end
 
 windower.register_event('unhandled command', function(command, ...)
     local args = L{...}:map(string.lower)
 
-    if command == 'get' or command == 'put' or command == 'gets' or command == 'puts' then
+    if handled_commands:contains(command) then
         local count
-        if command == 'gets' or command == 'puts' then
+        if command:endswith('s') then
             command = command:sub(1, -2)
         else
             local last = args[#args]
@@ -164,30 +173,32 @@ windower.register_event('unhandled command', function(command, ...)
             end
         end
 
-        local bag = args[#args]
-        local specified_bag = rawget(bag_ids, bag)
+        if command == 'get' then
+            args:append('inventory')
+        end
+
+        local destination_bag = validate_bag(args[#args], 'destination')
+        if not destination_bag then
+            return
+        end
+
+        args:remove()
+
+        if command == 'put' then
+            args:append('inventory')
+        end
+
+        local source_bag
+        local specified_bag = rawget(bag_ids, args[#args])
         if specified_bag then
-            if not windower.ffxi.get_bag_info(specified_bag).enabled then
-                error('%s currently not enabled':format(res.bags[specified_bag].name))
+            source_bag = validate_bag(args[#args], 'source')
+            if not source_bag then
                 return
             end
 
             args:remove()
-        elseif command == 'put' and not specified_bag then
-            error('Specify a valid destination bag to put items in.')
-            return
         end
 
-        local source_bag
-        local destination_bag
-        if command == 'get' then
-            source_bag = specified_bag
-            destination_bag = bag_ids.inventory
-        else
-            destination_bag = specified_bag
-            source_bag = bag_ids.inventory
-        end
-        
         local destination_bag_info = windower.ffxi.get_bag_info(destination_bag)
         if destination_bag_info.max - destination_bag_info.count == 0 then
             error('Not enough space in %s to move items.':format(res.bags[destination_bag].name))
@@ -195,7 +206,7 @@ windower.register_event('unhandled command', function(command, ...)
         end
 
         local item_name = args:concat(' ')
- 
+
         local item_ids = (S(res.items:name(windower.wc_match-{item_name})) + S(res.items:name_log(windower.wc_match-{item_name}))):map(table.get-{'id'})
         if item_ids:length() == 0 then
             error('Unknown item: %s':format(item_name))
@@ -213,20 +224,20 @@ windower.register_event('unhandled command', function(command, ...)
         end
 
         for match in matches:it() do
-            windower.ffxi[command .. '_item'](command == 'get' and match.bag or destination_bag, match.slot, match.count)
-            
-            if settings.AutoStack and command == 'put' and match.count < res.items[match.id].stack then
-                stack(destination_bag)
+            windower.ffxi.move_item(match.bag, destination_bag, match.slot, match.count)
+
+            if settings.AutoStack and command ~= 'get' and match.count < res.items[match.id].stack then
+                windower.ffxi.stack_items(destination_bag)
             end
         end
-    
+
     elseif command == 'stack' then
         log('Stacking items in all currently accessible bags.')
 
         for bag_index in bag_ids:filter(table.get-{'enabled'} .. windower.ffxi.get_bag_info):it() do
-            stack(bag_index)
+            windower.ffxi.stack_items(bag_index)
         end
-    end	
+    end
 end)
 
 ninjutsu = res.spells:type('Ninjutsu')

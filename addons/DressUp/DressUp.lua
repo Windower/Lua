@@ -26,7 +26,7 @@
 
 _addon.name = 'DressUp'
 _addon.author = 'Cair'
-_addon.version = '1.30'
+_addon.version = '1.31'
 _addon.commands = {'DressUp','du'}
 
 
@@ -67,6 +67,8 @@ local initialize = function()
     print_blink_settings("global")
     if load_profile(player.main_job) then
         notice('Loaded profile: ' .. player.main_job)
+    elseif load_profile(player.main_job_full) then
+        notice('Loaded profile: ' .. player.main_job_full)
     end
 
     update_model(info.self.index)
@@ -85,7 +87,10 @@ windower.register_event('logout', function()
 end)
 
 windower.register_event('job change',function(job)
-    if load_profile(res.jobs[job].name) then
+    if load_profile(res.jobs[job].name_short) then
+        update_model(info.self.index)
+        notice('Loaded profile: ' .. res.jobs[job].name_short)
+    elseif load_profile(res.jobs[job].name) then
         update_model(info.self.index)
         notice('Loaded profile: ' .. res.jobs[job].name)
     end

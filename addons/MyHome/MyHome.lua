@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.]]
 
 _addon.name = 'MyHome'
 _addon.author = 'from20020516'
-_addon.version = '1.1.1'
+_addon.version = '1.1.2'
 _addon.commands = {'myhome','mh','warp'}
 
 require('logger')
@@ -106,7 +106,8 @@ windower.register_event('addon command',function(...)
     else
     local player = windower.ffxi.get_player()
     local get_spells = windower.ffxi.get_spells()
-    local spell = S{player.main_job_id,player.sub_job_id}[4]
+    local has_blm_17 = (player.main_job_id == 4 and player.main_job_level >= 17) or (player.sub_job_id == 4 and player.sub_job_level >= 17)
+    local spell = has_blm_17
         and (get_spells[261] and player.vitals.mp >= 100 and {japanese='デジョン',english='"Warp"'}
         or get_spells[262] and player.vitals.mp >= 150 and {japanese='デジョンII',english='"Warp II"'})
         if spell then

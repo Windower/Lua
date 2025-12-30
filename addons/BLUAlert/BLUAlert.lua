@@ -1,7 +1,7 @@
 --[[
 BLUAlert v1.0.0.0
 
-Copyright © 2017, Christopher Szewczyk
+Copyright Â© 2017, Christopher Szewczyk
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -29,15 +29,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
 require('sets')
-res = require('resources')
-chat = require('chat')
+local res = require('resources')
+local chat = require('chat')
 
 _addon.name    = 'BLUAlert'
 _addon.author  = 'Kainsin'
 _addon.version = '1.0.0.0'
 
 -- Some BLU spells have a different name then the monster abilities they come from.
-blu_different_names = {
+local blu_different_names = {
     ["Everyone's Grudge"]     = "Evryone. Grudge",
     ["Nature's Meditation"]   = "Nat. Meditation",
     ["Orcish Counterstance"]  = "O. Counterstance",
@@ -48,8 +48,8 @@ blu_different_names = {
 }
 
 -- Traverse through all of the BLU spells looking for the one with the given name.
-blu_spells = res.spells:type('BlueMagic')
-function find_blu_spell(monster_ability_name)
+local blu_spells = res.spells:type('BlueMagic')
+local function find_blu_spell(monster_ability_name)
     for i,v in pairs(blu_spells) do
         if (v.english == monster_ability_name) then
             return v.id
@@ -60,13 +60,17 @@ end
 -- Since the action packet gives monster abilities by ID, we'll want to create a
 -- Monster Ability -> BLU Spell mapping to quickly find out which monster ability
 -- corresponds to which spell.
-spell_id_map = {}
+local spell_id_map = {}
 for i,v in pairs(res.monster_abilities) do
     local monster_ability_name = blu_different_names[v.english] or v.english
     spell_id_map[i] = find_blu_spell(monster_ability_name)
 end
+for i,v in pairs(res.weapon_skills) do
+    local weapon_skill_name = blu_different_names[v.english] or v.english
+    spell_id_map[i] = find_blu_spell(weapon_skill_name)
+end
 
-function get_action_id(targets)
+local function get_action_id(targets)
     for i,v in pairs(targets) do
         for i2,v2 in pairs(v['actions']) do
             if v2['param'] then

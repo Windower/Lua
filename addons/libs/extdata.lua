@@ -894,7 +894,6 @@ augment_values = {
         [0x72] = {{stat='Weapon skill damage ',offset=1,percent=true}},
         [0x73] = {{stat='Magic damage',offset=1}},
         [0x74] = {{stat='Blood Pact Dmg.',offset=1}},
-        [0x74] = {{stat='Blood Pact Dmg.',offset=1}},
         [0x75] = {{stat='"Avatar perpetuation cost"',offset=1}},
         [0x76] = {{stat='"Blood Pact" ability delay',offset=1}},
         [0x77] = {{stat='Haste',offset=1,percent=true}},

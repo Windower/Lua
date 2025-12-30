@@ -1006,8 +1006,7 @@ fields.outgoing[0x0EA] = L{
 
 -- Cancel
 fields.outgoing[0x0F1] = L{
-    {ctype='unsigned char',     label='Buff'},                                  -- 04
-    {ctype='unsigned char',     label='_unknown1'},                             -- 05
+    {ctype='unsigned short',    label='Buff'},                                  -- 04
     {ctype='unsigned char',     label='_unknown2'},                             -- 06
     {ctype='unsigned char',     label='_unknown3'},                             -- 07
 }
@@ -1514,7 +1513,7 @@ fields.incoming[0x017] = function()
     local fields = func.incoming[0x017]
 
     return function(data, type)
-        return fields.base + (fields[type or data:byte(5)] or fields.default)
+        return fields.base + (fields[type or data and data:byte(5)] or fields.default)
     end
 end()
 

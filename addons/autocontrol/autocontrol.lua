@@ -168,21 +168,27 @@ function set_attachments_from_autoset(autoset,slot)
             if petlessZones:contains(windower.ffxi.get_info().zone) then 
                 return
             else
-                local recasts = windower.ffxi.get_ability_recasts()
-                if settings.AutoActivate and recasts[recast_ids.activate] == 0 then
-                    windower.send_command('input /ja "Activate" <me>')
-                elseif settings.AutoDeusExAutomata and recasts[recast_ids.deusex] == 0 then
-                    log('Activate is down, using Deus Ex Automata instead.')
-                    windower.send_command('input /ja "Deus Ex Automata" <me>')
-                elseif settings.AutoActivate and settings.AutoDeusExAutomata then
-                    log('Activate and Deus Ex Automata timers were not ready.')
-                elseif settings.AutoActivate then
-                    log('Activate timer was not ready.')
-                elseif settings.AutoDeusExAutomata then
-                    log('Deus Ex Automata timer was not ready.')
-                end
+                coroutine.schedule(activate_puppet, 0.5)
             end
         end
+    end
+end
+
+function activate_puppet()
+    local recasts = windower.ffxi.get_ability_recasts()
+    if settings.AutoActivate and recasts[recast_ids.activate] == 0 then
+        windower.send_command('input /ja "Activate" <me>')
+    elseif settings.AutoDeusExAutomata and recasts[recast_ids.deusex] == 0 then
+        if settings.AutoActivate then
+            log('Activate is down, using Deus Ex Automata instead.')
+        end
+        windower.send_command('input /ja "Deus Ex Automata" <me>')
+    elseif settings.AutoActivate and settings.AutoDeusExAutomata then
+        log('Activate and Deus Ex Automata timers were not ready.')
+    elseif settings.AutoActivate then
+        log('Activate timer was not ready.')
+    elseif settings.AutoDeusExAutomata then
+        log('Deus Ex Automata timer was not ready.')
     end
 end
 

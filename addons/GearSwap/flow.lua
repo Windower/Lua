@@ -53,7 +53,7 @@ function equip_sets(swap_type,ts,...)
     end
 
     windower.debug(tostring(swap_type)..' enter')
-    if showphase or debugging.general then msg.debugging(8,windower.to_shift_jis(tostring(swap_type))..' enter') end
+    if showphase or debugging.general then msg.debugging(windower.to_shift_jis(tostring(swap_type))..' enter') end
 
     local cur_equip = table.reassign({},update_equipment())
 
@@ -92,7 +92,7 @@ function equip_sets(swap_type,ts,...)
 
     if not val1 then val1 = {}
         if debugging.general then
-            msg.debugging(8,'val1 error')
+            msg.debugging('val1 error')
         end
     end
 
@@ -187,7 +187,7 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: equip_sets_exit(swap_type,ind,val1)
+--Name: equip_sets_exit(swap_type, ts, val1)
 --Desc: Cleans up the global table and leaves equip_sets properly.
 --Args:
 ---- swap_type - Current swap type for equip_sets
@@ -197,15 +197,15 @@ end
 --Returns:
 ---- none
 -----------------------------------------------------------------------------------
-function equip_sets_exit(swap_type,ts,val1)
+function equip_sets_exit(swap_type, ts, val1)
     if command_registry[ts] then
-        table.update(command_registry[ts],_global)
+        table.update(command_registry[ts], _global)
     end
     if type(swap_type) == 'string' then
         if swap_type == 'pretarget' then
 
             if command_registry[ts].cancel_spell then
-                msg.debugging("Action canceled ("..storedcommand..' '..val1.target.raw..")")
+                msg.debugging('Action canceled (' .. storedcommand .. ' ' .. val1.target.raw .. ')')
                 storedcommand = nil
                 command_registry:delete_entry(ts)
                 return true
@@ -218,59 +218,60 @@ function equip_sets_exit(swap_type,ts,val1)
                 val1.target = command_registry[ts].new_target -- Switch target, if it is requested.
             end
 
+            if st_targs[val1.target.raw] then
+                st_flag = true
+                return storedcommand .. ' ' .. val1.target.raw
+            end
+
             -- Compose a proposed packet for the given action (this should be possible after pretarget)
-            command_registry[ts].spell = val1
-            if val1.target and val1.target.id and val1.target.index and val1.prefix and unify_prefix[val1.prefix] then
+            if val1.target.id and val1.target.index then
                 if val1.prefix == '/item' then
                     -- Item use packet handling here
                     if bit.band(val1.target.spawn_type, 2) == 2 and find_inventory_item(val1.id) then
                         -- 0x36 packet
                         if val1.target.distance <= 6 then
-                            command_registry[ts].proposed_packet = assemble_menu_item_packet(val1.target.id,val1.target.index,val1.id)
+                            command_registry[ts].proposed_packet = assemble_menu_item_packet(val1.target.id, val1.target.index, val1.id)
                         else
-                            windower.add_to_chat(67, "Target out of range.")
+                            windower.add_to_chat(67, 'Target out of range.')
                         end
                     elseif find_usable_item(val1.id) then
                         -- 0x37 packet
-                        command_registry[ts].proposed_packet = assemble_use_item_packet(val1.target.id,val1.target.index,val1.id)
+                        command_registry[ts].proposed_packet = assemble_use_item_packet(val1.target.id, val1.target.index, val1.id)
                     end
                     if not command_registry[ts].proposed_packet then
                         command_registry:delete_entry(ts)
                     end
                 elseif outgoing_action_category_table[unify_prefix[val1.prefix]] then
                     if filter_precast(val1) then
-                        command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id,val1.target.index,outgoing_action_category_table[unify_prefix[val1.prefix]],val1.id,command_registry[ts].target_arrow)
+                        command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id, val1.target.index, outgoing_action_category_table[unify_prefix[val1.prefix]], val1.id, command_registry[ts].target_arrow)
                         if not command_registry[ts].proposed_packet then
                             command_registry:delete_entry(ts)
 
-                            msg.debugging("Unable to create a packet for this command because the target is still invalid after pretarget ("..storedcommand..' '..val1.target.raw..")")
+                            msg.debugging('Unable to create a packet for this command because the target is still invalid after pretarget (' .. storedcommand .. ' ' .. val1.target.raw .. ')')
                             storedcommand = nil
-                            return storedcommand..' '..val1.target.raw
+                            return storedcommand .. ' ' .. val1.target.raw
                         end
                     end
                 else
-                    msg.debugging(8,"Hark, what weird prefix through yonder window breaks? "..tostring(val1.prefix))
+                    msg.debugging('Hark, what weird prefix through yonder window breaks? ' .. tostring(val1.prefix))
                 end
             end
 
-            if ts and command_registry[ts] and val1.target then
-                if st_targs[val1.target.raw] then
-                -- st targets
-                    st_flag = true
-                elseif not val1.target.name then
+            if ts and command_registry[ts] then
+                if not val1.target.name then
                 -- Spells with invalid pass_through_targs, like using <t> without a target
                     command_registry:delete_entry(ts)
-                    msg.debugging("Change target was used to pick an invalid target ("..storedcommand..' '..val1.target.raw..")")
-                    local ret = storedcommand..' '..val1.target.raw
+                    msg.debugging('Change target was used to pick an invalid target (' .. storedcommand .. ' ' .. val1.target.raw .. ')')
+                    local ret = storedcommand .. ' ' .. val1.target.raw
                     storedcommand = nil
                     return ret
                 else
                 -- Spells with complete target information
                 -- command_registry[ts] is deleted for cancelled spells
                     if command_registry[ts].pretarget_cast_delay == 0 then
-                        equip_sets('precast',ts,val1)
+                        equip_sets('precast', ts, val1)
                     else
-                        windower.send_command('@wait '..command_registry[ts].pretarget_cast_delay..';lua i '.._addon.name..' pretarget_delayed_cast '..ts)
+                        windower.send_command('@wait ' .. command_registry[ts].pretarget_cast_delay .. ';lua i ' .. _addon.name .. ' pretarget_delayed_cast ' .. ts)
                     end
                     return true
                 end
@@ -282,7 +283,7 @@ function equip_sets_exit(swap_type,ts,val1)
         elseif swap_type == 'precast' then
             -- Update the target_arrow
             if val1.prefix ~= '/item' then
-                command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id,val1.target.index,outgoing_action_category_table[unify_prefix[val1.prefix]],val1.id,command_registry[ts].target_arrow)
+                command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id, val1.target.index, outgoing_action_category_table[unify_prefix[val1.prefix]], val1.id, command_registry[ts].target_arrow)
             end
             return precast_send_check(ts)
         elseif swap_type == 'filtered_action' and command_registry[ts] and command_registry[ts].cancel_spell then
@@ -291,7 +292,7 @@ function equip_sets_exit(swap_type,ts,val1)
             return true
         elseif swap_type == 'midcast' and _settings.demo_mode then
             command_registry[ts].midaction = false
-            equip_sets('aftercast',ts,val1)
+            equip_sets('aftercast', ts, val1)
         elseif swap_type == 'aftercast' then
             if ts then
                 command_registry:delete_entry(ts)

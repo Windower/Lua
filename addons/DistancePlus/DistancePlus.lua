@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'DistancePlus'
 _addon.author = 'Sammeh'
-_addon.version = '1.3.0.10'
+_addon.version = '1.3.0.11'
 _addon.command = 'dp'
 
 -- 1.3.0.2 Fixed up nil's per recommendation on submission to Windower 
@@ -40,6 +40,7 @@ _addon.command = 'dp'
 -- 1.3.0.8 Wasn't refreshing 'self' upon job change.  Fixed up spacing.
 -- 1.3.0.9 Fixup MaxDecimal from config plugin addition.
 -- 1.3.0.10  Changed slightly some variable scopes for lower mem usage.
+-- 1.3.0.11 Fixed an error in distance calculation for Flourishes II.
 
 require('tables')
 
@@ -121,16 +122,17 @@ function displayabilities(distance,master_pet_distance,s,t)
     local list = 'Abilities:\n'
     if abilitylist then 
       for key,ability in pairs(abilitylist) do
-        ability_en = res.job_abilities[ability].name
+        ability_en = res.job_abilities[ability].en
+        ability_name = res.job_abilities[ability].name
         ability_type = res.job_abilities[ability].type
         ability_targets = res.job_abilities[ability].targets
         ability_distance = res.job_abilities[ability].range
-        if distance and ability_en and (ability_type == 'JobAbility' or ability_type == 'PetCommand' or ability_type == 'BloodPactRage' or ability_type == 'BloodPactWard' or ability_type == 'Monster' or ability_type == 'Step') and ability_en ~= "Flourishes II" then 
+        if distance and ability_name and (ability_type == 'JobAbility' or ability_type == 'PetCommand' or ability_type == 'BloodPactRage' or ability_type == 'BloodPactWard' or ability_type == 'Monster' or ability_type == 'Step') and ability_en ~= "Flourishes II" then 
             if ability_targets.Self ~= true then
                 if distance < (t.model_size + ability_distance * range_mult[ability_distance] + s.model_size) and distance ~= 0 then 
-                    list = list..'\\cs(0,255,0)'..ability_en..'\\cs(255,255,255)'..'\n'
+                    list = list..'\\cs(0,255,0)'..ability_name..'\\cs(255,255,255)'..'\n'
                 else
-                    list = list..'\\cs(255,255,255)'..ability_en..'\n'
+                    list = list..'\\cs(255,255,255)'..ability_name..'\n'
                 end
             --[[ too much crap on screen!!! 
             elseif ability_targets.Self == true and (ability_type == 'Monster' or ability_type == 'PetCommand') and master_pet_distance then
