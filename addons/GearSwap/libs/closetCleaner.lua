@@ -34,6 +34,7 @@ cc.sandbox.windower.coroutine = functions.empty
 cc.sandbox.windower.register_event = functions.empty
 cc.sandbox.windower.raw_register_event = functions.empty
 cc.sandbox.windower.register_unhandled_command = functions.empty
+cc.sandbox.windower.register_unhandled_command = functions.empty
 
 defaults = T{}
 -- Jobs you want to execute with, recomment put all active jobs you have lua for will look for <job>.lua or <playername>_<job>.lua files
@@ -184,6 +185,7 @@ function cc.run_report(path)
     end
     f:close()
     add_to_chat(1, "File created: "..mainReportName)
+    add_to_chat(2, "Recommended to reload gearswap: //lua r gearswap")
 end
 
 function cc.xmlify(phrase)
@@ -234,6 +236,12 @@ function cc.export_inv(path, errRpt)
     end
 end
 
+function cc.select_default_macro_book()
+	if ccDebug then
+		add_to_chat(1, "override select_default_macro_book")
+	end
+end 
+
 -- loads all the relevant jobs.lua files and inserts the sets tables into a supersets table:
 -- supersets.<JOB>.sets....
 function cc.export_sets(path, errRpt, dbgRpt, f)
@@ -250,6 +258,7 @@ function cc.export_sets(path, errRpt, dbgRpt, f)
     fpath = fpath:gsub('//','/')
     fpath = string.lower(fpath)
     dpath = fpath..'data/'
+	select_default_macro_book = cc.select_default_macro_book
     for i,v in ipairs(settings.ccjobs) do
 		dname = string.lower(dpath..player.name..'/'..v..'.lua')
         lname = string.lower(dpath..player.name..'_'..v..'.lua')
@@ -301,6 +310,8 @@ function cc.extract_sets(file)
         gearswap.setfenv(user_file, cc.sandbox) 
         cc.sandbox.sets = {}
 		user_file() 
+		cc.sandbox.ccRunning = true
+		cc.sandbox.select_default_macro_book = cc.select_default_macro_book
         local def_gear = cc.sandbox.init_get_sets or cc.sandbox.get_sets
         if def_gear then 
             def_gear() 
@@ -317,6 +328,8 @@ function cc.extract_sets_sel(file)
 	cc.InitializeSetsForSelindrile()               -- Must set each time after clearing out the sets list
     if settings.ccSeluseGlobalItems then GetGlobalItems() end
     include(file)
+	ccRunning = true
+	select_default_macro_book = cc.select_default_macro_book
     init_gear_sets()                            -- Selindrile uses this rather than get_sets
 	selsets = table.copy(sets)
 	sets = {}
@@ -375,7 +388,9 @@ function cc.list_sets(t, fsets, path, errRpt, dbgRpt, f)
                             end
                         end
                     end
-                elseif (type(val)=="number") then
+                elseif (type(val)=="boolean") then
+					-- do nothing
+				elseif (type(val)=="number") then
 					errors = errors + 1
                     errRpt:write("Found Number: "..val.." from "..pos.." table "..t..'\n')
                 else
