@@ -34,7 +34,6 @@ cc.sandbox.windower.coroutine = functions.empty
 cc.sandbox.windower.register_event = functions.empty
 cc.sandbox.windower.raw_register_event = functions.empty
 cc.sandbox.windower.register_unhandled_command = functions.empty
-cc.sandbox.windower.register_unhandled_command = functions.empty
 
 defaults = T{}
 -- Jobs you want to execute with, recomment put all active jobs you have lua for will look for <job>.lua or <playername>_<job>.lua files
