@@ -256,7 +256,7 @@ windower.register_event('addon command', function(comm, ...)
             local attach = args:sconcat()
             add_attachment(attach,slot)
         end
-    elseif comm == 'equipset' then
+    elseif comm == 'equipset' or comm == 'e' or comm == 'equip' then
         if args[1] then
             attach_set(args[1])
         end
@@ -290,7 +290,7 @@ windower.register_event('addon command', function(comm, ...)
         log('  1. help - Brings up this menu.')
         log('  2. setlist - list all saved automaton sets.')
         log('  3. saveset <setname> - saves <setname> to your settings.')
-        log('  4. equipset <setname> - equips <setname> to your automaton.')
+        log('  4. equipset or equip or e <setname> - equips <setname> to your automaton.')
         log('  5. attlist <setname> - gets the attachment list for <setname>')
         log('  6. list - gets the list of currently equipped attachments.')
         log('  7. maneuvertimers - Toggles showing maneuver timers on/off.')
