@@ -4,9 +4,17 @@
 //send <target> <command>
 ```
 
-The target can be the receiver's name, `@all` to send to all instances, `@other` to send to all instances excluding the sender, `@party` to send to all instances that are in the senders party, or `@<job>` to send to a specific job. The command can be any valid FFXI or Windower command.
+The `target` can be:
+* the receiver's name
+* `@all` to send to all instances,
+* `@other` to send to all instances excluding the sender,
+* `@party` to send to all instances that are in the sender's party,
+* `@zone` to send to all instances in the same zone as the sender,
+* `@<job>` to send to a specific job.
 
-Examples:
+The `command` can be any valid FFXI or Windower command.
+
+**Examples:**
 ```
 //send @all /ma "Blizzard" <t>
 
