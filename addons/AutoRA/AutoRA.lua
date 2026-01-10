@@ -1,12 +1,12 @@
-_addon.author = 'Banggugyangu'
-_addon.version = '3.0.0'
+_addon.author = 'Banggugyangu, edit by Aragan'
+_addon.version = '3.0.1'
 _addon.commands = {'autora', 'ara'}
 
 require('functions')
 local config = require('config')
 
 local defaults = {
-    HaltOnTp = true,
+    HaltOnTp = false,
     Delay = 1.5
 }
 
@@ -15,8 +15,9 @@ local settings = config.load(defaults)
 local auto = false
 local player_id
 
-windower.send_command('bind ^d ara start')
-windower.send_command('bind !d ara stop')
+windower.send_command('bind ^d ara toggle')
+windower.send_command('bind ^f ara haltontp')
+-- windower.send_command('bind !d ara toggle')
 
 local shoot = function()
     windower.send_command('input /shoot <t>')
@@ -57,7 +58,7 @@ local check = function()
     if player.vitals.tp >= 1000 and settings.HaltOnTp then
         auto = false
         windower.add_to_chat(17, 'AutoRA  HALTING AT 1000 TP ~~~~~~~~~~~~~~')
-    elseif player.status == 1 then
+    else
         shoot()
     end
 end
@@ -75,6 +76,12 @@ windower.register_event('addon command', function(command)
         start()
     elseif command == 'stop' then
         stop()
+    elseif command == 'toggle' then
+        if auto then
+            stop()
+        else
+            start()
+        end
     elseif command == 'shoot' then
         shoot()
     elseif command == 'reload' then
@@ -82,11 +89,12 @@ windower.register_event('addon command', function(command)
     elseif command == 'haltontp' then
         haltontp()
     elseif command == 'help' then
-        windower.add_to_chat(17, 'AutoRA  v' .. _addon.version .. 'commands:')
+        windower.add_to_chat(17, 'AutoRA  v' .. _addon.version .. ' commands:')
         windower.add_to_chat(17, '//ara [options]')
         windower.add_to_chat(17, '    start      - Starts auto attack with ranged weapon')
         windower.add_to_chat(17, '    stop       - Stops auto attack with ranged weapon')
-        windower.add_to_chat(17, '    haltontp    - Toggles automatic halt upon reaching 1000 TP')
+        windower.add_to_chat(17, '    toggle     - Toggles auto attack on/off')
+        windower.add_to_chat(17, '    haltontp   - Toggles automatic halt upon reaching 1000 TP')
         windower.add_to_chat(17, '    help       - Displays this help text')
         windower.add_to_chat(17, ' ')
         windower.add_to_chat(17, 'AutoRA will only automate ranged attacks if your status is "Engaged".  Otherwise it will always fire a single ranged attack.')
