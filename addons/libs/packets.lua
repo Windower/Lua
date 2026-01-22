@@ -239,7 +239,7 @@ do
         if not data then
             local argcount = select('#', ...)
             local bits = bit_size(fields, argcount > 0 and select(argcount, ...) or nil)
-            data = ('\x00'):rep(4 + 4 * math.ceil((bits or 0) / 32))
+            data = string.char(0):rep(4 + 4 * math.ceil((bits or 0) / 32))
         end
 
         return parse(fields, data)
@@ -365,7 +365,7 @@ function packets.parse(dir, data)
     for key, val in ipairs({res._raw:sub(5):unpack(pack_str)}) do
         local field = fields[key]
         if field then
-            res[field.label] = field.enc and val:decode(field.enc) or val
+            res[field.label] = field.enc and field.enc.decode(val) or val
         end
     end
 
@@ -429,7 +429,7 @@ end
 
 local lookup = function(packet, field)
     local val = packet[field.label]
-    return field.enc and val:encode(field.enc) or val
+    return field.enc and field.enc.encode(val) or val
 end
 
 -- Returns binary data from a packet

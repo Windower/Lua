@@ -19,33 +19,75 @@ local func = {
     outgoing = {},
 }
 
--- String decoding definitions
-local ls_enc = {
-    charset = T('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ':split()):update({
-        [0] = '`',
-        [60] = 0:char(),
-        [63] = 0:char(),
-    }),
-    bits = 6,
-    terminator = function(str)
-        return (#str % 4 == 2 and 60 or 63):binary()
+-- String encoding definitions
+local ls_enc
+local sign_enc
+do
+    local encoding_ls = {
+        charset = T(('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'):split()):update({
+            [0] = '`',
+            [60] = string.char(0),
+            [63] = string.char(0),
+        }),
+        bits = 6,
+        terminator = function(str)
+            return (#str % 4 == 2 and 60 or 63):binary()
+        end,
+    }
+
+    local encoding_sign = {
+        charset = T(('0123456798ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz{'):split()):update({
+            [0] = string.char(0),
+        }),
+        bits = 6,
+    }
+
+    local make_encoding = function(enc)
+        return {
+            encode = function(val)
+                return val:encode(enc)
+            end,
+            decode = function(val)
+                return val:decode(enc)
+            end,
+        }
     end
-}
-local sign_enc = {
-    charset = T('0123456798ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz{':split()):update({
-        [0] = 0:char(),
-    }),
-    bits = 6,
-}
+
+    ls_enc = make_encoding(encoding_ls)
+
+    sign_enc = make_encoding(encoding_sign)
+end
+
+local pad
+do
+    local identity = function(value)
+        return value
+    end
+
+    local make_encoding = function(amount, remainder)
+        local append = function(val)
+            return val .. string.char(0):rep(amount)
+        end
+
+        if remainder == nil then
+            return append
+        end
+
+        return function(val)
+            return #val % 4 == remainder and append(val) or val
+        end
+    end
+
+    pad = function(amount, offset)
+        return {
+            decode = identity,
+            encode = make_encoding(amount, offset),
+        }
+    end
+end
 
 -- Function definitions. Used to display packet field information.
 local res = require('resources')
-
-local function s(val, from, to)
-    from = from - 1
-    to = to
-    return bit.band(bit.rshift(val, from), 2^(to - from) - 1)
-end
 
 local function id(val)
     local mob = windower.ffxi.get_mob_by_id(val)
@@ -1424,7 +1466,7 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned short',    label='Main'},                                  -- 54
     {ctype='unsigned short',    label='Sub'},                                   -- 56
     {ctype='unsigned short',    label='Ranged'},                                -- 58
-    {ctype='char*',             label='Character Name'},                        -- 5A -   *
+    {ctype='char*',             label='Character Name',     enc=pad(1,1)},      -- 5A -   *
 }
 
 -- NPC Update
