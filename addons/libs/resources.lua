@@ -26,7 +26,11 @@ local resource_mt = {}
 
 -- The metatable for the root resource table
 local resources = setmetatable({}, {__index = function(t, k)
-    local fn = assert(k and fns[k], 'Unable to load resource "%s". Resource file not found!\n  Resolution: To attempt a force update of resources (and addons and libs), delete directory\n  "%s" and restart Windower.':format(tostring(k), (windower.windower_path..'updates'):gsub('\\','\\\\')))
+    if k == nil then
+        return nil
+    end
+
+    local fn = assert(fns[k], ('Cannot find resource file "%s".\n  Try forcing an update by deleting the following directory, then restart Windower:\n  %s'):format(tostring(k), (windower.windower_path .. 'updates/')))
     t[k] = setmetatable(fn(), resource_mt)
     return t[k]
 end})
@@ -46,13 +50,13 @@ local redict = {
 }
 
 -- The metatable for a single resource item (an entry in a sub table of the root resource table)
-local resource_entry_mt = {__index = function()
-    return function(t, k)
+local resource_entry_mt = {
+    __index = function(t, k)
         return redict[k] and t[redict[k]] or table[k]
-    end
-end()}
+    end,
+}
 
-function resource_group(r, fn, attr)
+local resource_group = function(r, fn, attr)
     attr = redict[attr] or attr
     fn = type(fn) == 'function' and fn or
         bit_slots[attr] and class(fn) == 'Set' and set.subset+{fn} or
@@ -73,7 +77,7 @@ end
 resource_mt.__class = 'Resource'
 
 resource_mt.__index = function(t, k)
-    return slots[t] and slots[t]:contains(k) and resource_group:endapply(k) or table[k]
+    return slots[t] and slots[t]:contains(k) and resource_group-{k} or table[k]
 end
 
 resource_mt.__tostring = function(t)
@@ -200,7 +204,7 @@ bit_slots = {
 return resources
 
 --[[
-Copyright © 2013-2015, Windower
+Copyright © 2013-2026, Windower
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
