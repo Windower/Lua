@@ -339,6 +339,10 @@ windower.register_event('keyboard', function(dik, down)
     end
 end)
 
+windower.register_event('lose focus', function()
+    keys:clear()
+end)
+
 windower.register_event('prerender', function()
     if settings.Verbose and settings.VerboseOutput == 'Text' then
         label:show()
