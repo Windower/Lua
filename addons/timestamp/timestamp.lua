@@ -1,55 +1,28 @@
---[[
-timestamp v1.20131102
-
-Copyright © 2013-2014, Giuliano Riccio
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
-
-* Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
-* Neither the name of timestamp nor the
-names of its contributors may be used to endorse or promote products
-derived from this software without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL Giuliano Riccio BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-]]
-
 _addon.name     = 'timestamp'
 _addon.author   = 'Zohno'
-_addon.version  = '1.20131102'
+_addon.version  = '2.0.0'
 _addon.commands = {'timestamp', 'ts'}
 
-chars = require('chat.chars')
+require('chat')
 require('logger')
 require('tables')
 require('sets')
 require('lists')
+require('strings')
+local chars = require('chat.chars')
+local config = require('config')
 
-config = require('config')
-
+local tz
+local tz_sep
 do
     local now  = os.time()
     local h, m = math.modf(os.difftime(now, os.time(os.date('!*t', now))) / 3600)
 
-    tz = '%+.4d':format(100 * h + 60 * m)
-    tz_sep = '%+.2d:%.2d':format(h, 60 * m)
+    tz = ('%+.4d'):format(100 * h + 60 * m)
+    tz_sep = ('%+.2d:%.2d'):format(h, 60 * m)
 end
 
-constants = {
+local constants = {
     ['year']         = '%Y',
     ['y']            = '%Y',
     ['year_short']   = '%y',
@@ -86,20 +59,19 @@ constants = {
     ['rfc3339']      = '%Y-%m-%dT%H:%M:%S' .. tz_sep,
 }
 
-lead_bytes = S{0x1E, 0x1F, 0xF7, 0xEF, 0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87, 0x88, 0x89, 0x7F}
-newline_pattern = '[' .. string.char(0x07, 0x0A) .. ']'
+local newline_pattern = '[\n\007]'
 
-defaults = {}
+local defaults = {}
 defaults.color  = 201
 defaults.format = '[${time}]'
 
-settings = config.load(defaults)
+local settings = config.load(defaults)
 
-function make_timestamp(format)
+local make_timestamp = function(format)
     return os.date((format:gsub('%${([%l%d_]+)}', constants)))
 end
 
-windower.register_event('incoming text', function(original, modified, mode, newmode, blocked)
+windower.register_event('incoming text', function(_, modified, mode, newmode, blocked)
     if blocked then
         return
     end
@@ -107,40 +79,19 @@ windower.register_event('incoming text', function(original, modified, mode, newm
     if mode == 151 or mode == 150 then
         newmode = 151
     else
-        local lines = L{}
+        local lines = modified:split(newline_pattern, string.encoding.shift_jis, 0, false, false):filter(-'')
 
-        -- Split by newline, if applicable
-        if modified:match(newline_pattern) then
-            local split = modified:split(newline_pattern, 0, true, false)
-            lines:append(split[1])
-
-            for i = 2, split.n, 2 do
-                local last = lines:last()[-1]
-                if last and lead_bytes:contains(last:byte()) then
-                    lines[-1] = '%s%s%s':format(lines[-1], split[i], split[i+1])
-                else
-                    lines:append(split[i + 1])
-                end
+        -- Insert spaces in NPC text
+        if mode == 190 then
+            for i = 2, lines.n do
+                lines[i] = string.char(0x81, 0x40) .. lines[i]
             end
-
-            if lines:last() == '' then
-                lines:remove(lines.n)
-            end
-
-            -- Insert spaces in NPC text
-            if mode == 190 then
-                for i = 2, lines.n do
-                    lines[i] = string.char(0x81, 0x40) .. lines[i]
-                end
-            end
-        else
-            lines:append(modified)
         end
 
         -- Append the colored timestamp before every line and concatenate them again by a newline
         modified = lines:map(function(str)
             return make_timestamp(settings.format):color(settings.color)..' '..str
-        end):concat(string.char(0x0A))
+        end):concat('\n')
     end
 
     return modified, newmode
@@ -201,3 +152,17 @@ windower.register_event('addon command', function(cmd, ...)
         log(chars.wsquare..' timestamp format <format> -- sets the timestamp format.')
     end
 end)
+
+--[[
+Copyright 2013-2026 Giuliano Riccio
+
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the documentation and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS “AS IS” AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+]]
