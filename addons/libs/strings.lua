@@ -89,7 +89,7 @@ do
         end,
         [string.encoding.shift_jis] = function(byte)
             return
-                (byte < 0x80 or byte >= 0xA1 and byte <= 0xDF) and 1 or
+                (byte <= 0x1D or byte >= 0x20 and byte < 0x80 or byte >= 0xA1 and byte <= 0xDF) and 1 or
                 (byte >= 0x1E and byte <= 0x1F or byte >= 0x80 and byte <= 0x9F or byte >= 0xE0 and byte <= 0xEF or byte >= 0xFA and byte <= 0xFC) and 2 or
                 byte == 0xFD and 6
         end,
@@ -99,16 +99,18 @@ do
     }
 
     do
-        local process = function(str, from, to, fn)
+        local process = function(str, from, to, encoding)
             local index = from
+            local fn = lengths[encoding]
             return function()
                 if index > to then
                     return nil
                 end
 
-                local length = fn(str:byte(index, index))
+                local byte = str:byte(index, index)
+                local length = fn(byte)
                 if length == false then
-                    _raw.error('Invalid code point')
+                    _raw.error(('Invalid code point: %02X (%s)'):format(byte, tostring(encoding)))
                 end
 
                 index = index + length
@@ -121,10 +123,10 @@ do
                 return str:sub(from, to):gmatch('.')
             end,
             [string.encoding.utf8] = function(str, from, to)
-                return process(str, from, to, lengths[string.encoding.utf8])
+                return process(str, from, to, string.encoding.utf8)
             end,
             [string.encoding.shift_jis] = function(str, from, to)
-                return process(str, from, to, lengths[string.encoding.shift_jis])
+                return process(str, from, to, string.encoding.shift_jis)
             end,
             [string.encoding.binary] = function(str, from, to)
                 return str:sub(from, to):gmatch('.')
