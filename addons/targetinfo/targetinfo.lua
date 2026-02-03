@@ -9,7 +9,7 @@ texts = require('texts')
 -- Config
 
 defaults = {}
-defaults.ShowHexID = true
+defaults.ShowHexIndex = true
 defaults.ShowFullID = true
 defaults.ShowSpeed = true
 defaults.ShowTargetName = false
@@ -42,8 +42,8 @@ initialize = function(text, settings)
     if settings.ShowFullID then
         properties:append('ID:            ${full|-|%08s}')
     end
-    if settings.ShowHexID then
-        properties:append('Hex ID:             ${hex|-|%.3X}')
+    if settings.ShowHexIndex then
+        properties:append('Hex Index:             ${hex|-|%.3X}')
     end
     if settings.ShowSpeed then
         properties:append('Speed:           ${speed|-}')
