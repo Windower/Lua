@@ -106,7 +106,7 @@ function files.create_path(f)
         end
     end
 
-    newpath = windower.addon_path
+    local newpath = windower.addon_path
     for dir in path:psplit('[/\\]'):filter(-''):it() do
         newpath = newpath .. dir .. '/'
 
