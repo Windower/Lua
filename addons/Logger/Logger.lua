@@ -13,11 +13,6 @@ defaults.TimestampFormat = '%H:%M:%S'
 local settings = config.load(defaults)
 
 local name
-windower.register_event('load', 'login', 'logout', function()
-    local player = windower.ffxi.get_player()
-    name = player and player.name
-end)
-
 local file
 local refresh_file
 do
@@ -31,7 +26,6 @@ do
 
     refresh_file = function(time)
         if time < next then
-            print('ney')
             return
         end
 
@@ -42,11 +36,8 @@ do
         end
 
         next = math.floor((time + offset) / 86400) * 86400 - offset
-        print(next)
     end
 end
-
-refresh_file(os.time())
 
 windower.register_event('incoming text', function(_, text, _, _, blocked)
     if blocked or text == '' then
@@ -56,7 +47,22 @@ windower.register_event('incoming text', function(_, text, _, _, blocked)
     local time = os.time()
     refresh_file(time)
 
-    file:append(('%s%s\n'):format(settings.AddTimestamp and os.date(settings.TimestampFormat, os.time()) or '', text:strip_format()))
+    local formatted = text:strip_colors()
+    if settings.AddTimestamp then
+        file:append(('%s %s\n'):format(os.date(settings.TimestampFormat, time), formatted))
+    else
+        file:append(('%s\n'):format(formatted))
+    end
+end)
+
+windower.register_event('load', 'login', 'logout', function()
+    local player = windower.ffxi.get_player()
+    name = player and player.name
+    if name ~= nil then
+        refresh_file(os.time())
+    else
+        file = nil
+    end
 end)
 
 --[[
