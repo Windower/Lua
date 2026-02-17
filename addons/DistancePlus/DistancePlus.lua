@@ -28,27 +28,75 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'DistancePlus'
 _addon.author = 'Sammeh'
-_addon.version = '1.3.0.11'
+_addon.version = '2.0.2'
 _addon.command = 'dp'
-
--- 1.3.0.2 Fixed up nil's per recommendation on submission to Windower 
--- 1.3.0.3 Replaced all tabs for 4 spaces to normalize indentations.
--- 1.3.0.4 Moving some expensive functions to on-load vs per-render.
--- 1.3.0.5 Implement config plugin.
--- 1.3.0.6 Fix ability list on job change.
--- 1.3.0.7 Implement ranged fix w/o ja_distance
--- 1.3.0.8 Wasn't refreshing 'self' upon job change.  Fixed up spacing.
--- 1.3.0.9 Fixup MaxDecimal from config plugin addition.
--- 1.3.0.10  Changed slightly some variable scopes for lower mem usage.
--- 1.3.0.11 Fixed an error in distance calculation for Flourishes II.
 
 require('tables')
 
-res = require 'resources'
-config = require('config')
-texts = require('texts')
+local res = require 'resources'
+local config = require('config')
+local texts = require('texts')
 
-defaults = {}
+-- Global Variables
+local self = nil
+local abilitylist = nil
+local MaxDistance = 25
+local option = "Default"
+local showabilities = false
+local showheight = false
+local height_upper_threshold = 8.5
+local height_lower_threshold = -7.5
+local decimal_format = "%.2f"
+
+-- Performance Variables
+local last_update = 0
+local update_interval = 0.1 -- Updates 10 times a second (0.1s delay)
+
+-- Color Constants for Text Objects (RGB)
+local COLOR_BLUE   = {0, 191, 255}
+local COLOR_GREEN  = {0, 255, 0}
+local COLOR_YELLOW = {255, 255, 0}
+local COLOR_WHITE  = {255, 255, 255}
+local COLOR_RED    = {255, 0, 0}
+
+-- Static Range Multipliers
+local range_mult = {
+    [2] = 1.55,
+    [3] = 1.490909,
+    [4] = 1.44,
+    [5] = 1.377778,
+    [6] = 1.30,
+    [7] = 1.15,
+    [8] = 1.25,
+    [9] = 1.377778,
+    [10] = 1.45,
+    [11] = 1.454545454545455,
+    [12] = 1.666666666666667,
+}
+
+-- Ranged Weapon Data
+local RangedData = {
+    Gun = {
+        trueshot_max = 4.3189,
+        trueshot_min = 3.0209,
+        square_max   = 6.8199,
+        square_min   = 2.2219
+    },
+    Bow = {
+        trueshot_max = 9.5199,
+        trueshot_min = 6.02,
+        square_max   = 14.5199,
+        square_min   = 4.62
+    },
+    Xbow = {
+        trueshot_max = 8.3999,
+        trueshot_min = 5.0007,
+        square_max   = 11.7199,
+        square_min   = 3.6199
+    }
+}
+
+local defaults = {}
 defaults.main = {}
 defaults.main.pos = {}
 defaults.main.pos.x = -178
@@ -68,7 +116,6 @@ defaults.pettxt.text.font = 'Arial'
 defaults.pettxt.text.size = 14
 defaults.pettxt.flags = {}
 defaults.pettxt.flags.right = true
-
 
 defaults.abilitytxt = {}
 defaults.abilitytxt.pos = {}
@@ -90,314 +137,256 @@ defaults.heighttxt.text.size = 14
 defaults.heighttxt.flags = {}
 defaults.heighttxt.flags.right = true
 
-height_upper_threshold = 8.5
-height_lower_threshold = -7.5
+local settings = config.load(defaults)
+local distance = texts.new('${value}', settings.main) 
+local petdistance = texts.new('${value||%.2f}', settings.pettxt)
+local abilities = texts.new('${value}', settings.abilitytxt)
+local height = texts.new('${value||%.2f}', settings.heighttxt)
 
-
-settings = config.load(defaults)
-distance = texts.new('${value||%.2f}', settings.main)
-petdistance = texts.new('${value||%.2f}', settings.pettxt)
-abilities = texts.new('${value}', settings.abilitytxt)
-height = texts.new('${value||%.2f}', settings.heighttxt)
-
-
-option = "Default"
-showabilities = false
-showheight = false
-
-function displayabilities(distance,master_pet_distance,s,t)
-    local range_mult = {
-        [2] = 1.55,
-        [3] = 1.490909,
-        [4] = 1.44,
-        [5] = 1.377778,
-        [6] = 1.30,
-        [7] = 1.15,
-        [8] = 1.25,
-        [9] = 1.377778,
-        [10] = 1.45,
-        [11] = 1.454545454545455,
-        [12] = 1.666666666666667,
-    }
-    local list = 'Abilities:\n'
+function displayabilities(dist, master_pet_distance, s, t)
+    -- OPTIMIZATION: Using a table to build strings is much faster than '..' concatenation
+    local list_lines = {} 
+    table.insert(list_lines, 'Abilities:\n')
+    
     if abilitylist then 
-      for key,ability in pairs(abilitylist) do
-        ability_en = res.job_abilities[ability].en
-        ability_name = res.job_abilities[ability].name
-        ability_type = res.job_abilities[ability].type
-        ability_targets = res.job_abilities[ability].targets
-        ability_distance = res.job_abilities[ability].range
-        if distance and ability_name and (ability_type == 'JobAbility' or ability_type == 'PetCommand' or ability_type == 'BloodPactRage' or ability_type == 'BloodPactWard' or ability_type == 'Monster' or ability_type == 'Step') and ability_en ~= "Flourishes II" then 
+      for key, ability in pairs(abilitylist) do
+        local ability_en = res.job_abilities[ability].en
+        local ability_name = res.job_abilities[ability].name
+        local ability_type = res.job_abilities[ability].type
+        local ability_targets = res.job_abilities[ability].targets
+        local ability_distance = res.job_abilities[ability].range
+        
+        if dist and ability_name and (ability_type == 'JobAbility' or ability_type == 'PetCommand' or ability_type == 'BloodPactRage' or ability_type == 'BloodPactWard' or ability_type == 'Monster' or ability_type == 'Step') and ability_en ~= "Flourishes II" then 
             if ability_targets.Self ~= true then
-                if distance < (t.model_size + ability_distance * range_mult[ability_distance] + s.model_size) and distance ~= 0 then 
-                    list = list..'\\cs(0,255,0)'..ability_name..'\\cs(255,255,255)'..'\n'
+                if dist < (t.model_size + ability_distance * range_mult[ability_distance] + s.model_size) and dist ~= 0 then 
+                    table.insert(list_lines, '\\cs(0,255,0)'..ability_name..'\\cs(255,255,255)\n')
                 else
-                    list = list..'\\cs(255,255,255)'..ability_name..'\n'
+                    table.insert(list_lines, '\\cs(255,255,255)'..ability_name..'\n')
                 end
-            --[[ too much crap on screen!!! 
-            elseif ability_targets.Self == true and (ability_type == 'Monster' or ability_type == 'PetCommand') and master_pet_distance then
-                if master_pet_distance < (4 + s.model_size + t.model_size) and distance ~= 0 then 
-                    list = list..'\\cs(0,255,0)'..ability_en..'\\cs(255,255,255)'..'\n'
-                else
-                    list = list..'\\cs(255,255,255)'..ability_en..'\n'
-                end
-            --]]
             end
         end
       end
     end
-    abilities.value = list
+    abilities.value = table.concat(list_lines) -- Combine all lines at once
     abilities:visible(showabilities)
 end
 
 function check_job()
-    windower.add_to_chat(8,'*****DP Job Selection:'..self.main_job..'*****')
+    if not self then return end
+    windower.add_to_chat(8,'*****Distance Plus Job Selection: '..self.main_job..'*****')
+    
     if self.main_job == 'RDM' or self.main_job == 'BLM' or self.main_job == 'GEO' or self.main_job == 'SCH' or self.main_job == 'WHM' or self.main_job == 'BRD'  then
         option = "Magic"
-        windower.add_to_chat(8,'Mode: Magic.')
-        windower.add_to_chat(8,' White = Can not cast.')
-        windower.add_to_chat(8,' Green = Casting Range')
+        windower.add_to_chat(8,'[Distance Plus] Mode: Magic Distances ON. ')
         MaxDistance = 20     
     elseif self.main_job == 'COR' then
-        windower.add_to_chat(8,'Mode: Gun.')
-        windower.add_to_chat(8,' White  = Can not shoot.')
-        windower.add_to_chat(8,' Yellow = Ranged Attack Capable (No Buff)')
-        windower.add_to_chat(8,' Green  = Shoots Squarely (Good)')
-        windower.add_to_chat(8,' Blue   = True Shot (Best)')
+        windower.add_to_chat(8,'[Distance Plus] Mode: Gun - Ranged Distances ON. - Refer to Legend //dp')
         option = "Gun"
         MaxDistance = 25
     elseif self.main_job == 'RNG' then
-        windower.add_to_chat(8,'RANGER should do //dp Bow, //dp XBow, or //dp Gun')
-        windower.add_to_chat(8,'Mode: Default.')
+        windower.add_to_chat(8,'RANGER: Use //dp Bow, //dp XBow, or //dp Gun')
+        windower.add_to_chat(8,'[Distance Plus] Mode: Default.')
         option = "Default"
         MaxDistance = 25
     elseif self.main_job == 'NIN' then
         option = "Ninjutsu"
-        windower.add_to_chat(8,'Mode: Ninjutsu.')
-        windower.add_to_chat(8,' White = Can not cast.')
-        windower.add_to_chat(8,' Green = Casting Range')
+        windower.add_to_chat(8,'[Distance Plus] Mode: Ninjutsu.')
     else
-        windower.add_to_chat(8,'Mode: Default.')
+        windower.add_to_chat(8,'[Distance Plus] Mode: Default.')
         option = "Default"
         MaxDistance = 25
     end
 end
 
+-- Helper Function: Returns Color AND Status Text
+local function get_ranged_status(mode, dist, t_size, s_size)
+    local data = RangedData[mode]
+    if not data then return COLOR_WHITE, "" end
+
+    local model_offset = t_size + s_size
+    local correction = (t_size > 1.6) and 0.1 or 0
+    
+    local ts_max = model_offset + data.trueshot_max + correction
+    local ts_min = model_offset + data.trueshot_min + correction
+    local sq_max = model_offset + data.square_max + correction
+    local sq_min = model_offset + data.square_min + correction
+    
+    if dist < sq_min then
+         return COLOR_RED, "Critical Penalty"  
+    elseif dist > sq_max and dist < MaxDistance then
+         return COLOR_YELLOW, "Distance Penalty" 
+    elseif (dist <= sq_max and dist > ts_max) or (dist < ts_min and dist >= sq_min) then
+        return COLOR_GREEN, "Square Shot"
+    elseif (dist <= ts_max and dist >= ts_min) then
+        return COLOR_BLUE, "True Shot"
+    else
+        return COLOR_WHITE, "Out of Range"
+    end
+end
 
 windower.register_event('prerender', function()
+    -- PERFORMANCE THROTTLE: Only run this logic 10 times a second
+    if os.clock() - last_update < update_interval then
+        return
+    end
+    last_update = os.clock()
+
     local t = windower.ffxi.get_mob_by_target('t') or windower.ffxi.get_mob_by_target('st')
     local s = windower.ffxi.get_mob_by_target('me')
-    if windower.ffxi.get_mob_by_target('pet') then
-        pet = windower.ffxi.get_mob_by_target('pet')
-    else
-        pet = nil
-    end
+    local pet = windower.ffxi.get_mob_by_target('pet') 
+
     if pet and self.main_job ~= 'DRG' then
         if self.main_job == 'BST' then
             local PetMaxDistance = 4
             local pettargetdistance = PetMaxDistance + pet.model_size + s.model_size
             if pet.model_size > 1.6 then 
-                pettargetdistance = PetMaxDistance + pet.model_size + s.model_size + 0.1
+                pettargetdistance = pettargetdistance + 0.1
             end
             if pet.distance:sqrt() < pettargetdistance then
-                petdistance:color(0,255,0) -- Green
+                petdistance:color(COLOR_GREEN[1], COLOR_GREEN[2], COLOR_GREEN[3])
             else
-                petdistance:color(255,255,255) -- White
+                petdistance:color(COLOR_WHITE[1], COLOR_WHITE[2], COLOR_WHITE[3])
             end
-        --else
-        -- may add some stuff here for SMN    
         end
         petdistance.value = pet.distance:sqrt()
-        petdistance:visible(pet ~= nil)
+        petdistance:visible(true)
     else 
         petdistance:visible(false)
     end
+    
     if t then
+        local dist = t.distance:sqrt()
+        
         if pet then 
-            displayabilities(t.distance:sqrt(),pet.distance:sqrt(),s,t)
+            displayabilities(dist, pet.distance:sqrt(), s, t)
         else
-            displayabilities(t.distance:sqrt(),nil,s,t)
+            displayabilities(dist, nil, s, t)
         end
-        if t.distance:sqrt() == 0 then
-            distance:color(255,255,255)
+        
+        local status_text = ""
+        
+        if dist == 0 then
+            distance:color(COLOR_WHITE[1], COLOR_WHITE[2], COLOR_WHITE[3])
         else
-        if option == 'Default' then
-            distance:color(255,255,255)
-        elseif option == 'Bow' then
-            MaxDistance = 25
-            trueshotmax = s.model_size + t.model_size + 9.5199
-            trueshotmin = s.model_size + t.model_size + 6.02
-            squareshot_far_max = s.model_size + t.model_size + 14.5199
-            squareshot_close_min = s.model_size + t.model_size + 4.62
-            if t.model_size > 1.6 then 
-                trueshotmax = trueshotmax + 0.1
-                trueshotmin = trueshotmin + 0.1
-                squareshot_far_max = squareshot_far_max + 0.1
-                squareshot_close_min = squareshot_close_min + 0.1
-            end
-            if t.distance:sqrt() < MaxDistance and (t.distance:sqrt() > squareshot_far_max or t.distance:sqrt() < squareshot_close_min) then 
-                distance:color(255,255,0) -- Yellow (No Ranged Boost)
-            elseif (t.distance:sqrt() <= squareshot_far_max and t.distance:sqrt() > trueshotmax) or (t.distance:sqrt() < trueshotmin and t.distance:sqrt() >= squareshot_close_min) then 
-                distance:color(0,255,0) -- Green   (Square Shot)
-            elseif (t.distance:sqrt() <= trueshotmax and t.distance:sqrt() >= trueshotmin) then
-                distance:color(0,0,255) -- Blue  (Strikes True)
-            else 
-                distance:color(255,255,255) -- White  (Can't Shoot)
-            end
-        elseif option == 'Xbow' then
-            MaxDistance = 25
-            trueshotmax = s.model_size + t.model_size + 8.3999
-            trueshotmin = s.model_size + t.model_size + 5.0007
-            squareshot_far_max = s.model_size + t.model_size + 11.7199
-            squareshot_close_min = s.model_size + t.model_size + 3.6199
-            if t.model_size > 1.6 then 
-                trueshotmax = trueshotmax + 0.1
-                trueshotmin = trueshotmin + 0.1
-                squareshot_far_max = squareshot_far_max + 0.1
-                squareshot_close_min = squareshot_close_min + 0.1
-            end
-            if t.distance:sqrt() < MaxDistance and (t.distance:sqrt() > squareshot_far_max or t.distance:sqrt() < squareshot_close_min) then 
-                distance:color(255,255,0) -- Yellow (No Ranged Boost)
-            elseif (t.distance:sqrt() <= squareshot_far_max and t.distance:sqrt() > trueshotmax) or (t.distance:sqrt() < trueshotmin and t.distance:sqrt() >= squareshot_close_min) then 
-                distance:color(0,255,0) -- Green   (Square Shot)
-            elseif (t.distance:sqrt() <= trueshotmax and t.distance:sqrt() >= trueshotmin) then
-                distance:color(0,0,255) -- Blue  (Strikes True)
-            else 
-                distance:color(255,255,255) -- White  (Can't Shoot)
-            end
-        elseif option == 'Gun' then
-            MaxDistance = 25
-            trueshotmax = s.model_size + t.model_size + 4.3189
-            trueshotmin = s.model_size + t.model_size + 3.0209
-            squareshot_far_max = s.model_size + t.model_size + 6.8199
-            squareshot_close_min = s.model_size + t.model_size + 2.2219
-            if t.model_size > 1.6 then 
-                trueshotmax = trueshotmax + 0.1
-                trueshotmin = trueshotmin + 0.1
-                squareshot_far_max = squareshot_far_max + 0.1
-                squareshot_close_min = squareshot_close_min + 0.1
-            end
-            if t.distance:sqrt() < MaxDistance and (t.distance:sqrt() > squareshot_far_max or t.distance:sqrt() < squareshot_close_min) then 
-                distance:color(255,255,0) -- Yellow (No Ranged Boost)
-            elseif (t.distance:sqrt() <= squareshot_far_max and t.distance:sqrt() > trueshotmax) or (t.distance:sqrt() < trueshotmin and t.distance:sqrt() >= squareshot_close_min) then 
-                distance:color(0,255,0) -- Green   (Square Shot)
-            elseif (t.distance:sqrt() <= trueshotmax and t.distance:sqrt() >= trueshotmin) then
-                distance:color(0,0,255) -- Blue  (Strikes True)
-            else 
-                distance:color(255,255,255) -- White  (Can't Shoot)
-            end
-        elseif option == 'Magic' then
-            MaxDistance = 20
-            if t.model_size > 2 then 
-                MaxDistance = MaxDistance + 0.1
-            elseif  math.floor(t.model_size * 10) == 44 then 
-                MaxDistance = 20.0666
-            elseif math.floor(t.model_size * 10) == 53 then 
-                MaxDistance = 20
-            end
-            targetdistance = MaxDistance + t.model_size + s.model_size
-            if t.distance:sqrt() < targetdistance then
-                distance:color(0,255,0) -- Green
+            if option == 'Default' then
+                distance:color(COLOR_WHITE[1], COLOR_WHITE[2], COLOR_WHITE[3])
+            
+            elseif RangedData[option] then
+                MaxDistance = 25
+                local rgb, text = get_ranged_status(option, dist, t.model_size, s.model_size)
+                distance:color(rgb[1], rgb[2], rgb[3])
+                status_text = text
+                
+            elseif option == 'Magic' or option == 'Ninjutsu' then
+                local limit = (option == 'Magic') and 20 or 16.1
+                if t.model_size > 2 then limit = limit + 0.1
+                elseif math.floor(t.model_size * 10) == 44 then limit = (option=='Magic') and 20.0666 or 16.1
+                elseif math.floor(t.model_size * 10) == 53 then limit = (option=='Magic') and 20 or 16.1
+                end
+                
+                if dist < (limit + t.model_size + s.model_size) then
+                    distance:color(COLOR_GREEN[1], COLOR_GREEN[2], COLOR_GREEN[3])
+                else
+                    distance:color(COLOR_WHITE[1], COLOR_WHITE[2], COLOR_WHITE[3])
+                end
             else
-                distance:color(255,255,255) -- White can't Cast
+                distance:color(COLOR_WHITE[1], COLOR_WHITE[2], COLOR_WHITE[3])
             end
-        elseif option == 'Ninjutsu' then
-            MaxDistance = 16.1
-            if t.model_size > 2 then 
-                MaxDistance = MaxDistance + 0.1
-            elseif  math.floor(t.model_size * 10) == 44 then 
-                MaxDistance = 16.1
-            elseif math.floor(t.model_size * 10) == 53 then 
-                MaxDistance = 16.1
-            end
-            targetdistance = MaxDistance + t.model_size + s.model_size
-            if t.distance:sqrt() < targetdistance then
-                distance:color(0,255,0) -- Green
-            else
-                distance:color(255,255,255) -- White can't Cast
-            end
+        end
+        
+        if status_text ~= "" then
+            distance.value = string.format(decimal_format .. " %s", dist, status_text)
         else
-              distance:color(255,255,255)
+            distance.value = string.format(decimal_format, dist)
         end
-        end
-        distance.value = t.distance:sqrt()
         
         height.value = t.z - s.z
         if (t.z - s.z) >= height_upper_threshold or (t.z - s.z) <= height_lower_threshold then
-            height:color(0,255,0) -- green
+            height:color(COLOR_GREEN[1], COLOR_GREEN[2], COLOR_GREEN[3])
         else
-            height:color(255,0,0) -- red
+            height:color(COLOR_RED[1], COLOR_RED[2], COLOR_RED[3])
         end
         
     end
-     distance:visible(t ~= nil)
+    distance:visible(t ~= nil)
     height:visible(t ~= nil and showheight)
 end)
 
-
 windower.register_event('addon command', function(command)
     command = command or 'help'
-    if command:lower() == 'help' then
-        windower.add_to_chat(8,'DistancePlus: Valid Modes are //DP <command>:')
-        windower.add_to_chat(8,' Gun, Bow, Xbow, Magic, JA')
-        windower.add_to_chat(8,' MaxDecimal    - Expand MaxDecimal for Max Accuracy. DP Calculates to the Thousand')
-        windower.add_to_chat(8,' Default     - Reset to Defaults')
-        windower.add_to_chat(8,' Pets         - Not a command.  If a pet is out another dialog will pop up with distance between you and Pet.')
-    elseif command:lower() == 'gun' then
-        windower.add_to_chat(8,'Mode: Gun.')
-        windower.add_to_chat(8,' White  = Can not shoot.')
-        windower.add_to_chat(8,' Yellow = Ranged Attack Capable (No Buff)')
-        windower.add_to_chat(8,' Green  = Shoots Squarely (Good)')
-        windower.add_to_chat(8,' Blue   = True Shot (Best)')
+    local cmd = command:lower()
+
+    if cmd == 'help' then
+        windower.add_to_chat(207, 'Distance Plus Commands:')
+        windower.add_to_chat(207, '  //dp gun|bow|xbow : Ranged modes')
+        windower.add_to_chat(207, '  //dp magic|nin    : Caster modes')
+        windower.add_to_chat(207, '  //dp default      : Reset to standard')
+        windower.add_to_chat(207, '  //dp ja      : Show Job Abilities available against target')
+        windower.add_to_chat(207, '  //dp height  : Vertical Distance')
+        windower.add_to_chat(207, '  ')		
+        windower.add_to_chat(207, '  --- Ranged Color Legend ---')
+        windower.add_to_chat(207, '  Blue:   True Shot (Bonus Damage!)') 
+        windower.add_to_chat(158, '  Green:  Square Shot (Normal Damage)') 
+        windower.add_to_chat(36,  '  Yellow: Distance Penalty (Too Far)') 
+        windower.add_to_chat(167, '  Red:    Critical Penalty (Too Close!)')
+        windower.add_to_chat(8,   '  White:  Out of Range') 
+        windower.add_to_chat(207, '  ')		
+        windower.add_to_chat(207, '  --- Magic Color Legend ---')
+        windower.add_to_chat(158, '  Green:  Within Range to Cast')
+        windower.add_to_chat(8,   '  White:  Out of Range') 
+        windower.add_to_chat(207, '  ')
+        windower.add_to_chat(207, '  --- Weapon Skill Mechanics ---')
+        windower.add_to_chat(8,   '  Physical WS (E.g. Last Stand): Needs True Shot (Blue)')
+        windower.add_to_chat(8,   '  Magical WS (E.g. Wildfire):   Ignores Distance Rules')
+        windower.add_to_chat(207, '  ')
+        
+    elseif cmd == 'gun' then
         option = "Gun"
-    elseif command:lower() == 'xbow' then
-        option = "Xbow"
-        windower.add_to_chat(8,'Mode: XBOW.')
-        windower.add_to_chat(8,' White  = Can not shoot.')
-        windower.add_to_chat(8,' Yellow = Ranged Attack Capable (No Buff)')
-        windower.add_to_chat(8,' Green  = Shoots Squarely (Good)')
-        windower.add_to_chat(8,' Blue   = True Shot (Best)')
-    elseif command:lower() == 'bow' then
+        windower.add_to_chat(8,'[Distance Plus] Mode: Gun - Refer to Ranged Color Legend //dp')
+    elseif cmd == 'bow' then
         option = "Bow"
-        windower.add_to_chat(8,'Mode: BOW.')
-        windower.add_to_chat(8,' White  = Can not shoot.')
-        windower.add_to_chat(8,' Yellow = Ranged Attack Capable (No Buff)')
-        windower.add_to_chat(8,' Green  = Shoots Squarely (Good)')
-        windower.add_to_chat(8,' Blue   = True Shot (Best)')
-    elseif command:lower() == 'magic' then
+        windower.add_to_chat(8,'[Distance Plus] Mode: Bow - Refer to Ranged Color Legend //dp')
+    elseif cmd == 'xbow' then
+        option = "Xbow"
+        windower.add_to_chat(8,'[Distance  Plus] Mode: Xbow - Refer to Ranged Color Legend //dp')
+    elseif cmd == 'magic' then
         option = "Magic"
-        windower.add_to_chat(8,'Mode: Magic.')
-        windower.add_to_chat(8,' White = Can not cast.')
-        windower.add_to_chat(8,' Green = Casting Range')
-    elseif command:lower() == 'ninjutsu' then
+        windower.add_to_chat(8,'[Distance Plus] Mode: Magic - Refer to Magic Color Legend //dp')
+    elseif cmd == 'nin' or cmd == 'ninjutsu' then
         option = "Ninjutsu"
-        windower.add_to_chat(8,'Mode: Ninjutsu.')
-        windower.add_to_chat(8,' White = Can not cast.')
-        windower.add_to_chat(8,' Green = Casting Range')
-    elseif command:lower() == 'default' then
-       windower.add_to_chat(8,'Mode: Default.')
+        windower.add_to_chat(8,'[Distance Plus] Mode: Ninjutsu')
+    elseif cmd == 'default' then
        option = "Default"
        MaxDistance = 25
-       distance:visible(false)
-       distance = texts.new('${value||%.2f}', settings.main)
-    elseif command:lower() == 'maxdecimal' then
-       distance:visible(false)
-       distance = texts.new('${value||%.12f}', settings.main)
-    elseif command:lower() == 'abilitylist' or command:lower() == 'ja' then
+       decimal_format = "%.2f"
+       windower.add_to_chat(8,'[Distance Plus] Mode: Default reset.')
+    elseif cmd == 'maxdecimal' then
+       decimal_format = "%.12f"
+       windower.add_to_chat(8,'[Distance Plus] Max Decimals enabled.')
+    elseif cmd == 'abilitylist' or cmd == 'ja' then
+        showabilities = not showabilities
         if showabilities then
-            showabilities = false
-        else
-            windower.add_to_chat(8,'Mode: JA.')
-            showabilities = true
+            windower.add_to_chat(8,'[Distance Plus] Job Abilities: ON')
             displayabilities()
+        else
+            windower.add_to_chat(8,'[Distance Plus] Job Abilities: OFF')
+            abilities:visible(false)
         end
-    elseif command:lower() == 'height' then
-        showheight = true
+    elseif cmd == 'height' then
+        showheight = not showheight
+        if showheight then
+            windower.add_to_chat(8,'[Distance Plus] Height Indicator: ON')
+        else
+            windower.add_to_chat(8,'[Distance Plus] Height Indicator: OFF')
+            height:visible(false)
+        end
+    else
+        windower.add_to_chat(8,'[Distance Plus] Unknown command. Type //dp help for list.')
     end
 end)
 
 windower.register_event('job change', function()
-    coroutine.sleep(2) -- sleeping because jobchange too fast doesn't show new abilities
+    coroutine.sleep(2)
     self = windower.ffxi.get_player()
     check_job()
     abilitylist = windower.ffxi.get_abilities().job_abilities
@@ -408,7 +397,7 @@ end)
 
 windower.register_event('load', function()
     if windower.ffxi.get_player() then 
-        coroutine.sleep(2) -- sleeping because jobchange too fast doesn't show new abilities
+        coroutine.sleep(2)
         self = windower.ffxi.get_player()
         check_job()
         abilitylist = windower.ffxi.get_abilities().job_abilities
@@ -418,7 +407,7 @@ end)
 
 
 windower.register_event('login', function()
-    coroutine.sleep(2) -- sleeping because jobchange too fast doesn't show new abilities
+    coroutine.sleep(2)
     self = windower.ffxi.get_player()
     check_job()
     abilitylist = windower.ffxi.get_abilities().job_abilities
