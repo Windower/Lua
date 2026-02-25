@@ -306,22 +306,28 @@ end
 
 local function poke_npc()
     local mob, npc = validate(support_npcs)
-    if npc then
-        local player = windower.ffxi.get_player()
-        if S(player.buffs):contains(npc.buff) then
-            return ''
-        end
-        conditions['support'] = true
-        local p = packets.new('outgoing', 0x01a, {
-            ["Target"] = mob.id,
-            ["Target Index"] = mob.index,
-            ["Category"] = 0,
-            ["Param"] = 0,
-            ["_unknown1"] = 0,
-        })
-        packets.inject(p)
-        return busy_wait('support', 10, "getting crafting buff")
+    if not npc then
+        return 'Cannot find a nearby Ionis / advanced imagery support NPC.'
     end
+
+    local player = windower.ffxi.get_player()
+    if S(player.buffs):contains(npc.buff) then
+        return ''
+    end
+    conditions['support'] = true
+    local p = packets.new('outgoing', 0x01a, {
+        ["Target"] = mob.id,
+        ["Target Index"] = mob.index,
+        ["Category"] = 0,
+        ["Param"] = 0,
+        ["_unknown1"] = 0,
+    })
+    packets.inject(p)
+    local msg = busy_wait('support', 10, "getting crafting buff")
+    if not msg then
+        coroutine.sleep(2)
+    end
+    return msg
 end
 
 local function unblock_sort(id, data)
@@ -549,9 +555,6 @@ local function check_queue()
                 local poke_msg = poke_npc()
                 if poke_msg then
                     error(poke_msg)
-                elseif poke_msg == nil then
-                    -- Poked the NPC successfully
-                    coroutine.sleep(2)
                 end
             end
             if food then
