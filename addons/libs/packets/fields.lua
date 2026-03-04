@@ -1276,6 +1276,18 @@ enums['mh door menus'] = {      -- only known use is Mog House exit menu type
     [0x09] = 'Adoulin',         -- no flower girl quest, should always be this value for adoulin mh
 }
 
+-- Standard Message
+-- Really ancient message packet -- used for log messages like "You throw away X itemNameHere" (Message 180)
+fields.incoming[0x009] = L{
+    {ctype='unsigned int',      label='ID',},                                   -- 04
+    {ctype='unsigned short',    label='Index',},                                -- 08
+    {ctype='unsigned short',    label='Message'},                               -- 0A
+    {ctype='unsigned char',     label='Attr',               const=0x10},        -- 0C   packet is ignored by client if this value is not 0x10
+    {ctype='char*',             label='data'},                                  -- 0D   The formatting of this data can be exceptionally crude. For example the string literal data for Message 180:
+                                                                                --      Para0 5725 Para1 1
+                                                                                --      Meaning, Parameter 0 = 5725, Parameter 1 = 1
+}
+
 -- Zone update
 fields.incoming[0x00A] = L{
     {ctype='unsigned int',      label='Player',             fn=id},             -- 04
