@@ -1263,7 +1263,7 @@ types.job_level = L{
     {ctype='unsigned char',     label='Level'},                                 -- 00
 }
 
-enums['mh door menus'] = {      -- only known use is Mog House exit menu type 
+enums['mh door menus'] = {      -- only known use is Mog House exit menu type
     [0x00] = 'None',            -- results in simple yes/no dialog to leave to where you came from
     [0x01] = 'San d\'Oria',     -- only when flower girl quest completed
     [0x02] = 'Bastok',          -- only when flower girl quest completed
@@ -1279,11 +1279,11 @@ enums['mh door menus'] = {      -- only known use is Mog House exit menu type
 -- Standard Message
 -- Really ancient message packet -- used for log messages like "You throw away X itemNameHere" (Message 180)
 fields.incoming[0x009] = L{
-    {ctype='unsigned int',      label='ID',},                                   -- 04
-    {ctype='unsigned short',    label='Index',},                                -- 08
+    {ctype='unsigned int',      label='ID'},                                    -- 04
+    {ctype='unsigned short',    label='Index'},                                 -- 08
     {ctype='unsigned short',    label='Message'},                               -- 0A
-    {ctype='unsigned char',     label='Attr',               const=0x10},        -- 0C   packet is ignored by client if this value is not 0x10
-    {ctype='char*',             label='data'},                                  -- 0D   The formatting of this data can be exceptionally crude. For example the string literal data for Message 180:
+    {ctype='unsigned char',     label='_unknown',           const=0x10},        -- 0C   packet is ignored by client if this value is not 0x10
+    {ctype='char*',             label='Data'},                                  -- 0D   The formatting of this data can be exceptionally crude. For example the string literal data for Message 180:
                                                                                 --      Para0 5725 Para1 1
                                                                                 --      Meaning, Parameter 0 = 5725, Parameter 1 = 1
 }
