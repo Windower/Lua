@@ -820,6 +820,60 @@ do
             return res
         end
     end
+
+    do
+        _raw.string.lower = string.lower
+        _raw.string.upper = string.upper
+
+        local upper_min = 0x41
+        local upper_max = 0x5A
+        local lower_min = 0x61
+        local lower_max = 0x7A
+
+        local process = function(str, encoding, from, to, min, max, modify)
+            if type(encoding) ~= 'table' then
+                encoding, from, to = string.encoding.ascii, encoding, from
+            end
+
+            if encoding == string.encoding.ascii and from == nil and to == nil then
+                return modify(str)
+            end
+
+            from = adjust_from(str, from)
+            to = adjust_to(str, to)
+
+            local result = ''
+
+            local last_change = false
+            local last = 1
+            local pos = from
+            for c in str:it(encoding, from, to) do
+                local b = c:byte()
+                local change = b >= min and b <= max
+                if last_change ~= change then
+                    local sub = str:sub(last, pos - 1)
+                    if last_change then
+                        sub = modify(sub)
+                    end
+                    result = result .. sub
+                    last_change = change
+                    last = pos
+                end
+
+                pos = pos + #c
+            end
+
+            return result .. str:sub(last)
+        end
+
+        function string.lower(str, encoding, from, to)
+            return process(str, encoding, from, to, upper_min, upper_max, _raw.string.lower)
+        end
+
+        function string.upper(str, encoding, from, to)
+            return process(str, encoding, from, to, lower_min, lower_max, _raw.string.upper)
+        end
+    end
 end
 
 -- Splits a string into a table by a separator pattern.
