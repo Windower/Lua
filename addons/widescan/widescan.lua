@@ -99,9 +99,10 @@ function widescan.cmd.scan(args, track)
         query[key] = value
     end
 
-    if query['placeholder']  then
+    local zone_id = windower.ffxi.get_info().zone
+    if query['placeholder'] and placeholder_lists[zone_id] then
         local nms = {}
-        for nm_name in pairs(placeholder_lists) do
+        for nm_name in pairs(placeholder_lists[zone_id]) do
             if (windower.wc_match(nm_name, query['placeholder'] .. '*')) then
                 table.insert(nms, nm_name)
             end
@@ -156,8 +157,9 @@ function widescan.query(query, track)
             matched = tonumber(query['index'], 16) == v.Index
         end
 
-        if query['placeholder'] then
-            matched = placeholder_lists[query['placeholder']][v.Index]
+        local zone_id = windower.ffxi.get_info().zone
+        if query['placeholder'] and placeholder_lists[zone_id] then
+            matched = placeholder_lists[zone_id][query['placeholder']][v.Index]
         end
 
         if matched then
