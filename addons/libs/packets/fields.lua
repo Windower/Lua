@@ -4100,12 +4100,13 @@ types.ability_recast = L{
     {ctype='unsigned char',     label='_unknown1',          const=0x00},        -- 02
     {ctype='unsigned char',     label='Recast',             fn=arecast},        -- 03
     {ctype='signed short',      label='Recast Modifier'},                       -- 04
-    {ctype='unsigned short',    label='_unknown2'}                              -- 06
+    {ctype='unsigned short',    label='_unknown2'},                             -- 06
 }
 
 -- Ability timers
 fields.incoming[0x119] = L{
     {ref=types.ability_recast,                              count=0x1F},        -- 04
+    {ctype='unsigned short',    label='Mount'},                                 -- FC
 }
 
 return fields
