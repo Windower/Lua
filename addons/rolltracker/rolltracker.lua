@@ -414,8 +414,8 @@ end
 --Checks to see if the below event has ran more than twice to enable busting
 ranMultiple = false
 windower.register_event('outgoing text', function(original, modified)
-    cleaned = windower.convert_auto_trans(original)
-    modified = original
+    cleaned = windower.convert_auto_trans(modified)
+    
     if cleaned:match('/jobability \"?Double.*Up') or cleaned:match('/ja \"?Double.*Up') then
         if isLucky and settings.autostopper and rollActor == player.id then
             windower.add_to_chat(settings.channel.warn, 'Attempting to Doubleup on a Lucky Roll: Re-double up to continue.':color(settings.color.warn))
