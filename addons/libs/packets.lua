@@ -99,7 +99,7 @@ do
         type = (type or ctype):trim()
 
         local array = not non_array_types:contains(type)
-        local count_num =  count_str and count_str:number() or 1
+        local count_num = count_str and count_str:number() or 1
         local type_count = count_str and array and count_num or 1
 
         local bits = (array and type_count or count_num) * bit_sizes[type];
@@ -272,16 +272,20 @@ pack_ids['data']            = 'A'
 local make_pack_string = function(field)
     local ctype = field.ctype
 
+    if field.enc and field.enc.pack then
+        return field.enc.pack
+    end
+
     if pack_ids[ctype] then
         return pack_ids[ctype]
     end
 
-    local type_name, number = ctype:match(array_pattern)
-    if type_name then
+    local array_type_name, number = ctype:match(array_pattern)
+    if array_type_name then
         number = tonumber(number)
-        local pack_id = pack_ids[type_name]
+        local pack_id = pack_ids[array_type_name]
         if pack_id then
-            if type_name == 'char' then
+            if array_type_name == 'char' then
                 return 'S' .. number  -- Windower exclusive
             else
                 return pack_id .. number
@@ -289,11 +293,11 @@ local make_pack_string = function(field)
         end
     end
 
-    type_name = ctype:match(pointer_pattern)
-    if type_name then
-        local pack_id = pack_ids[type_name]
+    local pointer_type_name = ctype:match(pointer_pattern)
+    if pointer_type_name then
+        local pack_id = pack_ids[pointer_type_name]
         if pack_id then
-            if type_name == 'char' then
+            if pointer_type_name == 'char' then
                 return 'z'
             else
                 return pack_id .. '*'

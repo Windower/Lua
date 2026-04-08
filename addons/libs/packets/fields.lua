@@ -63,24 +63,18 @@ do
         return value
     end
 
-    local make_encoding = function(amount, remainder)
-        local append = function(val)
-            return val .. string.char(0):rep(amount)
-        end
-
-        if remainder == nil then
-            return append
-        end
-
+    local make_encoding = function(zeroes)
+        local suffix = string.char(0):rep(zeroes)
         return function(val)
-            return #val % 4 == remainder and append(val) or val
+            return val == '' and '\0' or val .. suffix
         end
     end
 
-    pad = function(amount, offset)
+    pad = function(zeroes)
         return {
             decode = identity,
-            encode = make_encoding(amount, offset),
+            encode = make_encoding(zeroes),
+            pack = 'S*',
         }
     end
 end
@@ -1481,7 +1475,7 @@ fields.incoming[0x00D] = L{
     {ctype='unsigned short',    label='Main'},                                  -- 54
     {ctype='unsigned short',    label='Sub'},                                   -- 56
     {ctype='unsigned short',    label='Ranged'},                                -- 58
-    {ctype='char*',             label='Character Name',     enc=pad(1,1)},      -- 5A
+    {ctype='char*',             label='Character Name',     enc=pad(2)},        -- 5A
 }
 
 -- NPC Update
@@ -1547,20 +1541,20 @@ func.incoming[0x017].default = L{
     {ctype='bool',              label='GM'},                                    -- 05
     {ctype='unsigned short',    label='_padding1',},                            -- 06   Reserved for Yell and Assist Modes
     {ctype='char[0xF]',         label='Sender Name'},                           -- 08
-    {ctype='char*',             label='Message'},                               -- 17   Max of 150 characters
+    {ctype='char*',             label='Message',          enc=pad(0)},          -- 17   Max of 150 characters
 }
 func.incoming[0x017][0x1A] = L{ -- Yell
     {ctype='bool',              label='GM'},                                    -- 05
     {ctype='unsigned short',    label='Zone',             fn=zone},             -- 06   Zone ID of sender
     {ctype='char[0xF]',         label='Sender Name'},                           -- 08
-    {ctype='char*',             label='Message'},                               -- 17   Max of 150 characters
+    {ctype='char*',             label='Message',          enc=pad(0)},          -- 17   Max of 150 characters
 }
 func.incoming[0x017][0x22] = L{ -- AssistJ
     {ctype='bool',              label='GM'},                                    -- 05
     {ctype='unsigned char',     label='Mastery Rank'},                          -- 06   Sender Mastery Rank
     {ctype='unsigned char',     label='Mentor Icon',      fn=e+{'mentor icon'}},-- 07   Color of Mentor Flag
     {ctype='char[0xF]',         label='Sender Name'},                           -- 08
-    {ctype='char*',             label='Message'},                               -- 17   Max of 150 characters
+    {ctype='char*',             label='Message',          enc=pad(0)},          -- 17   Max of 150 characters
 }
 func.incoming[0x017][0x23] = func.incoming[0x017][0x22] -- AssistE
 
