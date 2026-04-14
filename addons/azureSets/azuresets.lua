@@ -14,7 +14,7 @@ documentation and/or other materials provided with the distribution.
 names of its contributors may be used to endorse or promote products
 derived from this software without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
 DISCLAIMED. IN NO EVENT SHALL The Addon's Contributors BE LIABLE FOR ANY
@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 _addon.name = 'AzureSets'
 _addon.version = '1.25'
 _addon.author = 'Nitrous (Shiva), Gol-exe'
-_addon.commands = {'aset', 'azuresets', 'asets'}
+_addon.commands = {'aset','azuresets','asets'}
 
 require('tables')
 require('strings')
