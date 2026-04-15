@@ -74,11 +74,11 @@ end
 
 function initialize()
     local player = windower.ffxi.get_player()
-    local is_blu = player and (player.main_job_id == BLU_JOB_ID or player.sub_job_id == BLU_JOB_ID)
-    local game_info = windower.ffxi.get_info()
+    if not player then return end
 
-    if is_blu and game_info then
-        update_blu_info()
+    update_blu_info(player)
+
+    if bluJobLevel then
         update_current_spellset()
     end
 end
