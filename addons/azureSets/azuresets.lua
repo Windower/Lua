@@ -148,7 +148,7 @@ function is_spellset_equipped(spellset)
 end
 
 function set_spells_from_spellset(spellset, setPhase)
-    local setToSet = settings.spellsets[spellset]
+    local setToSet = settings.spellsets[spellset]:map(string.lower)
     update_current_spellset()
 
     if setPhase == 'remove' then
