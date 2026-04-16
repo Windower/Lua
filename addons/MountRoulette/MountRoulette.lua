@@ -26,7 +26,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-_addon.name = 'Mount Roulette'
+_addon.name = 'MountRoulette'
 _addon.author = 'Dean James (Xurion of Bismarck)'
 _addon.version = '3.2.1'
 _addon.commands = {'mountroulette', 'mr'}
