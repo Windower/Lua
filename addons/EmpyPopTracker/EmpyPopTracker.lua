@@ -26,7 +26,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-_addon.name = 'Empy Pop Tracker'
+_addon.name = 'EmpyPopTracker'
 _addon.author = 'Dean James (Xurion of Bismarck)'
 _addon.commands = { 'ept', 'empypoptracker' }
 _addon.version = '2.8.0'
