@@ -26,7 +26,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 --]]
 
-_addon.name = 'Mount Muzzle'
+_addon.name = 'MountMuzzle'
 _addon.description = 'Change or remove the default mount music.'
 _addon.author = 'Sjshovan (Apogee) sjshovan@gmail.com'
 _addon.version = '0.9.6'
