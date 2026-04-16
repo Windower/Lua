@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.name = 'Auto Enter Key'
+_addon.name = 'AutoEnterKey'
 _addon.version = '1.0'
 _addon.author = 'Chiaia (Asura)'
 _addon.commands = {'ake',}
