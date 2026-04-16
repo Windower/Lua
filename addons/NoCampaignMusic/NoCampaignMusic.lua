@@ -26,7 +26,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-_addon.name = 'No Campaign Music'
+_addon.name = 'NoCampaignMusic'
 _addon.author = 'Dean James (Xurion of Bismarck)'
 _addon.version = '2.0.1'
 _addon.commands = {'nocampaignmusic', 'ncm'}
