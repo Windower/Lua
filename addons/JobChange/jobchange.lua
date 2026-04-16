@@ -26,7 +26,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
 
-_addon.name = 'Job Change'
+_addon.name = 'JobChange'
 _addon.author = 'Sammeh; Akaden'
 _addon.version = '1.0.4'
 _addon.command = 'jc'
