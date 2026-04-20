@@ -10,66 +10,67 @@ return {
         bayld    = 'You receive \n\0 bayld!\1271\0\7',
     },
 
+    -- Zone IDs only. DAT paths are resolved automatically by dialog.open_dat_by_zone_id.
     zones = {
-        [2] = 6422,   -- carpenters' landing
-        [4] = 6424,   -- bibiki bay
-        [5] = 6425,   -- uleguerand range
-        [7] = 6427,   -- attohwa chasm
-        [24] = 6444,  -- lufaise meadows
-        [25] = 6445,  -- misareaux coast
-        [51] = 6471,  -- wajaom woodlands
-        [52] = 6472,  -- bhaflau thickets
-        [61] = 6481,  -- mount zhayolm
-        [79] = 6499,  -- caedarva mire
-        [81] = 6501,  -- east ronfaure [s]
-        [82] = 6502,  -- jugner forest [s]
-        [83] = 6503,  -- vunkerl inlet [s]
-        [84] = 6504,  -- batallia downs [s]
-        [88] = 6508,  -- north gustaberg [s]
-        [89] = 6509,  -- grauberg [s]
-        [90] = 6510,  -- pashhow marshlands [s]
-        [91] = 6511,  -- rolanberry fields [s]
-        [95] = 6515,  -- west sarutabaruta [a]
-        [96] = 6516,  -- fort karugo-narugo [s]
-        [97] = 6517,  -- meriphataud mountains [s]
-        [98] = 6518,  -- sauromugue champaign [s]
-        [100] = 6520, -- west ronfaure
-        [101] = 6521, -- east ronfaure
-        [102] = 6522, -- la theine plateau
-        [103] = 6523, -- valkurm dunes
-        [104] = 6524, -- jugner forest
-        [105] = 6525, -- batallia downs
-        [106] = 6526, -- north gustaberg
-        [107] = 6527, -- south gustaberg
-        [108] = 6528, -- konschtat highlands
-        [109] = 6529, -- pashhow marshlands
-        [110] = 6530, -- rolanberry fields
-        [111] = 6531, -- beaucedine glacier
-        [112] = 6532, -- xarcabard
-        [113] = 6533, -- cape teriggan
-        [114] = 6534, -- eastern altepa desert
-        [115] = 6535, -- west sarutabaruta
-        [116] = 6536, -- east sarutabaruta
-        [117] = 6537, -- tahrongi canyon
-        [118] = 6538, -- buburimu peninsula
-        [119] = 6539, -- meriphataud mountains
-        [120] = 6540, -- sauromugue champaign
-        [121] = 6541, -- the sanctuary of zi'tah
-        [122] = 6542, -- ro'maeve
-        [123] = 6543, -- yuhtunga jungle
-        [124] = 6544, -- yhoator jungle
-        [125] = 6545, -- western altepa desert
-        [126] = 6546, -- qufim island
-        [127] = 6547, -- behemonth's dominion
-        [128] = 6548, -- valley of sorrows
-        [136] = 6556, -- beaucedine glacier [s]
-        [137] = 6557, -- xarcabard [s]
-        [260] = 85595, -- yashe hunting grounds
-        [261] = 85596, -- ceizak battlegrounds
-        [262] = 85597, -- foret de hennetiel
-        [263] = 85598, -- yorcia weald
-        [265] = 85600, -- morimar basalt fields
-        [266] = 85601, -- marjami ravine
-        [267] = 85602, -- kamihr drifts
+          2,   -- carpenters' landing
+          4,   -- bibiki bay
+          5,   -- uleguerand range
+          7,   -- attohwa chasm
+         24,   -- lufaise meadows
+         25,   -- misareaux coast
+         51,   -- wajaom woodlands
+         52,   -- bhaflau thickets
+         61,   -- mount zhayolm
+         79,   -- caedarva mire
+         81,   -- east ronfaure [s]
+         82,   -- jugner forest [s]
+         83,   -- vunkerl inlet [s]
+         84,   -- batallia downs [s]
+         88,   -- north gustaberg [s]
+         89,   -- grauberg [s]
+         90,   -- pashhow marshlands [s]
+         91,   -- rolanberry fields [s]
+         95,   -- west sarutabaruta [s]
+         96,   -- fort karugo-narugo [s]
+         97,   -- meriphataud mountains [s]
+         98,   -- sauromugue champaign [s]
+        100,   -- west ronfaure
+        101,   -- east ronfaure
+        102,   -- la theine plateau
+        103,   -- valkurm dunes
+        104,   -- jugner forest
+        105,   -- batallia downs
+        106,   -- north gustaberg
+        107,   -- south gustaberg
+        108,   -- konschtat highlands
+        109,   -- pashhow marshlands
+        110,   -- rolanberry fields
+        111,   -- beaucedine glacier
+        112,   -- xarcabard
+        113,   -- cape teriggan
+        114,   -- eastern altepa desert
+        115,   -- west sarutabaruta
+        116,   -- east sarutabaruta
+        117,   -- tahrongi canyon
+        118,   -- buburimu peninsula
+        119,   -- meriphataud mountains
+        120,   -- sauromugue champaign
+        121,   -- the sanctuary of zi'tah
+        122,   -- ro'maeve
+        123,   -- yuhtunga jungle
+        124,   -- yhoator jungle
+        125,   -- western altepa desert
+        126,   -- qufim island
+        127,   -- behemonth's dominion
+        128,   -- valley of sorrows
+        136,   -- beaucedine glacier [s]
+        137,   -- xarcabard [s]
+        260,   -- yashe hunting grounds
+        261,   -- ceizak battlegrounds
+        262,   -- foret de hennetiel
+        263,   -- yorcia weald
+        265,   -- morimar basalt fields
+        266,   -- marjami ravine
+        267,   -- kamihr drifts
     },
 }

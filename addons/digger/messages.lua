@@ -1,8 +1,6 @@
-require('bit')
 require('strings')
-require('tables')
-require('lists')
 local files = require('files')
+local dialog = require('dialog')
 local settings = require('search_settings')
 
 local windower_settings = windower.get_windower_settings()
@@ -18,9 +16,7 @@ end
 
 local get_versions = function(version)
     local tokens = version:split('_')
-    local date = tonumber(tokens[1])
-    local minor = tonumber(tokens[2])
-    return date, minor
+    return tonumber(tokens[1]), tonumber(tokens[2])
 end
 
 local outdated = function(old)
@@ -32,88 +28,26 @@ local outdated = function(old)
     return date > old_date or date == old_date and minor > old_minor
 end
 
--- XOR each byte of a string with 0x80. Called once per search string up front so
--- the per-message scan can compare against raw encrypted DAT bytes directly.
-local xor_bytes = function(s)
-    local buf = {}
-    for i = 1, #s do
-        buf[i] = string.char(bit.bxor(s:byte(i), 0x80))
-    end
-    return table.concat(buf)
-end
-
--- Port of make_messages.py: find_dat(dat_id)
-local find_dat = function(dat_id)
-    local ffxi_path = windower.ffxi_path
-    for i = 1, 9 do
-        local vtable = assert(io.open(ffxi_path .. (i == 1 and 'VTABLE.DAT' or 'ROM' .. i .. '/VTABLE' .. i .. '.DAT'), 'rb'))
-        vtable:seek('set', dat_id)
-        local flag = vtable:read(1):unpack('C')
-        vtable:close()
-        if flag == i then
-            local ftable = assert(io.open(ffxi_path .. (i == 1 and 'FTABLE.DAT' or 'ROM' .. i .. '/FTABLE' .. i .. '.DAT'), 'rb'))
-            ftable:seek('set', dat_id * 2)
-            local file_id, dir_id = ftable:read(2):unpack('b7b9')
-            ftable:close()
-            return ffxi_path .. (i == 1 and 'ROM' or 'ROM' .. i) .. '/' .. dir_id .. '/' .. file_id .. '.DAT'
-        end
-    end
-    return nil
-end
-
--- Scan a single DAT for any of the searches. Searches are pre-XOR'd so we compare
--- directly against raw encrypted DAT bytes without decrypting the whole buffer.
--- searches_by_len: { [length] = { [name] = xored_search_string } }
-local scan_dat = function(dat_path, searches_by_len)
-    local dat = assert(io.open(dat_path, 'rb'))
-    local size, first = dat:read(8):unpack('II')
-    size = size - 0x10000000
-    first = bit.bxor(first, 0x80808080)
-    dat:seek('set', 4)
-    local offset_data = dat:read(first)
-    local data = dat:read('*a')
-    dat:close()
-
-    local matches = {}
-    local previous = 0
-    local last = first / 4
-    for i = 1, last do
-        local next = (i == last and size or bit.bxor(offset_data:unpack('I', 4 * i + 1), 0x80808080)) - first
-        local candidates = searches_by_len[next - previous]
-        if candidates then
-            local message = data:sub(previous + 1, next)
-            for name, search in pairs(candidates) do
-                if message == search then
-                    matches[name] = i - 1
+local search_dialog = function(zones, searches)
+    local result = {}
+    for _, zone_id in ipairs(zones) do
+        local dat_file = dialog.open_dat_by_zone_id(zone_id, 'english')
+        if dat_file then
+            local dat = dat_file:read('*a')
+            dat_file:close()
+            local zone_data = {}
+            for name, str in pairs(searches) do
+                local ids = dialog.get_ids_matching_entry(dat, dialog.encode_string(str))
+                if ids[1] then
+                    zone_data[name] = ids[1]
                 end
             end
+            result[zone_id] = zone_data
         end
-        previous = next
-    end
-    return matches
-end
-
--- Port of make_messages.py: search_dialog(zones, search)
-local search_dialog = function(zones, searches)
-    local searches_by_len = {}
-    for name, str in pairs(searches) do
-        local xored = xor_bytes(str)
-        local len = #xored
-        if not searches_by_len[len] then
-            searches_by_len[len] = {}
-        end
-        searches_by_len[len][name] = xored
-    end
-
-    local result = {}
-    for zone_id, dat_id in pairs(zones) do
-        local dat_path = assert(find_dat(dat_id), 'digger: could not find DAT for zone ' .. zone_id)
-        result[zone_id] = scan_dat(dat_path, searches_by_len)
     end
     return result
 end
 
--- Port of make_messages.py: write_lua(messages), with version header for cache staleness check.
 local write_lua = function(version, result)
     local zone_ids = {}
     for zone_id in pairs(result) do
