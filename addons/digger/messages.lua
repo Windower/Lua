@@ -1,61 +1,152 @@
-messages = {}
-messages[2] = {bayld=7388, ease=7380, fail=7305, full=7303, notes=7387, points=7385, standing=7386, success=6391}
-messages[4] = {bayld=7382, ease=7374, fail=7299, full=7297, notes=7381, points=7379, standing=7380, success=6391}
-messages[5] = {bayld=7339, ease=7331, fail=7256, full=7254, notes=7338, points=7336, standing=7337, success=6404}
-messages[7] = {bayld=7333, ease=7325, fail=7250, full=7248, notes=7332, points=7330, standing=7331, success=6391}
-messages[24] = {bayld=7669, ease=7661, fail=7586, full=7584, notes=7668, points=7666, standing=7667, success=6391}
-messages[25] = {bayld=7189, ease=7181, fail=7106, full=7104, notes=7188, points=7186, standing=7187, success=6391}
-messages[51] = {bayld=7163, ease=7155, fail=7080, full=7078, notes=7162, points=7160, standing=7161, success=6391}
-messages[52] = {bayld=7163, ease=7155, fail=7080, full=7078, notes=7162, points=7160, standing=7161, success=6391}
-messages[61] = {bayld=7163, ease=7155, fail=7080, full=7078, notes=7162, points=7160, standing=7161, success=6391}
-messages[79] = {bayld=7163, ease=7155, fail=7080, full=7078, notes=7162, points=7160, standing=7161, success=6391}
-messages[81] = {bayld=7848, ease=7840, fail=7765, full=7763, notes=7847, points=7845, standing=7846, success=6391}
-messages[82] = {bayld=7480, ease=7472, fail=7397, full=7395, notes=7479, points=7477, standing=7478, success=6391}
-messages[83] = {bayld=7167, ease=7159, fail=7084, full=7082, notes=7166, points=7164, standing=7165, success=6391}
-messages[84] = {bayld=7187, ease=7179, fail=7104, full=7102, notes=7186, points=7184, standing=7185, success=6391}
-messages[88] = {bayld=7473, ease=7465, fail=7390, full=7388, notes=7472, points=7470, standing=7471, success=6391}
-messages[89] = {bayld=7167, ease=7159, fail=7084, full=7082, notes=7166, points=7164, standing=7165, success=6391}
-messages[90] = {bayld=7264, ease=7256, fail=7181, full=7179, notes=7263, points=7261, standing=7262, success=6391}
-messages[91] = {bayld=7187, ease=7179, fail=7104, full=7102, notes=7186, points=7184, standing=7185, success=6391}
-messages[95] = {bayld=7194, ease=7186, fail=7111, full=7109, notes=7193, points=7191, standing=7192, success=6391}
-messages[96] = {bayld=7167, ease=7159, fail=7084, full=7082, notes=7166, points=7164, standing=7165, success=6391}
-messages[97] = {bayld=7725, ease=7717, fail=7642, full=7640, notes=7724, points=7722, standing=7723, success=6391}
-messages[98] = {bayld=7725, ease=7717, fail=7642, full=7640, notes=7724, points=7722, standing=7723, success=6391}
-messages[100] = {bayld=7348, ease=7340, fail=7265, full=7263, notes=7347, points=7345, standing=7346, success=6413}
-messages[101] = {bayld=7348, ease=7340, fail=7265, full=7263, notes=7347, points=7345, standing=7346, success=6413}
-messages[102] = {bayld=7330, ease=7322, fail=7247, full=7245, notes=7329, points=7327, standing=7328, success=6391}
-messages[103] = {bayld=7348, ease=7340, fail=7265, full=7263, notes=7347, points=7345, standing=7346, success=6413}
-messages[104] = {bayld=7822, ease=7814, fail=7739, full=7737, notes=7821, points=7819, standing=7820, success=6413}
-messages[105] = {bayld=7348, ease=7340, fail=7265, full=7263, notes=7347, points=7345, standing=7346, success=6413}
-messages[106] = {bayld=7348, ease=7340, fail=7265, full=7263, notes=7347, points=7345, standing=7346, success=6572}
-messages[107] = {bayld=7348, ease=7340, fail=7265, full=7263, notes=7347, points=7345, standing=7346, success=6413}
-messages[108] = {bayld=7330, ease=7322, fail=7247, full=7245, notes=7329, points=7327, standing=7328, success=6391}
-messages[109] = {bayld=7348, ease=7340, fail=7265, full=7263, notes=7347, points=7345, standing=7346, success=6413}
-messages[110] = {bayld=7348, ease=7340, fail=7265, full=7263, notes=7347, points=7345, standing=7346, success=6413}
-messages[111] = {bayld=7348, ease=7340, fail=7265, full=7263, notes=7347, points=7345, standing=7346, success=6572}
-messages[112] = {bayld=7365, ease=7357, fail=7282, full=7280, notes=7364, points=7362, standing=7363, success=6404}
-messages[113] = {bayld=7668, ease=7660, fail=7585, full=7583, notes=7667, points=7665, standing=7666, success=6391}
-messages[114] = {bayld=7668, ease=7660, fail=7585, full=7583, notes=7667, points=7665, standing=7666, success=6391}
-messages[115] = {bayld=7167, ease=7159, fail=7084, full=7082, notes=7166, points=7164, standing=7165, success=6391}
-messages[116] = {bayld=7326, ease=7318, fail=7243, full=7241, notes=7325, points=7323, standing=7324, success=6391}
-messages[117] = {bayld=7348, ease=7340, fail=7265, full=7263, notes=7347, points=7345, standing=7346, success=6572}
-messages[118] = {bayld=7367, ease=7359, fail=7284, full=7282, notes=7366, points=7364, standing=7365, success=6426}
-messages[119] = {bayld=7348, ease=7340, fail=7265, full=7263, notes=7347, points=7345, standing=7346, success=6413}
-messages[120] = {bayld=7356, ease=7348, fail=7273, full=7271, notes=7355, points=7353, standing=7354, success=6413}
-messages[121] = {bayld=7668, ease=7660, fail=7585, full=7583, notes=7667, points=7665, standing=7666, success=6391}
-messages[122] = {bayld=7326, ease=7318, fail=7243, full=7241, notes=7325, points=7323, standing=7324, success=6391}
-messages[123] = {bayld=7668, ease=7660, fail=7585, full=7583, notes=7667, points=7665, standing=7666, success=6391}
-messages[124] = {bayld=7668, ease=7660, fail=7585, full=7583, notes=7667, points=7665, standing=7666, success=6391}
-messages[125] = {bayld=7326, ease=7318, fail=7243, full=7241, notes=7325, points=7323, standing=7324, success=6391}
-messages[126] = {bayld=7326, ease=7318, fail=7243, full=7241, notes=7325, points=7323, standing=7324, success=6391}
-messages[127] = {bayld=7326, ease=7318, fail=7243, full=7241, notes=7325, points=7323, standing=7324, success=6391}
-messages[128] = {bayld=7326, ease=7318, fail=7243, full=7241, notes=7325, points=7323, standing=7324, success=6391}
-messages[136] = {bayld=7167, ease=7159, fail=7084, full=7082, notes=7166, points=7164, standing=7165, success=6391}
-messages[137] = {bayld=7689, ease=7681, fail=7606, full=7604, notes=7688, points=7686, standing=7687, success=6391}
-messages[260] = {bayld=7167, ease=7159, fail=7084, full=7082, notes=7166, points=7164, standing=7165, success=6391}
-messages[261] = {bayld=7167, ease=7159, fail=7084, full=7082, notes=7166, points=7164, standing=7165, success=6391}
-messages[262] = {bayld=7167, ease=7159, fail=7084, full=7082, notes=7166, points=7164, standing=7165, success=6391}
-messages[263] = {bayld=7167, ease=7159, fail=7084, full=7082, notes=7166, points=7164, standing=7165, success=6391}
-messages[265] = {bayld=7167, ease=7159, fail=7084, full=7082, notes=7166, points=7164, standing=7165, success=6391}
-messages[266] = {bayld=7167, ease=7159, fail=7084, full=7082, notes=7166, points=7164, standing=7165, success=6391}
-messages[267] = {bayld=7167, ease=7159, fail=7084, full=7082, notes=7166, points=7164, standing=7165, success=6391}
+require('bit')
+require('strings')
+require('tables')
+require('lists')
+local files = require('files')
+local settings = require('search_settings')
+
+local windower_settings = windower.get_windower_settings()
+
+local file = files.new('data/message_ids.lua')
+
+local load_messages = function()
+    if not file:exists() then
+        return nil
+    end
+    return loadstring(assert(file:read()))()
+end
+
+local get_versions = function(version)
+    local tokens = version:split('_')
+    local date = tonumber(tokens[1])
+    local minor = tonumber(tokens[2])
+    return date, minor
+end
+
+local outdated = function(old)
+    if not old then
+        return true
+    end
+    local old_date, old_minor = get_versions(old)
+    local date, minor = get_versions(windower_settings.ffxi_version)
+    return date > old_date or date == old_date and minor > old_minor
+end
+
+-- XOR each byte of a string with 0x80. Called once per search string up front so
+-- the per-message scan can compare against raw encrypted DAT bytes directly.
+local xor_bytes = function(s)
+    local buf = {}
+    for i = 1, #s do
+        buf[i] = string.char(bit.bxor(s:byte(i), 0x80))
+    end
+    return table.concat(buf)
+end
+
+-- Port of make_messages.py: find_dat(dat_id)
+local find_dat = function(dat_id)
+    local ffxi_path = windower.ffxi_path
+    for i = 1, 9 do
+        local vtable = assert(io.open(ffxi_path .. (i == 1 and 'VTABLE.DAT' or 'ROM' .. i .. '/VTABLE' .. i .. '.DAT'), 'rb'))
+        vtable:seek('set', dat_id)
+        local flag = vtable:read(1):unpack('C')
+        vtable:close()
+        if flag == i then
+            local ftable = assert(io.open(ffxi_path .. (i == 1 and 'FTABLE.DAT' or 'ROM' .. i .. '/FTABLE' .. i .. '.DAT'), 'rb'))
+            ftable:seek('set', dat_id * 2)
+            local file_id, dir_id = ftable:read(2):unpack('b7b9')
+            ftable:close()
+            return ffxi_path .. (i == 1 and 'ROM' or 'ROM' .. i) .. '/' .. dir_id .. '/' .. file_id .. '.DAT'
+        end
+    end
+    return nil
+end
+
+-- Scan a single DAT for any of the searches. Searches are pre-XOR'd so we compare
+-- directly against raw encrypted DAT bytes without decrypting the whole buffer.
+-- searches_by_len: { [length] = { [name] = xored_search_string } }
+local scan_dat = function(dat_path, searches_by_len)
+    local dat = assert(io.open(dat_path, 'rb'))
+    local size, first = dat:read(8):unpack('II')
+    size = size - 0x10000000
+    first = bit.bxor(first, 0x80808080)
+    dat:seek('set', 4)
+    local offset_data = dat:read(first)
+    local data = dat:read('*a')
+    dat:close()
+
+    local matches = {}
+    local previous = 0
+    local last = first / 4
+    for i = 1, last do
+        local next = (i == last and size or bit.bxor(offset_data:unpack('I', 4 * i + 1), 0x80808080)) - first
+        local candidates = searches_by_len[next - previous]
+        if candidates then
+            local message = data:sub(previous + 1, next)
+            for name, search in pairs(candidates) do
+                if message == search then
+                    matches[name] = i - 1
+                end
+            end
+        end
+        previous = next
+    end
+    return matches
+end
+
+-- Port of make_messages.py: search_dialog(zones, search)
+local search_dialog = function(zones, searches)
+    local searches_by_len = {}
+    for name, str in pairs(searches) do
+        local xored = xor_bytes(str)
+        local len = #xored
+        if not searches_by_len[len] then
+            searches_by_len[len] = {}
+        end
+        searches_by_len[len][name] = xored
+    end
+
+    local result = {}
+    for zone_id, dat_id in pairs(zones) do
+        local dat_path = assert(find_dat(dat_id), 'digger: could not find DAT for zone ' .. zone_id)
+        result[zone_id] = scan_dat(dat_path, searches_by_len)
+    end
+    return result
+end
+
+-- Port of make_messages.py: write_lua(messages), with version header for cache staleness check.
+local write_lua = function(version, result)
+    local zone_ids = {}
+    for zone_id in pairs(result) do
+        zone_ids[#zone_ids + 1] = zone_id
+    end
+    table.sort(zone_ids)
+
+    local zone_lines = {}
+    for _, zone_id in ipairs(zone_ids) do
+        local zone_data = result[zone_id]
+        local names = {}
+        for name in pairs(zone_data) do
+            names[#names + 1] = name
+        end
+        table.sort(names)
+        local entries = {}
+        for _, name in ipairs(names) do
+            entries[#entries + 1] = name .. '=' .. zone_data[name]
+        end
+        zone_lines[#zone_lines + 1] = '    [' .. zone_id .. '] = {' .. table.concat(entries, ', ') .. '},\n'
+    end
+
+    local disclaimer = '-- This file is automatically generated.\n\n'
+    file:write(disclaimer .. 'return \'' .. version .. '\', {\n' .. table.concat(zone_lines) .. '}\n')
+end
+
+local old_version, old_messages = load_messages()
+
+if outdated(old_version) then
+    messages = search_dialog(settings.zones, settings.search)
+    write_lua(windower_settings.ffxi_version, messages)
+else
+    messages = old_messages
+end
+
+return messages
