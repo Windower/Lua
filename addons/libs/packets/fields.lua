@@ -1270,6 +1270,10 @@ enums['mh door menus'] = {      -- only known use is Mog House exit menu type
     [0x09] = 'Adoulin',         -- no flower girl quest, should always be this value for adoulin mh
 }
 
+fields.incoming[0x008] = L{
+    {ctype='data[48]',			label='Zones'},				-- bitfield of previously visited zones
+}
+
 -- Standard Message
 -- Really ancient message packet -- used for log messages like "You throw away X itemNameHere" (Message 180)
 fields.incoming[0x009] = L{
@@ -3188,6 +3192,17 @@ func.incoming[0x063][0x05] = L{
     {ctype='unsigned short',    label='_unknown2'},                             -- 08   Lowest bit of this might indicate JP availability
     {ctype='unsigned short',    label='_unknown3'},                             -- 0A
     {ref=types.job_point_info,  lookup={res.jobs, 0x00},    count=24},          -- 0C
+}
+
+func.incoming[0x063][0x06] = L{
+    {ctype='data[2]',			label='_unknown1'},								-- 
+    {ctype='data[16]',			label='Homepoints'},							-- bitfields in same order as HP menu
+    {ctype='data[16]',			label='Survival Guides'},						-- bitfields in same order as SG menu
+    {ctype='data[16]',			label='Adoulin Waypoints'},						-- bitfields not in same order as menu
+    {ctype='data[4]',			label='Telepoints'},							-- bitfields in same order as 'gate crystal' KIs
+    {ctype='data[4]',			label='WoTG Unlocks'},							-- 0-9 bits are maws, 14-16 are lycopodium, rest unknown
+    {ctype='data[4]',			label='Eschan Portals'},						-- Zi'Tah > Ru'Aun > Reisenjima
+    {ctype='data[4]',			label='_unknown2'},								-- always zeroes, probably unused.
 }
 
 func.incoming[0x063][0x09] = L{
