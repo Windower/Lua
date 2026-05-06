@@ -22,13 +22,14 @@ verbose            = false
 superverbose       = false
 timercountdown     = 0
 
+local windower_settings = windower.get_windower_settings()
 defaults = T{}
 
 defaults.autocolor = true
 
 defaults.pos   = T{}
-defaults.pos.x = windower.get_windower_settings().x_res*2/3
-defaults.pos.y = windower.get_windower_settings().y_res-17
+defaults.pos.x = windower_settings.ui_x_res*2/3
+defaults.pos.y = windower_settings.ui_y_res-17
 
 defaults.bg         = T{}
 defaults.bg.alpha   = 255
