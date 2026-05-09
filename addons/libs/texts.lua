@@ -632,6 +632,9 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
     elseif type == 1 then
         for _, t in pairs(windower.text.saved_texts) do
             local m = meta[t]
+			if t:hover(x, y) then
+				call_events(t, 'left_click', x, y)
+			end
             if m.settings.flags.draggable and t:hover(x, y) then
                 local pos_x, pos_y = windower.text.get_location(m.name)
 
