@@ -65,6 +65,8 @@ function slips.get_slip_by_item_id(id)
 end
 
 function slips.get_item_bit_position(id, slip_id)
+    local slip
+
     if slip_id ~= nil then
         if slips.items[slip_id] == nil then
             return nil
