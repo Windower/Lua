@@ -1,5 +1,5 @@
 _addon.name    = 'linuxfix'
-_addon.version = '0.5.0'
+_addon.version = '0.5.1'
 _addon.author = 'Rubenator,Surik,BeYoNDLiFe'
 
 --[[
