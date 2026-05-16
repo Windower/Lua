@@ -24,6 +24,14 @@ _addon.author = 'Rubenator,Surik,BeYoNDLiFe'
 	Big shoutout and thanks to Rubenator, he took the awful code Surik and BeYoNDLiFe gave him and made it so much better.
 ]]--
 
+local wineprefix = os.getenv('WINEPREFIX')
+
+if not wineprefix then
+    windower.add_to_chat(207, 'This addon needed on Wine prefix versions 4.22 thru 8.4. Wineprefix not detected. Unloading.')
+    windower.send_command('lua u linuxfix')
+    return
+end
+
 check_rate = 1
 
 require('luau')
@@ -31,7 +39,7 @@ mods = S{}
 keybinds = {}
 last_state = T{}
 local dik_lookup = T{[-1]='sysrq', [1]='escape', [2]='1', [3]='2', [4]='3', [5]='4', [6]='5', [7]='6', [8]='7', [9]='8', [10]='9', [11]='0', [12]='-', [13]='=', [14]='backspace', [15]='tab', [16]='q', [17]='w', [18]='e', [19]='r', [20]='t', [21]='y', [22]='u', [23]='i', [24]='o', [25]='p', [26]='[', [27]=']', [28]='enter', [30]='a', [31]='s', [32]='d', [33]='f', [34]='g', [35]='h', [36]='j', [37]='k', [38]='l', [39]="\\;", [40]="'", [41]='`',  [43]='\\\\', [44]='z', [45]='x', [46]='c', [47]='v', [48]='b', [49]='n', [50]='m', [51]=',', [52]='.', [53]='/', [54]='rshift', [55]='numpad*', [57]='space', [58]='capslock', [59]='f1', [60]='f2', [61]='f3', [62]='f4', [63]='f5', [64]='f6', [65]='f7', [66]='f8', [67]='f9', [68]='f10', [69]='numlock', [70]='scrolllock', [71]='numpad7', [72]='numpad8', [73]='numpad9', [74]='numpad-', [75]='numpad4', [76]='numpad5', [77]='numpad6', [78]='numpad+', [79]='numpad1', [80]='numpad2', [81]='numpad3', [82]='numpad0', [83]='numpad.', [86]='oem_102', [87]='f11', [88]='f12', [100]='f13', [101]='f14', [102]='f15', [112]='kana', [115]='abnt_c1', [121]='convert', [123]='noconvert', [125]='yen', [126]='abnt_c2', [141]='numpadequals', [145]='at', [146]='colon', [147]='underline', [148]='kanji', [149]='stop', [150]='ax', [151]='unlabeled', [153]='nexttrack', [156]='numpadenter', [157]='rctrl', [160]='mute', [161]='calculator', [162]='playpause', [164]='mediastop', [174]='volumedown', [176]='volumeup', [178]='webhome', [179]='numpadcomma', [181]='numpad/', [183]='sysrq', [184]='rmenu', [197]='pause', [199]='home', [200]='up', [201]='pageup', [203]='left', [205]='right', [207]='end', [208]='down', [209]='pagedown', [210]='insert', [211]='delete', [220]='rwin', [222]='power', [223]='sleep', [227]='wake', [229]='websearch', [230]='webfavorites', [231]='webrefresh', [232]='webstop', [233]='', [234]='webback', [235]='mycomputer', [236]='mail', [237]='mediaselect'}
-local mod_lookup = T{[29]='Ctrl', [42]='Shift', [56]='Alt', [219]='Win', [221]='Apps'}
+local mod_lookup = T{[29]='Ctrl', [42]='Shift', [56]='Alt', [219]='Windows', [221]='Apps'}
 key_lookup = T{}
 name_lookup = T{}
 last_update = nil
