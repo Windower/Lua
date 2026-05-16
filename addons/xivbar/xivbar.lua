@@ -27,7 +27,7 @@
 ]]
 
 -- Addon description
-_addon.name = 'XIV Bar'
+_addon.name = 'xivbar'
 _addon.author = 'Edeon'
 _addon.version = '1.0'
 _addon.language = 'english'
