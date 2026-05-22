@@ -3440,6 +3440,38 @@ fields.incoming[0x08D] = L{
     {ref=types.job_point,       count='*'},                                     -- 04
 }
 
+-- Alter Ego Points
+fields.incoming[0x08E] = L{
+    {ctype='unsigned short',    label='Alter Ego Points'},                      -- 04
+    {ctype='data[2]',           label='_unknown1'},                             -- 06   No visible effect when modified
+    {ctype='data[8]',           label='_unknown2'},                             -- 08   No visible effect when modified
+    {ctype='unsigned char',     label='HP Tier'},                               -- 10
+    {ctype='unsigned char',     label='MP Tier'},                               -- 11
+    {ctype='unsigned char',     label='STR Tier'},                              -- 12
+    {ctype='unsigned char',     label='DEX Tier'},                              -- 13
+    {ctype='unsigned char',     label='VIT Tier'},                              -- 14
+    {ctype='unsigned char',     label='AGI Tier'},                              -- 15
+    {ctype='unsigned char',     label='INT Tier'},                              -- 16
+    {ctype='unsigned char',     label='MND Tier'},                              -- 17
+    {ctype='unsigned char',     label='CHR Tier'},                              -- 18
+    {ctype='unsigned char',     label='Combat Skill Tier'},                     -- 19
+    {ctype='unsigned char',     label='Magic Skill Tier'},                      -- 1A
+    {ctype='data[13]',          label='_padding1'},                             -- 1B   Unused tier slots
+    {ctype='data[16]',          label='_padding2'},                             -- 28   No visible effect when modified
+    {ctype='unsigned short',    label='HP Points to Next Tier'},                -- 38
+    {ctype='unsigned short',    label='MP Points to Next Tier'},                -- 3A
+    {ctype='unsigned short',    label='STR Points to Next Tier'},               -- 3C
+    {ctype='unsigned short',    label='DEX Points to Next Tier'},               -- 3E
+    {ctype='unsigned short',    label='VIT Points to Next Tier'},               -- 40
+    {ctype='unsigned short',    label='AGI Points to Next Tier'},               -- 42
+    {ctype='unsigned short',    label='INT Points to Next Tier'},               -- 44
+    {ctype='unsigned short',    label='MND Points to Next Tier'},               -- 46
+    {ctype='unsigned short',    label='CHR Points to Next Tier'},               -- 48
+    {ctype='unsigned short',    label='Combat Skill Points to Next Tier'},      -- 4A
+    {ctype='unsigned short',    label='Magic Skill Points to Next Tier'},       -- 4C
+    {ctype='data[26]',          label='_padding3'},                             -- 4E   Unused points-to-next-tier slots
+}
+
 -- Campaign Map Info
 -- fields.incoming[0x071]
 -- Perhaps it's my lack of interest, but this (triple-ish) packet is nearly incomprehensible to me.
