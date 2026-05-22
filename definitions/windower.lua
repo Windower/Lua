@@ -1150,6 +1150,7 @@ windower = {
     },
 
     ---Packet injection functions
+    ---@class windower.packets
     packets = {
         ---Injects an incoming packet, as if the server sent it.
         ---@param id integer The ID of the packet.
