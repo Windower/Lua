@@ -26,11 +26,12 @@
 
 _addon.name = 'DressUp'
 _addon.author = 'Cair'
-_addon.version = '1.31'
+_addon.version = '1.4'
 _addon.commands = {'DressUp','du'}
 
 
 packets = require('packets')
+texts = require('texts')
 require('luau')
 require('helper_functions')
 require('static_variables')
@@ -46,6 +47,14 @@ require('legs')
 require('feet')
 
 settings = config.load(defaults)
+
+help_display = texts.new(helptext, {
+    pos = {x = 20, y = 20},
+    bg = {alpha = 200, red = 0, green = 0, blue = 0},
+    flags = {draggable = true},
+    text = {size = 10, font = 'Consolas', alpha = 255, red = 255, green = 255, blue = 255}
+})
+
 info = T{
     names = T{},
     self = T{},
@@ -213,7 +222,11 @@ windower.register_event('addon command', function (command,...)
     local _clear = nil
     
     if command == 'help' then
-        print(helptext)
+        if help_display:visible() then
+            help_display:hide()
+        else
+            help_display:show()
+        end
     elseif command == "eval" then
         assert(loadstring(L{...}:concat(' ')))()
     
@@ -287,8 +300,11 @@ windower.register_event('addon command', function (command,...)
                 return
             elseif table.containskey(_faces,args[1]) then
                 settings[command]["face"] = _faces[args[1]]
-            elseif S{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,29,30}:contains(tonumber(args[1])) then
+            elseif tonumber(args[1]) and tonumber(args[1]) >= 0 and tonumber(args[1]) <= 35 then
                 settings[command]["face"] = tonumber(args[1])
+            else
+                error("Invalid face ID or name provided. Please use standard designations like 1a, 1b, etc., or a raw number between 0 and 35.")
+                return
             end
         
         else
@@ -443,8 +459,11 @@ windower.register_event('addon command', function (command,...)
                     return
                 elseif table.containskey(_faces,args[1]) then
                     table.append(_models,_faces[args:remove(1)])
-                elseif S{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,29,30}:contains(tonumber(args[1])) then
+                elseif tonumber(args[1]) and tonumber(args[1]) >= 0 and tonumber(args[1]) <= 35 then
                     table.append(_models,tonumber(args:remove(1)))
+                else
+                    error("Invalid face ID or name provided: " .. tostring(args[1]) .. ". Please use standard designations like 1a, 1b, etc., or a raw number between 0 and 35.")
+                    return
                 end
             end
         else
