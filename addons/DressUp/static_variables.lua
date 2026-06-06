@@ -24,21 +24,31 @@
 -- (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 -- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-helptext = [[DressUp - Command List:
-1. help - Displays this help menu.
-2a. self/others [race/face/<item slot>] [<item name>/<race name>/<face>]
-2b. player <player name> [race/face/item slot] [item name/name/face]
-	- Assigns models to yourself, others, or an individual player as specified.
-	- Supports IDs as well as names. Specify male or female if necessary.
-3. clear [self/others/player] <player name> [race/face/<item slot>]
-	- Clears settings for the selection. Player name specific to player option.
-4. replacements [race/face/<item slot>] <selection1> <selection2>
-	- Handles 1:1 replacement, similar to .DAT swapping. 
-5. blinking [self/others/party/follow/all] [always/target/combat/all] [on/off]
-	- Changes blinking settings. Toggles if nothing is specified.
-	- Also accepts "bmn" and "blinkmenot" as command prefix.
-6. autoupdate - Updates your model as you send the commands to do so.
-	- This uses outgoing packets.
+helptext = [[DressUp - Command List:  //du  or //du help - help menu toggle
+1. self / others / player <name> [race/face/slot] [model/name/id]
+    - Assigns models to yourself, others, or an individual player as specified.
+    - Slots: head, body, hands, legs, feet, main, sub, ranged.
+    - Example: //du self head "walahra turban" or //du self face 17
+	
+2. clear [self/others/player] <name> [race/face/slot]
+    - Clears settings for the selection.
+    - Example: //du clear self
+	
+3. replacements [race/face/slot] <old> <new>
+    - Replaces a model with another, similar to .DAT swapping.
+    - Example (Faces use 1a, 1b, etc., or raw ID 0-35): //du replacements face 1a 17
+	
+4. blinking [self/others/party/follow/all] [always/target/combat/all] [on/off]
+    - Prevents gear blinking when players change equipment.
+    - View current settings with: //du blinking settings
+    - Also accepts "bmn" and "blinkmenot" as command prefix.
+	
+5. autoupdate / au
+    - Toggles updating your character's appearance instantly as you type commands.
+	
+6. save / load / delete <profile name>
+    - Manages gear profiles for your own character.
+    - Profiles named JOB or NAME_JOB are loaded automatically on job change.
  ]]
 
 -- Initializes default settings table
@@ -90,8 +100,8 @@ _faces["7a"] = 12
 _faces["7b"] = 13
 _faces["8a"] = 14
 _faces["8b"] = 15
-_faces["Fomor"] = 29
-_faces["Mannequin"] = 30
+_faces["fomor"] = 29
+_faces["mannequin"] = 30
 
 -- PC Update Masks associated with model changes
 
