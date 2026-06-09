@@ -20,6 +20,25 @@ dps_db    = require('damagedb'):new() -- global for now
 
 -------------------------------------------------------
 
+-- Message ID lookup tables (allocated once at load, O(1) membership test)
+local ranged_hit_ids = {[157]=true, [352]=true, [576]=true, [577]=true}
+local skillchain_ids = {
+    [196]=true,[223]=true,[288]=true,[289]=true,[290]=true,[291]=true,[292]=true,
+    [293]=true,[294]=true,[295]=true,[296]=true,[297]=true,[298]=true,[299]=true,
+    [300]=true,[301]=true,[302]=true,[385]=true,[386]=true,[387]=true,[388]=true,
+    [389]=true,[390]=true,[391]=true,[392]=true,[393]=true,[394]=true,[395]=true,
+    [396]=true,[397]=true,[398]=true,[732]=true,[767]=true,[768]=true,[769]=true,[770]=true
+}
+
+local function tbl_contains(t, val)
+    for _, v in pairs(t) do
+        if v == val then return true end
+    end
+    return false
+end
+
+local display_dirty = false
+
 -- Conventional settings layout
 local default_settings = {}
 default_settings.numplayers = 8
@@ -33,6 +52,7 @@ default_settings.combinepets = true
 default_settings.oneperline = false
 default_settings.compactsc = false
 default_settings.creditpetdamagetoowner = false
+default_settings.logperiod = 0
 
 default_settings.display = {}
 default_settings.display.pos = {}
@@ -98,7 +118,7 @@ windower.register_event('addon command', function()
             sb_output('sb stat <stat> [<player>] : Shows specific damage stats. Respects filters. If player isn\'t specified, stats for everyone are displayed.')
             sb_output('  Valid stats are: '..dps_db.player_stat_fields:tostring():stripchars('{}"'))
             sb_output('sb set <flag> <value> : Sets configuration variables')
-            sb_output('  Valid flags are: CombinePets, NumPlayers, BGTransparency, Font, SBColor, ShowAlliDPS, ResetFilters, ShowFellow, OnePerLine, CompactSC, CreditPetDamageToOwner')
+            sb_output('  Valid flags are: CombinePets, NumPlayers, BGTransparency, Font, SBColor, ShowAlliDPS, ResetFilters, ShowFellow, OnePerLine, CompactSC, CreditPetDamageToOwner, LogPeriod')
         elseif command == 'pos' then
             if params[2] then
                 local posx, posy = tonumber(params[1]), tonumber(params[2])
@@ -209,6 +229,19 @@ windower.register_event('addon command', function()
                 end
                 settings:save()
                 sb_output("Setting 'CreditPetDamageToOwner' set to " .. tostring(settings.creditpetdamagetoowner))
+            elseif setting:lower() == 'logperiod' then
+                local val = tonumber(params[2])
+                if not val or val < 0 then
+                    error("Invalid value for 'LogPeriod'. Must be a number >= 0 (minutes, 0 = disabled).")
+                    return
+                end
+                settings.logperiod = val
+                settings:save()
+                if val == 0 then
+                    sb_output("Setting 'LogPeriod' disabled (mob entries kept forever)")
+                else
+                    sb_output("Setting 'LogPeriod' set to " .. val .. " minute(s)")
+                end
             end
         elseif command == 'reset' then
             reset()
@@ -383,26 +416,41 @@ local function update_dps_clock()
             end
         end
     end
+
+    local was_active = dps_clock:is_active()
     if player and (player.in_combat or (pet ~= nil and pet.status == 1)) then
         dps_clock:advance()
     else
         dps_clock:pause()
     end
 
-    display:update()
+    if settings.logperiod > 0 then
+        if dps_db:prune(settings.logperiod * 60) then
+            display_dirty = true
+        end
+    end
+
+    if dps_clock:is_active() or display_dirty or was_active ~= dps_clock:is_active() then
+        display:update()
+        display_dirty = false
+    end
 end
 
 
--- Returns all mob IDs for anyone in your alliance, including their pets.
-function get_ally_mob_ids()
-    local allies = T{}
+-- Builds a set of all mob IDs for anyone in your alliance, including their pets.
+-- Returns a plain table with [id]=true entries for O(1) lookup.
+function build_ally_set()
+    local allies = {}
     local party = windower.ffxi.get_party()
 
     for _, member in pairs(party) do
         if type(member) == 'table' and member.mob then
-            allies:append(member.mob.id)
-            if member.mob.pet_index and member.mob.pet_index> 0 and windower.ffxi.get_mob_by_index(member.mob.pet_index) then
-                allies:append(windower.ffxi.get_mob_by_index(member.mob.pet_index).id)
+            allies[member.mob.id] = true
+            if member.mob.pet_index and member.mob.pet_index > 0 then
+                local pet_mob = windower.ffxi.get_mob_by_index(member.mob.pet_index)
+                if pet_mob then
+                    allies[pet_mob.id] = true
+                end
             end
         end
     end
@@ -410,109 +458,110 @@ function get_ally_mob_ids()
     if settings.showfellow then
         local fellow = windower.ffxi.get_mob_by_target("ft")
         if fellow ~= nil then
-            allies:append(fellow.id)
+            allies[fellow.id] = true
         end
     end
-    
+
     return allies
-end
-
-
--- Returns true if is someone (or a pet of someone) in your alliance.
-function mob_is_ally(mob_id)
-    -- get zone-local ids of all allies and their pets
-    return get_ally_mob_ids():contains(mob_id)
 end
 
 
 function action_handler(raw_actionpacket)
     local actionpacket = ActionPacket.new(raw_actionpacket)
-    
-    local category = actionpacket:get_category_string()
 
     local player = windower.ffxi.get_player()
-    local pet
-    if player ~= nil then
-        local player_mob = windower.ffxi.get_mob_by_id(player.id)
-        if player_mob ~= nil then
-            local pet_index = player_mob.pet_index
-            if pet_index ~= nil then
-                pet = windower.ffxi.get_mob_by_index(pet_index)
-            end
-        end
-    end
-    if not player or not (windower.ffxi.get_player().in_combat or (pet ~= nil and pet.status == 1)) then
-        -- nothing to do
+    if not player then
         return
     end
-    
+
+    local pet
+    local player_mob = windower.ffxi.get_mob_by_id(player.id)
+    if player_mob ~= nil then
+        local pet_index = player_mob.pet_index
+        if pet_index ~= nil then
+            pet = windower.ffxi.get_mob_by_index(pet_index)
+        end
+    end
+
+    if not (player.in_combat or (pet ~= nil and pet.status == 1)) then
+        return
+    end
+
+    display_dirty = true
+
+    local allies = build_ally_set()
+    local actor_is_ally = allies[actionpacket.raw.actor_id] or false
+    local actor_name
+
     for target in actionpacket:get_targets() do
-        for subactionpacket in target:get_actions() do
-            if (mob_is_ally(actionpacket.raw.actor_id) and not mob_is_ally(target.raw.id)) then
-                -- Ignore actions within the alliance, but parse all alliance-outwards or outwards-alliance packets.
+        local target_is_ally = allies[target.raw.id] or false
+
+        if actor_is_ally and not target_is_ally then
+            if not actor_name then
+                actor_name = create_mob_name(actionpacket)
+            end
+            local target_name = target:get_name()
+
+            for subactionpacket in target:get_actions() do
                 local main  = subactionpacket:get_basic_info()
                 local add   = subactionpacket:get_add_effect()
                 local spike = subactionpacket:get_spike_effect()
-                if main.message_id == 1 then
-                    dps_db:add_m_hit(target:get_name(), create_mob_name(actionpacket), main.param)
-                elseif main.message_id == 67 then
-                    dps_db:add_m_crit(target:get_name(), create_mob_name(actionpacket), main.param)
-                elseif main.message_id == 15 or main.message_id == 63 then
-                    dps_db:incr_misses(target:get_name(), create_mob_name(actionpacket))
-                elseif main.message_id == 353 then
-                    dps_db:add_r_crit(target:get_name(), create_mob_name(actionpacket), main.param)
-                elseif T{157, 352, 576, 577}:contains(main.message_id) then
-                    dps_db:add_r_hit(target:get_name(), create_mob_name(actionpacket), main.param)
-                elseif main.message_id == 353 then
-                    dps_db:add_r_crit(target:get_name(), create_mob_name(actionpacket), main.param)
-                elseif main.message_id == 354 then
-                    dps_db:incr_r_misses(target:get_name(), create_mob_name(actionpacket))
-                elseif main.message_id == 188 then
-                    dps_db:incr_ws_misses(target:get_name(), create_mob_name(actionpacket))
+                local msg = main.message_id
+
+                if msg == 1 then
+                    dps_db:add_m_hit(target_name, actor_name, main.param)
+                elseif msg == 67 then
+                    dps_db:add_m_crit(target_name, actor_name, main.param)
+                elseif msg == 15 or msg == 63 then
+                    dps_db:incr_misses(target_name, actor_name)
+                elseif msg == 353 then
+                    dps_db:add_r_crit(target_name, actor_name, main.param)
+                elseif ranged_hit_ids[msg] then
+                    dps_db:add_r_hit(target_name, actor_name, main.param)
+                elseif msg == 354 then
+                    dps_db:incr_r_misses(target_name, actor_name)
+                elseif msg == 188 then
+                    dps_db:incr_ws_misses(target_name, actor_name)
                 elseif main.resource and main.resource == 'weapon_skills' and main.conclusion then
-                    dps_db:add_ws_damage(target:get_name(), create_mob_name(actionpacket), main.param, main.spell_id)
-                -- Siren's Hysteric Assault does HP drain and falls under message_id 802
-                elseif main.message_id == 802 then
-                    dps_db:add_damage(target:get_name(), create_mob_name(actionpacket), main.param)
+                    dps_db:add_ws_damage(target_name, actor_name, main.param, main.spell_id)
+                elseif msg == 802 then
+                    dps_db:add_damage(target_name, actor_name, main.param)
                 elseif main.conclusion then
-                    if main.conclusion.subject == 'target' and T(main.conclusion.objects):contains('HP') and main.param ~= 0 then
-                        dps_db:add_damage(target:get_name(), create_mob_name(actionpacket), (main.conclusion.verb == 'gains' and -1 or 1)*main.param)
+                    if main.conclusion.subject == 'target' and tbl_contains(main.conclusion.objects, 'HP') and main.param ~= 0 then
+                        dps_db:add_damage(target_name, actor_name, (main.conclusion.verb == 'gains' and -1 or 1)*main.param)
                     end
                 end
-                
+
                 if add and add.conclusion then
-                    local actor_name = create_mob_name(actionpacket)
-                    if not settings.compactsc then
-                        if T{196,223,288,289,290,291,292,
-                            293,294,295,296,297,298,299,
-                            300,301,302,385,386,387,388,
-                            389,390,391,392,393,394,395,
-                            396,397,398,732,767,768,769,770}:contains(add.message_id) then
-                            actor_name = string.format("Skillchain (%s)", actor_name:sub(1, 3))
-                        end
-                    else
-                        if T{196,223,288,289,290,291,292,
-                            293,294,295,296,297,298,299,
-                            300,301,302,385,386,387,388,
-                            389,390,391,392,393,394,395,
-                            396,397,398,732,767,768,769,770}:contains(add.message_id) then
-                            actor_name = string.format("SC:%s", actor_name:sub(1, 13))
+                    local sc_name = actor_name
+                    if skillchain_ids[add.message_id] then
+                        if not settings.compactsc then
+                            sc_name = string.format("Skillchain (%s)", actor_name:sub(1, 3))
+                        else
+                            sc_name = string.format("SC:%s", actor_name:sub(1, 13))
                         end
                     end
-                    if add.conclusion.subject == 'target' and T(add.conclusion.objects):contains('HP') and add.param ~= 0 then
-                        dps_db:add_damage(target:get_name(), actor_name, (add.conclusion.verb == 'gains' and -1 or 1)*add.param)
+                    if add.conclusion.subject == 'target' and tbl_contains(add.conclusion.objects, 'HP') and add.param ~= 0 then
+                        dps_db:add_damage(target_name, sc_name, (add.conclusion.verb == 'gains' and -1 or 1)*add.param)
                     end
                 end
                 if spike and spike.conclusion then
-                    if spike.conclusion.subject == 'target' and T(spike.conclusion.objects):contains('HP') and spike.param ~= 0 then
-                        dps_db:add_damage(target:get_name(), create_mob_name(actionpacket), (spike.conclusion.verb == 'gains' and -1 or 1)*spike.param)
+                    if spike.conclusion.subject == 'target' and tbl_contains(spike.conclusion.objects, 'HP') and spike.param ~= 0 then
+                        dps_db:add_damage(target_name, actor_name, (spike.conclusion.verb == 'gains' and -1 or 1)*spike.param)
                     end
                 end
-            elseif (mob_is_ally(target.raw.id) and not mob_is_ally(actionpacket.raw.actor_id)) then
+            end
+        elseif target_is_ally and not actor_is_ally then
+            if not actor_name then
+                actor_name = create_mob_name(actionpacket)
+            end
+            local target_name = target:get_name()
+
+            for subactionpacket in target:get_actions() do
                 local spike = subactionpacket:get_spike_effect()
                 if spike and spike.conclusion then
-                    if spike.conclusion.subject == 'actor' and T(spike.conclusion.objects):contains('HP') and spike.param ~= 0 then
-                        dps_db:add_damage(create_mob_name(actionpacket), target:get_name(), (spike.conclusion.verb == 'loses' and 1 or -1)*spike.param)
+                    if spike.conclusion.subject == 'actor' and tbl_contains(spike.conclusion.objects, 'HP') and spike.param ~= 0 then
+                        dps_db:add_damage(actor_name, target_name, (spike.conclusion.verb == 'loses' and 1 or -1)*spike.param)
                     end
                 end
             end
@@ -562,6 +611,12 @@ end
 config.register(settings, function(settings)
     update_dps_clock:loop(settings.UpdateFrequency)
     display:visibility(display.visible and windower.ffxi.get_info().logged_in)
+end)
+
+windower.register_event('unload', function()
+    if ActionPacket.close_listener then
+        ActionPacket.close_listener(action_handler)
+    end
 end)
 
 
