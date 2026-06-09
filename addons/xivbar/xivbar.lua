@@ -82,7 +82,7 @@ function update_bar(bar, text, width, current, pp, flag)
             end
 
             if flag == 1 then
-                xivbar.hp_update = false
+                xivbar.update_hp = false
             elseif flag == 2 then
                 xivbar.update_mp = false
             elseif flag == 3 then
@@ -137,6 +137,16 @@ function show()
         initialize()
     end
 
+    local windower_player = windower.ffxi.get_player()
+    if windower_player ~= nil then
+        player.hpp = windower_player.vitals.hpp
+        player.mpp = windower_player.vitals.mpp
+        player.current_hp = windower_player.vitals.hp
+        player.current_mp = windower_player.vitals.mp
+        player.current_tp = windower_player.vitals.tp
+        player:calculate_tpp()
+    end
+
     ui:show()
     xivbar.ready = true
     xivbar.update_hp = true
@@ -166,22 +176,30 @@ end)
 
 -- BIND EVENTS
 windower.register_event('hp change', function(new, old)
-    player.current_hp = new
+    local vitals = windower.ffxi.get_player().vitals
+    player.current_hp = vitals.hp
+    player.hpp = vitals.hpp
     xivbar.update_hp = true
 end)
 
 windower.register_event('hpp change', function(new, old)
-    player.hpp = new
+    local vitals = windower.ffxi.get_player().vitals
+    player.current_hp = vitals.hp
+    player.hpp = vitals.hpp
     xivbar.update_hp = true
 end)
 
 windower.register_event('mp change', function(new, old)
-    player.current_mp = new
+    local vitals = windower.ffxi.get_player().vitals
+    player.current_mp = vitals.mp
+    player.mpp = vitals.mpp
     xivbar.update_mp = true
 end)
 
 windower.register_event('mpp change', function(new, old)
-    player.mpp = new
+    local vitals = windower.ffxi.get_player().vitals
+    player.current_mp = vitals.mp
+    player.mpp = vitals.mpp
     xivbar.update_mp = true
 end)
 
