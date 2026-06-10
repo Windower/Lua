@@ -164,6 +164,7 @@ end)
 -- ON LOGOUT
 windower.register_event('logout', function()
     hide()
+    xivbar.initialized = false
 end)
 
 windower.register_event('incoming chunk', function(id, data)
