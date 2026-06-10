@@ -28,6 +28,7 @@
 
 local player = {}
 
+player.id = nil
 player.hpp = 0
 player.mpp = 0
 player.tpp = 0
