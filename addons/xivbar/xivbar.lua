@@ -29,7 +29,7 @@
 -- Addon description
 _addon.name = 'XIV Bar'
 _addon.author = 'Edeon'
-_addon.version = '1.0'
+_addon.version = '1.1'
 _addon.language = 'english'
 
 -- Libs
