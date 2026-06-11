@@ -117,6 +117,7 @@ data.outgoing[0x117] = {name='Unity Ranking Menu',  description='Sent when openi
 data.outgoing[0x118] = {name='Unity Chat Status',   description='Sent when changing unity chat status.'}
 
 -- Server packets (incoming)
+data.incoming[0x008] = {name='Visited Zones',		description='A list of previously visited zones.'}
 data.incoming[0x009] = {name='Standard Message',    description='A standardized message send from FFXI.'}
 data.incoming[0x00A] = {name='Zone In',             description='Info about character and zone around it.'}
 data.incoming[0x00B] = {name='Zone Out',            description='Packet contains IP and port of next zone to connect to.'}

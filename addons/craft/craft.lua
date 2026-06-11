@@ -1,5 +1,5 @@
 --[[
-Craft v1.1.3
+Craft v1.1.4
 
 Copyright © 2017 Mojo
 All rights reserved.
@@ -71,9 +71,7 @@ local appropriated = {}
 local inventory = {}
 
 local function filter_bag(v)
-    return not (v.name:match("Inventory") or
-        v.name:match("Temporary") or
-        v.name:match("Wardrobe"))
+    return not (v.name:match("Inventory") or v.name:match("Temporary"))
 end
 
 local function get_bag_command(k)
@@ -152,7 +150,7 @@ craft - Command List:
 * put "Dragon Mask" safe2 - Moves all Dragon Masks to Mog
   Safe 2 (if available).
 5.  delay - Sets the delay between crafting attempts
-    (default 24, minimum 17)
+    (default 24, minimum 11)
 * delay 30 - Sets the delay between crafting to 30
   seconds.]]
 
@@ -294,24 +292,42 @@ local function busy_wait(block, timeout, message)
     end
 end
 
+local function wait_for_idle_status()
+    local loop_count = 0
+    while windower.ffxi.get_player().status ~= 0 do
+        coroutine.sleep(0.2)
+        loop_count = loop_count + 1
+        if loop_count >= 40 then
+            -- Wait up to 8 seconds for status to normalize
+            return "You cannot act at the moment because your status is "..tostring(windower.ffxi.get_player().status)
+        end
+    end
+end
+
 local function poke_npc()
     local mob, npc = validate(support_npcs)
-    if npc then
-        local player = windower.ffxi.get_player()
-        if S(player.buffs):contains(npc.buff) then
-            return
-        end
-        conditions['support'] = true
-        local p = packets.new('outgoing', 0x01a, {
-            ["Target"] = mob.id,
-            ["Target Index"] = mob.index,
-            ["Category"] = 0,
-            ["Param"] = 0,
-            ["_unknown1"] = 0,
-        })
-        packets.inject(p)
-        return busy_wait('support', 10, "getting crafting buff")
+    if not npc then
+        return 'Cannot find a nearby Ionis / advanced imagery support NPC.'
     end
+
+    local player = windower.ffxi.get_player()
+    if S(player.buffs):contains(npc.buff) then
+        return ''
+    end
+    conditions['support'] = true
+    local p = packets.new('outgoing', 0x01a, {
+        ["Target"] = mob.id,
+        ["Target Index"] = mob.index,
+        ["Category"] = 0,
+        ["Param"] = 0,
+        ["_unknown1"] = 0,
+    })
+    packets.inject(p)
+    local msg = busy_wait('support', 10, "getting crafting buff")
+    if not msg then
+        coroutine.sleep(2)
+    end
+    return msg
 end
 
 local function unblock_sort(id, data)
@@ -526,13 +542,20 @@ end
 
 local function check_queue()
     if not queue:empty() then
-        if not paused then
+        local idle_msg = wait_for_idle_status()
+        if type(idle_msg) == 'string' then
+            error(idle_msg)
+        end
+
+        if not paused and not idle_msg then
             if jiggle then
                 commence_jigglin()
             end
             if support then
-                poke_npc()
-                coroutine.sleep(2)
+                local poke_msg = poke_npc()
+                if poke_msg then
+                    error(poke_msg)
+                end
             end
             if food then
                 consume_food()
@@ -583,7 +606,7 @@ local function handle_delay(seconds)
     if n == nil then
         return "Invalid delay %s":format(seconds)
     else
-        n = math.max(17, n)
+        n = math.max(11, n)
         notice("Setting delay to %d":format(n))
         delay = n
     end
