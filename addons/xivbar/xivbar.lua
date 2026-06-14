@@ -29,7 +29,7 @@
 -- Addon description
 _addon.name = 'XIV Bar'
 _addon.author = 'Edeon'
-_addon.version = '1.0'
+_addon.version = '1.1'
 _addon.language = 'english'
 
 -- Libs
@@ -164,6 +164,7 @@ end)
 -- ON LOGOUT
 windower.register_event('logout', function()
     hide()
+    xivbar.initialized = false
 end)
 
 windower.register_event('incoming chunk', function(id, data)
