@@ -1270,6 +1270,11 @@ enums['mh door menus'] = {      -- only known use is Mog House exit menu type
     [0x09] = 'Adoulin',         -- no flower girl quest, should always be this value for adoulin mh
 }
 
+-- Visited Zones
+fields.incoming[0x008] = L{
+	{ctype='bit[384]',			label='Zones'},				-- bitfield of previously visited zones
+}
+
 -- Standard Message
 -- Really ancient message packet -- used for log messages like "You throw away X itemNameHere" (Message 180)
 fields.incoming[0x009] = L{

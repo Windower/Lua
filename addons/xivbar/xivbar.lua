@@ -29,13 +29,14 @@
 -- Addon description
 _addon.name = 'XIV Bar'
 _addon.author = 'Edeon'
-_addon.version = '1.0'
+_addon.version = '1.1'
 _addon.language = 'english'
 
 -- Libs
-config = require('config')
-texts  = require('texts')
-images = require('images')
+config  = require('config')
+texts   = require('texts')
+images  = require('images')
+packets = require('packets')
 
 -- User settings
 local defaults = require('defaults')
@@ -58,6 +59,7 @@ function initialize()
     local windower_player = windower.ffxi.get_player()
 
     if windower_player ~= nil then
+        player.id = windower_player.id
         player.hpp = windower_player.vitals.hpp
         player.mpp = windower_player.vitals.mpp
         player.current_hp = windower_player.vitals.hp
@@ -82,7 +84,7 @@ function update_bar(bar, text, width, current, pp, flag)
             end
 
             if flag == 1 then
-                xivbar.hp_update = false
+                xivbar.update_hp = false
             elseif flag == 2 then
                 xivbar.update_mp = false
             elseif flag == 3 then
@@ -162,33 +164,38 @@ end)
 -- ON LOGOUT
 windower.register_event('logout', function()
     hide()
+    xivbar.initialized = false
 end)
 
--- BIND EVENTS
-windower.register_event('hp change', function(new, old)
-    player.current_hp = new
-    xivbar.update_hp = true
-end)
+windower.register_event('incoming chunk', function(id, data)
+    if id ~= 0x0DF or player.id == nil then return end
 
-windower.register_event('hpp change', function(new, old)
-    player.hpp = new
-    xivbar.update_hp = true
-end)
+    local packet = packets.parse('incoming', data)
+    if packet['ID'] ~= player.id then return end
 
-windower.register_event('mp change', function(new, old)
-    player.current_mp = new
-    xivbar.update_mp = true
-end)
+    local hp = packet['HP']
+    local mp = packet['MP']
+    local tp = packet['TP']
+    local hpp = packet['HPP']
+    local mpp = packet['MPP']
 
-windower.register_event('mpp change', function(new, old)
-    player.mpp = new
-    xivbar.update_mp = true
-end)
+    if hp ~= player.current_hp or hpp ~= player.hpp then
+        player.current_hp = hp
+        player.hpp = hpp
+        xivbar.update_hp = true
+    end
 
-windower.register_event('tp change', function(new, old)
-    player.current_tp = new
-    player:calculate_tpp()
-    xivbar.update_tp = true
+    if mp ~= player.current_mp or mpp ~= player.mpp then
+        player.current_mp = mp
+        player.mpp = mpp
+        xivbar.update_mp = true
+    end
+
+    if tp ~= player.current_tp then
+        player.current_tp = tp
+        player:calculate_tpp()
+        xivbar.update_tp = true
+    end
 end)
 
 windower.register_event('prerender', function()

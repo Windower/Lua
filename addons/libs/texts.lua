@@ -18,8 +18,7 @@ local events = {
     right_click = true,
     double_right_click = true,
     middle_click = true,
-    scroll_up = true,
-    scroll_down = true,
+    scroll = true,
     hover = true,
     drag = true,
     right_drag = true,
@@ -95,19 +94,17 @@ amend = function(settings, defaults)
     return settings
 end
 
-local call_events = function(t, event, ...)
-    if not meta[t].events[event] then
-        return
-    end
-
-    -- Trigger registered post-reload events
-    for _, event in ipairs(meta[t].events[event]) do
-        event(t, meta[t].root_settings)
+local call_events = function(t, key, ...)
+    -- Trigger registered events
+    for _, event in ipairs(meta[t].events[key] or {}) do
+        event(t, ...)
     end
 end
 
 local apply_settings = function(_, t, settings)
-    settings = settings or meta[t].settings
+    local m = meta[t]
+    settings = settings or m.settings
+
     texts.pos(t, settings.pos.x, settings.pos.y)
     texts.bg_alpha(t, settings.bg.alpha)
     texts.bg_color(t, settings.bg.red, settings.bg.green, settings.bg.blue)
@@ -121,12 +118,12 @@ local apply_settings = function(_, t, settings)
     texts.bold(t, settings.flags.bold)
     texts.right_justified(t, settings.flags.right)
     texts.bottom_justified(t, settings.flags.bottom)
-    texts.visible(t, meta[t].status.visible)
+    texts.visible(t, m.status.visible)
     texts.stroke_width(t, settings.text.stroke.width)
     texts.stroke_color(t, settings.text.stroke.red, settings.text.stroke.green, settings.text.stroke.blue)
     texts.stroke_alpha(t, settings.text.stroke.alpha)
 
-    call_events(t, 'reload')
+    call_events(t, 'reload', m.root_settings)
 end
 
 -- Returns a new text object.
@@ -181,7 +178,7 @@ function texts.new(str, settings, root_settings)
     local t = {}
     local m = {}
     meta[t] = m
-    m.name = (_addon and _addon.name or 'text') .. '_gensym_' .. tostring(t):sub(8) .. '_%.8X':format(16^8 * math.random()):sub(3)
+    m.name = (_addon and _addon.name or 'text') .. '_gensym_' .. tostring(t):sub(8) .. ('_%.8X'):format(16^8 * math.random()):sub(3)
     t._name = m.name
     m.settings = settings or {}
     m.status = m.status or {visible = false, text = {}}
@@ -272,7 +269,7 @@ function texts.append(t, str)
     local index = #m.textorder + 1
     while i <= #str do
         local startpos, endpos = str:find('%${.-}', i)
-        local rndname = '%s_%u':format(m.name, index)
+        local rndname = ('%s_%u'):format(m.name, index)
         if startpos then
             -- Match before the tag
             local match = str:sub(i, startpos - 1)
@@ -627,6 +624,7 @@ windower.register_event('mouse', function(type, x, y, delta, blocked)
     if type == 0 then
         if dragged then
             dragged.text:pos(x - dragged.x, y - dragged.y)
+            call_events(dragged.text, 'drag', x - dragged.x, y - dragged.y)
             return true
         end
 
@@ -669,27 +667,36 @@ end)
 -- Can define functions to execute every time the settings are reloaded
 function texts.register_event(t, key, fn)
     if not events[key] then
-        error('Event %s not available for text objects.':format(key))
+        error(('Event %s not available for text objects.'):format(key))
         return
     end
 
     local m = meta[t]
-    m.events[key] = m.events[key] or {}
-    m.events[key][#m.events[key] + 1] = fn
-    return #m.events[key]
+    local ev = m.events[key]
+    if not ev then
+        ev = {}
+        m.events[key] = ev
+    end
+    ev[#ev + 1] = fn
+    return #ev
 end
 
 function texts.unregister_event(t, key, fn)
-    if not (events[key] and meta[t].events[key]) then
+    if not events[key] then
+        return
+    end
+
+    local ev = meta[t].events[key]
+    if not ev then
         return
     end
 
     if type(fn) == 'number' then
-        table.remove(meta[t].events[key], fn)
+        table.remove(ev, fn)
     else
-        for index, event in ipairs(meta[t].events[key]) do
+        for index, event in ipairs(ev) do
             if event == fn then
-                table.remove(meta[t].events[key], index)
+                table.remove(ev, index)
                 return
             end
         end

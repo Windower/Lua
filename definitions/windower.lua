@@ -1150,6 +1150,7 @@ windower = {
     },
 
     ---Packet injection functions
+    ---@class windower.packets
     packets = {
         ---Injects an incoming packet, as if the server sent it.
         ---@param id integer The ID of the packet.
@@ -1216,3 +1217,18 @@ windower = {
     ---@field augment string | nil The augment data as a binary string, if the item is augmented, otherwise `nil`.
     item_display = {},
 }
+
+---Returns a binary string containing the provided values packed (that is, serialized in binary form) according to the format string `fmt`.
+---@param fmt string The format string, as described [here](https://github.com/Windower/Lua/wiki/LPack-Library).
+---@param ... string | number The values to encode.
+---@return string #The packed binary string.
+---@nodiscard
+function string.pack(fmt, ...) end
+
+---Returns the values packed in the binary string, extracted according to the format string `fmt`.
+---@param fmt string The format string, as described [here](https://github.com/Windower/Lua/wiki/LPack-Library).
+---@param s string The binary string containing the data to extract.
+---@param pos? integer The position to start the extraction from. Defaults to 1.
+---@return string | number ... #The extracted values.
+---@nodiscard
+function string.unpack(fmt, s, pos) end
