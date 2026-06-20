@@ -2394,22 +2394,16 @@ func.incoming[0x044][0x12] = L{
     {ctype='unsigned char',     label='Slot 11'},                               -- 14
     {ctype='unsigned char',     label='Slot 12'},                               -- 15
     {ctype='unsigned short',    label='_unknown2'},                             -- 16
-    {ctype='unsigned int',      label='Available Heads'},                       -- 18   Flags for the available heads (Position corresponds to Item ID shifted down by 8192)
-    {ctype='unsigned int',      label='Available Bodies'},                      -- 1C   Flags for the available bodies (Position corresponds to Item ID)
-    {ctype='unsigned int',      label='_unknown3'},                             -- 20
-    {ctype='unsigned int',      label='_unknown4'},                             -- 24
-    {ctype='unsigned int',      label='_unknown5'},                             -- 28
-    {ctype='unsigned int',      label='_unknown6'},                             -- 2C
-    {ctype='unsigned int',      label='_unknown7'},                             -- 30
-    {ctype='unsigned int',      label='_unknown8'},                             -- 34
-    {ctype='unsigned int',      label='Fire Attachments'},                      -- 38   Flags for the available Fire Attachments (Position corresponds to Item ID)
-    {ctype='unsigned int',      label='Ice Attachments'},                       -- 3C   Flags for the available Ice Attachments (Position corresponds to Item ID)
-    {ctype='unsigned int',      label='Wind Attachments'},                      -- 40   Flags for the available Wind Attachments (Position corresponds to Item ID)
-    {ctype='unsigned int',      label='Earth Attachments'},                     -- 44   Flags for the available Earth Attachments (Position corresponds to Item ID)
-    {ctype='unsigned int',      label='Thunder Attachments'},                   -- 48   Flags for the available Thunder Attachments (Position corresponds to Item ID)
-    {ctype='unsigned int',      label='Water Attachments'},                     -- 4C   Flags for the available Water Attachments (Position corresponds to Item ID)
-    {ctype='unsigned int',      label='Light Attachments'},                     -- 50   Flags for the available Light Attachments (Position corresponds to Item ID)
-    {ctype='unsigned int',      label='Dark Attachments'},                      -- 54   Flags for the available Dark Attachments (Position corresponds to Item ID)
+    {ctype='data[4]',           label='Available Heads'},                       -- 18   Flags for the available heads (Position corresponds to Item ID shifted down by 8192)
+    {ctype='data[28]',          label='Available Bodies'},                      -- 1C   Flags for the available bodies (Position corresponds to Item ID)
+    {ctype='data[4]',           label='Fire Attachments'},                      -- 38   Flags for the available Fire Attachments (Position corresponds to Item ID)
+    {ctype='data[4]',           label='Ice Attachments'},                       -- 3C   Flags for the available Ice Attachments (Position corresponds to Item ID)
+    {ctype='data[4]',           label='Wind Attachments'},                      -- 40   Flags for the available Wind Attachments (Position corresponds to Item ID)
+    {ctype='data[4]',           label='Earth Attachments'},                     -- 44   Flags for the available Earth Attachments (Position corresponds to Item ID)
+    {ctype='data[4]',           label='Thunder Attachments'},                   -- 48   Flags for the available Thunder Attachments (Position corresponds to Item ID)
+    {ctype='data[4]',           label='Water Attachments'},                     -- 4C   Flags for the available Water Attachments (Position corresponds to Item ID)
+    {ctype='data[4]',           label='Light Attachments'},                     -- 50   Flags for the available Light Attachments (Position corresponds to Item ID)
+    {ctype='data[4]',           label='Dark Attachments'},                      -- 54   Flags for the available Dark Attachments (Position corresponds to Item ID)
     {ctype='char[16]',          label='Pet Name'},                              -- 58
     {ctype='unsigned short',    label='Current HP'},                            -- 68
     {ctype='unsigned short',    label='Max HP'},                                -- 6A
