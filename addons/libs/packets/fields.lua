@@ -2377,6 +2377,30 @@ func.incoming[0x044].base = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 06
 }
 
+-- BLU
+func.incoming[0x044][0x10] = L{
+    {ctype='unsigned char',     label='Slot 1',     fn=add+{512}},              -- 08 Spell ids shifted down by 512 (0x200)
+    {ctype='unsigned char',     label='Slot 2',     fn=add+{512}},              -- 09
+    {ctype='unsigned char',     label='Slot 3',     fn=add+{512}},              -- 0A
+    {ctype='unsigned char',     label='Slot 4',     fn=add+{512}},              -- 0B
+    {ctype='unsigned char',     label='Slot 5',     fn=add+{512}},              -- 0C
+    {ctype='unsigned char',     label='Slot 6',     fn=add+{512}},              -- 0D
+    {ctype='unsigned char',     label='Slot 7',     fn=add+{512}},              -- 0E
+    {ctype='unsigned char',     label='Slot 8',     fn=add+{512}},              -- 0F
+    {ctype='unsigned char',     label='Slot 9',     fn=add+{512}},              -- 10
+    {ctype='unsigned char',     label='Slot 10',    fn=add+{512}},              -- 11
+    {ctype='unsigned char',     label='Slot 11',    fn=add+{512}},              -- 12
+    {ctype='unsigned char',     label='Slot 12',    fn=add+{512}},              -- 13
+    {ctype='unsigned char',     label='Slot 13',    fn=add+{512}},              -- 14
+    {ctype='unsigned char',     label='Slot 14',    fn=add+{512}},              -- 15
+    {ctype='unsigned char',     label='Slot 15',    fn=add+{512}},              -- 16
+    {ctype='unsigned char',     label='Slot 16',    fn=add+{512}},              -- 18
+    {ctype='unsigned char',     label='Slot 17',    fn=add+{512}},              -- 1C
+    {ctype='unsigned char',     label='Slot 18',    fn=add+{512}},              -- 20
+    {ctype='unsigned char',     label='Slot 19',    fn=add+{512}},              -- 24
+    {ctype='unsigned char',     label='Slot 20',    fn=add+{512}},              -- 28
+}
+
 -- PUP
 func.incoming[0x044][0x12] = L{
     {ctype='unsigned char',     label='Automaton Head'},                        -- 08   Harlequinn 1, Valoredge 2, Sharpshot 3, Stormwaker 4, Soulsoother 5, Spiritreaver 6
