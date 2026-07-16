@@ -460,7 +460,7 @@ function equip_gear_by_status(playerStatus, petStatus)
     
     -- If status not defined, treat as idle.
     -- Be sure to check for positive HP to make sure they're not dead.
-    if (playerStatus == 'Idle' or playerStatus == '') and player.hp > 0 then
+    if (playerStatus == 'Idle' or playerStatus == 'Event' or playerStatus == '') and player.hp > 0 then
         equip(get_idle_set(petStatus))
     elseif playerStatus == 'Engaged' then
         equip(get_melee_set(petStatus))
