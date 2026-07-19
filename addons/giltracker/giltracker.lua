@@ -224,12 +224,6 @@ function format_value(amount)
         separator = ','
     end
 
-    local sign = ''
-    if value:sub(1, 1) == '-' then
-        sign = '-'
-        value = value:sub(2)
-    end
-
     local first_group = #value % 3
     if first_group == 0 then
         first_group = 3
@@ -241,7 +235,7 @@ function format_value(amount)
         formatted = formatted..separator..value:sub(index, index + 2)
     end
 
-    return sign..formatted
+    return formatted
 end
 
 function is_cutscene(status_id)
