@@ -28,7 +28,7 @@
 
 _addon.name = 'giltracker'
 _addon.author = 'sylandro'
-_addon.version = '1.0.0'
+_addon.version = '1.0.1'
 _addon.language = 'English'
 
 config = require('config')
@@ -51,6 +51,7 @@ local is_hidden_by_key = false
 
 defaults = {}
 defaults.hideKey = SCROLL_LOCK_KEY
+defaults.thousandsSeparator = ','
 defaults.gilText = {}
 defaults.gilText.bg = {}
 defaults.gilText.bg.alpha = 100
@@ -163,6 +164,12 @@ windower.register_event('keyboard', function(dik, down, _flags, _blocked)
     toggle_display_if_hide_key_is_pressed(dik, down)
 end)
 
+windower.register_event('time change', function()
+    if inventory_loaded then
+        update_gil()
+    end
+end)
+
 function ready_if_valid_treasure_packet(packet_data)
     local p = packets.parse('incoming',packet_data)
     if (p.Count > 0) then ready = true end
@@ -192,7 +199,7 @@ end
 
 function update_gil()
     local gil = windower.ffxi.get_items('gil')
-    gil_text:text(comma_value(gil))
+    gil_text:text(format_value(gil))
 end
 
 function show()
@@ -205,13 +212,36 @@ function hide()
     gil_image:hide()
 end
 
-function comma_value(amount)
-    local formatted = tostring(amount)
-    while true do
-        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-        if (k==0) then break end
+function format_value(amount)
+    local value = tostring(amount)
+    local separator = settings.thousandsSeparator
+
+    if separator == 'space' then
+        separator = ' '
+    elseif separator == 'none' then
+        separator = ''
+    elseif separator == nil or separator == '' then
+        separator = ','
     end
-    return formatted
+
+    local sign = ''
+    if value:sub(1, 1) == '-' then
+        sign = '-'
+        value = value:sub(2)
+    end
+
+    local first_group = #value % 3
+    if first_group == 0 then
+        first_group = 3
+    end
+
+    local formatted = value:sub(1, first_group)
+
+    for index = first_group + 1, #value, 3 do
+        formatted = formatted..separator..value:sub(index, index + 2)
+    end
+
+    return sign..formatted
 end
 
 function is_cutscene(status_id)
