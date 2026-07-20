@@ -45,6 +45,14 @@ local LOGIN_ZONE_PACKET = 0x0A
 local ITEM_UPDATE_PACKET = 0x20
 local ITEM_MODIFY_PACKET = 0x1F
 
+local separator_map = {
+    none = '',
+    space = ' ',
+    period = '.',
+    comma = ',',
+    [''] = ',',
+}
+
 local hideKey = SCROLL_LOCK_KEY
 local is_hidden_by_cutscene = false
 local is_hidden_by_key = false
@@ -52,6 +60,7 @@ local is_hidden_by_key = false
 defaults = {}
 defaults.hideKey = SCROLL_LOCK_KEY
 defaults.thousandsSeparator = ','
+defaults.refreshInterval = 5
 defaults.gilText = {}
 defaults.gilText.bg = {}
 defaults.gilText.bg.alpha = 100
@@ -93,6 +102,16 @@ defaults.gilImage.visible = true
 local settings = config.load(defaults)
 config.save(settings)
 
+function get_separator()
+    local separator = separator_map[settings.thousandsSeparator] or settings.thousandsSeparator
+
+    if type(separator) ~= 'string' then
+        return defaults.thousandsSeparator
+    end
+
+    return separator
+end
+
 settings.gilImage.texture = {}
 settings.gilImage.texture.path = windower.addon_path..'gil.png'
 settings.gilImage.texture.fit = true
@@ -109,6 +128,15 @@ local gil_text = texts.new(settings.gilText)
 local inventory_loaded = false
 local ready = false
 
+local function refresh_gil_loop()
+    while true do
+        coroutine.sleep(math.max(tonumber(settings.refreshInterval) or defaults.refreshInterval, 1))
+        if inventory_loaded then
+            update_gil()
+        end
+    end
+end
+
 config.register(settings, function(settings)
     hideKey = settings.hideKey
     local windower_settings = windower.get_windower_settings()
@@ -122,6 +150,7 @@ windower.register_event('load',function()
     if windower.ffxi.get_info().logged_in then
         initialize()
     end
+    coroutine.schedule(refresh_gil_loop, 0)
 end)
 
 windower.register_event('login',function()
@@ -162,12 +191,6 @@ end)
 
 windower.register_event('keyboard', function(dik, down, _flags, _blocked)
     toggle_display_if_hide_key_is_pressed(dik, down)
-end)
-
-windower.register_event('time change', function()
-    if inventory_loaded then
-        update_gil()
-    end
 end)
 
 function ready_if_valid_treasure_packet(packet_data)
@@ -213,28 +236,19 @@ function hide()
 end
 
 function format_value(amount)
-    local value = tostring(amount)
-    local separator = settings.thousandsSeparator
+    local formatted = tostring(amount)
+    local separator = get_separator()
+    local k
 
-    if separator == 'none' then
-        return value
-    elseif separator == 'space' then
-        separator = ' '
-    elseif separator == 'period' then
-        separator = '.'
-    elseif separator == 'comma' or separator == '' or not separator then
-        separator = ','
+    if separator == '' then
+        return formatted
     end
 
-    local first_group = #value % 3
-    if first_group == 0 then
-        first_group = 3
-    end
-
-    local formatted = value:sub(1, first_group)
-
-    for index = first_group + 1, #value, 3 do
-        formatted = formatted..separator..value:sub(index, index + 2)
+    while true do
+        formatted, k = string.gsub(formatted, '^(%d+)(%d%d%d)', function(prefix, group)
+            return prefix..separator..group
+        end)
+        if k == 0 then break end
     end
 
     return formatted
