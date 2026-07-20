@@ -216,11 +216,13 @@ function format_value(amount)
     local value = tostring(amount)
     local separator = settings.thousandsSeparator
 
-    if separator == 'space' then
+    if separator == 'none' then
+        return value
+    elseif separator == 'space' then
         separator = ' '
-    elseif separator == 'none' then
-        separator = ''
-    elseif separator == nil or separator == '' then
+    elseif separator == 'period' then
+        separator = '.'
+    elseif separator == 'comma' or separator == '' or not separator then
         separator = ','
     end
 
