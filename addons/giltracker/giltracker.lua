@@ -28,7 +28,7 @@
 
 _addon.name = 'giltracker'
 _addon.author = 'sylandro'
-_addon.version = '1.0.1'
+_addon.version = '1.1.0'
 _addon.language = 'English'
 
 config = require('config')
@@ -244,10 +244,10 @@ function format_value(amount)
         return formatted
     end
 
+    local replacement = '%1'..separator:gsub('%%', '%%%%')..'%2'
+
     while true do
-        formatted, k = string.gsub(formatted, '^(%d+)(%d%d%d)', function(prefix, group)
-            return prefix..separator..group
-        end)
+        formatted, k = string.gsub(formatted, '^(%d+)(%d%d%d)', replacement)
         if k == 0 then break end
     end
 
