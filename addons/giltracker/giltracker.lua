@@ -28,7 +28,7 @@
 
 _addon.name = 'giltracker'
 _addon.author = 'sylandro'
-_addon.version = '1.0.0'
+_addon.version = '1.1.0'
 _addon.language = 'English'
 
 config = require('config')
@@ -45,12 +45,22 @@ local LOGIN_ZONE_PACKET = 0x0A
 local ITEM_UPDATE_PACKET = 0x20
 local ITEM_MODIFY_PACKET = 0x1F
 
+local separator_map = {
+    none = '',
+    space = ' ',
+    period = '.',
+    comma = ',',
+    [''] = ',',
+}
+
 local hideKey = SCROLL_LOCK_KEY
 local is_hidden_by_cutscene = false
 local is_hidden_by_key = false
 
 defaults = {}
 defaults.hideKey = SCROLL_LOCK_KEY
+defaults.thousandsSeparator = ','
+defaults.refreshInterval = 5
 defaults.gilText = {}
 defaults.gilText.bg = {}
 defaults.gilText.bg.alpha = 100
@@ -92,6 +102,16 @@ defaults.gilImage.visible = true
 local settings = config.load(defaults)
 config.save(settings)
 
+function get_separator()
+    local separator = separator_map[settings.thousandsSeparator] or settings.thousandsSeparator
+
+    if type(separator) ~= 'string' then
+        return defaults.thousandsSeparator
+    end
+
+    return separator
+end
+
 settings.gilImage.texture = {}
 settings.gilImage.texture.path = windower.addon_path..'gil.png'
 settings.gilImage.texture.fit = true
@@ -108,6 +128,15 @@ local gil_text = texts.new(settings.gilText)
 local inventory_loaded = false
 local ready = false
 
+local function refresh_gil_loop()
+    while true do
+        coroutine.sleep(math.max(tonumber(settings.refreshInterval) or defaults.refreshInterval, 1))
+        if inventory_loaded then
+            update_gil()
+        end
+    end
+end
+
 config.register(settings, function(settings)
     hideKey = settings.hideKey
     local windower_settings = windower.get_windower_settings()
@@ -121,6 +150,7 @@ windower.register_event('load',function()
     if windower.ffxi.get_info().logged_in then
         initialize()
     end
+    coroutine.schedule(refresh_gil_loop, 0)
 end)
 
 windower.register_event('login',function()
@@ -192,7 +222,7 @@ end
 
 function update_gil()
     local gil = windower.ffxi.get_items('gil')
-    gil_text:text(comma_value(gil))
+    gil_text:text(format_value(gil))
 end
 
 function show()
@@ -205,12 +235,22 @@ function hide()
     gil_image:hide()
 end
 
-function comma_value(amount)
+function format_value(amount)
     local formatted = tostring(amount)
-    while true do
-        formatted, k = string.gsub(formatted, "^(-?%d+)(%d%d%d)", '%1,%2')
-        if (k==0) then break end
+    local separator = get_separator()
+    local k
+
+    if separator == '' then
+        return formatted
     end
+
+    local replacement = '%1'..separator:gsub('%%', '%%%%')..'%2'
+
+    while true do
+        formatted, k = string.gsub(formatted, '^(%d+)(%d%d%d)', replacement)
+        if k == 0 then break end
+    end
+
     return formatted
 end
 
