@@ -1,4 +1,4 @@
-_addon.version = '1.2'
+_addon.version = '1.3'
 _addon.name = 'Send'
 _addon.command = 'send'
 _addon.author = 'Byrth, Lili'
@@ -39,7 +39,9 @@ windower.register_event('addon command', function(target, ...)
     if player and target == player['name']:lower() then
         execute_command(command)
         return
-    elseif player and target == '@all' or target == '@'..player.main_job:lower() then
+    elseif target == '@all' then
+        execute_command(command)
+    elseif player and target == '@'..player.main_job:lower() then
         execute_command(command)
     elseif target == '@party' then
         if player then
@@ -67,11 +69,6 @@ windower.register_event('ipc message', function (msg)
         windower.add_to_chat(207, 'send receive (debug): ' .. msg)
     end
 
-    local info = windower.ffxi.get_info()
-    if not info.logged_in then
-        return
-    end
-
     local split = msg:split(' ', string.encoding.shift_jis, 3, false, true)
     if #split < 3 or split[1] ~= 'send' then
         return
@@ -80,6 +77,16 @@ windower.register_event('ipc message', function (msg)
     local target = split[2]
     local command = split[3]
 
+    if target == '@all' or target == '@others' then
+        execute_command(command)
+        return
+    end
+
+    local info = windower.ffxi.get_info()
+    if not info.logged_in then
+        return
+    end
+
     local player = windower.ffxi.get_player()
 
     if target:lower() == player.name:lower() then
@@ -87,7 +94,7 @@ windower.register_event('ipc message', function (msg)
     elseif target:startswith('@') then
         local arg = target:sub(2):lower()
 
-        if arg == player.main_job:lower() or arg == 'all' or arg == 'others' then
+        if arg == player.main_job:lower() then
             execute_command(command)
         elseif arg:startswith('party') then
             local sender = arg:sub(6, #arg):lower()
