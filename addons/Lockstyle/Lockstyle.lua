@@ -165,7 +165,7 @@ windower.register_event('outgoing chunk', function(id, original, modified)
 	local player = windower.ffxi.get_player()
     local packet = packets.parse('outgoing', original)
     if packet.Type == 0 and player then
-        schedule_apply(player.main_job, 'new')
+        schedule_apply(player.main_job, 'same')
     end
 end)
 
