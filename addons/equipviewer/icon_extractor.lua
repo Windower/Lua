@@ -22,7 +22,7 @@
         (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
         SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ]]
--- icon_extractor v1.1.2
+-- icon_extractor v1.1.3
 -- Written by Rubenator of Leviathan
 -- Base Extraction Code graciously provided by Trv of Windower discord
 local icon_extractor = {}
@@ -85,7 +85,7 @@ for i = 0x000, 0x0FF do
 end
 
 --[[
-3072 bytes per icon
+5120 bytes per icon
 640 bytes for stats, string table, etc.
 2432 bytes for pixel data
 --]]
@@ -109,7 +109,10 @@ local item_by_id = function (id, output_path)
     local icon_file = open_dat(dat_stats)
     
     local id_offset = dat_stats.min + dat_stats.offset
-    icon_file:seek('set', (id - id_offset) * 0xC00 + 0x2BD)
+    local icon_stride = 0x1400
+    local icon_data_offset = 0x2BD
+
+    icon_file:seek('set', (id - id_offset) * icon_stride + icon_data_offset)
     local data = icon_file:read(0x800)
 
     bmp = convert_item_icon_to_bmp(data)
