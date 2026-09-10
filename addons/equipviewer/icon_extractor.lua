@@ -85,7 +85,7 @@ for i = 0x000, 0x0FF do
 end
 
 --[[
-5120 bytes per icon
+5120 bytes per item
 640 bytes for stats, string table, etc.
 2432 bytes for pixel data
 --]]
