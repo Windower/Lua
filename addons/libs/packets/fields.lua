@@ -3170,14 +3170,12 @@ func.incoming[0x063][0x03] = L{
     {ctype='unsigned int',      label='_unknown5'},                             -- 18   00s
     {ctype='data[64]',          label='Instinct Bitfield 1'},                   -- 1C   See below
     -- Bitpacked 2-bit values. 0 = no instincts from that species, 1 == first instinct, 2 == first and second instinct, 3 == first, second, and third instinct.
-    {ctype='data[128]',         label='Monster Level Char field'},              -- 5C   Mapped onto the item ID for these creatures. (00 doesn't exist, 01 is rabbit, 02 is behemoth, etc.)
+    {ctype='data[128]',         label='Monster Level Char field'},              -- 5C   Mapped onto the item ID (0 to 127) for these creatures. (00 doesn't exist, 01 is rabbit, 02 is behemoth, etc.)
 }
 
 func.incoming[0x063][0x04] = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 06   B0 00
-    {ctype='data[126]',         label='_unknown2'},                             -- 08   FF-ing has no effect.
-    {ctype='unsigned char',     label='Slime Level'},                           -- 86
-    {ctype='unsigned char',     label='Spriggan Level'},                        -- 87
+    {ctype='data[128]',         label='Monster Level Char field 2'},            -- 08   ID (128 to 255).
     {ctype='data[12]',          label='Instinct Bitfield 3'},                   -- 88   Contains job/race instincts from the 0x03 set. Has 8 unused bytes. This is a 1:1 mapping.
     {ctype='data[32]',          label='Variants Bitfield'},                     -- 94   Does not show normal monsters, only variants. Bit is 1 if the variant is owned. Length is an estimation including the possible padding.
 }
