@@ -218,7 +218,7 @@ parse.i[0x028] = function (data)
     local spell = get_spell(act)
 --    if not spell_res or (spell.english ~= spell_res.english) then print('Did not match.',spell.english,spell_res) end
 
-    if spell then logit('\n\n'..tostring(os.clock)..'(178) Event Action: '..tostring(spell[language])..' '..tostring(act.category))
+    if spell then logit('\n\n'..tostring(os.clock())..'(178) Event Action: '..tostring(spell[language])..' '..tostring(act.category))
     else logit('\n\nNil spell detected') end
 
     if spell and spell[language] then
@@ -341,7 +341,7 @@ parse.i[0x029] = function (data)
     end
 
     if unable_to_use:contains(arr.message_id) then
-        logit('\n\n'..tostring(os.clock)..'(195) Event Action Message: '..tostring(message_id)..' Interrupt')
+        logit('\n\n'..tostring(os.clock())..'(195) Event Action Message: '..tostring(arr.message_id)..' Interrupt')
         local ts,tab = command_registry:find_by_time()
 
         if tab and tab.spell then

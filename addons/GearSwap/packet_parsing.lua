@@ -120,7 +120,7 @@ parse.i[0x01B] = function (data)
     local tab = {}
     for slot_id,slot_name in pairs(default_slot_map) do
         local tf = (((enc%(2^(slot_id+1))) / 2^slot_id) >= 1)
-        if encumbrance_table[slot_id] and not tf and not_sent_out_equip[slot_name] and not disable_table[i] then
+        if encumbrance_table[slot_id] and not tf and not_sent_out_equip[slot_name] and not disable_table[slot_id] then
             tab[slot_name] = not_sent_out_equip[slot_name]
             not_sent_out_equip[slot_name] = nil
         end
@@ -283,7 +283,6 @@ parse.i[0x050] = function (data)
         if chunk == data:sub(5,7) then
             -- Matched
             injected_equipment_registry[slot] = injected_equipment_registry[slot]:slice(ind+1) -- Eliminate current and all preceding packets if we get a match
-            matched = true
             return
         end
         --[[for i=9,9+4*(chunk:byte(5)-1),4 do -- The server replies to equipset packets with both single equip packets and equipset packets.
@@ -307,7 +306,7 @@ function update_equipment()
             tab[default_slot_map[i]] = {
                 bag_id = last:byte(3),
                 slot = last:byte(1) == 0 and empty or last:byte(1),
-                }
+            }
         end
     end
     return tab
@@ -615,12 +614,6 @@ parse.i[0x076] = function (data)
                     end
                 end
                 local new_buffs = convert_buff_list(_ExtraPartyData.buffs[index])
-                if index == 1464 then
-                    local newbuff_count = 0
-                    for _,v in pairs(new_buffs) do
-                        newbuff_count = newbuff_count + 1
-                    end
-                end
                 if cur_player and cur_player.buffactive and not gearswap_disabled and
                         user_env and type(user_env['party_buff_change']) == 'function' then
                     -- Make sure the character existed before (with a buffactive list) - Avoids zoning.

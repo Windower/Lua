@@ -499,7 +499,7 @@ function assemble_use_item_packet(target_id,target_index,item_id)
     outstr = outstr..string.char( (target_id%256), math.floor(target_id/256)%256, math.floor( (target_id/65536)%256) , math.floor( (target_id/16777216)%256) )
     outstr = outstr..string.char(0,0,0,0)
     outstr = outstr..string.char( (target_index%256), math.floor(target_index/256)%256)
-    inventory_index,bag_id = find_usable_item(item_id)
+    local inventory_index,bag_id = find_usable_item(item_id)
     if inventory_index then
         outstr = outstr..string.char(inventory_index%256)..string.char(0,bag_id,0,0,0)
     else
@@ -551,7 +551,7 @@ function assemble_menu_item_packet(target_id,target_index,...)
     -- Inventory Index for the one unit
 
     for i,v in pairs(counts) do
-        inventory_index = find_inventory_item(i)
+        local inventory_index = find_inventory_item(i)
         if inventory_index then
             outstr = outstr..string.char(inventory_index%256)
         else
@@ -678,7 +678,7 @@ function filter_pretarget(action)
         if not table.contains(available,action.id) then
             bool,err = false,"Unable to execute command. You do not have access to that job ability."
         end
-    elseif category == 25 and (not player.main_job_id == 23 or not windower.ffxi.get_mjob_data().species or
+    elseif category == 25 and (player.main_job_id ~= 23 or not windower.ffxi.get_mjob_data().species or
         not res.monstrosity[windower.ffxi.get_mjob_data().species] or not res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[action.id] or
         not (res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[action.id] <= player.main_job_level)) then
         -- Monstrosity filtering
@@ -1008,7 +1008,7 @@ function get_spell(act)
             spell = copy_entry(res.job_abilities[75]) -- 'Elemental Seal'
         elseif msg_ID == 305 then
             spell = copy_entry(res.job_abilities[76]) -- 'Trick Attack'
-        elseif msg_ID == 311 or msg_ID == 311 then
+        elseif msg_ID == 311 or msg_ID == 312 then
             spell = copy_entry(res.job_abilities[79]) -- 'Cover'
         elseif msg_ID == 240 or msg_ID == 241 then
             spell = copy_entry(res.job_abilities[43]) -- 'Hide'
