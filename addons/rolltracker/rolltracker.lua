@@ -25,7 +25,7 @@
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name = 'RollTracker'
-_addon.version = '1.8.1.1'
+_addon.version = '1.8.1.2'
 _addon.author = 'Balloon'
 _addon.commands = {'rolltracker','rt'}
 
@@ -48,8 +48,14 @@ defaults.color.bonus = 13
 defaults.color.lucky = 158
 defaults.color.warn = 159
 defaults.color.unlucky = 167
+defaults.color.bust = 167
 
 settings = config.load(defaults)
+
+lastRoll = {}
+lastRoll.reported = false
+lastRoll.rollID = 0
+lastRoll.rollNum = 0
 
 windower.register_event('addon command',function (...)
     cmd = {...}
@@ -208,7 +214,10 @@ end)
 windower.register_event('load', 'login', function()
     isLucky = false
     rollPlusBonus = false
-    lastRoll = 0
+    lastRoll.reported = false
+    lastRoll.rollID = 0
+    lastRoll.rollNum = 0
+
     player = windower.ffxi.get_player()
 end)
 
@@ -272,11 +281,14 @@ windower.register_event('action', function(act)
 
 
             if rollNum == 12 and #rollMembers > 0 then
-                local bustchat = amountHit..'Bust! '..chat.controls.reset..chars.implies..' '..membersHit..' '..chars.implies..' ('..rollInfo[rollID][rollNum+1]..rollInfo[rollID][14]..')'
-                windower.add_to_chat(settings.channel.roll, bustchat:color(settings.color.bust))
+                local bustchat = amountHit..'Bust! ':color(settings.color.bust)..chat.controls.reset..chars.implies..' '..membersHit..' '..chars.implies..' ('..rollInfo[rollID][rollNum+1]..rollInfo[rollID][14]..')'
+                windower.add_to_chat(settings.channel.roll, bustchat)
             else
                 local bonuschat = ' (+'..rollBonus..')'
                 windower.add_to_chat(settings.channel.roll, amountHit..membersHit..chat.controls.reset..' '..chars.implies..' '..rollInfo[rollID][1]..' Roll '..chars['circle' .. rollNum]..luckChat.. bonuschat:color(settings.color.bonus) ..BustRate(rollNum, rollActor)..ReportRollInfo(rollID, rollActor))
+            end
+            if isLucky then
+                lastRoll.reported = false
             end
         end
     end
@@ -292,12 +304,20 @@ function RollEffect(rollid, rollnum)
     local rollName = rollInfo[rollid][1]
     local rollVal = rollInfo[rollid][rollnum]
 
-    if lastRoll ~= rollid then
-        lastRoll = rollid
+    -- If we changed rolls, always report the first roll
+    if lastRoll.rollID ~= rollid then
+        lastRoll.rollID = rollid
+        lastRoll.reported = false
         rollPlusBonus = false
         gearBonus = false
         jobBonus = false
+    -- If we're doing the same roll multiple times, try to detect it
+    -- This will still miss a scenario where we roll a low number, fold, and re-roll the same roll
+    -- if we get a higher number the second time, but what can we really do
+    elseif rollnum <= lastRoll.rollNum then
+        lastRoll.reported = false
     end
+    lastRoll.rollNum = rollnum
 
     --I'm handling one roll a bit odd, so I need to deal with it separately.
     --Which is stupid, I know, but look at how I've done most of this.
@@ -398,17 +418,13 @@ function BustRate(rollNum, rollActor)
 end
 
 --Display Lucky/Unlucky #s and check if it's already been reported once.
-reportedOnce = false
 function ReportRollInfo(rollID, rollActor)
-    if rollActor ~= player.id or not settings.luckyinfo then
+    if rollActor ~= player.id or not settings.luckyinfo or lastRoll.reported then
         return ''
-    elseif reportedOnce then
-        reportedOnce = false
-        return ''
-    else
-        reportedOnce = true
-        return '\7  '..rollInfo[rollID][1]..' Roll\'s Lucky #: ' ..rollInfo[rollID][15]..' Unlucky #: '..rollInfo[rollID][16]
     end
+
+    lastRoll.reported = true
+    return '\7  '..rollInfo[rollID][1]..' Roll\'s Lucky #: ' ..rollInfo[rollID][15]..' Unlucky #: '..rollInfo[rollID][16]
 end
 
 --Checks to see if the below event has ran more than twice to enable busting
@@ -442,6 +458,6 @@ windower.register_event('outgoing text', function(original, modified)
 
         return modified
     end
-   return modified
+    return modified
 
 end)
