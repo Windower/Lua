@@ -65,7 +65,7 @@ function export_set(options)
 
     local compact = contains_any('compact')
     local bgwiki = contains_any('bgwiki')
-    if check_exclusive(compact) then
+    if check_exclusive(compact, bgwiki) then
         msg.addon_msg(123, 'Cannot export: "compact" and "bgwiki" are mutually exclusive.')
         return
     end
@@ -128,7 +128,7 @@ function export_set(options)
 
     msg.addon_msg(123, buildmsg)
 
-    local item_list = T{}
+    local item_list, exported = T{}, nil
     if all_items then
         for i = 0, #res.bags do
             item_list:extend(get_item_list(items[res.bags[i].english:gsub(' ', ''):lower()]))
@@ -326,7 +326,7 @@ function unpack_names(ret_tab,up,tab_level,unpacked_table,exported)
         elseif i=='name' and type(v) == 'string' then
             alt = up
             flag = true
-        elseif type(v) == 'string' and v~='augment' and v~= 'augments' and v~= 'priority' then
+        elseif type(v) == 'string' and v~='augment' and v~= 'augments' and v~= 'priority' and i ~= 'bag' and v ~= 'bag' then
             alt = i
             flag = true
         end
@@ -341,11 +341,6 @@ function unpack_names(ret_tab,up,tab_level,unpacked_table,exported)
                     for aug_ind,augment in pairs(tab_level.augments) do
                         if augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
                     end
-                    if aug_str ~= '' then unpacked_table[#unpacked_table].augments = aug_str end
-                end
-                if tab_level.augment then
-                    local aug_str = unpacked_table[#unpacked_table].augments or ''
-                    if tab_level.augment ~= 'none' then aug_str = aug_str.."'"..augment:gsub("'","\\'").."'," end
                     if aug_str ~= '' then unpacked_table[#unpacked_table].augments = aug_str end
                 end
                 exported[tempname:lower()] = true

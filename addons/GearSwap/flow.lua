@@ -65,7 +65,7 @@ function equip_sets(swap_type,ts,...)
         end
     end
 
-    logit('\n\n'..tostring(os.clock)..'(15) equip_sets: '..tostring(swap_type))
+    logit('\n\n'..tostring(os.clock())..'(15) equip_sets: '..tostring(swap_type))
     if val1 then
         if type(val1) == 'table' and val1.english then
             logit(' : '..val1.english)
@@ -142,7 +142,7 @@ function equip_sets(swap_type,ts,...)
                 failure_reason = 'KOed'
             end
             msg.debugging("Cannot change gear right now: "..tostring(failure_reason))
-            logit('\n\n'..tostring(os.clock)..'(69) failure_reason: '..tostring(failure_reason))
+            logit('\n\n'..tostring(os.clock())..'(69) failure_reason: '..tostring(failure_reason))
         else
             local chunk_table = L{}
             for eq_slot_id,priority in priorities:it() do
@@ -318,7 +318,7 @@ end
 function user_pcall(str,...)
     if user_env then
         if type(user_env[str]) == 'function' then
-            bool,err = pcall(user_env[str],...)
+            local bool,err = pcall(user_env[str],...)
             if not bool then error('\nGearSwap has detected an error in the user function '..str..':\n'..err) end
         elseif user_env[str] then
             msg.addon_msg(123,windower.to_shift_jis(tostring(str))..'() exists but is not a function')
@@ -339,7 +339,7 @@ end
 function user_pcall2(str,...)
     if user_env then
         if type(user_env[str]) == 'function' then
-            bool,err = pcall(user_env[str],...)
+            local bool,err = pcall(user_env[str],...)
             if not bool then print('\nGearSwap has detected an error in the user function '..str..':\n'..err) end
         elseif user_env[str] then
             msg.addon_msg(123,windower.to_shift_jis(tostring(str))..'() exists but is not a function')

@@ -114,7 +114,7 @@ require 'actions'
 packets = require 'packets'
 
 -- Resources Checks
-if res.items and res.bags and res.slots and res.statuses and res.jobs and res.elements and res.skills and res.buffs and res.spells and res.job_abilities and res.weapon_skills and res.monster_skills and res.action_messages and res.skills and res.monstrosity and res.weather and res.moon_phases and res.races and res.monster_abilities then
+if res.items and res.bags and res.slots and res.statuses and res.jobs and res.elements and res.skills and res.buffs and res.spells and res.job_abilities and res.weapon_skills and res.monster_skills and res.action_messages and res.monstrosity and res.weather and res.moon_phases and res.races and res.monster_abilities then
 else
     error('Missing resources!')
 end
@@ -151,7 +151,7 @@ end)
 
 windower.register_event('addon command',function (...)
     windower.debug('addon command')
-    logit('\n\n'..tostring(os.clock)..table.concat({...},' '))
+    logit('\n\n'..tostring(os.clock())..table.concat({...},' '))
     local splitup = {...}
     if not splitup[1] then return end -- handles //gs
 

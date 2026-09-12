@@ -160,14 +160,14 @@ function unpack_equip_list(equip_list,cur_equip)
                                     -- If the item is Rare, then even if the augments are wrong try to equip it anyway because you only have one
                                         equip_list[slot_name] = nil
                                         ret_list[slot_id] = {bag_id=bag.id,slot=item_tab.slot}
-                                        used_list = ret_list[slot_id]
+                                        used_list[slot_id] = ret_list[slot_id]
                                         break
                                     --else the piece specifies augments that don't match the current piece, so don't break and keep trying.
                                     end
                                 else
                                     equip_list[slot_name] = nil
                                     ret_list[slot_id] = {bag_id=bag.id,slot=item_tab.slot}
-                                    used_list = ret_list[slot_id]
+                                    used_list[slot_id] = ret_list[slot_id]
                                     break
                                 end
                             end
@@ -192,11 +192,11 @@ function unpack_equip_list(equip_list,cur_equip)
             else
                 for __,slot_name in pairs(default_slot_map) do
                     local name = expand_entry(equip_list[slot_name])
-                    if name ~= empty and name_match(item_id,name) then
+                    if name and name ~= empty and name_match(item_tab.id,name) then
                         if not res.items[item_tab.id].jobs[player.main_job_id] then
                             equip_list[slot_name] = nil
                             error_list[slot_name] = name..' (cannot be worn by this job)'
-                        elseif not (res.items[item_tab.id].level<=player.jobs[player.main_job]) then
+                        elseif not (res.items[item_tab.id].level<=player.jobs[res.jobs[player.main_job_id].ens]) then
                             equip_list[slot_name] = nil
                             error_list[slot_name] = name..' (job level is too low)'
                         elseif not res.items[item_tab.id].races[player.race_id] then

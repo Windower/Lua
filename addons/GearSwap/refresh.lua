@@ -243,7 +243,6 @@ function refresh_player(dt,user_event_flag)
                 pet.claim_id = nil
                 pet.is_npc = nil
                 pet.isvalid = true
-                if pet.tp then pet.tp = pet.tp/10 end
 
                 if avatar_element[pet.name] then
                     pet.element = res.elements[avatar_element[pet.name]][language]
@@ -345,8 +344,6 @@ function refresh_player(dt,user_event_flag)
     player.target = target_complete(windower.ffxi.get_mob_by_target('t'))
     player.subtarget = target_complete(windower.ffxi.get_mob_by_target('st'))
     player.last_subtarget = target_complete(windower.ffxi.get_mob_by_target('lastst'))
-
-    
 
     table.reassign(fellow,target_complete(windower.ffxi.get_mob_by_target('<ft>')))
     if fellow.name then
@@ -622,7 +619,7 @@ end
 ---- It also allows one to check for the alternate spelling of an item.
 -----------------------------------------------------------------------------------
 function refresh_item_list(itemlist)
-    retarr = make_user_table()
+    local retarr = make_user_table()
     for i,v in pairs(itemlist) do
         if type(v) == 'table' and v.id and v.id ~= 0 then
             -- If we don't already have the primary item name in the table, add it.
