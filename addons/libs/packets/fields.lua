@@ -710,11 +710,11 @@ fields.outgoing[0x05A] = L{
 -- Dialogue options
 fields.outgoing[0x05B] = L{
     {ctype='unsigned int',      label='Target',             fn=id},             -- 04
-    {ctype='unsigned short',    label='Option Index'},                          -- 08
-    {ctype='unsigned short',    label='_unknown1'},                             -- 0A
+    {ctype='unsigned int',      label='Option Index'},                          -- 08
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0C
-    {ctype='bool',              label='Automated Message'},                     -- 0E   1 if the response packet is automatically generated, 0 if it was selected by you
-    {ctype='unsigned char',     label='_unknown2'},                             -- 0F
+    {ctype='bool',              label='Continue',                               -- 0E   Determines which mode the menu uses
+                                alias='Automated Message'},
+    {ctype='unsigned char',     label='_padding'            const=0},           -- 0F
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 10
     {ctype='unsigned short',    label='Menu ID'},                               -- 12
 }
@@ -725,11 +725,11 @@ fields.outgoing[0x05C] = L{
     {ctype='float',             label='Z'},                                     -- 08
     {ctype='float',             label='Y'},                                     -- 0C
     {ctype='unsigned int',      label='Target ID',          fn=id},             -- 10   NPC that you are requesting a warp from
-    {ctype='unsigned int',      label='_unknown1'},                             -- 14   01 00 00 00 observed
+    {ctype='unsigned int',      label='Option Index'},                          -- 14
     {ctype='unsigned short',    label='Zone'},                                  -- 18
     {ctype='unsigned short',    label='Menu ID'},                               -- 1A
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 1C
-    {ctype='unsigned char',     label='_unknown2',          const=1},           -- 1E
+    {ctype='bool',              label='Continue',           const=true},        -- 1E   Always set for warp requests
     {ctype='unsigned char',     label='Rotation'},                              -- 1F
 }
 
@@ -2081,7 +2081,7 @@ fields.incoming[0x033] = L{
     {ctype='char[16]',          label='_dupeNPC Name1'},                        -- 20
     {ctype='char[16]',          label='_dupeNPC Name2'},                        -- 30
     {ctype='char[16]',          label='_dupeNPC Name3'},                        -- 40
-    {ctype='char[32]',          label='Menu Parameters'},                       -- 50   The way this information is interpreted varies by menu.
+    {ctype='data[32]',          label='Menu Parameters'},                       -- 50   The way this information is interpreted varies by menu.
 }
 
 -- NPC Interaction Type 2
@@ -3484,7 +3484,7 @@ fields.incoming[0x0AC] = L{
 }
 
 fields.incoming[0x0AE] = L{
-    {ctype='data[7]',        label='Mounts'},                                -- 04
+    {ctype='data[7]',           label='Mounts'},                                -- 04
 }
 
 -- Moblin Maze Mongers information
@@ -3502,6 +3502,14 @@ fields.incoming[0x0B5] = L{
     {ctype='data[0x14]',        label='_unknown1'},                             -- 04
     {ctype='unsigned int',      label='Number of Opens'},                       -- 18
     {ctype='unsigned int',      label='_unknown2'},                             -- 1C
+}
+
+-- Reservation Response
+fields.incoming[0x0BF] = L{
+    {ctype='unsigned short',    label='_unknown1'},                             -- 04
+    {ctype='unsigned short',    label='Result'},                                -- 06   Success is 4, other values are failures
+    {ctype='unsigned int',      label='_unknown2'},                             -- 08
+    {ctype='unsigned int',      label='NPC Index'},                             -- 0C
 }
 
 -- Alliance status update
