@@ -2377,6 +2377,11 @@ func.incoming[0x044].base = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 06
 }
 
+-- COR
+func.incoming[0x044][0x11] = L{
+    {ctype='data[4]',           label='Available Rolls'},                       -- 08 bitfield of available Phantom Rolls
+}
+
 -- PUP
 func.incoming[0x044][0x12] = L{
     {ctype='unsigned char',     label='Automaton Head'},                        -- 08   Harlequinn 1, Valoredge 2, Sharpshot 3, Stormwaker 4, Soulsoother 5, Spiritreaver 6
