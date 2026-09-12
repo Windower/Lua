@@ -192,7 +192,7 @@ function unpack_equip_list(equip_list,cur_equip)
             else
                 for __,slot_name in pairs(default_slot_map) do
                     local name = expand_entry(equip_list[slot_name])
-                    if name ~= empty and name_match(item_tab.id,name) then
+                    if name and name ~= empty and name_match(item_tab.id,name) then
                         if not res.items[item_tab.id].jobs[player.main_job_id] then
                             equip_list[slot_name] = nil
                             error_list[slot_name] = name..' (cannot be worn by this job)'
