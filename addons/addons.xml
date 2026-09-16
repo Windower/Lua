@@ -879,4 +879,11 @@
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>https://discord.gg/aUrHCvk</support>
   </addon>
+   <addon>
+    <name>Glide</name>
+    <author>Staticvoid</author>
+    <description>Addon for tracking and displaying Hover Shot stack count and distance from last Hover attack.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>https://discord.gg/aUrHCvk</support>
+  </addon>
 </addons>
