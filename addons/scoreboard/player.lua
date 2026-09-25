@@ -16,7 +16,8 @@ function Player:new (o)
     local attrs = {
         clock = nil,            -- specific DPS clock for this player
         damage = 0,             -- total damage done by this player
-        ws  = T{},              -- table of all WS and their corresponding damage
+        ws_total = 0,           -- sum of all WS damage
+        ws_count = 0,           -- number of WS landed
         ws_misses = 0,          -- total ws misses
         m_hits = 0,             -- total melee hits
         m_misses = 0,           -- total melee misses
@@ -67,14 +68,8 @@ end
 
 
 function Player:add_ws_damage(ws_name, damage)
-    --[[
-    if not self.ws[ws_name] then
-        self.ws[ws_name] = L{}
-    end
-    
-    self.ws[ws_name]:append(damage)
-    ]]
-    self.ws:append(damage)
+    self.ws_count = self.ws_count + 1
+    self.ws_total = self.ws_total + damage
     self.damage = self.damage + damage
 end
 

@@ -84,6 +84,13 @@ Command list:
   //sb stat acc            Shows accuracy for everyone
   //sb stat crit Flippant  Only show crit rate for Flippant
 
+* SET <flag> <value>
+  Sets a configuration variable in-game and saves it to settings.xml.
+  Run //sb help for the full list of valid flags.
+  Examples:
+  //sb set LogPeriod 30    Prune mob entries after 30 minutes of inactivity
+  //sb set LogPeriod 0     Disable pruning (keep mob entries forever)
+
 The settings file, located in addons/scoreboard/data/settings.xml, contains
 additional configuration options:
 * posX - x coordinate for position
@@ -99,7 +106,9 @@ additional configuration options:
 * showallidps - Set to true to display the alliance DPS, false otherwise.
 * resetfilters - Set to true if you want filters reset when you "//sb reset", false otherwise.
 * showfellow - Set to true to display your adventuring fellow's DPS, false otherwise.
- 
+* logPeriod - Minutes to keep mob entries before pruning (0 = keep forever).
+              Can also be changed in-game with //sb set LogPeriod <minutes>.
+
 Caveats:
 * DPS is an approximation, although I tested it manually and found it to
   be very accurate. Because DPS accumulation is based on the game's notion

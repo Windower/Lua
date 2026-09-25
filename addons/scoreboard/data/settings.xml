@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <settings>
-  <!--
+	<!--
 	This file controls the settings for the Scoreboard plugin.
 	Settings in the <global> section apply to all characters
 
@@ -9,6 +9,7 @@
 		posY - y coordinate for position
 		numPlayers - The maximum number of players to display damage for
 		bgTransparency - Transparency level for the background. 0-255 range
+		logPeriod - Minutes to keep mob entries before pruning (0 = keep forever)
 	-->
 	<global>
 		<posX>10</posX>
@@ -16,6 +17,7 @@
 		<bgTransparency>200</bgTransparency>
 		<numPlayers>8</numPlayers>
         <UpdateFrequency>0.5</UpdateFrequency>
+		<logPeriod>0</logPeriod>
 	</global>
 
 	<!--
