@@ -11,5 +11,10 @@ This addon displays a grid detailing empty and filled inventory slots, similar t
 5. Type ``` lua r invtracker ``` to reload the addon
 6. Press Insert in FFXI again to close the windower console
 
+### Slot size
+
+The size of the inventory dots can be adjusted in `settings.xml` using the
+`slotImage.box.size` and `slotImage.background.size` height and width values.
+
 ## Issues:
 1. There is no way to get the inventory sort order, so all items in the grid will be ordered by status and item count.
