@@ -1,6 +1,6 @@
-**Author:**  Cairthenn<br>
-**Version:**  1.2<br>
-**Date:** Jan. 31, 2016<br>
+**Author:**  Cairthenn, Nineball<br>
+**Version:**  1.4<br>
+**Date:** July 7, 2025<br>
 
 # FastCS #
 

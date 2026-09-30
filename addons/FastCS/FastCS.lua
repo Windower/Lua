@@ -1,6 +1,6 @@
 _addon.name = "FastCS"
-_addon.author = "Cairthenn"
-_addon.version = "1.3"
+_addon.author = "Cairthenn, Nineball"
+_addon.version = "1.4"
 _addon.commands = {"FastCS","FCS"}
 
 --Requires:
@@ -11,7 +11,7 @@ require("luau")
 
 defaults = {}
 defaults.frame_rate_divisor = 2
-defaults.exclusions = S{"home point #1", "home point #2", "home point #3", "home point #4", "home point #5", "igsli", "urbiolaine", "teldro-kesdrodo", "nunaarl bthtrogg", "survival guide", "waypoint"}
+defaults.exclusions = S{"home point #1", "home point #2", "home point #3", "home point #4", "home point #5", "igsli", "urbiolaine", "teldro-kesdrodo", "nunaarl bthtrogg", "survival guide", "waypoint", "treasure casket"}
 settings = config.load(defaults)
 
 -- Globals:
@@ -30,6 +30,8 @@ helptext = [[FastCS - Command List:
 	- The prefix can be used interchangeably. For example, "fastcs fps 2" will set the default to 30 FPS.
 3. exclusion [add|remove] <name>
     - Adds or removes a target from the exclusions list. Case insensitive.
+4. exclusion list
+    - Shows currently loaded exclusions list.
  ]]
  
 function disable()
@@ -125,9 +127,17 @@ windower.register_event("addon command", function (command,...)
             if args[1] == "add" then
                 settings.exclusions:add(args[2]:lower())
                 notice(args[2] .. " added to the exclusions list.")
+                settings:save()
             elseif args[1] == "remove" then
                 settings.exclusions:remove(args[2]:lower())
                 notice(args[2] .. " removed from the exclusions list.")
+                settings:save()
+            else
+                error("The command syntax was invalid.")
+            end
+        elseif #args == 1 then
+            if args[1] == "list" then
+                notice("exclusions : " .. tostring(settings.exclusions))
             else
                 error("The command syntax was invalid.")
             end
