@@ -622,21 +622,31 @@ function refresh_item_list(itemlist)
     local retarr = make_user_table()
     for i,v in pairs(itemlist) do
         if type(v) == 'table' and v.id and v.id ~= 0 then
+            local item = res.items[v.id]
+            local item_name = item[language]
             -- If we don't already have the primary item name in the table, add it.
-            if res.items[v.id] and res.items[v.id][language] and not retarr[res.items[v.id][language]] then
-                retarr[res.items[v.id][language]] = table.copy(v)
-                retarr[res.items[v.id][language]].shortname=res.items[v.id][language]:lower()
-                -- If a long version of the name exists, and is different from the short version,
-                -- add the long name to the info table and point the long name's key at that table.
-                if res.items[v.id][language..'_log'] and res.items[v.id][language..'_log']:lower() ~= res.items[v.id][language]:lower() then
-                    retarr[res.items[v.id][language]].longname = res.items[v.id][language..'_log']:lower()
-                    retarr[res.items[v.id][language..'_log']] = retarr[res.items[v.id][language]]
+            if item and item_name then
+                local entry = retarr[item_name]
+                if entry then
+                    -- If there's already an entry for this item, all the hard work has already
+                    -- been done.  Just update the count on the subtable of the main item, and
+                    -- everything else will link together.
+                    entry.count = entry.count + v.count
+                else
+                    local lower_item_name = item_name:lower()
+                    local new_entry = table.copy(v)
+                    new_entry.shortname=lower_item_name
+                    retarr[item_name] = new_entry
+
+                    -- If a long version of the name exists, and is different from the short version,
+                    -- add the long name to the info table and point the long name's key at that table.
+                    local long_item_name = item[language..'_log']
+                    local lower_long_item_name = long_item_name:lower()
+                    if long_item_name and lower_long_item_name ~= lower_item_name then
+                        new_entry.longname = lower_long_item_name
+                        retarr[long_item_name] = new_entry
+                    end
                 end
-            elseif res.items[v.id] and res.items[v.id][language] then
-                -- If there's already an entry for this item, all the hard work has already
-                -- been done.  Just update the count on the subtable of the main item, and
-                -- everything else will link together.
-                retarr[res.items[v.id][language]].count = retarr[res.items[v.id][language]].count + v.count
             end
         end
     end
