@@ -623,7 +623,7 @@ function refresh_item_list(itemlist)
     for i,v in pairs(itemlist) do
         if type(v) == 'table' and v.id and v.id ~= 0 then
             local item = res.items[v.id]
-            local item_name = item[language]
+            local item_name = item and item[language]
             -- If we don't already have the primary item name in the table, add it.
             if item and item_name then
                 local entry = retarr[item_name]
@@ -641,8 +641,8 @@ function refresh_item_list(itemlist)
                     -- If a long version of the name exists, and is different from the short version,
                     -- add the long name to the info table and point the long name's key at that table.
                     local long_item_name = item[language..'_log']
-                    local lower_long_item_name = long_item_name:lower()
-                    if long_item_name and lower_long_item_name ~= lower_item_name then
+                    local lower_long_item_name = long_item_name and long_item_name:lower()
+                    if lower_long_item_name and lower_long_item_name ~= lower_item_name then
                         new_entry.longname = lower_long_item_name
                         retarr[long_item_name] = new_entry
                     end
