@@ -31246,7 +31246,7 @@ return {
         },
     },
     ["Sollerets"] = {
-        ["crystal"] = "Fire Crystal",
+        ["crystal"] = "Earth Crystal",
         ["ingredients"] = {
             "Mythril Sheet",
             "Mythril Sheet",
