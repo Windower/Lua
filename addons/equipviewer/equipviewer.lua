@@ -104,6 +104,7 @@ local defaults = {
     hide_on_zone = true,
     hide_on_cutscene = true,
     left_justify = false,
+    draggable = false,
 }
 settings = config.load(defaults)
 config.save(settings)
@@ -111,6 +112,37 @@ if settings.game_path then
     icon_extractor.ffxi_path(settings.game_path)
 end
 local last_encumbrance_bitfield = 0
+local pending_drag_save = false
+local last_drag_move_time = 0
+
+function position_all_ui_elements()
+    if bg_image then
+        bg_image:pos(settings.pos.x, settings.pos.y)
+    end
+    for _, slot in pairs(equipment_data) do
+        if slot.image then
+            position(slot)
+        end
+    end
+    for _, slot in pairs(encumbrance_data) do
+        if slot.image then
+            position(slot)
+        end
+    end
+    if ammo_count_text then
+        if settings.left_justify then
+            ammo_count_text:pos(
+                settings.pos.x + settings.size*3,
+                settings.pos.y + settings.size*0.58
+            )
+        else
+            ammo_count_text:pos(
+                (windower.get_windower_settings().ui_x_res - (settings.pos.x + settings.size*4))*-1,
+                settings.pos.y + settings.size*0.58
+            )
+        end
+    end
+end
 
 -- gets the currently equipped item data for the slot information provided
 local function get_equipped_item(slotName, slotId, bag, index)
@@ -347,6 +379,9 @@ end
 
 -- Moves ui object to correct spot based on 'display_pos' field
 function position(slot)
+    if not slot.image then
+        return
+    end
     local pos_x = settings.pos.x + ((slot.display_pos % 4) * settings.size)
     local pos_y = settings.pos.y + (math.floor(slot.display_pos / 4) * settings.size)
     slot.image:pos(pos_x, pos_y)
@@ -402,6 +437,27 @@ function display_ammo_count(count)
     end
 end
 
+windower.register_event('prerender', function()
+    if not settings.draggable or not bg_image then
+        return
+    end
+
+    local moved_x = math.floor(bg_image:pos_x())
+    local moved_y = math.floor(bg_image:pos_y())
+    if moved_x ~= settings.pos.x or moved_y ~= settings.pos.y then
+        settings.pos.x = moved_x
+        settings.pos.y = moved_y
+        position_all_ui_elements()
+        pending_drag_save = true
+        last_drag_move_time = os.clock()
+    end
+
+    if pending_drag_save and (os.clock() - last_drag_move_time) > 0.25 then
+        config.save(settings)
+        pending_drag_save = false
+    end
+end)
+
 -- Called when player status changes.
 windower.register_event('status change', function(new_status_id)
     if new_status_id == 4 and settings.hide_on_cutscene then --Cutscene/Menu
@@ -456,6 +512,30 @@ windower.register_event('addon command', function (...)
         setup_ui()
 
         log('Position changed to '..settings.pos.x..', '..settings.pos.y)
+    elseif cmd == 'draggable' or cmd == 'drag' then
+        if #cmd_args < 1 then
+            settings.draggable = not settings.draggable
+        else
+            local state = tostring(cmd_args[1]):lower()
+            if S{'1', 'on', 'true'}:contains(state) then
+                settings.draggable = true
+            elseif S{'0', 'off', 'false'}:contains(state) then
+                settings.draggable = false
+            else
+                error('Invalid argument. Use on/off.')
+                return
+            end
+        end
+
+        if bg_image then
+            bg_image:draggable(settings.draggable)
+        end
+        if not settings.draggable and pending_drag_save then
+            pending_drag_save = false
+        end
+
+        config.save(settings)
+        log('draggable changed to '..tostring(settings.draggable))
     elseif cmd == 'size' then
         if #cmd_args < 1 then
             error('Not enough arguments.')
@@ -621,6 +701,7 @@ windower.register_event('addon command', function (...)
         log('ev hideonzone: toggles hiding while crossing zone line')
         log('ev hideoncutscene: toggles hiding when in cutscene/npc menu/etc')
         log('ev justify: toggles between ammo text left and right justify')
+        log('ev draggable [on|off]: toggles allowing drag to move the display')
     end
 end)
 
@@ -642,7 +723,7 @@ function refresh_ui_settings()
             width = settings.size * 4,
             height = settings.size * 4,
         },
-        draggable = false,
+        draggable = settings.draggable,
     }
     equipment_image_settings = {
         color = {
