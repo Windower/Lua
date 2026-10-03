@@ -48,8 +48,8 @@ windower.register_event('outgoing text', function(original, modified)
             return ' ' .. str:gsub(' ', string.char(7)) .. ' '
         end):split(' '):filter(-'')
 
-    if splitline.n == 0 then
-        return
+    if not splitline[2] then
+        return modified
     end
 
     local command = splitline[1]
@@ -57,9 +57,9 @@ windower.register_event('outgoing text', function(original, modified)
     local unified_prefix = unify_prefix[command]
     local abil, temp_mob_arr
 
-    if splitline[2] and not bstpet then
+    if not bstpet then
         abil = splitline[2]:gsub(string.char(7), ' '):lower()
-    elseif splitline[2] and bstpet then
+    elseif bstpet then
         local pet_abilities = {}
         for _, v in ipairs(windower.ffxi.get_abilities().job_abilities) do
             if v >= bstpet_range.min and v <= bstpet_range.max then
