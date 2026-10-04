@@ -882,7 +882,7 @@
    <addon>
     <name>Glide</name>
     <author>Staticvoid</author>
-    <description>addon for building and maintaining Hover Shot bonus; Tracks and displays Hover shot stacks and distance from last applicable hover attack.</description>
+    <description>Addon for building and maintaining Hover Shot bonus; Tracks and displays Hover shot stacks and distance from last applicable hover attack.</description>
     <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
     <support>https://discord.gg/aUrHCvk</support>
   </addon>
