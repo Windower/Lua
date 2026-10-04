@@ -59,10 +59,11 @@ windower.register_event('outgoing text', function(original, modified)
         return modified
     end
 
-    local abil, temp_mob_arr
-
+    local abil
+    local targ = splitline[3]
     if unified_prefix == '/ra' then
         storedcommand = command .. ' '
+        targ = splitline[2]
     elseif bstpet then
         storedcommand = command .. ' ' .. splitline[2]
         local pet_abilities = {}
@@ -79,13 +80,12 @@ windower.register_event('outgoing text', function(original, modified)
         abil = splitline[2]:gsub(string.char(7), ' '):lower()
     end
 
-    if validabils[language][unified_prefix] and validabils[language][unified_prefix][abil] then
-        temp_mob_arr = valid_target(splitline[3])
-    elseif validabils[language][unified_prefix] then
-        temp_mob_arr = valid_target(splitline[2])
+    local temp_mob_arr = valid_target(targ)
+    if not temp_mob_arr then
+        return modified
     end
 
-    if not (temp_mob_arr and (validabils[language][unified_prefix][abil] or unified_prefix == '/ra')) then
+    if not (validabils[language][unified_prefix][abil] or unified_prefix == '/ra') then
         return modified
     end
 
