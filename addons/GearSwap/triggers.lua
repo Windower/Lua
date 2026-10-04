@@ -55,11 +55,16 @@ windower.register_event('outgoing text', function(original, modified)
     local command = splitline[1]
     local bstpet = (command == '/bstpet' and tonumber(splitline[2]))
     local unified_prefix = unify_prefix[command]
+    if not unified_prefix then
+        return modified
+    end
+
     local abil, temp_mob_arr
 
-    if not bstpet then
-        abil = splitline[2]:gsub(string.char(7), ' '):lower()
+    if unified_prefix == '/ra' then
+        storedcommand = command .. ' '
     elseif bstpet then
+        storedcommand = command .. ' ' .. splitline[2]
         local pet_abilities = {}
         for _, v in ipairs(windower.ffxi.get_abilities().job_abilities) do
             if v >= bstpet_range.min and v <= bstpet_range.max then
@@ -69,6 +74,9 @@ windower.register_event('outgoing text', function(original, modified)
         if pet_abilities[tonumber(splitline[2])] then
             abil = res.job_abilities[pet_abilities[tonumber(splitline[2])]].name:gsub(string.char(7), ' '):lower() -- .name, or .english?
         end
+    else
+        storedcommand = nil
+        abil = splitline[2]:gsub(string.char(7), ' '):lower()
     end
 
     if validabils[language][unified_prefix] and validabils[language][unified_prefix][abil] then
@@ -77,7 +85,7 @@ windower.register_event('outgoing text', function(original, modified)
         temp_mob_arr = valid_target(splitline[2])
     end
 
-    if not (unified_prefix and temp_mob_arr and (validabils[language][unified_prefix][abil] or unified_prefix == '/ra')) then
+    if not (temp_mob_arr and (validabils[language][unified_prefix][abil] or unified_prefix == '/ra')) then
         return modified
     end
 
@@ -106,28 +114,22 @@ windower.register_event('outgoing text', function(original, modified)
 
     if unified_prefix == '/ma' then
         r_line = copy_entry(res.spells[validabils[language][unified_prefix][abil]])
-        storedcommand = command .. ' "' .. windower.to_shift_jis(r_line[language]) .. '" '
     elseif unified_prefix == '/ms' and find_monster_skill(abil) then
         r_line = find_monster_skill(abil)
-        storedcommand = command .. ' "' .. windower.to_shift_jis(r_line[language]) .. '" '
     elseif unified_prefix == '/ws' then
         r_line = copy_entry(res.weapon_skills[validabils[language][unified_prefix][abil]])
-        storedcommand = command .. ' "' .. windower.to_shift_jis(r_line[language]) .. '" '
     elseif unified_prefix == '/ja' then
         r_line = copy_entry(res.job_abilities[validabils[language][unified_prefix][abil]])
-        if bstpet then
-            storedcommand = command .. ' ' .. splitline[2]
-        else
-            storedcommand = command .. ' "' .. windower.to_shift_jis(r_line[language]) .. '" '
-        end
     elseif unified_prefix == '/item' then
         r_line = copy_entry(res.items[validabils[language][unified_prefix][abil]])
         r_line.prefix = '/item'
         r_line.type = 'Item'
-        storedcommand = command .. ' "' .. windower.to_shift_jis(r_line[language]) .. '" '
     elseif unified_prefix == '/ra' then
         r_line = copy_entry(resources_ranged_attack)
-        storedcommand = command .. ' '
+    end
+
+    if not storedcommand then
+        storedcommand = command .. ' "' .. windower.to_shift_jis(r_line[language]) .. '" '
     end
 
     r_line.name = r_line[language]
