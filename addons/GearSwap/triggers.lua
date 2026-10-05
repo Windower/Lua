@@ -60,10 +60,12 @@ windower.register_event('outgoing text', function(original, modified)
     end
 
     local abil
+    local r_name = res_prefix_map[unified_prefix]
     local targ = splitline[3]
     if unified_prefix == '/ra' then
         storedcommand = command .. ' '
         targ = splitline[2]
+        abil = res[r_name][0][language]:lower() -- Give ranged attacks a phony ability name so they can follow the same code path as other actions
     elseif bstpet then
         storedcommand = command .. ' ' .. splitline[2]
         local pet_abilities = {}
@@ -73,7 +75,7 @@ windower.register_event('outgoing text', function(original, modified)
             end
         end
         if pet_abilities[tonumber(splitline[2])] then
-            abil = res.job_abilities[pet_abilities[tonumber(splitline[2])]].name:gsub(string.char(7), ' '):lower() -- .name, or .english?
+            abil = res[r_name][pet_abilities[tonumber(splitline[2])]].name:gsub(string.char(7), ' '):lower() -- .name, or .english?
         end
     else
         storedcommand = nil
@@ -85,7 +87,8 @@ windower.register_event('outgoing text', function(original, modified)
         return modified
     end
 
-    if not (validabils[language][unified_prefix][abil] or unified_prefix == '/ra') then
+    local r_index = validabils[language][unified_prefix][abil]
+    if not r_index then
         return modified
     end
 
@@ -112,20 +115,11 @@ windower.register_event('outgoing text', function(original, modified)
         return line
     end
 
-    if unified_prefix == '/ma' then
-        r_line = copy_entry(res.spells[validabils[language][unified_prefix][abil]])
-    elseif unified_prefix == '/ms' and find_monster_skill(abil) then
+
+    if unified_prefix == '/ms' then
         r_line = find_monster_skill(abil)
-    elseif unified_prefix == '/ws' then
-        r_line = copy_entry(res.weapon_skills[validabils[language][unified_prefix][abil]])
-    elseif unified_prefix == '/ja' then
-        r_line = copy_entry(res.job_abilities[validabils[language][unified_prefix][abil]])
-    elseif unified_prefix == '/item' then
-        r_line = copy_entry(res.items[validabils[language][unified_prefix][abil]])
-        r_line.prefix = '/item'
-        r_line.type = 'Item'
-    elseif unified_prefix == '/ra' then
-        r_line = copy_entry(resources_ranged_attack)
+    else
+        r_line = copy_entry(res[r_name][r_index])
     end
 
     if not storedcommand then
