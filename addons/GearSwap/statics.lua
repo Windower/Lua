@@ -36,7 +36,6 @@ action_type_map = {['/ja']='Ability',['/jobability']='Ability',['/so']='Magic',[
 
 res_prefix_map = {['/ma']='spells',['/ms']='monster_skills',['/ja']='job_abilities',['/ws']='weapon_skills',['/item']='items',['/ra']='ranged_attacks'}
 
--- Phony resource so ranged attacks can be treated the same as other actions
 res.ranged_attacks = {[0] = {id="0",index="0",prefix="/range",range=25,english="Ranged",german="Fernwaffe",french="Attaque à dist.",japanese="飛び道具",type="Misc",element="None",targets=S{"Enemy"}}}
 
 equippable_item_bags = {res.bags:equippable(true):extract()}

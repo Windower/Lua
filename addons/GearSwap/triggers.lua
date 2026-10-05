@@ -65,7 +65,7 @@ windower.register_event('outgoing text', function(original, modified)
     if unified_prefix == '/ra' then
         storedcommand = command .. ' '
         targ = splitline[2]
-        abil = res[r_name][0][language]:lower() -- Give ranged attacks a phony ability name so they can follow the same code path as other actions
+        abil = res[r_name][0][language]:lower()
     elseif bstpet then
         storedcommand = command .. ' ' .. splitline[2]
         local pet_abilities = {}
