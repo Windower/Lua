@@ -1,23 +1,27 @@
 _addon.name = 'Glide'
 _addon.author = 'Staticvoid'
-_addon.version = '1.1.1'
+_addon.version = '1.1.2'
 _addon.commands = {'Glide'}
 
 local res = require('resources')
 local config = require('config')
 local texts = require('texts')
 
-local move_threshold = 1.00 
-local last_shot_pos = nil
-local player_id = nil
-local hover_stacks = 0
-local last_target_id = nil
-local last_stack_valid = false
-local last_update = nil
-local distance = 0
-local logged_in = true
-local next_velocity_check = os.time()
 local display = windower.get_windower_settings()
+local _data = {}
+_data.move_threshold = 1.00 
+_data.last_shot_pos = nil
+_data.player_id = nil
+_data.hover_stacks = 0
+_data.last_target_id = nil
+_data.last_stack_valid = false
+_data.last_update = nil
+_data.distance = 0
+_data.last_display_state = nil
+_data.text_visible = false
+_data.logged_in = true
+_data.next_velocity_check = os.time()
+
 local defaults = {}
 defaults.main = {}
 defaults.main.pos = {
@@ -46,6 +50,7 @@ defaults.main.bg = {
     green = 0,
     blue = 0
 }
+
 local settings = config.load(defaults)
 
 local distance_text = texts.new(
@@ -54,32 +59,48 @@ local distance_text = texts.new(
 )
 
 local function update_distance_text(distance)
-    if not logged_in then
+    if not _data.logged_in then
         return
     end
+
+    _data.distance = _data.distance or 0
+
+    if _data.hover_stacks == 0 then
+        _data.distance = 0
+    end
+
+    local value = math.min(_data.distance, 20)
+    local suffix = _data.distance >= 20 and '+' or ''
+
+    local color = _data.distance >= _data.move_threshold and '\\cs(0,200,0)' or '\\cs(185,200,210)'
+
+    local formatted_distance = string.format('%.2f', value)
+
+    local current_state = table.concat({
+        formatted_distance,
+        tostring(_data.hover_stacks),
+        suffix,
+        color
+    }, '|')
+
+    if current_state == _data.last_display_state then
+        return
+    end
+
+    _data.last_display_state = current_state
+
     distance_text.glide = '\\cs(225,215,50)Glide™\\cr'
-    distance_text.stacks = hover_stacks
-
-    if hover_stacks == 0 then
-        distance = 0
-    end
-
-    if distance >= 20 then
-        distance_text.value = 20
-        distance_text.suffix = '+'
-    else
-        distance_text.value = distance or 0
-        distance_text.suffix = ''
-    end
-
-    if distance >= move_threshold then
-        distance_text.color = '\\cs(0,200,0)'
-    else
-        distance_text.color = '\\cs(185,200,210)'
-    end
+    distance_text.stacks = _data.hover_stacks
+    distance_text.value = value
+    distance_text.suffix = suffix
+    distance_text.color = color
 
     distance_text:update()
-    distance_text:show()
+
+    if not _data.text_visible then
+        distance_text:show()
+        _data.text_visible = true
+    end
 end
 
 local function is_ranged_weaponskill(ws_id)
@@ -128,54 +149,79 @@ end
 local function check_for_pulse(mob)
     local mob = windower.ffxi.get_mob_by_id(mob)
     if mob and mob.hpp == 0 then
-        hover_stacks = 0
-        last_shot_pos = nil
-        last_target_id = nil
+        _data.hover_stacks = 0
+        _data.last_shot_pos = nil
+        _data.last_target_id = nil
     end
 end
 
 windower.register_event('zone change', function(new, old)
-    hover_stacks = 0
-    last_shot_pos = nil
-    last_target_id = nil
+    _data.hover_stacks = 0
+    _data.last_shot_pos = nil
+    _data.last_target_id = nil
 end)
 
 windower.register_event('load', function()
-    player_id = windower.ffxi.get_player().id
+    local player = windower.ffxi.get_player()
+
+    if player then
+        _data.player_id = player.id
+    end
+
     update_distance_text(0)
     windower.add_to_chat(207, 'Glide loaded.')
 end)
 
 windower.register_event('prerender', function()
-    if last_shot_pos then
-        local player = windower.ffxi.get_mob_by_id(player_id)
+
+    if not _data.logged_in or not _data.player_id then
+        return
+    end
+
+    if _data.last_shot_pos then
+
+        local player = windower.ffxi.get_mob_by_id(_data.player_id)
+
         if player then
+
             if player.status == 4 then
-                last_shot_pos = nil
+                _data.last_shot_pos = nil
+                _data.last_stack_valid = false
+                _data.last_update = false
+                _data.distance = 0
+                update_distance_text(0)
                 return
             end
-            local dx = player.x - last_shot_pos.x
-            local dy = player.y - last_shot_pos.y
-            distance = math.sqrt(dx * dx + dy * dy)
-            last_stack_valid = (distance >= 1.0)
-            last_update = false
-            update_distance_text(distance)
+
+            local dx = player.x - _data.last_shot_pos.x
+            local dy = player.y - _data.last_shot_pos.y
+
+            _data.distance = math.sqrt(dx * dx + dy * dy)
+
+            _data.last_stack_valid = (_data.distance >= _data.move_threshold)
+            _data.last_update = false
+
+            update_distance_text(_data.distance)
         end
-    elseif not last_update then
-        last_update = true
+
+    elseif not _data.last_update then
+
+        _data.last_update = true
+        _data.distance = 0
+
         update_distance_text(0)
     end
 end)
 
--- look at various things of concern related to hover shot.
+-- Look at various things of concern related to hover shot.
 windower.register_event('action', function(act)
-    if not logged_in then
+    if not _data.logged_in then
         return
     end
 
-    local player = windower.ffxi.get_mob_by_id(player_id)
+    local player = windower.ffxi.get_mob_by_id(_data.player_id)
 
-    if act.actor_id ~= player_id then
+    if act.actor_id ~= _data.player_id then
         return
     end
     -- If a JA is used make sure its not hover shot.
@@ -184,8 +230,8 @@ windower.register_event('action', function(act)
         for _, target in ipairs(act.targets) do
             for _, action in ipairs(target.actions) do
                 if action.message == 100 and action.param == 628 then
-                    hover_stacks = 0
-                    last_target_id = nil
+                    _data.hover_stacks = 0
+                    _data.last_target_id = nil
                     return
                 end
             end
@@ -197,11 +243,11 @@ windower.register_event('action', function(act)
         return
     end
 
-    -- Only count stacks while Hover Shot is active.
+    -- Only count stacks while Hover Shot is active; If it is not go no further with processing.
     if not has_hover_shot() then
-        hover_stacks = 0
-        last_target_id = nil
-        last_shot_pos = nil
+        _data.hover_stacks = 0
+        _data.last_target_id = nil
+        _data.last_shot_pos = nil
         local player_main_job = windower.ffxi.get_player().main_job
         if player_main_job == 'RNG' then
             if act.category == 2 or act.category == 3 then
@@ -212,8 +258,8 @@ windower.register_event('action', function(act)
     end
 
     -- Make Velocity Shot check periodic so we aren't looking at it every action.
-    if os.time() > next_velocity_check then
-        next_velocity_check = os.time() + 15
+    if os.time() > _data.next_velocity_check then
+        _data.next_velocity_check = os.time() + 15
         -- Velocity Shot check.
         if not has_velocity_shot() then
             windower.add_to_chat(207,'Velocity Shot is not activated.')
@@ -239,18 +285,18 @@ windower.register_event('action', function(act)
                     check_for_pulse:schedule(1,target.id)
 
                 -- Cuando cambiamos objetivo.
-                if last_target_id and target.id ~= last_target_id then
-                    hover_stacks = 0
+                if _data.last_target_id and target.id ~= _data.last_target_id then
+                    _data.hover_stacks = 0
                 end
 
-                if last_stack_valid then
-                    hover_stacks = math.min(hover_stacks + 1, 25)
+                if _data.last_stack_valid then
+                    _data.hover_stacks = math.min(_data.hover_stacks + 1, 25)
                 else
-                    hover_stacks = 1
+                    _data.hover_stacks = 1
                 end
 
-                last_target_id = target.id
-                last_shot_pos = {x = player.x, y = player.y}
+                _data.last_target_id = target.id
+                _data.last_shot_pos = {x = player.x, y = player.y}
                 return
             end
         end
@@ -258,9 +304,15 @@ windower.register_event('action', function(act)
 end)
 
 windower.register_event('login', function()
-    logged_in = true
+    _data.logged_in = true
+
+    local player = windower.ffxi.get_player()
+    _data.player_id = player and player.id or nil
+
+    _data.last_display_state = nil
+    _data.last_update = false
 end)
 
 windower.register_event('logout', function()
-    logged_in = false
+    _data.logged_in = false
 end)
