@@ -92,7 +92,6 @@ end
 
 for i,v in pairs(res.items) do
     v.prefix = '/item'
-    v.type = 'Item'
     if not validabils['english'][v.prefix][v.english:lower()] or v.cast_delay then
         make_entry(v,i)
     end

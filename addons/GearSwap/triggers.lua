@@ -122,6 +122,10 @@ windower.register_event('outgoing text', function(original, modified)
         r_line = copy_entry(res[r_name][r_index])
     end
 
+    if unified_prefix == '/item' then
+        r_line.type = 'Item'
+    end
+
     if not storedcommand then
         storedcommand = command .. ' "' .. windower.to_shift_jis(r_line[language]) .. '" '
     end
