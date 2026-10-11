@@ -411,7 +411,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
             end
             am.message_id = false
         elseif passed_messages:contains(am.message_id) then
-            local item,status,spell,skill,number,number2
+            local item,status,spell,skill,number,number2,number_div10
             local outstr = res.action_messages[am.message_id][language]
             local color = color_filt(res.action_messages[am.message_id].color, am.actor_id==Self.id)
             if plural_entities:contains(am.actor_id) then
@@ -460,6 +460,10 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                 number2 = am.param_2
             end
             
+            if fields.number_div10 then
+                number_div10 = string.format("%.1f", am.param_2 / 10)
+            end
+            
             if fields.skill and res.skills[am.param_1] then
                 skill = res.skills[am.param_1][language]:lower()
             end
@@ -482,6 +486,7 @@ windower.register_event('incoming chunk',function (id,original,modified,is_injec
                 :gsub('${skill}',color_it(skill or '',color_arr.abilcol))
                 :gsub('${number}',number or '')
                 :gsub('${number2}',number2 or '')
+                :gsub('${number_div10}',number_div10 or '')
                 :gsub('${skill}',skill or '')
                 :gsub('${lb}','\7'), am.message_id))
             windower.add_to_chat(color,outstr)
