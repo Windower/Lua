@@ -4,6 +4,8 @@
 
 * Displays current equipment grid on screen. Also can show current Ammo count and current Encumbrance.
 
+### Note: if at any time, your icons become corrupted, simply delete the `icons` folder and it will regenerate on it's own.
+
 ## Settings
 
 * Most settings can be modified via commands, but you can edit the settings.xml directly for a few uncommon settings.
