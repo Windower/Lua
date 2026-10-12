@@ -59,7 +59,7 @@ windower.register_event('outgoing text', function(original, modified)
         return modified
     end
 
-    local abil
+    local abil, r_line
     local r_name = res_prefix_map[unified_prefix]
     local targ = splitline[3]
     if unified_prefix == '/ra' then
@@ -98,23 +98,6 @@ windower.register_event('outgoing text', function(original, modified)
     end
 
     refresh_globals()
-
-    local r_line, find_monster_skill
-
-    function find_monster_skill(abil)
-        local line = false
-        if player.species and player.species.tp_moves then
-            -- Iterates over currently available monster TP moves instead of using validabils
-            for i, v in pairs(player.species.tp_moves) do
-                if res.monster_skills[i][language]:lower() == abil then
-                    line = copy_entry(res.monster_skills[i])
-                    break
-                end
-            end
-        end
-        return line
-    end
-
 
     if unified_prefix == '/ms' then
         r_line = find_monster_skill(abil)

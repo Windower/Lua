@@ -1096,6 +1096,30 @@ function spell_complete(rline)
 end
 
 -----------------------------------------------------------------------------------
+--Name: find_monster_skill(abil)
+--Desc: Takes a monster ability name and finds the corresponding monster_skills
+--      resource line for the player's current species
+--Args:
+---- abil - ability name
+-----------------------------------------------------------------------------------
+--Returns:
+---- rline - resource line
+-----------------------------------------------------------------------------------
+function find_monster_skill(abil)
+    local rline = false
+    if player.species and player.species.tp_moves then
+        -- Iterates over currently available monster TP moves instead of using validabils
+        for i, v in pairs(player.species.tp_moves) do
+            if res.monster_skills[i][language]:lower() == abil then
+                rline = copy_entry(res.monster_skills[i])
+                break
+            end
+        end
+    end
+    return rline
+end
+
+-----------------------------------------------------------------------------------
 --Name: logit()
 --Args:
 ---- logfile (file): File to be logged to
