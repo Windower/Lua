@@ -1,9 +1,48 @@
-_addon.version = '1.3'
+_addon.version = '1.4'
 _addon.name = 'Send'
 _addon.command = 'send'
 _addon.author = 'Byrth, Lili'
 
+require('tables')
+
 local debug = false
+
+-- Job aliases (@whm, @rdm, ...) used inside a command are replaced with the character name that
+-- is on that job. Every instance announces its name and job over IPC so the sender can look them up.
+-- When several characters share a job, @cor picks the first alphabetically and @cor:2 the second, etc.
+local JOBS = T{'war','mnk','whm','blm','rdm','thf','pld','drk','bst','brd','rng','sam','nin','drg','smn',
+               'blu','cor','pup','dnc','sch','geo','run'}
+local roster = {}    -- character name -> job (lowercase)
+
+local function announce()
+    local player = windower.ffxi.get_player()
+    if player and player.main_job then
+        roster[player.name] = player.main_job:lower()
+        windower.send_ipc_message('send @roster %s %s':format(player.name, player.main_job:lower()))
+    end
+end
+
+-- Returns the nth (default 1) character name on the job, ordered alphabetically.
+local function lookup_job(job, n)
+    job = job:lower()
+    if not JOBS:contains(job) then return nil end
+    local names = {}
+    for name, j in pairs(roster) do
+        if j == job then names[#names + 1] = name end
+    end
+    table.sort(names, function(a, b) return a:lower() < b:lower() end)
+    return names[n or 1]
+end
+
+local function expand_jobs(command)
+    return (command:gsub('@(%a%a%a)(:?%d*)(%f[^%w])', function(job, idx, rest)
+        local n = idx:match('^:(%d+)$')
+        local name = lookup_job(job, n and tonumber(n))
+        if name then
+            return name .. (n and '' or idx) .. rest
+        end
+    end))
+end
 
 require('functions')
 require('chat')
@@ -33,6 +72,18 @@ windower.register_event('addon command', function(target, ...)
         local entity = windower.ffxi.get_mob_by_target(target_string)
         return entity and entity.id or '<' .. target_string .. 'id>'
     end)
+
+    command = expand_jobs(command)
+
+    -- @job:N as a target resolves to that character's name
+    local tjob, tidx = target:match('^@(%a%a%a):(%d+)$')
+    if tjob and JOBS:contains(tjob) then
+        local name = lookup_job(tjob, tonumber(tidx))
+        if not name then
+            return windower.add_to_chat(55, 'send: no character found for ' .. target)
+        end
+        target = name:lower()
+    end
 
     local player = windower.ffxi.get_player()
 
@@ -74,8 +125,17 @@ windower.register_event('ipc message', function (msg)
         return
     end
 
+    if split[2] == '@roster' then
+        local name, job = split[3]:match('^(%S+) (%S+)$')
+        if name then roster[name] = job end
+        return
+    elseif split[2] == '@rosterreq' then
+        announce()
+        return
+    end
+
     local target = split[2]
-    local command = split[3]
+    local command = expand_jobs(split[3])
 
     if target == '@all' or target == '@others' then
         execute_command(command)
@@ -125,3 +185,21 @@ function execute_command(msg)
         windower.send_command(msg)
     end
 end
+
+windower.register_event('login', function()
+    coroutine.schedule(function()
+        announce()
+        windower.send_ipc_message('send @rosterreq x')
+    end, 3)
+end)
+
+windower.register_event('job change', 'zone change', function()
+    coroutine.schedule(announce, 3)
+end)
+
+windower.register_event('load', function()
+    if windower.ffxi.get_info().logged_in then
+        announce()
+        windower.send_ipc_message('send @rosterreq x')
+    end
+end)
