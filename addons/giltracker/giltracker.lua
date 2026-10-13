@@ -28,7 +28,7 @@
 
 _addon.name = 'giltracker'
 _addon.author = 'sylandro'
-_addon.version = '1.1.0'
+_addon.version = '1.1.1'
 _addon.language = 'English'
 
 config = require('config')
@@ -128,14 +128,21 @@ local gil_text = texts.new(settings.gilText)
 local inventory_loaded = false
 local ready = false
 
-local function refresh_gil_loop()
-    while true do
-        coroutine.sleep(math.max(tonumber(settings.refreshInterval) or defaults.refreshInterval, 1))
-        if inventory_loaded then
-            update_gil()
-        end
+local next_refresh = 0
+
+windower.register_event('prerender', function()
+    if not inventory_loaded then
+        return
     end
-end
+
+    local now = os.clock()
+    if now < next_refresh then
+        return
+    end
+
+    next_refresh = now + math.max(tonumber(settings.refreshInterval) or defaults.refreshInterval, 1)
+    update_gil()
+end)
 
 config.register(settings, function(settings)
     hideKey = settings.hideKey
@@ -150,7 +157,6 @@ windower.register_event('load',function()
     if windower.ffxi.get_info().logged_in then
         initialize()
     end
-    coroutine.schedule(refresh_gil_loop, 0)
 end)
 
 windower.register_event('login',function()
@@ -221,6 +227,10 @@ function initialize()
 end
 
 function update_gil()
+    if not windower.ffxi.get_info().logged_in then
+        return
+    end
+
     local gil = windower.ffxi.get_items('gil')
     gil_text:text(format_value(gil))
 end
