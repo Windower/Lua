@@ -481,7 +481,7 @@ parse.i[0x063] = function (data)
                 newbuffs[n].matched_exactly = nil
                 for i,old in pairs(_ExtraData.player.buff_details) do
                     -- Find unchanged buffs
-                    if old.id == new.id and math.abs(old.time-new.time) < 1 and not old.matched_exactly then
+                    if old.id == new.id and math.abs(old.time-new.time) < (old.duration < 6 and 4 or 1) and not old.matched_exactly then
                         newbuffs[n].matched_exactly = true
                         _ExtraData.player.buff_details[i].matched_exactly = true
                         break
