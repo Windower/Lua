@@ -249,10 +249,10 @@ function equip_sets_exit(swap_type, ts, val1)
                 else
                     command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id, val1.target.index, outgoing_action_category_table[unify_prefix[val1.prefix]], val1.id, command_registry[ts].target_arrow)
                 end
-            end
 
-            if not command_registry[ts].proposed_packet then
-                command_registry:delete_entry(ts)
+                if not command_registry[ts].proposed_packet then
+                    command_registry:delete_entry(ts)
+                end
             end
 
             if ts and command_registry[ts] then
