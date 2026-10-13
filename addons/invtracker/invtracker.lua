@@ -28,7 +28,7 @@
 
 _addon.name = 'invtracker'
 _addon.author = 'sylandro'
-_addon.version = '1.0.0'
+_addon.version = '1.0.1'
 _addon.language = 'English'
 
 config = require('config')
@@ -67,6 +67,14 @@ defaults.slotImage.sort = true
 defaults.slotImage.spacing = 4
 defaults.slotImage.blockSpacing = 4
 defaults.slotImage.visible = true
+defaults.slotImage.box = {}
+defaults.slotImage.box.size = {}
+defaults.slotImage.box.size.height = 2
+defaults.slotImage.box.size.width = 2
+defaults.slotImage.background = {}
+defaults.slotImage.background.size = {}
+defaults.slotImage.background.size.height = 3
+defaults.slotImage.background.size.width = 3
 defaults.slotImage.pos = {}
 defaults.slotImage.pos.x = -365
 defaults.slotImage.pos.y = -50
@@ -204,20 +212,12 @@ defaults.slotImage.status.empty.background.color.blue = 0
 local settings = config.load(defaults)
 config.save(settings)
 
-settings.slotImage.box = {}
-settings.slotImage.box.size = {}
-settings.slotImage.box.size.height = 2
-settings.slotImage.box.size.width = 2
 settings.slotImage.box.texture = {}
 settings.slotImage.box.texture.path = windower.addon_path..'slot.png'
 settings.slotImage.box.texture.fit = false
 settings.slotImage.box.repeatable = {}
 settings.slotImage.box.repeatable.x = 1
 settings.slotImage.box.repeatable.y = 1
-settings.slotImage.background = {}
-settings.slotImage.background.size = {}
-settings.slotImage.background.size.height = 3
-settings.slotImage.background.size.width = 3
 settings.slotImage.background.texture = {}
 settings.slotImage.background.texture.path = windower.addon_path..'slot.png'
 settings.slotImage.background.texture.fit = false
