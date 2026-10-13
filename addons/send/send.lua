@@ -7,9 +7,9 @@ require('tables')
 
 local debug = false
 
--- Job aliases (@whm, @rdm, ...) used inside a command are replaced with the character name that
--- is on that job. Every instance announces its name and job over IPC so the sender can look them up.
--- When several characters share a job, @cor picks the first alphabetically and @cor:2 the second, etc.
+-- The @job:N target (e.g. @cor:2) selects the Nth character on a job. Every instance announces its
+-- name and job over IPC so the sender can look it up. Characters sharing a job are ordered
+-- alphabetically. The command itself is never modified.
 local JOBS = T{'war','mnk','whm','blm','rdm','thf','pld','drk','bst','brd','rng','sam','nin','drg','smn',
                'blu','cor','pup','dnc','sch','geo','run'}
 local roster = {}    -- character name -> job (lowercase)
@@ -32,16 +32,6 @@ local function lookup_job(job, n)
     end
     table.sort(names, function(a, b) return a:lower() < b:lower() end)
     return names[n or 1]
-end
-
-local function expand_jobs(command)
-    return (command:gsub('@(%a%a%a)(:?%d*)(%f[^%w])', function(job, idx, rest)
-        local n = idx:match('^:(%d+)$')
-        local name = lookup_job(job, n and tonumber(n))
-        if name then
-            return name .. (n and '' or idx) .. rest
-        end
-    end))
 end
 
 require('functions')
@@ -72,8 +62,6 @@ windower.register_event('addon command', function(target, ...)
         local entity = windower.ffxi.get_mob_by_target(target_string)
         return entity and entity.id or '<' .. target_string .. 'id>'
     end)
-
-    command = expand_jobs(command)
 
     -- @job:N as a target resolves to that character's name
     local tjob, tidx = target:match('^@(%a%a%a):(%d+)$')
@@ -135,7 +123,7 @@ windower.register_event('ipc message', function (msg)
     end
 
     local target = split[2]
-    local command = expand_jobs(split[3])
+    local command = split[3]
 
     if target == '@all' or target == '@others' then
         execute_command(command)
