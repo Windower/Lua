@@ -209,24 +209,12 @@ end
 function MergedPlayer:wsavg()
     local wsdmg   = 0
     local wscount = 0
-    --[[
+
     for _, p in pairs(self.players) do
-        for _, dmgtable in pairs(p.ws) do
-            for _, dmg in pairs(dmgtable) do
-                wsdmg = wsdmg + dmg
-                wscount = wscount + 1
-            end
-        end 
+        wsdmg   = wsdmg + p.ws_total
+        wscount = wscount + p.ws_count
     end
-    ]]
-    
-    for _, p in pairs(self.players) do
-        for _, dmg in pairs(p.ws) do
-            wsdmg = wsdmg + dmg
-            wscount = wscount + 1
-        end
-    end
-    
+
     if wscount > 0 then
         return {wsdmg / wscount, wscount}
     else
@@ -236,12 +224,12 @@ end
 
 function MergedPlayer:wsacc()
     local hits, misses = 0, 0
-    
+
     for _, p in ipairs(self.players) do
-        hits = hits + table.length(p.ws)
+        hits = hits + p.ws_count
         misses = misses + p.ws_misses
     end
-    
+
     local total = hits + misses
     if total > 0 then
         return {hits / total, total}
@@ -254,16 +242,9 @@ end
 function MergedPlayer:merge(other)
     self.damage = self.damage + other.damage
 
-    for ws_id, values in pairs(other.ws) do
-        if self.ws[ws_id] then
-            for _, value in ipairs(values) do
-                self.ws[ws_id]:append(value)
-            end
-        else
-            self.ws[ws_id] = table.copy(values)
-        end
-    end
-    
+    self.ws_total = self.ws_total + other.ws_total
+    self.ws_count = self.ws_count + other.ws_count
+
     self.m_hits   = self.m_hits + other.m_hits
     self.m_misses = self.m_misses + other.m_misses
     self.m_min    = math.min(self.m_min, other.m_min)
