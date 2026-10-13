@@ -966,7 +966,7 @@ function get_spell(act)
     end
 
     if act.category == 12 or act.category == 2 then
-        spell = copy_entry(resources_ranged_attack)
+        spell = copy_entry(res.ranged_attacks[0])
     else
         if not res.action_messages[msg_ID] or msg_ID == 31 then
             if act.category == 4 or act.category == 8 then
