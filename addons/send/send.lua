@@ -43,11 +43,11 @@ windower.register_event('addon command', function(target, ...)
         execute_command(command)
     elseif player and target == '@'..player.main_job:lower() then
         execute_command(command)
-    elseif target == '@party' then
+    elseif target == '@party' or target =="@p" then
         if player then
             execute_command(command)
         end
-        target = target .. player.name
+        target = '@party' .. player.name
     elseif target == '@zone' then
         if player then
             execute_command(command)
