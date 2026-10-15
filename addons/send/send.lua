@@ -1,4 +1,4 @@
-_addon.version = '1.3'
+_addon.version = '1.4'
 _addon.name = 'Send'
 _addon.command = 'send'
 _addon.author = 'Byrth, Lili'
@@ -39,20 +39,20 @@ windower.register_event('addon command', function(target, ...)
     if player and target == player['name']:lower() then
         execute_command(command)
         return
-    elseif target == '@all' or target == "@a" then
+    elseif target == '@all' or target == '@a' then
         execute_command(command)
     elseif player and target == '@'..player.main_job:lower() then
         execute_command(command)
-    elseif target == '@party' or target =="@p" then
+    elseif target == '@party' or target == '@p' then
         if player then
             execute_command(command)
         end
         target = '@party' .. player.name
-    elseif target == '@zone' or target == "@z" then
+    elseif target == '@zone' or target == '@z' then
         if player then
             execute_command(command)
         end
-        target = "@zone" .. windower.ffxi.get_info().zone
+        target = '@zone' .. windower.ffxi.get_info().zone
     end
 
     command = 'send ' .. target .. ' ' .. command
@@ -77,7 +77,7 @@ windower.register_event('ipc message', function (msg)
     local target = split[2]
     local command = split[3]
 
-    if target == '@all' or target == '@others' or target == "@o" then
+    if target == '@all' or target == '@others' or target == '@o' then
         execute_command(command)
         return
     end
