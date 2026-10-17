@@ -77,7 +77,7 @@ windower.register_event('ipc message', function (msg)
     local target = split[2]
     local command = split[3]
 
-    if target == '@all' or target == '@others' or target == '@o' then
+    if target == '@all' or target == '@others' or target == '@o' or target == '@a' then
         execute_command(command)
         return
     end
