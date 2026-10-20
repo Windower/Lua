@@ -112,6 +112,8 @@ parse.i[0x00E] = function (data)
 end
 
 parse.i[0x01B] = function (data)
+    _ExtraData.player.mastery_rank = data:byte(0x67)
+
     for job_id = 1,23 do
         player.jobs[to_windower_api(res.jobs[job_id].english)] = data:byte(job_id + 72)
     end
