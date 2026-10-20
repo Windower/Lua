@@ -1,4 +1,4 @@
---[[Copyright © 2021, Arico
+--[[Copyright © 2026, Arico
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
