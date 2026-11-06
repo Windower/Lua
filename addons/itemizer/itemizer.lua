@@ -442,10 +442,8 @@ windower.register_event('outgoing text', function()
 end())
 
 --[[
-Copyright © 2013-2015, Ihina
+Copyright © 2013-2026, Ihina
 All rights reserved.
-
-Local modifications (2026): Ninjutsu tool fallback.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
