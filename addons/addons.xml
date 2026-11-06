@@ -338,6 +338,13 @@
     <support>https://discord.gg/aUrHCvk</support>
   </addon>
   <addon>
+    <name>Lockstyle</name>
+    <author>Sechs</author>
+    <description>Randomizes a lockstyle from an user defined list, personalized for each job and each character.</description>
+    <bugtracker>https://github.com/Windower/Lua/issues</bugtracker>
+    <support>http://www.ffxiah.com/player/Asura/Sechs</support>
+  </addon>
+  <addon>
     <name>Logger</name>
     <author>Arcon</author>
     <description>Logs the chat log to a file.</description>
