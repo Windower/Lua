@@ -1,6 +1,6 @@
 _addon.name = 'Itemizer'
 _addon.author = 'Ihina'
-_addon.version = '3.3.2.1'
+_addon.version = '3.3.2.2'
 _addon.command = 'itemizer'
 
 require('luau')
@@ -8,32 +8,33 @@ local packets = require('packets')
 
 defaults = {}
 defaults.AutoNinjaTools = true
+defaults.NinjaToolFallback = true
 defaults.AutoItems = true
 defaults.AutoStack = true
 defaults.Delay = 0.5
 defaults.version                       = _addon.version
 defaults.UseUniversalTools = {}
 
-defaults.UseUniversalTools.Katon       = false
-defaults.UseUniversalTools.Hyoton      = false
-defaults.UseUniversalTools.Huton       = false
-defaults.UseUniversalTools.Doton       = false
-defaults.UseUniversalTools.Raiton      = false
-defaults.UseUniversalTools.Suiton      = false
-defaults.UseUniversalTools.Utsusemi    = false
-defaults.UseUniversalTools.Jubaku      = false
-defaults.UseUniversalTools.Hojo        = false
-defaults.UseUniversalTools.Kurayami    = false
-defaults.UseUniversalTools.Dokumori    = false
-defaults.UseUniversalTools.Tonko       = false
-defaults.UseUniversalTools.Monomi      = false
-defaults.UseUniversalTools.Aisha       = false
-defaults.UseUniversalTools.Yurin       = false
-defaults.UseUniversalTools.Myoshu      = false
-defaults.UseUniversalTools.Migawari    = false
-defaults.UseUniversalTools.Kakka       = false
-defaults.UseUniversalTools.Gekka       = false
-defaults.UseUniversalTools.Yain        = false
+defaults.UseUniversalTools.Katon       = true
+defaults.UseUniversalTools.Hyoton      = true
+defaults.UseUniversalTools.Huton       = true
+defaults.UseUniversalTools.Doton       = true
+defaults.UseUniversalTools.Raiton      = true
+defaults.UseUniversalTools.Suiton      = true
+defaults.UseUniversalTools.Utsusemi    = true
+defaults.UseUniversalTools.Jubaku      = true
+defaults.UseUniversalTools.Hojo        = true
+defaults.UseUniversalTools.Kurayami    = true
+defaults.UseUniversalTools.Dokumori    = true
+defaults.UseUniversalTools.Tonko       = true
+defaults.UseUniversalTools.Monomi      = true
+defaults.UseUniversalTools.Aisha       = true
+defaults.UseUniversalTools.Yurin       = true
+defaults.UseUniversalTools.Myoshu      = true
+defaults.UseUniversalTools.Migawari    = true
+defaults.UseUniversalTools.Kakka       = true
+defaults.UseUniversalTools.Gekka       = true
+defaults.UseUniversalTools.Yain        = true
 
 settings = config.load(defaults)
 
@@ -123,9 +124,10 @@ windower.register_event("addon command", function(command, arg2, ...)
   3. AutoItems - Toggles automatically getting items from bags (shortened ai)
   4. UseUniversalTool <spell> - Toggles using universal ninja tools for <spell> (shortened uut)
      i.e. uut katon  - will toggle katon either true or false depending on your setting
-     all defaulted false.
+     defaults to true for all spells.
   5. AutoStack - Toggles utomatically stacking items in the destination bag (shortened as, defaults true)
-  6. Help - Shows this menu.]]
+  6. Help - Shows this menu.
+  7. NinjaToolFallback - Toggles spell-specific tool fallback for NIN main when a universal tool is unavailable (shortened ntf, defaults true).]]
         for _, line in ipairs(helptext:split('\n')) do
             log(line)
         end
@@ -141,6 +143,10 @@ windower.register_event("addon command", function(command, arg2, ...)
         settings.AutoNinjaTools = not settings.AutoNinjaTools
         settings:save()
         log('AutoNinjaTools is now', settings.AutoNinjaTools)
+    elseif T{'ninjatoolfallback','ntf'}:contains(command:lower()) then
+        settings.NinjaToolFallback = not settings.NinjaToolFallback
+        settings:save()
+        log('NinjaToolFallback is now', settings.NinjaToolFallback)
     elseif T{'autoitems','ai'}:contains(command:lower()) then
         settings.AutoItems = not settings.AutoItems
         settings:save()
@@ -311,8 +317,9 @@ gen_tools = T{
 active = S{}
 
 -- Returning true resends the command in settings.Delay seconds
--- Returning false doesn't resend the command and executes it
-collect_item = function(id, items)
+-- Returning false means the item is already in Inventory.
+-- Returning nil lets the caller try another item when this one is missing.
+collect_item = function(id, items, allow_missing)
     items = items or {inventory = windower.ffxi.get_items(bag_name_to_id.inventory)}
 
     local item = T(items.inventory):with('id', id)
@@ -334,6 +341,8 @@ collect_item = function(id, items)
 
         -- Add currently processing ID to set of active IDs
         active:add(id)
+    elseif allow_missing then
+        return nil
     else
         error(windower.from_shift_jis('Item "%s" not found in any accessible bags':format(res.items[id].name)))
     end
@@ -341,7 +350,7 @@ collect_item = function(id, items)
     return match ~= nil
 end
 
-reschedule = function(text, ids, items)
+reschedule = function(text, ids, items, alternatives)
     if not items then
         local info = windower.ffxi.get_bag_info(bag_name_to_id.inventory)
         items = {inventory = windower.ffxi.get_items(bag_name_to_id.inventory)}
@@ -354,10 +363,13 @@ reschedule = function(text, ids, items)
         return false
     end
 
-    for id in L(ids):it() do
-        if collect_item(id, items) then
+    for index, id in ipairs(ids) do
+        local waiting = collect_item(id, items, alternatives and index < #ids)
+        if waiting then
             windower.send_command:prepare('input %s':format(text)):schedule(settings.Delay)
             return true
+        elseif alternatives and waiting == false then
+            return false
         end
     end
 end
@@ -384,10 +396,13 @@ windower.register_event('outgoing text', function()
             end
 
             if name then
-                if settings.UseUniversalTools[name] == false or windower.ffxi.get_player().main_job ~= 'NIN' then
-                    return reschedule(text, {spec_tools[name], windower.ffxi.get_player().main_job == 'NIN' and gen_tools[name] or nil})
+                local main_nin = windower.ffxi.get_player().main_job == 'NIN'
+                if settings.UseUniversalTools[name] == false or not main_nin then
+                    return reschedule(text, {spec_tools[name], main_nin and gen_tools[name] or nil})
+                elseif settings.NinjaToolFallback then
+                    return reschedule(text, {gen_tools[name], spec_tools[name]}, nil, true)
                 else
-                    return reschedule(text, {windower.ffxi.get_player().main_job == 'NIN' and gen_tools[name] or nil})
+                    return reschedule(text, {gen_tools[name]})
                 end
             end
 
@@ -427,7 +442,7 @@ windower.register_event('outgoing text', function()
 end())
 
 --[[
-Copyright © 2013-2015, Ihina
+Copyright © 2013-2026, Ihina
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

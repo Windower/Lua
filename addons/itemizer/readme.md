@@ -25,14 +25,19 @@ Toggles the auto-stacking of items when moving items to non-inventory bags. (Def
 itemizer autoninjatools (shortened: ant)
 ```
 
-Toggles the auto-pulling of ninja tools from bags when not in your bag. Prioritizes specific tools then moves to universal unless the next command is used to set the tools to only use universal tools for specific spells. (Default: True)
+Toggles automatic retrieval of missing ninja tools from accessible bags. (Default: True)
 
 ```
-itemizer useuniversaltools <spell> (shortened: uut)
+itemizer useuniversaltool <spell> (shortened: uut)
 ```
 
-Toggles the use of only universal tools for `spell`. Does not use :ichi or :ni suffixes. (Default: False for all spells)  
-For Example:  itemiser uut katon
+Toggles universal tool preference for `spell` on NIN main. Omit the :ichi or :ni suffix. Enabled by default for all spells. For example, `itemizer uut katon` toggles the preference for Katon.
+
+```
+itemizer ninjatoolfallback (shortened: ntf)
+```
+
+Toggles fallback to the spell-specific tool on NIN main. It applies only when automatic ninja tool retrieval is enabled, the spell prefers a universal tool, and Itemizer cannot find that tool. For example, Utsusemi falls back from Shikanofuda to Shihei and Katon falls back from Inoshishinofuda to Uchitake. This setting defaults to on.
 
 ```
 get <item> [bag] [count]
