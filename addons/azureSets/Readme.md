@@ -1,26 +1,47 @@
 **Author:** Ricky Gall  
-**Version:** 1.25
+**Version:** 1.26
 **Description:**  
 Addon to make setting blue spells easier. Currently only works as blu main.
 
 **Abbreviations:** aset, azureset
 
 **Commands:**
- 1. //aset removeall - Unsets all spells.
+ 1. //aset removeall - Unsets all spells and stops a spellset being set.
  2. //aset spellset <setname> [ClearFirst|PreserveTraits] -- Set (setname)'s spells,
                   optional parameter: ClearFirst or PreserveTraits: overrides
                   setting to clear spells first or remove individually,
                   preserving traits where possible. Default: use settings or
                   preservetraits if settings not configured.
+                  Takes over from a spellset still being set.
  3. //aset set <setname> [ClearFirst|PreserveTraits] -- Same as spellset
  4. //aset add &lt;slot&gt; &lt;spell&gt; -- Set (spell) to slot (slot (number)).
  5. //aset save &lt;setname&gt; -- Saves current spellset as (setname).
  6. //aset currentlist -- Lists currently set spells.
- 7. //aset setlist -- Lists all spellsets.
- 8. //aset spelllist &lt;setname&gt; -- List spells in (setname)
- 9. //aset help --Shows this menu.
+ 7. //aset setlist -- Lists all spellsets with their spells and points.
+ 8. //aset spelllist &lt;setname&gt; -- List spells in (setname) with points and problems
+ 9. //aset stop -- Stops setting the spellset currently being set.
+10. //aset check [setname] -- Lists spells that can't be set, in (setname) or all sets.
+11. //aset help --Shows this menu.
 
 **Changes:**  
+v1.26
+* Each change now waits until the game shows it, instead of a fixed timer.
+* setspeed is now an optional minimum time between changes, default 0. Values already in your settings still apply.
+* Added setting setjitter: a short random pause between changes. Default: 0.15 seconds.
+* Added setting replace: swaps a spell straight into an unwanted spell's slot. Default: true.
+* PreserveTraits now fills empty slots before removing anything.
+* Spells that can't be set are skipped and listed at the end, instead of stopping the set.
+* Warns before setting if a spellset needs more slots or points than you have.
+* Setting a spellset while another is being set now takes over from it. removeall also stops it.
+* Added //aset stop and //aset check.
+* The cooldown timer only starts when spells changed.
+* A set counts as equipped once everything this character can set from it is set.
+* setlist and spelllist now show points and problems.
+* save notes when a set has the same spells as another.
+* add checks the spell is learned and counts the points of the spell it replaces.
+* Set names work in any case, and full names work for abbreviated spells.
+* //aset with no command now shows help.
+
 v1.25
 * Added compatibility for settings spells while sub job blu.
 
