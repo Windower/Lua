@@ -89,7 +89,8 @@ local fullNames = {
     ["everyone's grudge"] = 'evryone. grudge',
     ['everyones grudge'] = 'evryone. grudge',
     ['orcish counterstance'] = 'o. counterstance',
-    ['natural meditation'] = 'nat. meditation',
+    ["nature's meditation"] = 'nat. meditation',
+    ['natures meditation'] = 'nat. meditation',
     ['tempestuous upheaval'] = 'tem. upheaval',
     ['atramentous libations'] = 'atra. libations',
 }
