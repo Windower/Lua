@@ -206,7 +206,6 @@ function equip_sets_exit(swap_type, ts, val1)
 
             if command_registry[ts].cancel_spell then
                 msg.debugging('Action canceled (' .. storedcommand .. ' ' .. val1.target.raw .. ')')
-                storedcommand = nil
                 command_registry:delete_entry(ts)
                 return true
             elseif not ts or not command_registry[ts] or not storedcommand then
@@ -216,6 +215,14 @@ function equip_sets_exit(swap_type, ts, val1)
 
             if command_registry[ts].new_target then
                 val1.target = command_registry[ts].new_target -- Switch target, if it is requested.
+
+                if val1.prefix == '/item' then
+                    if val1.target.type ~= 'NONE' and bit.band(val1.target.spawn_type, 2) == 2 and find_inventory_item(val1.id) then
+                        val1.action_type = 'Trade'
+                    else
+                        val1.action_type = 'Item'
+                    end
+                end
             end
 
             if st_targs[val1.target.raw] then
@@ -224,50 +231,23 @@ function equip_sets_exit(swap_type, ts, val1)
             end
 
             -- Compose a proposed packet for the given action (this should be possible after pretarget)
-            if val1.target.id and val1.target.index then
+            if filter_precast(val1) then
                 if val1.prefix == '/item' then
                     -- Item use packet handling here
-                    if bit.band(val1.target.spawn_type, 2) == 2 and find_inventory_item(val1.id) then
+                    if val1.action_type == 'Trade' then
                         -- 0x36 packet
                         if val1.target.distance <= 6 then
                             command_registry[ts].proposed_packet = assemble_menu_item_packet(val1.target.id, val1.target.index, val1.id)
-                        else
-                            windower.add_to_chat(67, 'Target out of range.')
                         end
                     elseif find_usable_item(val1.id) then
                         -- 0x37 packet
                         command_registry[ts].proposed_packet = assemble_use_item_packet(val1.target.id, val1.target.index, val1.id)
                     end
-                    if not command_registry[ts].proposed_packet then
-                        command_registry:delete_entry(ts)
-                    end
-                elseif outgoing_action_category_table[unify_prefix[val1.prefix]] then
-                    if filter_precast(val1) then
-                        command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id, val1.target.index, outgoing_action_category_table[unify_prefix[val1.prefix]], val1.id, command_registry[ts].target_arrow)
-                        if not command_registry[ts].proposed_packet then
-                            command_registry:delete_entry(ts)
-
-                            msg.debugging('Unable to create a packet for this command because the target is still invalid after pretarget (' .. storedcommand .. ' ' .. val1.target.raw .. ')')
-                            storedcommand = nil
-                            return storedcommand .. ' ' .. val1.target.raw
-                        end
-                    end
                 else
-                    msg.debugging('Hark, what weird prefix through yonder window breaks? ' .. tostring(val1.prefix))
+                    command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id, val1.target.index, outgoing_action_category_table[unify_prefix[val1.prefix]], val1.id, command_registry[ts].target_arrow)
                 end
-            end
 
-            if ts and command_registry[ts] then
-                if not val1.target.name then
-                -- Spells with invalid pass_through_targs, like using <t> without a target
-                    command_registry:delete_entry(ts)
-                    msg.debugging('Change target was used to pick an invalid target (' .. storedcommand .. ' ' .. val1.target.raw .. ')')
-                    local ret = storedcommand .. ' ' .. val1.target.raw
-                    storedcommand = nil
-                    return ret
-                else
-                -- Spells with complete target information
-                -- command_registry[ts] is deleted for cancelled spells
+                if command_registry[ts].proposed_packet then
                     if command_registry[ts].pretarget_cast_delay == 0 then
                         equip_sets('precast', ts, val1)
                     else
@@ -275,10 +255,11 @@ function equip_sets_exit(swap_type, ts, val1)
                     end
                     return true
                 end
-            elseif not ts or not command_registry[ts] then
-                msg.debugging('This case should not be hittable - 2')
-                return true
             end
+
+            msg.debugging('No valid target at end of pretarget (' .. storedcommand .. ' ' .. val1.target.raw .. ')')
+            command_registry:delete_entry(ts)
+            return storedcommand .. ' ' .. val1.target.raw
 
         elseif swap_type == 'precast' then
             -- Update the target_arrow
@@ -287,7 +268,6 @@ function equip_sets_exit(swap_type, ts, val1)
             end
             return precast_send_check(ts)
         elseif swap_type == 'filtered_action' and command_registry[ts] and command_registry[ts].cancel_spell then
-            storedcommand = nil
             command_registry:delete_entry(ts)
             return true
         elseif swap_type == 'midcast' and _settings.demo_mode then

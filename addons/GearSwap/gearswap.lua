@@ -50,6 +50,7 @@ error = _raw.error
 require 'lists'
 require 'queues'
 require 'sets'
+require 'sqlite3'
 
 
 windower.text.create = function (str)

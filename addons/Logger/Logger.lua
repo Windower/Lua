@@ -47,7 +47,9 @@ windower.register_event('incoming text', function(_, text, _, _, blocked)
     local time = os.time()
     refresh_file(time)
 
-    local formatted = text:strip_colors()
+    local formatted = windower.from_shift_jis(
+        windower.convert_auto_trans(text):strip_colors()
+    ):match('^(.-)%s*$')
     if settings.AddTimestamp then
         file:append(('%s %s\n'):format(os.date(settings.TimestampFormat, time), formatted))
     else
