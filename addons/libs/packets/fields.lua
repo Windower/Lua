@@ -1012,8 +1012,7 @@ fields.outgoing[0x0C5] = L{
 }
 
 -- Celestite Menu
--- This packet has no content bytes. Sent on opening the Celestite menu while its state isn't loaded; the server
--- answers with incoming 0x08F.
+-- This packet has no content bytes. Sent when the Celestite menu opens.
 fields.outgoing[0x0C6] = L{
 }
 
@@ -3518,7 +3517,7 @@ types.celestite_set = L{
 }
 
 -- Celestite State
--- Sent in response to outgoing 0x0C6. Sets are the menu's tabs 0-5.
+-- Sent during zoning. Sets are the menu's tabs 0-5.
 fields.incoming[0x08F] = L{
     {ctype='data[32]',          label='Owned'},                                 -- 04   Bitfield, 256 bits: bit n (LSB first) set = you own item ID 0x72F0 + n
     {ctype='data[20]',          label='_unknown1'},                             -- 24   Record 0, laid out like a set; the client never reads it
