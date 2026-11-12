@@ -251,7 +251,7 @@ function equip_sets_exit(swap_type, ts, val1)
                     if command_registry[ts].pretarget_cast_delay == 0 then
                         equip_sets('precast', ts, val1)
                     else
-                        windower.send_command('@wait ' .. command_registry[ts].pretarget_cast_delay .. ';lua i ' .. _addon.name .. ' pretarget_delayed_cast ' .. ts)
+                        equip_sets:schedule(command_registry[ts].pretarget_cast_delay, 'precast', ts, val1)
                     end
                     return true
                 end
@@ -329,30 +329,10 @@ end
 
 
 -----------------------------------------------------------------------------------
---Name: pretarget_delayed_cast(ts)
---Desc: Triggers an outgoing action packet (if the passed key is valid).
---Args:
----- ts - Timestamp argument to precast_delayed_cast
------------------------------------------------------------------------------------
---Returns:
----- none
------------------------------------------------------------------------------------
-function pretarget_delayed_cast(ts)
-    ts = tonumber(ts)
-    if ts then
-        equip_sets('precast',ts,command_registry[ts].spell)
-    else
-        msg.debugging("Bad index passed to pretarget_delayed_cast")
-    end
-end
-
-
-
------------------------------------------------------------------------------------
 --Name: precast_send_check(ts)
 --Desc: Determines whether or not to send the current packet.
 --      Cancels if _global.cancel_spell is true
---          If command_registry[ts].precast_cast_delay is not 0, cues precast_delayed_cast with the proper
+--          If command_registry[ts].precast_cast_delay is not 0, cues send_action with the proper
 --          delay instead of sending immediately.
 --Args:
 ---- ts - key of command_registry
@@ -369,30 +349,11 @@ function precast_send_check(ts)
                 send_action(ts)
                 return
             else
-                windower.send_command('@wait '..command_registry[ts].precast_cast_delay..';lua i '.._addon.name..' precast_delayed_cast '..ts)
+                send_action:schedule(command_registry[ts].precast_cast_delay, ts)
             end
         end
     end
     return true
-end
-
-
------------------------------------------------------------------------------------
---Name: precast_delayed_cast(ts)
---Desc: Triggers an outgoing action packet (if the passed key is valid).
---Args:
----- ts - Timestamp argument to precast_delayed_cast
------------------------------------------------------------------------------------
---Returns:
----- none
------------------------------------------------------------------------------------
-function precast_delayed_cast(ts)
-    ts = tonumber(ts)
-    if ts then
-        send_action(ts)
-    else
-        msg.debugging("Bad index passed to precast_delayed_cast")
-    end
 end
 
 
