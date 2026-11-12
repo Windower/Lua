@@ -72,6 +72,8 @@ data.outgoing[0x0BF] = {name='Job Point Increase',  description='Sent when you i
 data.outgoing[0x0C0] = {name='Job Point Menu',      description='Sent when you open the Job Point menu and triggers Job Point Information packets.'}
 data.outgoing[0x0C3] = {name='Make Linkshell',      description='Sent in response to the /makelinkshell command.'}
 data.outgoing[0x0C4] = {name='Equip Linkshell',     description='Sent to equip a linkshell.'}
+data.outgoing[0x0C5] = {name='Update Celestite Set',description='Sent when you change a Celestite set\'s slots. Carries all ten slots of the set.'}
+data.outgoing[0x0C6] = {name='Celestite Menu',      description='Sent when you open the Celestite menu and triggers the Celestite State packet.'}
 data.outgoing[0x0CB] = {name='Open Mog',            description='Sent when opening or closing your mog house.'}
 data.outgoing[0x0D2] = {name='Party Marker Request',description='Requests map markers for your party.'}
 data.outgoing[0x0D3] = {name='GM Call',             description='Places a call to the GM queue.'}
@@ -198,6 +200,7 @@ data.incoming[0x085] = {name='Guild Sale List',     description='Provides the it
 data.incoming[0x086] = {name='Guild Open',          description='Sent to update the current guild status or open the guild buy/sell menu.'}
 data.incoming[0x08C] = {name='Merits',              description='Contains all merit information. 3 packets are sent.'}
 data.incoming[0x08D] = {name='Job Points',          description='Contains all job point information. 12 packets are sent.'}
+data.incoming[0x08F] = {name='Celestite State',     description='The Celestites you own and the slots of each Celestite set. Response to outgoing 0x0C6.'}
 data.incoming[0x0A0] = {name='Party Map Marker',    description='Marks where players are on your map.'}
 data.incoming[0x0AA] = {name='Spell List',          description='Packet that shows the spells that you know.'}
 data.incoming[0x0AC] = {name='Ability List',        description='Packet that shows your current abilities and traits.'}
