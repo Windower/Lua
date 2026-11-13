@@ -674,7 +674,7 @@ fields.outgoing[0x05B] = L{
     {ctype='unsigned short',    label='Target Index',       fn=index},          -- 0C
     {ctype='bool',              label='Continue',                               -- 0E   Determines which mode the menu uses
                                 alias='Automated Message'},
-    {ctype='unsigned char',     label='_padding'            const=0},           -- 0F
+    {ctype='unsigned char',     label='_padding',           const=0},           -- 0F
     {ctype='unsigned short',    label='Zone',               fn=zone},           -- 10
     {ctype='unsigned short',    label='Menu ID'},                               -- 12
 }
