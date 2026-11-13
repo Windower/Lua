@@ -2377,6 +2377,11 @@ func.incoming[0x044].base = L{
     {ctype='unsigned short',    label='_unknown1'},                             -- 06
 }
 
+-- BLU
+func.incoming[0x044][0x10] = L{
+    {ctype='unsigned char[20]',     label='Slot',     fn=add+{512}},            -- 08 Spell ids shifted down by 512 (0x200)
+}
+
 -- COR
 func.incoming[0x044][0x11] = L{
     {ctype='data[4]',           label='Available Rolls'},                       -- 08 bitfield of available Phantom Rolls
