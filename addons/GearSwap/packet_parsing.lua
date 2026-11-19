@@ -96,6 +96,8 @@ end
 parse.i[0x00B] = function(data)
     -- Blank temporary items when zoning.
     items.temporary = make_inventory_table()
+    if bag_tables then bag_tables.temporary = make_bag_table() end
+    if player then player.temporary = bag_tables and bag_tables.temporary or make_bag_table() end
 end
 
 parse.i[0x00E] = function (data)
@@ -141,6 +143,8 @@ parse.i[0x01E] = function (data)
     local count = data:unpack('I',5)
     local status = data:byte(0x0B)
     if not items[bag][slot] then items[bag][slot] = make_empty_item_table(slot) end
+    local old_id = items[bag][slot].id or 0
+    local old_count = items[bag][slot].count or 0
     items[bag][slot].count = count
     items[bag][slot].status = status
     if count == 0 then
@@ -148,26 +152,33 @@ parse.i[0x01E] = function (data)
         items[bag][slot].bazaar = 0
         items[bag][slot].status = 0
     end
+    update_item_slot(bag, old_id, old_count, items[bag][slot])
 end
 
 parse.i[0x01F] = function (data)
     local bag = to_windower_compact(res.bags[data:byte(0x0B)].english)
     local slot = data:byte(0x0C)
     if not items[bag][slot] then items[bag][slot] = make_empty_item_table(slot) end
+    local old_id = items[bag][slot].id or 0
+    local old_count = items[bag][slot].count or 0
     items[bag][slot].id = data:unpack('H',9)
     items[bag][slot].count = data:unpack('I',5)
     items[bag][slot].status = data:byte(0x0D)
+    update_item_slot(bag, old_id, old_count, items[bag][slot])
 end
 
 parse.i[0x020] = function (data)
         local bag = to_windower_compact(res.bags[data:byte(0x0F)].english)
         local slot = data:byte(0x10)
         if not items[bag][slot] then items[bag][slot] = make_empty_item_table(slot) end
+        local old_id = items[bag][slot].id or 0
+        local old_count = items[bag][slot].count or 0
         items[bag][slot].id = data:unpack('H',0x0D)
         items[bag][slot].count = data:unpack('I',5)
         items[bag][slot].bazaar = data:unpack('I',9)
         items[bag][slot].status = data:byte(0x11)
         items[bag][slot].extdata = data:sub(0x12,0x29)
+        update_item_slot(bag, old_id, old_count, items[bag][slot])
         -- Did not mess with linkshell stuff
 end
 
