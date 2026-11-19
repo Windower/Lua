@@ -194,6 +194,7 @@ equip_list_history = {}
 world = make_user_table()
 buffactive = make_user_table()
 alliance = make_user_table()
+bag_tables = {}
 st_targs = {['<st>']=true,['<stpc>']=true,['<stal>']=true,['<stnpc>']=true,['<stpt>']=true}
 st_flag = false
 current_file = nil

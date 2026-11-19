@@ -337,7 +337,12 @@ function refresh_player(dt,user_event_flag)
     -- Assign player.inventory to be keyed to item.inventory[i][language] and to have a value of count, similar to buffactive
     for i,bag in pairs(res.bags) do
         local bag_name = to_windower_bag_api(bag.en)
-        if items[bag_name] then player[bag_name] = refresh_item_list(items[bag_name]) end
+        if items[bag_name] then
+            if not bag_tables[bag_name] then
+                bag_tables[bag_name] = refresh_item_list(items[bag_name])
+            end
+            player[bag_name] = bag_tables[bag_name]
+        end
     end
 
     -- Monster tables for the target and subtarget.
@@ -600,6 +605,39 @@ function convert_buff_list(bufflist)
 end
 
 -----------------------------------------------------------------------------------
+-- Read-only Metatables for Bags and Item Entries
+-----------------------------------------------------------------------------------
+read_only_entry_mt = {
+    __index = function(t, k)
+        local data = rawget(t, '__data')
+        return data and data[k]
+    end,
+    __newindex = function(t, k, v)
+        error('GearSwap: Cannot modify read-only item data ("'..tostring(k)..'")', 2)
+    end,
+    __pairs = function(t)
+        return pairs(rawget(t, '__data') or {})
+    end
+}
+
+function make_read_only_entry(data)
+    return setmetatable({__data = data}, read_only_entry_mt)
+end
+
+bag_user_data_table = {
+    __newindex = function(tab, key, val)
+        error('GearSwap: Cannot modify read-only inventory bag table ("'..tostring(key)..'")', 2)
+    end,
+    __index = function(tab, key)
+        return rawget(tab, user_key_filter(key))
+    end
+}
+
+function make_bag_table()
+    return setmetatable({}, bag_user_data_table)
+end
+
+-----------------------------------------------------------------------------------
 --Name: refresh_item_list(itemlist)
 --Args:
 ---- itemlist (table): List of items from windower.ffxi.get_items().something
@@ -619,7 +657,7 @@ end
 ---- It also allows one to check for the alternate spelling of an item.
 -----------------------------------------------------------------------------------
 function refresh_item_list(itemlist)
-    local retarr = make_user_table()
+    local retarr = make_bag_table()
     for i,v in pairs(itemlist) do
         if type(v) == 'table' and v.id and v.id ~= 0 then
             local item = res.items[v.id]
@@ -631,26 +669,121 @@ function refresh_item_list(itemlist)
                     -- If there's already an entry for this item, all the hard work has already
                     -- been done.  Just update the count on the subtable of the main item, and
                     -- everything else will link together.
-                    entry.count = entry.count + v.count
+                    local raw_entry = (type(entry) == 'table' and rawget(entry, '__data')) or entry
+                    raw_entry.count = raw_entry.count + v.count
                 else
                     local lower_item_name = item_name:lower()
-                    local new_entry = table.copy(v)
-                    new_entry.shortname=lower_item_name
-                    retarr[item_name] = new_entry
+                    local raw_data = table.copy(v)
+                    raw_data.shortname = lower_item_name
+                    local new_entry = make_read_only_entry(raw_data)
+                    rawset(retarr, user_key_filter(item_name), new_entry)
 
                     -- If a long version of the name exists, and is different from the short version,
                     -- add the long name to the info table and point the long name's key at that table.
                     local long_item_name = item[language..'_log']
                     local lower_long_item_name = long_item_name and long_item_name:lower()
                     if lower_long_item_name and lower_long_item_name ~= lower_item_name then
-                        new_entry.longname = lower_long_item_name
-                        retarr[long_item_name] = new_entry
+                        raw_data.longname = lower_long_item_name
+                        rawset(retarr, user_key_filter(long_item_name), new_entry)
                     end
                 end
             end
         end
     end
     return retarr
+end
+
+-----------------------------------------------------------------------------------
+--Name: update_item_slot(bag, old_id, old_count, new_slot_data)
+--Args:
+---- bag (string): Bag name (e.g. 'inventory')
+---- old_id (number): Previous item id in the slot
+---- old_count (number): Previous item count in the slot
+---- new_slot_data (table): Current slot table from items[bag][slot]
+-----------------------------------------------------------------------------------
+function update_item_slot(bag, old_id, old_count, new_slot_data)
+    if not bag_tables[bag] then
+        if items[bag] then
+            bag_tables[bag] = refresh_item_list(items[bag])
+        else
+            bag_tables[bag] = make_bag_table()
+        end
+    end
+    local target_bag = bag_tables[bag]
+    local new_id = new_slot_data and new_slot_data.id or 0
+    local new_count = new_slot_data and new_slot_data.count or 0
+
+    if old_id == new_id then
+        local delta = new_count - old_count
+        if delta ~= 0 and old_id ~= 0 then
+            local item = res.items[old_id]
+            local item_name = item and item[language]
+            if item_name and target_bag[item_name] then
+                local entry = target_bag[item_name]
+                local raw_entry = (type(entry) == 'table' and rawget(entry, '__data')) or entry
+                raw_entry.count = raw_entry.count + delta
+                if raw_entry.count <= 0 then
+                    rawset(target_bag, user_key_filter(item_name), nil)
+                    local long_name = item[language..'_log']
+                    if long_name and long_name ~= item_name then
+                        rawset(target_bag, user_key_filter(long_name), nil)
+                    end
+                end
+            elseif item_name and delta > 0 then
+                local lower_item_name = item_name:lower()
+                local raw_data = table.copy(new_slot_data)
+                raw_data.shortname = lower_item_name
+                local new_entry = make_read_only_entry(raw_data)
+                rawset(target_bag, user_key_filter(item_name), new_entry)
+                local long_item_name = item[language..'_log']
+                local lower_long_item_name = long_item_name and long_item_name:lower()
+                if lower_long_item_name and lower_long_item_name ~= lower_item_name then
+                    raw_data.longname = lower_long_item_name
+                    rawset(target_bag, user_key_filter(long_item_name), new_entry)
+                end
+            end
+        end
+    else
+        if old_id ~= 0 and old_count > 0 then
+            local old_item = res.items[old_id]
+            local old_name = old_item and old_item[language]
+            if old_name and target_bag[old_name] then
+                local entry = target_bag[old_name]
+                local raw_entry = (type(entry) == 'table' and rawget(entry, '__data')) or entry
+                raw_entry.count = raw_entry.count - old_count
+                if raw_entry.count <= 0 then
+                    rawset(target_bag, user_key_filter(old_name), nil)
+                    local old_long = old_item[language..'_log']
+                    if old_long and old_long ~= old_name then
+                        rawset(target_bag, user_key_filter(old_long), nil)
+                    end
+                end
+            end
+        end
+        if new_id ~= 0 and new_count > 0 then
+            local new_item = res.items[new_id]
+            local new_name = new_item and new_item[language]
+            if new_name then
+                local entry = target_bag[new_name]
+                if entry then
+                    local raw_entry = (type(entry) == 'table' and rawget(entry, '__data')) or entry
+                    raw_entry.count = raw_entry.count + new_count
+                else
+                    local lower_item_name = new_name:lower()
+                    local raw_data = table.copy(new_slot_data)
+                    raw_data.shortname = lower_item_name
+                    local new_entry = make_read_only_entry(raw_data)
+                    rawset(target_bag, user_key_filter(new_name), new_entry)
+                    local long_item_name = new_item[language..'_log']
+                    local lower_long_item_name = long_item_name and long_item_name:lower()
+                    if lower_long_item_name and lower_long_item_name ~= lower_item_name then
+                        raw_data.longname = lower_long_item_name
+                        rawset(target_bag, user_key_filter(long_item_name), new_entry)
+                    end
+                end
+            end
+        end
+    end
 end
 
 -----------------------------------------------------------------------------------
