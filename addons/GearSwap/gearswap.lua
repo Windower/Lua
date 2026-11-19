@@ -24,10 +24,10 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.name = 'GearSwap2'
+_addon.name = 'GearSwap'
 _addon.version = '0.940'
 _addon.author = 'Byrth'
-_addon.commands = {'gs2','gearswap2','gs','gearswap'}
+_addon.commands = {'gs','gearswap'}
 
 if windower.file_exists(windower.addon_path..'data/bootstrap.lua') then
     debugging = {windower_debug = true,command_registry = false,general=false,logging=false}
