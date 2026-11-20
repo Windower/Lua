@@ -173,6 +173,26 @@ local item = function(val)
     return val ~= 0 and res.items[val] and res.items[val].name or '-'
 end
 
+-- Alter Ego Points upgrades by ID (0-31), in the shape a lookup reads (.english). Unlisted IDs are unused.
+local alter_ego_upgrades = {
+    [8]  = {english='Max HP'},
+    [9]  = {english='Max MP'},
+    [10] = {english='STR'},
+    [11] = {english='DEX'},
+    [12] = {english='VIT'},
+    [13] = {english='AGI'},
+    [14] = {english='INT'},
+    [15] = {english='MND'},
+    [16] = {english='CHR'},
+    [17] = {english='Combat Skills'},
+    [18] = {english='Magic Skills'},
+}
+
+-- An Alter Ego Points upgrade ID to its name
+local alter_ego_upgrade = function(val)
+    return alter_ego_upgrades[val] and alter_ego_upgrades[val].english or '-'
+end
+
 local server = function(val)
     return res.servers[val].name
 end
@@ -956,6 +976,18 @@ fields.outgoing[0x0BF] = L{
 -- Job Point Menu
 -- This packet has no content bytes
 fields.outgoing[0x0C0] = L{
+}
+
+-- Buy Alter Ego Upgrade
+-- Buys one level of an upgrade, sent after the menu's confirmation.
+fields.outgoing[0x0C1] = L{
+    {ctype='unsigned short',    label='Upgrade',            fn=alter_ego_upgrade},  -- 04   0-31: 8 Max HP, 9 Max MP, 10-16 STR-CHR, 17 Combat Skills, 18 Magic Skills
+    {ctype='unsigned short',    label='_junk1'},                                -- 06   Padding
+}
+
+-- Alter Ego Points Menu
+-- This packet has no content bytes. Sent when the Alter Ego Points menu opens.
+fields.outgoing[0x0C2] = L{
 }
 
 -- /makelinkshell
@@ -3448,6 +3480,23 @@ types.job_point = L{
 -- This is how it works as of 3-19-14, and it is safe to assume that it will change in the future.
 fields.incoming[0x08D] = L{
     {ref=types.job_point,       count='*'},                                     -- 04
+}
+
+types.alter_ego_level = L{
+    {ctype='unsigned char',     label='Level'},                                 -- 00   The menu shows it plus 1
+}
+
+types.alter_ego_cost = L{
+    {ctype='unsigned short',    label='Cost'},                                  -- 00   Points for the next level
+}
+
+-- Alter Ego Points
+-- Sent during zoning. Upgrades are labeled by name ('STR Level', 'STR Cost'); unused IDs as 'Unknown n'.
+fields.incoming[0x08E] = L{
+    {ctype='unsigned short',    label='Points'},                                -- 04   Available points
+    {ctype='unsigned short',    label='_junk1'},                                -- 06   Padding
+    {ref=types.alter_ego_level, lookup={alter_ego_upgrades, 0x00},  count=0x20},    -- 08   Upgrades 0-31
+    {ref=types.alter_ego_cost,  lookup={alter_ego_upgrades, 0x00},  count=0x20},    -- 28   Upgrades 0-31
 }
 
 -- Campaign Map Info
