@@ -173,6 +173,26 @@ local item = function(val)
     return val ~= 0 and res.items[val] and res.items[val].name or '-'
 end
 
+-- A Celestite index (item ID - 0x72F0) to the item's name, '-' for 0 (empty)
+local celestite = function(val)
+    return item(val ~= 0 and 0x72F0 + val or 0)
+end
+
+-- The Celestite sets 1-6 (the menu's tabs 0-5), in the shape a lookup reads (.english)
+local celestite_sets = {
+    {english='Tank'},
+    {english='Melee Fighter'},
+    {english='Ranged Fighter'},
+    {english='Offensive Caster'},
+    {english='Healer'},
+    {english='Support'},
+}
+
+-- A Celestite set number to its name
+local celestite_set = function(val)
+    return celestite_sets[val] and celestite_sets[val].english or '-'
+end
+
 local server = function(val)
     return res.servers[val].name
 end
@@ -971,6 +991,29 @@ fields.outgoing[0x0C4] = L{
     {ctype='unsigned char',     label='Inventory Slot ID'},                     -- 06  Inventory Slot that holds the linkshell
     {ctype='unsigned char',     label='Linkshell Number'},                      -- 07  Inventory Slot that holds the linkshell
     {ctype='data[16]',          label='String of unclear purpose'}              -- 08  Probably going to be used in the future system somehow. Currently "dummy"..string.char(0,0,0).."%s %s "..string.char(0,1)
+}
+
+-- Update Celestite Set
+-- Sends the set's whole slot array after the change, not just the changed slot. The client first clears any slot
+-- already holding the Celestite, so one can't be in two slots; a 0 clears a slot.
+fields.outgoing[0x0C5] = L{
+    {ctype='unsigned char',     label='Set',                fn=celestite_set},  -- 04   1-6: 1 Tank, 2 Melee Fighter, 3 Ranged Fighter, 4 Offensive Caster, 5 Healer, 6 Support
+    {ctype='unsigned char',     label='Slot 1',             fn=celestite},      -- 05   Celestite index (item ID - 0x72F0), 0 = empty
+    {ctype='unsigned char',     label='Slot 2',             fn=celestite},      -- 06
+    {ctype='unsigned char',     label='Slot 3',             fn=celestite},      -- 07
+    {ctype='unsigned char',     label='Slot 4',             fn=celestite},      -- 08
+    {ctype='unsigned char',     label='Slot 5',             fn=celestite},      -- 09
+    {ctype='unsigned char',     label='Slot 6',             fn=celestite},      -- 0A
+    {ctype='unsigned char',     label='Slot 7',             fn=celestite},      -- 0B
+    {ctype='unsigned char',     label='Slot 8',             fn=celestite},      -- 0C
+    {ctype='unsigned char',     label='Slot 9',             fn=celestite},      -- 0D
+    {ctype='unsigned char',     label='Slot 10',            fn=celestite},      -- 0E
+    {ctype='unsigned char',     label='_junk1'},                                -- 0F   Padding
+}
+
+-- Celestite Menu
+-- This packet has no content bytes. Sent when the Celestite menu opens.
+fields.outgoing[0x0C6] = L{
 }
 
 -- Open Mog
@@ -3448,6 +3491,37 @@ types.job_point = L{
 -- This is how it works as of 3-19-14, and it is safe to assume that it will change in the future.
 fields.incoming[0x08D] = L{
     {ref=types.job_point,       count='*'},                                     -- 04
+}
+
+types.celestite_set = L{
+    {ctype='unsigned char',     label='Slot 1 Level'},                          -- 00   0-15: 0 = locked (no Celestite can be equipped in the slot); a higher level crashes the client
+    {ctype='unsigned char',     label='Slot 2 Level'},                          -- 01
+    {ctype='unsigned char',     label='Slot 3 Level'},                          -- 02
+    {ctype='unsigned char',     label='Slot 4 Level'},                          -- 03
+    {ctype='unsigned char',     label='Slot 5 Level'},                          -- 04
+    {ctype='unsigned char',     label='Slot 6 Level'},                          -- 05
+    {ctype='unsigned char',     label='Slot 7 Level'},                          -- 06
+    {ctype='unsigned char',     label='Slot 8 Level'},                          -- 07
+    {ctype='unsigned char',     label='Slot 9 Level'},                          -- 08
+    {ctype='unsigned char',     label='Slot 10 Level'},                         -- 09
+    {ctype='unsigned char',     label='Slot 1',             fn=celestite},      -- 0A   Celestite index (item ID - 0x72F0), 0 = empty
+    {ctype='unsigned char',     label='Slot 2',             fn=celestite},      -- 0B
+    {ctype='unsigned char',     label='Slot 3',             fn=celestite},      -- 0C
+    {ctype='unsigned char',     label='Slot 4',             fn=celestite},      -- 0D
+    {ctype='unsigned char',     label='Slot 5',             fn=celestite},      -- 0E
+    {ctype='unsigned char',     label='Slot 6',             fn=celestite},      -- 0F
+    {ctype='unsigned char',     label='Slot 7',             fn=celestite},      -- 10
+    {ctype='unsigned char',     label='Slot 8',             fn=celestite},      -- 11
+    {ctype='unsigned char',     label='Slot 9',             fn=celestite},      -- 12
+    {ctype='unsigned char',     label='Slot 10',            fn=celestite},      -- 13
+}
+
+-- Celestite State
+-- Sent during zoning. Sets are the menu's tabs 0-5.
+fields.incoming[0x08F] = L{
+    {ctype='data[32]',          label='Owned'},                                 -- 04   Bitfield, 256 bits: bit n (LSB first) set = you own item ID 0x72F0 + n
+    {ctype='data[20]',          label='_unknown1'},                             -- 24   Record 0, laid out like a set; the client never reads it
+    {ref=types.celestite_set,   lookup={celestite_sets, 0x01},  count=0x06},    -- 38   Sets 1-6
 }
 
 -- Campaign Map Info
