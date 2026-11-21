@@ -118,7 +118,7 @@ windower.register_event('outgoing text', function(original, modified)
     spell.target = temp_mob_arr
     spell.action_type = action_type_map[command]
 
-    if spell.prefix == '/item' and spell.target.type ~= 'NONE' and bit.band(spell.target.spawn_type, 2) == 2 then
+    if spell.prefix == '/item' and spell.target.type ~= 'NONE' and bit.band(spell.target.spawn_type, 2) == 2 and find_inventory_item(spell.id) then
         spell.action_type = 'Trade'
     end
 
@@ -135,13 +135,10 @@ windower.register_event('outgoing text', function(original, modified)
 
         if spell.prefix == '/item' then
             -- Item use packet handling here
-            if spell.action_type == 'Trade' and find_inventory_item(spell.id) then
+            if spell.action_type == 'Trade' then
                 --0x36 packet
                 if spell.target.distance <= 6 then
                     command_registry[ts].proposed_packet = assemble_menu_item_packet(spell.target.id, spell.target.index, spell.id)
-                else
-                     windower.add_to_chat(67, 'Target out of range.')
-                     return true
                 end
             elseif find_usable_item(spell.id) then
                 --0x37 packet
@@ -151,10 +148,11 @@ windower.register_event('outgoing text', function(original, modified)
             command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id, spell.target.index, outgoing_action_category_table[unify_prefix[spell.prefix]], spell.id, initialize_arrow_offset(spell.target))
         end
 
-        -- The packets created above should not be used.
         if command_registry[ts].proposed_packet then
             equip_sets('precast', ts, spell)
             return true
+        else
+            command_registry:delete_entry(ts)
         end
     end
 

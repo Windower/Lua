@@ -3171,7 +3171,7 @@ func.incoming[0x063][0x03] = L{
     {ctype='unsigned short',    label='_unknown2'},                             -- 0E   00 00
     {ctype='unsigned short',    label='_unknown3'},                             -- 10   76 00
     {ctype='unsigned short',    label='Infamy'},                                -- 12
-    {ctype='unsigned int',      label='_unknown4'},                             -- 14   00s
+    {ctype='unsigned int',      label='Prestige'},                              -- 14
     {ctype='unsigned int',      label='_unknown5'},                             -- 18   00s
     {ctype='data[64]',          label='Instinct Bitfield 1'},                   -- 1C   See below
     -- Bitpacked 2-bit values. 0 = no instincts from that species, 1 == first instinct, 2 == first and second instinct, 3 == first, second, and third instinct.
