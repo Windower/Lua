@@ -133,17 +133,10 @@ windower.register_event('outgoing text', function(original, modified)
     if filter_precast(spell) then
         local ts = command_registry:new_entry(spell)
 
-        if spell.prefix == '/item' then
-            -- Item use packet handling here
-            if spell.action_type == 'Trade' then
-                --0x36 packet
-                if spell.target.distance <= 6 then
-                    command_registry[ts].proposed_packet = assemble_menu_item_packet(spell.target.id, spell.target.index, spell.id)
-                end
-            elseif find_usable_item(spell.id) then
-                --0x37 packet
-                command_registry[ts].proposed_packet = assemble_use_item_packet(spell.target.id, spell.target.index, spell.id)
-            end
+        if spell.action_type == 'Trade' then
+            command_registry[ts].proposed_packet = assemble_menu_item_packet(spell.target.id, spell.target.index, spell.id)
+        elseif spell.action_type == 'Item' then
+            command_registry[ts].proposed_packet = assemble_use_item_packet(spell.target.id, spell.target.index, spell.id)
         else
             command_registry[ts].proposed_packet = assemble_action_packet(spell.target.id, spell.target.index, outgoing_action_category_table[unify_prefix[spell.prefix]], spell.id, initialize_arrow_offset(spell.target))
         end
@@ -216,7 +209,7 @@ parse.i[0x028] = function (data)
         end
         return
     else
-        if debugging.general then windower.send_command('input /echo Incoming Action packet did not generate a spell/aftercast.')end
+        msg.debugging('Incoming Action packet did not generate a spell/aftercast.')
         return
     end
 
