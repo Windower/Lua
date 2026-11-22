@@ -192,12 +192,20 @@ storages_order         = S(res.bags:map(string.gsub-{' ', ''} .. string.lower ..
 
     return index1 < index2
 end)
-local storage_slips_order = slips.storages:map(function(id)
-    return 'slip ' .. res.items[id].english:lower():match('^storage slip (.*)$')
-end)
-merged_storages_orders = storages_order + storage_slips_order + L{'key items'}
+-- Deferred: slips iteration accesses res.items[id] for every slip, materializing
+-- a large portion of the item database (~20MB). Build on first search instead.
+merged_storages_orders = nil
 
-function search(query, export)    
+local function ensure_merged_storages_orders()
+    if merged_storages_orders then return end
+    local storage_slips_order = slips.storages:map(function(id)
+        return 'slip ' .. res.items[id].english:lower():match('^storage slip (.*)$')
+    end)
+    merged_storages_orders = storages_order + storage_slips_order + L{'key items'}
+end
+
+function search(query, export)
+    ensure_merged_storages_orders()
     update_global_storage()
     update()
     if query:length() == 0 then
