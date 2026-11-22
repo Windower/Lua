@@ -51,6 +51,7 @@ music_types = {
 
 songs = {
     [0] = 'No Music',
+    [23]='Unknown Name', [24]='Unknown Name',
     [25]='The Voracious Resurgence', [26]='The Devoured', [27]='Enroaching Perils', [28]='The Destiny Destroyers', [29]="Devils' Delight",  [30]="Sojourner", [31]='Black Stars Rise', [32]='All Smiles',
     [33]='Valhalla', [34]="We Are Vana'diel", [35]='Goddessspeed', [36]='Good Fortune', [37]='All-Consuming Chaos', [38]='Your Choice',
     [40]='Cloister of Time and Souls', [41]='Royal Wanderlust', [42]='Snowdrift Waltz', [43]='Troubled Shadows', [44]='Where Lords Rule Not', [45]='Summers Lost', [46]='Goddess Divine', [47]='Echoes of Creation', [48]='Main Theme', [49]='Luck of the Mog',
@@ -106,7 +107,7 @@ end
 
 function display_songs()
     windower.add_to_chat(207, 'Available songs:')
-    for id=25,900,5 do
+    for id=23,900,5 do
         local output = '  '
         for i=0,4 do
             if songs[id+i] then
@@ -122,7 +123,7 @@ end
 function find_songs(str)
     windower.add_to_chat(207, 'Songs matching %s:':format(str:color(204)))
     local output = ''
-    for id=25,900 do
+    for id=23,900 do
         if songs[id] and songs[id]:lower():find(str) then
             output = output .. '\n    %s: %s':format(tostring(id):color(204), songs[id])
         end
