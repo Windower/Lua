@@ -758,7 +758,11 @@ end
 -----------------------------------------------------------------------------------
 function filter_precast(spell)
     if not spell.target.id or not spell.target.index then
-        if debugging.general then msg.debugging('No target id or index') end
+        msg.debugging('No target id or index')
+        return false
+    elseif spell.action_type == 'Trade' and spell.target.distance > 6 then
+        return false
+    elseif spell.action_type == 'Item' and not find_usable_item(spell.id) then
         return false
     end
     return true

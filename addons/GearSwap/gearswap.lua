@@ -140,7 +140,6 @@ windower.register_event('load',function()
 
     if world.logged_in then
         refresh_user_env()
-        if debugging.general then windower.send_command('@unload spellcast;') end
     end
 end)
 

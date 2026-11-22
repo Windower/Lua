@@ -53,7 +53,7 @@ function equip_sets(swap_type,ts,...)
     end
 
     windower.debug(tostring(swap_type)..' enter')
-    if showphase or debugging.general then msg.debugging(windower.to_shift_jis(tostring(swap_type))..' enter') end
+    msg.debugging(tostring(swap_type)..' enter')
 
     local cur_equip = table.reassign({},update_equipment())
 
@@ -90,10 +90,9 @@ function equip_sets(swap_type,ts,...)
         msg.debugging("Entering User Event "..tostring(swap_type))
     end
 
-    if not val1 then val1 = {}
-        if debugging.general then
-            msg.debugging('val1 error')
-        end
+    if not val1 then
+        val1 = {}
+        msg.debugging('val1 error')
     end
 
 
@@ -230,19 +229,11 @@ function equip_sets_exit(swap_type, ts, val1)
                 return storedcommand .. ' ' .. val1.target.raw
             end
 
-            -- Compose a proposed packet for the given action (this should be possible after pretarget)
             if filter_precast(val1) then
-                if val1.prefix == '/item' then
-                    -- Item use packet handling here
-                    if val1.action_type == 'Trade' then
-                        -- 0x36 packet
-                        if val1.target.distance <= 6 then
-                            command_registry[ts].proposed_packet = assemble_menu_item_packet(val1.target.id, val1.target.index, val1.id)
-                        end
-                    elseif find_usable_item(val1.id) then
-                        -- 0x37 packet
-                        command_registry[ts].proposed_packet = assemble_use_item_packet(val1.target.id, val1.target.index, val1.id)
-                    end
+                if val1.action_type == 'Trade' then
+                    command_registry[ts].proposed_packet = assemble_menu_item_packet(val1.target.id, val1.target.index, val1.id)
+                elseif val1.action_type == 'Item' then
+                    command_registry[ts].proposed_packet = assemble_use_item_packet(val1.target.id, val1.target.index, val1.id)
                 else
                     command_registry[ts].proposed_packet = assemble_action_packet(val1.target.id, val1.target.index, outgoing_action_category_table[unify_prefix[val1.prefix]], val1.id, command_registry[ts].target_arrow)
                 end
