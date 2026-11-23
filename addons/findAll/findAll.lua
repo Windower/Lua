@@ -265,8 +265,8 @@ function search(query, export)
         local key_item = res.key_items[tonumber(id)]
 	    if key_item then
             key_item_names[id] = {
-                ['name'] = key_item.name,
-                ['long_name'] = key_item.name
+                ['name'] = (key_item.name:gsub('’', "'")),
+                ['long_name'] = (key_item.name:gsub('’', "'"))
             }
         end
     end
@@ -564,7 +564,7 @@ handle_command = function(...)
     if first_pass then
         first_pass = false
         windower.send_ipc_message('findAll update')
-        windower.send_command('wait 0.05;findall '..table.concat({...},' '))
+        coroutine.schedule(handle_command:prepare(...), 0.05)
     else
         first_pass = true
         local params = L{...}
