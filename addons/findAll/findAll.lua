@@ -266,7 +266,7 @@ function search(query, export)
 	    if key_item then
             key_item_names[id] = {
                 ['name'] = (key_item.name:gsub('’', "'")),
-                ['long_name'] = (key_item.name:gsub('’', "'"))
+                ['long_name'] = key_item.name
             }
         end
     end
@@ -290,7 +290,7 @@ function search(query, export)
     
     if settings.KeyItemDisplay then
           for id in pairs(key_item_names) do
-               if terms_pattern == '' or key_item_names[id].name:match(terms_pattern) then
+               if terms_pattern == '' or key_item_names[id].name:match(terms_pattern) or key_item_names[id].long_name:match(terms_pattern) then
                     results_key_items:add(id)
                end
           end
