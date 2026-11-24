@@ -265,7 +265,7 @@ function search(query, export)
         local key_item = res.key_items[tonumber(id)]
 	    if key_item then
             key_item_names[id] = {
-                ['name'] = key_item.name,
+                ['name'] = (key_item.name:gsub('’', "'")),
                 ['long_name'] = key_item.name
             }
         end
@@ -290,7 +290,7 @@ function search(query, export)
     
     if settings.KeyItemDisplay then
           for id in pairs(key_item_names) do
-               if terms_pattern == '' or key_item_names[id].name:match(terms_pattern) then
+               if terms_pattern == '' or key_item_names[id].name:match(terms_pattern) or key_item_names[id].long_name:match(terms_pattern) then
                     results_key_items:add(id)
                end
           end
@@ -564,7 +564,7 @@ handle_command = function(...)
     if first_pass then
         first_pass = false
         windower.send_ipc_message('findAll update')
-        windower.send_command('wait 0.05;findall '..table.concat({...},' '))
+        coroutine.schedule(handle_command:prepare(...), 0.05)
     else
         first_pass = true
         local params = L{...}
