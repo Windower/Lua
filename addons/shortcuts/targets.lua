@@ -48,7 +48,7 @@ function valid_target(targ,flag)
         local current_target = windower.ffxi.get_mob_by_target('t')
         local targar = {}
         for i,v in pairs(windower.ffxi.get_mob_array()) do
-            if string.find(strip(v.name),san_targ) and (v.valid_target or v.id == windower.ffxi.get_player().id) then -- Malformed pattern somehow
+            if string.find(strip(v.name),san_targ,1,true) and (v.valid_target or v.id == windower.ffxi.get_player().id) then
                 -- Handling for whether it's a monster or not
                 if v.is_npc and v.spawn_type ~= 14 and current_target then
                     if v.id == current_target.id then
@@ -128,7 +128,7 @@ function target_make(targets)
         return '<t>'
     elseif targets.Self then
         return '<me>'
-    elseif targets.Self or targets.Party or targets.Enemy or targets.NPC or targets.Ally or targets.Corpse then
+    elseif targets.Party or targets.Enemy or targets.NPC or targets.Ally or targets.Corpse then
         return '<t>'
     else
         return ''

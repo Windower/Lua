@@ -8,7 +8,8 @@ spellcast" project, and represents the interpretation part of spellcast.
 ####Commands/Settings:  
 None  
 
-####Changelog:  
+####Changelog:
+v2.10 - 11/24/26 - Fixed a few tiny bugs
 v2.9 - 03/05/16 - Adjusted default target logic when the target is a Trust.
 v2.8 - 11/27/15 - Changed how the non-action commands are handled (including secondary arguments).
 v2.7 - 11/15/14 - Totally gutted and reworked the ambiguous spell handling system. It is much simpler now.
