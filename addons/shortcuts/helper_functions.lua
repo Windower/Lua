@@ -40,7 +40,7 @@ function find_san(str)
 	str = bracket_closer(str,0x5B,0x5D)
 	
 	-- strip precentages
-	local hanging_percent
+	local hanging_percent = 0
 	while str:byte(#str-hanging_percent) == 37 do
 		hanging_percent = hanging_percent + 1
 	end
