@@ -24,7 +24,7 @@
 --(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 --SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-_addon.version = '2.903'
+_addon.version = '2.10'
 _addon.name = 'Shortcuts'
 _addon.author = 'Byrth'
 _addon.commands = {'shortcuts'}
@@ -363,8 +363,9 @@ function interp_text(splitline,offset,modified)
 
     local strippedabil = strip(abil)..greek_letter -- Slug the ability
     if validabils[strippedabil] then
-        local options,nonoptions,num_opts, r_line = {},{},0
         local player = windower.ffxi.get_player()
+        if not player then return modified, false end
+        local options,nonoptions,num_opts, r_line = {},{},0
         for v in validabils[strippedabil]:it() do
             if check_usability(player,v.res,v.id) then
                 options[v.res] = v.id

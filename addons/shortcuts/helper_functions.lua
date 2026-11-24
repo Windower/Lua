@@ -40,7 +40,7 @@ function find_san(str)
 	str = bracket_closer(str,0x5B,0x5D)
 	
 	-- strip precentages
-	local hanging_percent,num = 0,num
+	local hanging_percent
 	while str:byte(#str-hanging_percent) == 37 do
 		hanging_percent = hanging_percent + 1
 	end
@@ -59,7 +59,7 @@ end
 ---- string with its opened brackets closed
 -----------------------------------------------------------------------------------
 function bracket_closer(str,opener,closer)
-	op,cl,opadd = 0,0,1
+	local op,cl,opadd = 0,0,1
 	for i=1,#str do
 		local ch = str:byte(i)
 		if ch == opener then
@@ -73,7 +73,7 @@ function bracket_closer(str,opener,closer)
 		if opadd ~= #str then
 			str = str..string.char(closer)
 		else
-			str = str..str.char(0x7,closer)
+			str = str..string.char(0x7,closer)
 		end		-- Close captures
 	end
 	return str
@@ -177,14 +177,17 @@ end
 -----------------------------------------------------------------------------------
 function check_usability(player,resource,id)
     if resource == 'spells' and ( (res.spells[id].levels[player.main_job_id] and res.spells[id].levels[player.main_job_id] <= player.main_job_level) or
-      (res.spells[id].levels[player.sub_job_id] and res.spells[id].levels[player.sub_job_id] <= player.sub_job_level) ) then -- Should check to see if you know the spell
+      (res.spells[id].levels[player.sub_job_id] and res.spells[id].levels[player.sub_job_id] <= player.sub_job_level) ) and (windower.ffxi.get_spells() or {})[id] then
         return true
     elseif L(windower.ffxi.get_abilities()[resource] or {}):contains(id) then
         return true
     elseif resource == 'monster_skills' and player.main_job_id == 23 and (res.monstrosity[windower.ffxi.get_mjob_data().species].tp_moves[id] or 0) <= player.main_job_level then
         return true
-    elseif resource == 'mounts' and math.floor((windower.packets.last_incoming(0x0AE):byte(math.floor(id/8)+5)%2^(id%8+1))/2^(id%8)) == 1 then
-        return true
+    elseif resource == 'mounts' then
+		local last_packet = windower.packets.last_incoming(0x0AE)
+		if last_packet and math.floor((last_packet:byte(math.floor(id/8)+5)%2^(id%8+1))/2^(id%8)) == 1 then
+        	return true
+		end
     end
 end
 
