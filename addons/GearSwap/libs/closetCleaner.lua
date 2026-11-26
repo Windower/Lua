@@ -1,4 +1,4 @@
---Copyright © 2016-2017, Brimstone
+--Copyright © 2016-2025, Brimstone
 --All rights reserved.
 
 --Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,7 @@
 
 local cc = {}
 config = require ('config')
+slips = require 'slips'
 cc.sandbox = {}
 cc.sandbox.windower = setmetatable({}, {__index = windower})
 cc.sandbox.windower.coroutine = functions.empty
@@ -47,9 +48,46 @@ defaults.ccmaxuse = nil
 -- List bags you want to not check against, needs to match "Location" column in <player>_report.txt
 defaults.ccskipBags = S{ 'Storage', 'Temporary' }
 -- this prints out the _sets _ignored and _inventory files
-ccDebug = false
+defaults.ccDebug = false
+settings = config.load('ccConfig.xml', defaults)
+ccDebug = settings.ccDebug
 
-settings = config.load('ccConfig.xml',defaults)
+errors = 0
+cc.sandbox.slipDescriptions = {
+	{ key = 4, value = "Artifact Equipment" },
+	{ key = 5, value = "Artifact Armor +1" },
+	{ key = 15, value = "Reforged Artifact Armor" },
+	{ key = 16, value = "Reforged Artifact Armor +1" },
+	{ key = 24, value = "Reforged Artifact Armor +2" },
+	{ key = 25, value = "Reforged Artifact Armor +3" },
+	{ key = 32, value = "Reforged Artifact Armor +4" },
+	{ key = 12, value = "Relic Armor -1" },
+	{ key = 06, value = "Relic Armor" },
+	{ key = 7, value = "Relic Armor +1" },
+	{ key = 13, value = "Relic Armor +2 Can only be stored if it has been augmented." },
+	{ key = 17, value = "Reforged Relic Armor" },
+	{ key = 18, value = "Reforged Relic Armor +1" },
+	{ key = 26, value = "Reforged Relic Armor +2" },
+	{ key = 27, value = "Reforged Relic Armor +3" },
+	{ key = 33, value = "Reforged Relic Armor +4" },
+	{ key = 8, value = "Empyrean Armor" },
+	{ key = 9, value = "Empyrean Armor +1" },
+	{ key = 10, value = "Empyrean Armor +2" },
+	{ key = 20, value = "Reforged Empyrean Armor" },
+	{ key = 21, value = "Reforged Empyrean Armor +1" },
+	{ key = 29, value = "Reforged Empyrean Armor +2" },
+	{ key = 30, value = "Reforged Empyrean Armor +3" },
+	{ key = 2, value = "Lv.73~75 Abjuratory Armor, Tu'Lia Equipment, Lumoria Equipment, Limbus Equipment, Unity Leader Shirts" },
+	{ key = 3, value = "Zeni Armor,Campaign Equipment, Voidwatch Armor, Twilight Equipment, Vorac. Resurge. Rewards" },
+	{ key = 1, value = "Salvage Armor, Nyzul Isle Armor, Einherjar Equipment, Assault Equipment" },
+	{ key = 14, value = "Lv.99 Nyzul Isle Armor, Lv.99 Einherjar Equipment, Lv.99 Salvage Armor, Lv.99 Domain Invasion Equipment" },
+	{ key = 11, value = "Scenario Reward Items Stores certain equipment and furnishings acquired via events, quests, missions." },
+	{ key = 19, value = "Scenario Reward II Items Stores certain equipment and furnishings acquired via events, quests, missions." },
+	{ key = 22, value = "Scenario Reward III Items Stores certain equipment and furnishings acquired via events, quests, missions." },
+	{ key = 31, value = "Scenario Reward IV Items Stores certain equipment and furnishings acquired via events, quests, missions." },
+	{ key = 23, value = "Ambuscade Equipment" },
+	{ key = 28, value = "Ambuscade Weapons / Ambuscade Equipment" },
+}
 
 register_unhandled_command(function(command)
     command = command and command:lower() or nil
@@ -61,9 +99,20 @@ register_unhandled_command(function(command)
     cc.sandbox.itemsByName = T{}
     cc.sandbox.inventoryGear = T{}
     cc.sandbox.gsGear = T{}
+	cc.sandbox.slipsById = T{}
+	cc.sandbox.Id2SlipID = T{}
+	cc.sandbox.hasSlip = T{}
+	for _, slip_id in ipairs(slips.storages) do
+        for _, k in ipairs(slips.items[slip_id]) do
+            cc.sandbox.Id2SlipID[k] = slip_id
+        end
+    end
     for k,v in pairs(gearswap.res.items) do
         cc.sandbox.itemsBylongName[gearswap.res.items[k].name_log:lower()] = k
         cc.sandbox.itemsByName[gearswap.res.items[k].name:lower()] = k
+		if windower.wc_match(gearswap.res.items[k].english, "Storage Slip *") then
+			cc.sandbox.slipsById[k] = gearswap.res.items[k].english
+		end
     end
     cc.sandbox.jobs = {}
     for k,v in pairs(gearswap.res.jobs) do
@@ -83,23 +132,121 @@ register_unhandled_command(function(command)
     return true
 end)
 
+function cc.InitializeSetsForSelindrile()
+	sets.precast = {}
+    sets.precast.FC = {}
+    sets.precast.JA = {}
+    sets.precast.WS = {}
+    sets.precast.RA = {}
+    sets.precast.Item = {}
+    sets.midcast = {}
+    sets.midcast.RA = {}
+    sets.midcast.Pet = {}
+    sets.idle = {}
+    sets.resting = {}
+    sets.engaged = {}
+    sets.defense = {}
+    sets.buff = {}
+    sets.element = {}
+    sets.passive = {}
+    sets.weapons = {}
+    sets.DuskIdle = {}
+    sets.DayIdle = {}
+    sets.NightIdle = {}
+    sets.buff = {}  
+    gear = {}
+    gear.default = {}
+    gear.ElementalGorget = {name=""}
+    gear.ElementalBelt = {name=""}
+    gear.ElementalObi = {name=""}
+    gear.ElementalCape = {name=""}
+    gear.ElementalRing = {name=""}
+    gear.FastcastStaff = {name=""}
+    gear.RecastStaff = {name=""}
+    info = {}
+end
+
+function cc.checkSubstringExists(ccskipBags, substring)
+	if substring then 
+		for bag, value in pairs(ccskipBags) do
+			if string.find(substring, bag) then
+				return true
+			end
+		end
+	end
+    return false
+end
+
 -- This function creates the report and generates the calls to the other functions
 function cc.run_report(path)
+	add_to_chat(1, "closetCleaner Started!")
     mainReportName = path..'_report.txt'
     local f = io.open(mainReportName,'w+')
+	errReportName = path..'_errors.txt'
+	errRpt = io.open(errReportName,'w+')
+	dbgReportName = path..'_debug.txt'
+	dbgRpt = io.open(dbgReportName,'w+')
+	slipsReportName = path..'_slips.txt'
+	slipsRpt = io.open(slipsReportName,'w+')
     f:write('closetCleaner Report:\n')
     f:write('=====================\n\n')
-    cc.export_inv(path)
-    cc.export_sets(path)
+    slipsRpt:write('closetCleaner slips Report:\n')
+    slipsRpt:write('=====================\n\n')
+    cc.export_inv(path, errRpt)
+    cc.export_sets(path, errRpt, dbgRpt, f)
+	local storable_count = {}
+	local on_slips = cc.read_slip_items()
+	local by_slips = {}
+	local slip_count = {}
+	local printslips1 = {}
+	local printslips2 = {}
+	local printslips3 = {}
+	local printslips4 = {}
     for k,v in pairs(cc.sandbox.inventoryGear) do
-        if cc.sandbox.gsGear[k] == nil then
+		if gearswap.res.items[k].english:contains("Storage Slip") then
+			local name = cc.xmlify(tostring(gearswap.res.items[k].english)):gsub('NUM1','1')
+			itemid = cc.sandbox.itemsByName[name:lower()]
+			cc.sandbox.hasSlip[slips.get_slip_number_by_id(itemid)] = 1 
+		end
+		if not cc.job_used[k] then
+			cc.job_used[k] = " "
+		end
+		if cc.sandbox.gsGear[k] == nil then
             cc.sandbox.gsGear[k] = 0
         end
+		if cc.sandbox.Id2SlipID[k] ~= nil then
+			local slip_num = slips.storages:find(cc.sandbox.Id2SlipID[k])
+			if storable_count[slip_num] == nil then
+				storable_count[slip_num] = 1
+			else
+				storable_count[slip_num] = storable_count[slip_num] + 1
+			end
+			if printslips1[slip_num] == nil then
+				printslips1[slip_num] = {}
+				printslips2[slip_num] = {}
+				printslips3[slip_num] = {}
+				printslips4[slip_num] = {}
+			end	
+			table.insert(printslips1[slip_num], gearswap.res.items[k].english)
+			table.insert(printslips2[slip_num], tostring(v))
+			table.insert(printslips3[slip_num], cc.sandbox.gsGear[k])
+			table.insert(printslips4[slip_num], cc.job_used[k])
+		end
     end
     data = T{"Name", " | ", "Count", " | ", "Location", " | ", "Jobs Used", " | ", "Long Name"}
     form = T{"%25s", "%3s", "%10s", "%3s", "%20s", "%3s", "%-88s", "%3s", "%60s"}
+    sliphead = T{"Name", " | ", "Bag", " | ", "Count", " | ", "Jobs"}
+    slipform = T{"%25s", "%3s", "%10s", "%3s", "%6s", "%3s", "%-88s"}
     cc.print_row(f, data, form)
     cc.print_break(f, form)
+	for k, v in pairs(on_slips) do
+		if by_slips[v] == nil then
+			by_slips[v] = {}
+			slip_count[v] = 0
+		end
+		by_slips[v][k] = 1
+		slip_count[v] = slip_count[v] + 1
+	end
     if ccDebug then
         ignoredReportName = path..'_ignored.txt'
         f2 = io.open(ignoredReportName,'w+')
@@ -108,42 +255,88 @@ function cc.run_report(path)
         cc.print_row(f2, data, form)
         cc.print_break(f2, form)
     end
-    for k,v in cc.spairs(cc.sandbox.gsGear, function(t,a,b) return t[b] > t[a] end) do
-        if settings.ccmaxuse == nil or v <= settings.ccmaxuse then
+	for k,v in cc.spairs(cc.sandbox.gsGear, function(t,a,b) return t[b] > t[a] end) do
+		if settings.ccmaxuse == nil or v <= settings.ccmaxuse then
             printthis = 1
-            if not cc.job_used[k] then
-                cc.job_used[k] = " "
-            end
-            for s in pairs(settings.ccignore) do
-                if windower.wc_match(gearswap.res.items[k].english, s) then
-                    printthis = nil
-                    if cc.sandbox.inventoryGear[k] == nil then
-                        data = T{gearswap.res.items[k].english, " | ", tostring(v), " | ", "NOT FOUND", " | ", cc.job_used[k], " | ", gearswap.res.items[k].english_log}
-                    else
-                        data = T{gearswap.res.items[k].english, " | ", tostring(v), " | ", cc.sandbox.inventoryGear[k], " | ", cc.job_used[k], " | ", gearswap.res.items[k].english_log}
-                    end
-                    if ccDebug then
-                        cc.print_row(f2, data, form)
-                    end
-                    break
-                end 
-            end
-            if printthis then
-                if cc.sandbox.inventoryGear[k] == nil then
-                    data = T{gearswap.res.items[k].english, " | ", tostring(v), " | ", "NOT FOUND", " | ", cc.job_used[k], " | ", gearswap.res.items[k].english_log}
-                else
-                    data = T{gearswap.res.items[k].english, " | ", tostring(v), " | ", cc.sandbox.inventoryGear[k], " | ", cc.job_used[k], " | ", gearswap.res.items[k].english_log}
-                end
-                cc.print_row(f, data, form)
-            end
+			if not cc.checkSubstringExists(settings.ccskipBags, cc.sandbox.inventoryGear[k]) then
+				if not cc.job_used[k] then
+					cc.job_used[k] = " "
+				end
+				status = "NOT FOUND"
+				if on_slips[k] then
+					status = "Storage Slip %02d":format(on_slips[k])
+				end
+				for s in pairs(settings.ccignore) do
+					if windower.wc_match(gearswap.res.items[k].english, s) then
+						printthis = nil
+						if cc.sandbox.inventoryGear[k] == nil then
+							data = T{gearswap.res.items[k].english, " | ", tostring(v), " | ", status, " | ", cc.job_used[k], " | ", gearswap.res.items[k].english_log}
+						else
+							data = T{gearswap.res.items[k].english, " | ", tostring(v), " | ", cc.sandbox.inventoryGear[k], " | ", cc.job_used[k], " | ", gearswap.res.items[k].english_log}
+						end
+						if ccDebug then
+							cc.print_row(f2, data, form)
+						end
+						break
+					end 
+				end
+				if printthis then
+					if cc.sandbox.inventoryGear[k] == nil then
+						data = T{gearswap.res.items[k].english, " | ", tostring(v), " | ", status, " | ", cc.job_used[k], " | ", gearswap.res.items[k].english_log}
+					else
+						data = T{gearswap.res.items[k].english, " | ", tostring(v), " | ", cc.sandbox.inventoryGear[k], " | ", cc.job_used[k], " | ", gearswap.res.items[k].english_log}
+					end
+					cc.print_row(f, data, form)
+				end
+			end
         end
     end
-    if ccDebug then
+	for _, entry in ipairs(cc.sandbox.slipDescriptions) do
+		bsize = 75
+		owned = "No"
+		stored = 0
+		storable = 0
+		saved = 0
+		if cc.sandbox.hasSlip[entry.key] ~= nil then
+			owned = "Yes"
+			if slip_count[entry.key] then
+				stored = slip_count[entry.key]
+			end
+		end
+		if storable_count[entry.key] ~= nil then 
+			storable = storable_count[entry.key]
+		end	
+		if owned == "Yes" then
+			saved = storable
+		else
+			saved = math.max(0, storable - 1)
+		end
+		f1 = "%17s"
+		f2 = "%-17s"
+		slipsRpt:write("\n"..string.rep('=', bsize) .."\n")
+		slipsRpt:write(f1:format("Storage Slip %02d:":format(entry.key)).." "..f2:format(entry.value).."\n")
+		slipsRpt:write(f1:format("Owned:").." "..f2:format(owned).."\n")
+		slipsRpt:write(f1:format("Stored:") .." "..f2:format(stored).. "\n")
+		slipsRpt:write(f1:format("Storable:") .." "..f2:format(storable).."\n")
+		slipsRpt:write(f1:format("Potential Saved:") .." "..f2:format(saved) .."\n")
+		slipsRpt:write(string.rep('-', bsize) .."\n")
+		cc.print_row(slipsRpt, sliphead, slipform)
+		if printslips1[entry.key] ~= nil then 
+			for i, k in pairs(printslips1[entry.key]) do
+				slipdata = T{printslips1[entry.key][i], " | ", printslips2[entry.key][i], " | ", printslips3[entry.key][i], " | ", printslips4[entry.key][i]}
+				cc.print_row(slipsRpt, slipdata, slipform)
+			end		
+		end
+	end
+	if ccDebug then
         f2:close()
-        print("File created: "..ignoredReportName)
+        add_to_chat(1, "File created: "..ignoredReportName)
     end
     f:close()
-    print("File created: "..mainReportName)
+    add_to_chat(1, "File created: "..mainReportName)
+    slipsRpt:close()
+    add_to_chat(1, "File created: "..slipsReportName)
+    add_to_chat(2, "Recommended to reload gearswap: //lua r gearswap")
 end
 
 function cc.xmlify(phrase)
@@ -151,19 +344,19 @@ function cc.xmlify(phrase)
     return phrase --:gsub('"','&quot;'):gsub("'","&apos;"):gsub('<','&lt;'):gsub('>','&gt;'):gsub('&&','&amp;')
 end
  -- This function tallies all the gear in your inventory 
-function cc.export_inv(path)
+function cc.export_inv(path, errRpt)
     if ccDebug then
         reportName = path..'_inventory.txt'
         finv = io.open(reportName,'w+')
         finv:write('closetCleaner Inventory Report:\n')
         finv:write('=====================\n\n')
     end
-        
+	-- read slips first and overwrite 
     local item_list = T{}
     checkbag = true 
     for n = 0, #gearswap.res.bags do
-        if not settings.ccskipBags:contains(gearswap.res.bags[n].english) then
-            for i,v in ipairs(gearswap.get_item_list(gearswap.items[gearswap.res.bags[n].english:gsub(' ', ''):lower()])) do
+		for i,v in ipairs(gearswap.get_item_list(gearswap.items[gearswap.res.bags[n].english:gsub(' ', ''):lower()])) do
+			-- if not settings.ccskipBags:contains(gearswap.res.bags[n].english) then
                 if v.name ~= empty then
                     local slot = cc.xmlify(tostring(v.slot))
                     local name = cc.xmlify(tostring(v.name)):gsub('NUM1','1')
@@ -173,29 +366,36 @@ function cc.export_inv(path)
                     elseif cc.sandbox.itemsBylongName[name:lower()] ~= nil then
                         itemid = cc.sandbox.itemsBylongName[name:lower()]
                     else
-                        print("Item: "..name.." not found in gearswap.resources!")
+						errors = errors + 1
+                        errRpt:write("Item: "..name.." not found in gearswap.resources!")
                     end
                     if ccDebug then
                         finv:write("Name: "..name.." Slot: "..slot.." Bag: "..gearswap.res.bags[n].english.."\n")
                     end
-                    if cc.sandbox.inventoryGear[itemid] == nil then 
+					if cc.sandbox.inventoryGear[itemid] == nil then 
                         cc.sandbox.inventoryGear[itemid] = gearswap.res.bags[n].english
                     else
                         cc.sandbox.inventoryGear[itemid] = cc.sandbox.inventoryGear[itemid]..", "..gearswap.res.bags[n].english
                     end
                 end
-            end
+            -- end
         end
     end
     if ccDebug then
         finv:close()
-        print("File created: "..reportName)
+        add_to_chat(1, "File created: "..reportName)
     end
 end
 
+function cc.select_default_macro_book()
+	if ccDebug then
+		add_to_chat(1, "override select_default_macro_book")
+	end
+end 
+
 -- loads all the relevant jobs.lua files and inserts the sets tables into a supersets table:
 -- supersets.<JOB>.sets....
-function cc.export_sets(path)
+function cc.export_sets(path, errRpt, dbgRpt, f)
     if ccDebug then
         reportName = path..'_sets.txt'
         fsets = io.open(reportName,'w+')
@@ -209,14 +409,19 @@ function cc.export_sets(path)
     fpath = fpath:gsub('//','/')
     fpath = string.lower(fpath)
     dpath = fpath..'data/'
+	select_default_macro_book = cc.select_default_macro_book
     for i,v in ipairs(settings.ccjobs) do
-        dname = string.lower(dpath..player.name..'/'..v..'.lua')
+		dname = string.lower(dpath..player.name..'/'..v..'.lua')
         lname = string.lower(dpath..player.name..'_'..v..'.lua')
+        selgearFull = string.lower(dpath..player.name..'/'..player.name..'_'..v..'_gear.lua')
+        selgearRel = string.lower('..'..'/data/'..player.name..'/'..player.name..'_'..v..'_gear')
         lgname = string.lower(dpath..player.name..'_'..v..'_gear.lua')
         sname = string.lower(dpath..v..'.lua')
         sgname = string.lower(dpath..v..'_gear.lua')
-        if windower.file_exists(lgname) then
-            cc.supersets[v] = cc.extract_sets(lgname)
+        if windower.file_exists(selgearFull) then
+            cc.supersets[v] = cc.extract_sets_sel(selgearRel)
+        elseif windower.file_exists(lgname) then
+			cc.supersets[v] = cc.extract_sets(lgname)
         elseif windower.file_exists(lname) then
             cc.supersets[v] = cc.extract_sets(lname)
         elseif windower.file_exists(sgname) then
@@ -226,15 +431,27 @@ function cc.export_sets(path)
         elseif windower.file_exists(dname) then
             cc.supersets[v] = cc.extract_sets(dname)
         else
-           print('lua file for '..v..' not found!')
+           add_to_chat(3, 'Warning: lua file for '..v..' not found!')
         end
     end
-    cc.list_sets(cc.supersets, fsets) 
+    cc.list_sets(cc.supersets, fsets, path, errRpt, dbgRpt, f) 
     cc.supersets = nil
     if ccDebug then
         fsets:close()
-        print("File created: "..reportName)
+        add_to_chat(1, "File created: "..reportName)
     end
+end
+
+function cc.deepCopy(orig)
+    local copy = {}
+    for k, v in pairs(orig) do
+        if type(v) == 'table' then
+            copy[k] = cc.deepCopy(v)
+        else
+            copy[k] = v
+        end
+    end
+    return copy
 end
 
 -- sets the 'sets' and puts them into supersets based off file name. 
@@ -243,41 +460,66 @@ function cc.extract_sets(file)
     if user_file then 
         gearswap.setfenv(user_file, cc.sandbox) 
         cc.sandbox.sets = {}
-        user_file() 
+		user_file() 
+		cc.sandbox.ccRunning = true
+		cc.sandbox.select_default_macro_book = cc.select_default_macro_book
         local def_gear = cc.sandbox.init_get_sets or cc.sandbox.get_sets
         if def_gear then 
             def_gear() 
         end
         return table.copy(cc.sandbox.sets)
     else    
-        print('lua file for '..file..' not found!')
+        add_to_chat(3, 'lua file for '..file..' not found!')
     end 
 end
 
+-- sets the 'sets' and puts them into supersets based off file name. 
+function cc.extract_sets_sel(file) 
+	sets = {}
+	cc.InitializeSetsForSelindrile()               -- Must set each time after clearing out the sets list
+    if settings.ccSeluseGlobalItems then GetGlobalItems() end
+    include(file)
+	ccRunning = true
+	select_default_macro_book = cc.select_default_macro_book
+    init_gear_sets()                            -- Selindrile uses this rather than get_sets
+	selsets = table.copy(sets)
+	sets = {}
+	return selsets
+end
+
+function cc.printTable(t, path, dbgRpt)
+    for k, v in pairs(t) do
+        local newPath = path .. (type(k) == "string" and "." .. k or "[" .. k .. "]")
+        if type(v) == "table" then
+            cc.printTable(v, newPath, dbgRpt)
+        elseif (type(v)=="string") then
+			dbgRpt:write(newPath..'='..v..'\n')
+        end
+    end
+end
+
 -- this function tallies the items used in each lua file
-function cc.list_sets(t, f)  
+function cc.list_sets(t, fsets, path, errRpt, dbgRpt, f)  
     write_sets = T{}
     local print_r_cache={}
-    local function sub_print_r(t,fromTab)
+    local function sub_print_r(t,fromTab,fullName)
         if (type(t)=="table") then
             for pos,val in pairs(t) do
                 if S{"WAR", "MNK", "WHM", "BLM", "RDM", "THF", "PLD", "DRK", "BST", "BRD", "RNG", "SAM", "NIN", "DRG", "SMN", "BLU", "COR", "PUP", "DNC", "SCH", "GEO", "RUN"}:contains(pos) then
                     job = pos
                 end
                 if (type(val)=="table") then
-                    sub_print_r(val,job)
+					sub_print_r(val,job,fullName)
                 elseif (type(val)=="string") then
                     if val ~= "" and val ~= "empty" then 
-                        if S{"name", "main", "sub", "range", "ammo", "head", "neck", "left_ear", "right_ear", "body", "hands", "left_ring", "right_ring", "back", "waist", "legs", "feet", "ear1", "ear2", "ring1", "ring2", "lear", "rear", "lring", "rring"}:contains(pos) then
-                            if cc.sandbox.itemsByName[val:lower()] ~= nil then
+                        if S{"name", "main", "sub", "range", "ranged", "ammo", "head", "neck", "left_ear", "right_ear", "body", "hands", "left_ring", "right_ring", "back", "waist", "legs", "feet", "ear1", "ear2", "ring1", "ring2", "lear", "rear", "lring", "rring"}:contains(pos) then
+							if cc.sandbox.itemsByName[val:lower()] ~= nil then
                                 itemid = cc.sandbox.itemsByName[val:lower()]
                             elseif cc.sandbox.itemsBylongName[val:lower()] ~= nil then
                                 itemid = cc.sandbox.itemsBylongName[val:lower()]
                             else
-                                print("Item: '"..val.."' not found in gearswap.resources! "..pos)
-                            end
-                            if ccDebug then
-                                f:write('Processing '..job..' name for val '..val..' id '..itemid..'\n')
+								errors = errors + 1
+                                errRpt:write("Item: '"..val.."' Slot: "..pos.." => not found in gearswap.resources!\n")
                             end
                             if write_sets[itemid] == nil then
                                 write_sets[itemid] = 1
@@ -297,32 +539,47 @@ function cc.list_sets(t, f)
                             end
                         end
                     end
-                elseif (type(val)=="number") then
-                    print("Found Number: "..val.." from "..pos.." table "..t)
+                elseif (type(val)=="boolean") then
+					-- do nothing
+				elseif (type(val)=="number") then
+					errors = errors + 1
+                    errRpt:write("Found Number: "..val.." from "..pos..'\n')
                 else
-                    print("Error: Val needs to be table or string "..type(val))
+					errors = errors + 1
+                    errRpt:write("Error: Val needs to be table or string "..type(val)..'\n')
                 end
             end
         end
     end
-    sub_print_r(t,nil)
+    sub_print_r(t,nil,nil)
     if ccDebug then
         data = T{"Name", " | ", "Count", " | ", "Jobs", " | ", "Long Name"}
         form = T{"%22s", "%3s", "%10s", "%3s", "%88s", "%3s", "%60s"}
-        cc.print_row(f, data, form)
-        cc.print_break(f, form)
-        f:write('\n')
+        cc.print_row(fsets, data, form)
+        cc.print_break(fsets, form)
+        fsets:write('\n')
         for k,v in pairs(write_sets) do
             data = T{gearswap.res.items[k].english, " | ", tostring(v), " | ", cc.job_used[k], " | ", gearswap.res.items[k].english_log}
-            cc.print_row(f, data, form)
+            cc.print_row(fsets, data, form)
             cc.sandbox.gsGear[k] = v
         end
-        f:write()
+        fsets:write()
     else
         for k,v in pairs(write_sets) do
             cc.sandbox.gsGear[k] = v
         end
     end
+	errRpt:close()
+	
+	if errors > 0 then
+		add_to_chat(123, errors.." errors found, see report")
+		add_to_chat(123, "File created: "..errReportName)
+	end
+	if ccDebug then
+		cc.printTable(t, "sets", dbgRpt)
+		add_to_chat(1, "File created: "..dbgReportName)
+	end
+	dbgRpt:close()
 end
 
 -- interate throught table in a sorted order.
@@ -367,6 +624,24 @@ function cc.print_break(f, form)
         -- f:write(' ') -- can add characters to end here like spaces but subtract from number in the for loop above
     end
     f:write('\n')
+end
+
+function cc.read_slip_items()
+    local on_slips = {}
+    local ok, result = pcall(slips.get_player_items)
+    if not ok then return on_slips end
+    for slip_id, item_list in pairs(result) do
+        if type(item_list) == 'table' then
+            local slip_num = slips.storages:find(slip_id)
+            local label = slip_num 
+            for _, item_id in ipairs(item_list) do
+                if item_id and item_id ~= 0 then
+                    on_slips[item_id] = label
+                end
+            end
+        end
+    end
+    return on_slips
 end
 
 
