@@ -3,7 +3,8 @@ local MergedPlayer = require 'mergedplayer'
 
 local DamageDB = {
     db = T{},
-    filter = T{}
+    filter = T{},
+    last_update = {}
 }
 
 --[[
@@ -79,11 +80,13 @@ function DamageDB:_get_player(mob, player_name)
     if not self.db[mob] then
         self.db[mob] = T{}
     end
-    
+
     if not self.db[mob][player_name] then
         self.db[mob][player_name] = Player:new{name = player_name}
     end
-    
+
+    self.last_update[mob] = os.time()
+
     return self.db[mob][player_name]
 end
 
@@ -128,6 +131,24 @@ end
 
 function DamageDB:reset()
     self.db = T{}
+    self.last_update = {}
+end
+
+
+-- Removes mob entries that haven't received data in max_age_seconds.
+-- Returns true if any mobs were pruned.
+function DamageDB:prune(max_age_seconds)
+    local now = os.time()
+    local pruned = false
+    for mob, _ in pairs(self.db) do
+        local ts = self.last_update[mob]
+        if ts and (now - ts) > max_age_seconds then
+            self.db[mob] = nil
+            self.last_update[mob] = nil
+            pruned = true
+        end
+    end
+    return pruned
 end
 
 
