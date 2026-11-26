@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 _addon.name = 'ChatPorter'
-_addon.version = '1.39'
+_addon.version = '1.40'
 _addon.author = 'Ikonic'
 _addon.commands = {'ChatPorter','cp'}
 
@@ -106,6 +106,14 @@ showffochat = T{}
 
 specialChar = "|"
 lastTellFrom = ""
+
+function expand_auto_translate(str)
+    return (str:gsub('\253....\253', function(code) return '\239\39'..windower.convert_auto_trans(code)..'\239\40' end))
+end
+
+function box_text(str)
+    return (expand_auto_translate(str):strip_colors():trim():gsub('\239\39', '\\cs(40, 255, 40){\\cr'):gsub('\239%(', '\\cs(255, 60, 60)}\\cr'))
+end
 
 playerResolution = T{}
 playerResolution.x = windower.get_windower_settings().x_res
@@ -518,7 +526,7 @@ windower.register_event('ipc message',function (msg)
 			if (chatMode == "l") and (settings.linkshell.displaychat == true) then
 				if (senderLSname ~= LSname) then
 					windower.add_to_chat(settings.linkshell.color,"["..senderLSname.."] <"..senderName.."> "..message)
-					showlinkshell[#showlinkshell +1] = " ["..senderLSname.."] <"..senderName.."> "..message:strip_format().." "
+                    showlinkshell[#showlinkshell +1] = " ["..senderLSname.."] <"..senderName.."> "..box_text(message).." "
 					show("linkshell")
 				end
 			elseif (chatMode == "t") and (settings.tell.displaychat == true) then
@@ -528,7 +536,7 @@ windower.register_event('ipc message',function (msg)
 			elseif (chatMode == "p") and (settings.party.displaychat == true) then
 				if (T(windower.ffxi.get_party()):with('name', senderName) == nil) then
 					windower.add_to_chat(settings.party.color," ("..senderName..") "..message)
-					showparty[#showparty +1] = " ("..senderName..") "..message:strip_format():trim().." "
+                    showparty[#showparty +1] = " ("..senderName..") "..box_text(message).." "
 					show("party")
 				end
 			elseif (chatMode == "l2") then
@@ -573,39 +581,41 @@ windower.register_event('incoming text',function (original, modified, mode)
 	end
 ]]--
 
+    local text = expand_auto_translate(original):strip_colors()
+
 	if (mode == 6) or (mode == 14) or (mode == 213) or (mode == 214) then -- linkshell
-		if (string.find(original:strip_format(), "%[(%d+)%]<(%a+)> (.+)")) then
-			a,b,lsnum,player,message = string.find(original:strip_format(), "%[(%d+)%]<(%a+)> (.+)")
+        if (string.find(text, "%[(%d+)%]<(%a+)> (.+)")) then
+            a,b,lsnum,player,message = string.find(text, "%[(%d+)%]<(%a+)> (.+)")
 			windower.send_ipc_message(specialChar.."l:"..LSname..specialChar..player..specialChar..message)
-			showlinkshell[#showlinkshell +1] = " ["..lsnum.."]<"..player.."> "..message:strip_format():trim().." "
+            showlinkshell[#showlinkshell +1] = " ["..lsnum.."]<"..player.."> "..box_text(message).." "
 			show("linkshell")
 		end
 	elseif (mode == 5) or (mode == 13) then -- party
-		if (string.find(original:strip_format(), "%((%a+)%) (.+)")) then
-			a,b,player,message = string.find(original:strip_format(), "%((%a+)%) (.+)")
+        if (string.find(text, "%((%a+)%) (.+)")) then
+            a,b,player,message = string.find(text, "%((%a+)%) (.+)")
 			windower.send_ipc_message(specialChar.."p:"..""..specialChar..player..specialChar..message)
-			showparty[#showparty +1] = " ("..player..") "..message:strip_format():trim().." "
+            showparty[#showparty +1] = " ("..player..") "..box_text(message).." "
 			show("party")
 		end
 	elseif (mode == 4) or (mode == 12) then -- tell
-		if (string.find(original:strip_format(), ">>(%a+) : (.+)")) then -- incoming
-			a,b,player,message = string.find(original:strip_format(), ">>(%a+) : (.+)")
+        if (string.find(text, ">>(%a+) : (.+)")) then -- incoming
+            a,b,player,message = string.find(text, ">>(%a+) : (.+)")
 			lastTellFrom = player;
 			windower.send_ipc_message(specialChar.."t:"..player..specialChar..playerName..specialChar..message)
-			showtell[#showtell +1] = " >>"..player.." : "..message:strip_format():trim().." "
+            showtell[#showtell +1] = " >>"..player.." : "..box_text(message).." "
 			show("tell")
-		elseif (string.find(original:strip_format(), "(%a+)>> (.+)")) then -- outgoing
-			a,b,player,message = string.find(original:strip_format(), "(%a+)>> (.+)")
+        elseif (string.find(text, "(%a+)>> (.+)")) then -- outgoing
+            a,b,player,message = string.find(text, "(%a+)>> (.+)")
 			windower.send_ipc_message(specialChar.."t:"..playerName..specialChar..player..specialChar..message)
-			showtell[#showtell +1] = " "..player..">> "..message:strip_format():trim().." "
+            showtell[#showtell +1] = " "..player..">> "..box_text(message).." "
 			show("tell")
 		end
 	end
 		
-	if (string.find(original:strip_format(), "%[(%d+):#(%a+)%](.+): (.+)")) then
-		a,b,channum,chanchan,player,message = string.find(original:strip_format(), "%[(%d+):#(%a+)%](.+): (.+)")
+    if (string.find(text, "%[(%d+):#(%a+)%](.+): (.+)")) then
+        a,b,channum,chanchan,player,message = string.find(text, "%[(%d+):#(%a+)%](.+): (.+)")
 --		windower.send_ipc_message(specialChar.."f:"..player..specialChar..playerName..specialChar..message)
-		showffochat[#showffochat +1] = " "..original:strip_format():trim().." "
+        showffochat[#showffochat +1] = " "..box_text(text).." "
 		show("ffochat")
 	end
 
