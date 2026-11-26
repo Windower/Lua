@@ -1,5 +1,5 @@
 --[[
-Craft v1.1.4
+Craft v1.1.5
 
 Copyright © 2017 Mojo
 All rights reserved.
@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 _addon.name     = 'craft'
 _addon.author   = 'Mojo, Recipes provided by BG-Wiki.com'
-_addon.version  = '1.1.3'
+_addon.version  = '1.1.5'
 _addon.commands = {'craft'}
 
 require('chat')
@@ -363,7 +363,8 @@ local function fetch_ingredient(ingredient)
     if exceptions[ingredient] then
         id = exceptions[ingredient]
     else
-        item = res.items:name(ingredient)
+        -- Recipes use English names, so match them in English on any client.
+        local item = res.items:english(ingredient)
         id, name = next(item, nil)
     end
     if id then
@@ -810,25 +811,50 @@ windower.register_event('outgoing chunk', function(id, original, modified, injec
     end
 end)
 
+-- Synthesis results are printed in the client's language (English or Japanese).
+local synth_messages = {
+    english = {
+        made   = 'You synthesized: \30\02%s\30\01.',
+        made_n = 'You synthesized: \30\02%s\30\01 x%d.',
+        failed = 'Your synthesis has failed and your crystal is lost.',
+        lost   = 'You lost: \30\02%s\30\01.',
+    },
+    japanese = {
+        made   = '合成に成功しました：\30\02%s\30\01',
+        made_n = '合成に成功しました：\30\02%s\30\01 x%d',
+        failed = '合成に失敗しました。クリスタルは失われました。',
+        lost   = '失ったアイテム：\30\02%s\30\01',
+    },
+}
+local synth_text = synth_messages[windower.ffxi.get_info().language:lower()] or synth_messages.english
+
+local function synth_say(fmt, ...)
+    windower.add_to_chat(121, windower.to_shift_jis(fmt:format(...)))
+end
+
+local function item_name(id)
+    local item = res.items[id]
+    return item and item.name or tostring(id)
+end
+
 windower.register_event('incoming chunk', function(id, original, modified, injected, blocked)
     if id == 0x06F and injected_synth then
         local p = packets.parse('incoming',original)
         if p['Result'] == 0 or p['Result'] == 2 then
-            local item = res.items[p['Item']].english
             local count = p['Count']
-			if count > 1 then
-				windower.add_to_chat(121, 'You synthesized: \30\02%s\30\01 x%d.':format(item, count))
-			else
-				windower.add_to_chat(121, 'You synthesized: \30\02%s\30\01.':format(item))
-			end
-            injected_synth = false	
+            if count > 1 then
+                synth_say(synth_text.made_n, item_name(p['Item']), count)
+            else
+                synth_say(synth_text.made, item_name(p['Item']))
+            end
+            injected_synth = false
         end
         if p['Result'] == 1 or p['Result'] == 5 then
-            windower.add_to_chat(121,'Your synthesis has failed and your crystal is lost.')
-            for i=1, 8 do 
-                if p['Lost Item '..i] ~= 0 then 
-                    windower.add_to_chat(121, 'You lost: \30\02%s\30\01.':format(res.items[p['Lost Item '..i]].english)) 
-                end 
+            synth_say(synth_text.failed)
+            for i=1, 8 do
+                if p['Lost Item '..i] ~= 0 then
+                    synth_say(synth_text.lost, item_name(p['Lost Item '..i]))
+                end
             end
             injected_synth = false
         end
